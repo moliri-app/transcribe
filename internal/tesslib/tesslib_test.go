@@ -10,9 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/moliri-app/transcribe/internal/models"
-	"github.com/moliri-app/transcribe/internal/ocr"
-	"github.com/moliri-app/transcribe/internal/ocr/ocrtest"
+	"github.com/moliri-app/transcribe/internal/setup"
+	"github.com/moliri-app/transcribe/ocr"
+	"github.com/moliri-app/transcribe/ocr/ocrtest"
 )
 
 // TestTestSetLibrary downloads the library and models on first use, as the app does, into
@@ -23,15 +23,15 @@ func TestTestSetLibrary(t *testing.T) {
 	if dir == "" {
 		t.Skip("TRANSCRIBE_OCR_DATA not set")
 	}
-	if !models.TesseractLibSupported() {
+	if !setup.TesseractLibSupported() {
 		t.Skip("no Tesseract download on this platform")
 	}
 	lib := New(dir)
 	tess := &ocr.Tesseract{
-		TessData:     models.TesseractDataDir(dir),
+		TessData:     setup.TesseractDataDir(dir),
 		Lib:          lib,
-		Downloadable: models.TesseractModels(),
-		Fetch:        func(ctx context.Context, m string) error { return models.FetchTesseractModel(ctx, dir, m) },
+		Downloadable: setup.TesseractModels(),
+		Fetch:        func(ctx context.Context, m string) error { return setup.FetchTesseractModel(ctx, dir, m) },
 	}
 	reg := ocr.NewRegistry("desktop", tess)
 	if info := tess.Info(); !info.Usable || info.Boxes != "words" {

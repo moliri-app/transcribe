@@ -17,7 +17,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/moliri-app/transcribe/internal/ocr"
+	"github.com/moliri-app/transcribe/ocr"
 )
 
 // system is the text recognition of one operating system.

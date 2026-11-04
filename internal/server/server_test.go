@@ -14,7 +14,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/moliri-app/transcribe/internal/jobs"
+	"github.com/moliri-app/transcribe/internal/queue"
+	"github.com/moliri-app/transcribe/jobs"
 )
 
 func newServer(t *testing.T) (*Server, string) {
@@ -202,7 +203,7 @@ func TestUploadAndQueue(t *testing.T) {
 	if w.Code != 200 || !strings.Contains(w.Body.String(), `"added":1`) {
 		t.Fatalf("add: %d %s", w.Code, w.Body)
 	}
-	var q struct{ Jobs []jobs.Job }
+	var q struct{ Jobs []queue.Job }
 	_ = json.Unmarshal(do(s, "GET", "/api/queue", "", nil).Body.Bytes(), &q)
 	if len(q.Jobs) != 1 || q.Jobs[0].Options.Speakers != 2 {
 		t.Fatalf("queue: %+v", q)

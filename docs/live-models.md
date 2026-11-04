@@ -4,7 +4,7 @@
 
 German has since moved to Kroko for the preview and Parakeet for the final text: last section.
 
-`internal/pipeline/live.go`: Silero VAD cuts the arriving audio into utterances (at most 15 s). The
+`pipeline/live.go`: Silero VAD cuts the arriving audio into utterances (at most 15 s). The
 open utterance is decoded again from its start every 0.4 s of new audio for the preview, and once
 more when it ends for the final text. Both use an offline (non-streaming) model on 4 CPU threads:
 
@@ -18,7 +18,7 @@ German and re-recognises marked passages; base identifies the language.
 
 ## Measurement
 
-`internal/sherpa/livebench_test.go` (opt-in, see its header). Machine: Intel i9-11950H, CPU only,
+`sherpa/livebench_test.go` (opt-in, see its header). Machine: Intel i9-11950H, CPU only,
 4 threads, sherpa-onnx 1.13.8, int8 models, greedy search. WER is case- and punctuation-insensitive;
 numbers written as words count as errors against digits in the reference.
 
@@ -71,7 +71,7 @@ recording, origin not recorded) has 7.4 % WER.
 Limits: one conversation (two speakers, Hochdeutsch), no dialect, CPU only. FLEURS may have been
 part of some models' training data.
 
-Using a streaming model needs the sherpa-onnx online recognizer in `internal/sherpa` (the test
+Using a streaming model needs the sherpa-onnx online recognizer in `sherpa` (the test
 holds a working binding for 1.13.8) and a streaming variant of `liveStream`.
 
 ## Second pass after a recording (October 2026)
@@ -91,17 +91,17 @@ lines after whole sentences; the text step of the full pipeline does none of tha
 worse than Live with Parakeet. Running the live stream again with Parakeet gains nothing for
 `auto` (that is what Live does already; more context or a longer hold changed it by a few tenths),
 but cuts the errors of `de` to a quarter. So only notes in `de` get a second pass
-(`internal/pipeline/refine.go`): the live stream with Parakeet over the whole recording, about half
+(`pipeline/refine.go`): the live stream with Parakeet over the whole recording, about half
 a second of computing per second of audio on this CPU (on a busy machine). The full pipeline's
 text step has since learnt from the live stream (next section).
 
 ## The full pipeline's text step decodes as Live does (October 2026)
 
-`Engine.Transcribe` (`internal/pipeline/engine.go`) no longer decodes Silero pieces of at most
+`Engine.Transcribe` (`pipeline/engine.go`) no longer decodes Silero pieces of at most
 15 s without context: it runs the whole recording through the live stream with Parakeet
 (`decodeStream`, `liveTune`: context, gain, seamless cuts, held sentences), splits its lines at
 the speaker turns afterwards and keeps the German check (`deFallback`) and Whisper turbo for the
-gaps (`fillGaps`). Measured with `TestFileBench` (`internal/pipeline/file_bench_test.go`) on the
+gaps (`fillGaps`). Measured with `TestFileBench` (`pipeline/file_bench_test.go`) on the
 excerpts of `TestLiveBench`, both together, WER clean / headset, with the speakers the full
 pipeline finds (DiarizeAHC2, number found), the computing time of the text step per second of
 audio (on a busy machine):
@@ -128,7 +128,7 @@ audio (on a busy machine):
 ## The user's own words: hotwords (October 2026)
 
 „Meine Stimme“ on the Live page keeps a list of the user's own words (names, terms) that live
-transcription should write as they are written (`internal/pipeline/voice.go`). sherpa-onnx can
+transcription should write as they are written (`pipeline/voice.go`). sherpa-onnx can
 favour words while decoding (hotwords, with modified beam search instead of greedy search). Both
 NeMo transducers accept them; what they need is a vocabulary to split a hotword into the model's
 tokens, which the model folders do not have (no `bpe.vocab`). It is made from `tokens.txt` when the
@@ -136,7 +136,7 @@ recognizer is created: `modeling_unit` `bpe` splits a word into the pieces of hi
 and a piece scores as a Zipf distribution gives it by its rank in `tokens.txt` (`-ln rank`); with
 the id as score instead, the German model split „Moliri“ into single letters and got worse.
 
-`TestHotwords` (`internal/sherpa/hotwords_test.go`) on six sentences synthesised with Windows'
+`TestHotwords` (`sherpa/hotwords_test.go`) on six sentences synthesised with Windows'
 voices (German Hedda, English Zira) with „Moliri“, „Obeya“ and „sherpa-onnx“:
 
 - Greedy, Parakeet wrote „Moliri“ right but „Ubaya“, „Obaier“ for „Obeya“ and „Chopperons“,
@@ -170,7 +170,7 @@ their spelling.
 ## German live: Kroko for the preview, Parakeet for the final text (October 2026)
 
 With the language set to German, Live no longer uses the German FastConformer
-(`internal/pipeline/livekroko.go`): Kroko's streaming Zipformer hears the speech as it comes, and
+(`pipeline/livekroko.go`): Kroko's streaming Zipformer hears the speech as it comes, and
 its running result is the preview; Parakeet's live stream (`liveStream`, as for any other
 language, without its preview) runs beside it on the same audio in a goroutine of its own and gives
 the final text, which replaces Kroko's words of that utterance. Its doubtful utterances (a cough, a
@@ -178,7 +178,7 @@ word or two it is unsure of, what sounds English) are checked with Kroko, as the
 checked them before. Without Parakeet (not downloaded, or it fails to load), each stretch of speech
 Kroko heard is a final of its own. Both models are downloaded on demand; Kroko is 54 MB.
 
-`TestLiveBench` (`internal/pipeline/live_bench_test.go`, both excerpts together, WER clean /
+`TestLiveBench` (`pipeline/live_bench_test.go`, both excerpts together, WER clean /
 headset, on a machine kept busy by other programs):
 
 | | WER | Lines (ending a sentence) | Computing per second of audio |

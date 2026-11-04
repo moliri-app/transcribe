@@ -80,7 +80,7 @@ there yet). Errors are
 ## Result, format 1
 
 Every engine and every place (this app, Moliri's server service, the browser, an AI service through
-Moliri) gives the same format; the schema is [`internal/ocr/format.schema.json`](../internal/ocr/format.schema.json),
+Moliri) gives the same format; the schema is [`ocr/format.schema.json`](../ocr/format.schema.json),
 served at `/api/ocr/schema`. Readers refuse a `format` they do not know.
 
 ```json
@@ -210,8 +210,8 @@ and macOS the tesseract program of the system reads with its own models
 PP-OCRv5 (`onnx`) is PaddleOCR's text detection and its recognition of Latin script, the mobile
 models as RapidOCR 3.10 publishes them in ONNX, downloaded on first use into `<data>/ppocr` and pinned
 by checksum. They run on the ONNX Runtime that comes with speech recognition (`<data>/lib`, or
-`<data>/lib-cuda` on the graphics card), called through its C API with purego (`internal/ort`);
-pre- and post-processing are RapidOCR's, in Go (`internal/ocr/ppocr*.go`). Detection finds the
+`<data>/lib-cuda` on the graphics card), called through its C API with purego (`ort`);
+pre- and post-processing are RapidOCR's, in Go (`ocr/ppocr*.go`). Detection finds the
 lines, recognition reads them, the columns where its characters fall give the word boxes. Pieces of
 one row (a label and its value on an index card) become one line; a larger gap between lines starts
 a paragraph. The layout option makes no difference to it.
@@ -220,7 +220,7 @@ a paragraph. The layout option makes no difference to it.
 
 `go test ./internal/ocrapi` checks the AI service against fakes of the three interfaces (request
 shape, headers, image part, answers, errors) and the reading of answers against Moliri's
-expectations. `go test ./internal/ocr/...` checks the format, the schema and the engine list; with the tesseract
+expectations. `go test ./ocr/...` checks the format, the schema and the engine list; with the tesseract
 program installed it also reads the test set (`testdata/ocr`, the same as Moliri's
 `server/transcribe/testdata/ocr`). On Windows the library reads it with
 `TRANSCRIBE_OCR_DATA=<folder> go test ./internal/tesslib`, which downloads Tesseract and the models into
@@ -236,7 +236,7 @@ that folder first, as the app does. Measured on 2026-11-02 (Tesseract 5.0.0 from
 The same as the server's Tesseract 5.3 (2.4 %, 2.4 %, 0.0 %, 1.5 %).
 
 PP-OCRv5 reads the test set with `TRANSCRIBE_ORT_LIB=<data>/lib TRANSCRIBE_OCR_MODELS=<data>/ppocr go
-test ./internal/ocr` (with `TRANSCRIBE_ORT_CUDA=1` and `<data>/lib-cuda` on the graphics card).
+test ./ocr` (with `TRANSCRIBE_ORT_CUDA=1` and `<data>/lib-cuda` on the graphics card).
 Measured on 2026-11-03, the same on CPU and GPU:
 
 | Image | Character errors | Words found |

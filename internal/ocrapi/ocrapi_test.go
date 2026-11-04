@@ -25,7 +25,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/moliri-app/transcribe/internal/ocr"
+	"github.com/moliri-app/transcribe/ocr"
 )
 
 // service is a fake AI service: it keeps the requests and answers with the next of its answers.

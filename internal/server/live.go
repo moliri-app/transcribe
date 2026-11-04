@@ -20,9 +20,9 @@ import (
 
 	"github.com/coder/websocket"
 
-	"github.com/moliri-app/transcribe/internal/jobs"
 	"github.com/moliri-app/transcribe/internal/live"
 	"github.com/moliri-app/transcribe/internal/prefs"
+	"github.com/moliri-app/transcribe/jobs"
 )
 
 // Live transcription for other programs (protocol in docs/live-api.md) and the Live page.

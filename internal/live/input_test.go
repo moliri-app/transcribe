@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/moliri-app/transcribe/internal/audio"
+	"github.com/moliri-app/transcribe/audio"
 )
 
 // feed hands sound to the check in pieces of 100 ms, all of it speech, and gives its last verdict.
@@ -68,7 +68,7 @@ func TestInputCheck(t *testing.T) {
 	}
 }
 
-// With the live bench (see TestLiveBench in internal/pipeline): the clean recording passes, the
+// With the live bench (see TestLiveBench in pipeline): the clean recording passes, the
 // headset one is narrow.
 func TestInputCheckBench(t *testing.T) {
 	bench := os.Getenv("TRANSCRIBE_LIVE_BENCH")

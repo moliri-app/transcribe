@@ -15,10 +15,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/moliri-app/transcribe/internal/jobs"
 	"github.com/moliri-app/transcribe/internal/live"
-	"github.com/moliri-app/transcribe/internal/ocr"
 	"github.com/moliri-app/transcribe/internal/prefs"
+	"github.com/moliri-app/transcribe/jobs"
+	"github.com/moliri-app/transcribe/ocr"
 )
 
 // ocrFake reads every image as one line and remembers what it was given.

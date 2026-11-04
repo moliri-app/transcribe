@@ -20,7 +20,7 @@ import (
 	_ "golang.org/x/image/tiff"
 	_ "golang.org/x/image/webp"
 
-	"github.com/moliri-app/transcribe/internal/ocr"
+	"github.com/moliri-app/transcribe/ocr"
 )
 
 // MaxSide is the longest side of the image sent, as Moliri sends it (measured in Moliri's

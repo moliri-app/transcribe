@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/moliri-app/transcribe/internal/fileutil"
+	"github.com/moliri-app/transcribe/fileutil"
 )
 
 // Kinds of notes.

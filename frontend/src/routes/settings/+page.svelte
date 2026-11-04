@@ -323,7 +323,7 @@
 	let gelesen = $state(null);
 	let ocrFehler = $state('');
 
-	/** die Modelle von Tesseract mit Namen (internal/models/status.go) */
+	/** die Modelle von Tesseract mit Namen (models/status.go) */
 	const OCR_SPRACHEN = /** @type {Record<string, string>} */ ({
 		deu: 'Deutsch',
 		eng: 'Englisch',
@@ -342,7 +342,7 @@
 		nor: 'Norwegisch',
 		rus: 'Russisch'
 	});
-	/** was jede Erkennung gut kann (internal/ocr) */
+	/** was jede Erkennung gut kann (ocr) */
 	const OCR_LESER = /** @type {Record<string, string>} */ ({
 		tesseract: 'Liest Druck und Schreibmaschine, mit eigenen Modellen für Fraktur.',
 		onnx: 'Liest gedruckte lateinische Schrift sehr genau, auch Karteikarten und Listen, und kennt die Lage jedes Worts; auf der Grafikkarte schnell. Für Fraktur ist Tesseract besser.',

@@ -12,8 +12,8 @@ import (
 	"os"
 
 	"github.com/moliri-app/transcribe/internal/live"
-	"github.com/moliri-app/transcribe/internal/ocr"
 	"github.com/moliri-app/transcribe/internal/prefs"
+	"github.com/moliri-app/transcribe/ocr"
 )
 
 // Text recognition (OCR) for other programs (docs/ocr-api.md): POST /api/ocr reads an image,

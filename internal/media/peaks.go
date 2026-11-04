@@ -14,8 +14,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/moliri-app/transcribe/internal/fileutil"
-	"github.com/moliri-app/transcribe/internal/proc"
+	"github.com/moliri-app/transcribe/fileutil"
+	"github.com/moliri-app/transcribe/proc"
 )
 
 const (

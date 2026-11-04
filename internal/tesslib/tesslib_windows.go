@@ -18,8 +18,8 @@ import (
 
 	"github.com/ebitengine/purego"
 
-	"github.com/moliri-app/transcribe/internal/models"
-	"github.com/moliri-app/transcribe/internal/ocr"
+	"github.com/moliri-app/transcribe/internal/setup"
+	"github.com/moliri-app/transcribe/ocr"
 )
 
 // The C API of Tesseract (tesseract/capi.h) and the two Leptonica calls that read an image.
@@ -59,11 +59,11 @@ func load(dir string) (string, error) {
 			syscall.SyscallN(p, uintptr(unsafe.Pointer(d)))
 		}
 	}
-	lept, err := syscall.LoadLibrary(filepath.Join(dir, models.TesseractLibFiles[0]))
+	lept, err := syscall.LoadLibrary(filepath.Join(dir, setup.TesseractLibFiles[0]))
 	if err != nil {
 		return "", fmt.Errorf("leptonica: %w", err)
 	}
-	tess, err := syscall.LoadLibrary(filepath.Join(dir, models.TesseractLibFiles[1]))
+	tess, err := syscall.LoadLibrary(filepath.Join(dir, setup.TesseractLibFiles[1]))
 	if err != nil {
 		return "", fmt.Errorf("tesseract: %w", err)
 	}

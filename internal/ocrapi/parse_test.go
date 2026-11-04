@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/moliri-app/transcribe/internal/ocr"
+	"github.com/moliri-app/transcribe/ocr"
 )
 
 // The expectations of Moliri's tests/php/ai_ocr.test.php, so both places read a model's answer alike.

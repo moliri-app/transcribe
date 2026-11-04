@@ -245,7 +245,7 @@ reads)
   Converted to ONNX and published by RapidOCR (Apache License 2.0, RapidAI),
   https://github.com/RapidAI/RapidOCR, from
   https://www.modelscope.cn/models/RapidAI/RapidOCR (v3.10.0, onnx/PP-OCRv5/).
-  The pre- and post-processing in internal/ocr/ppocr*.go follows RapidOCR's
+  The pre- and post-processing in ocr/ppocr*.go follows RapidOCR's
   Python code (ch_ppocr_det, ch_ppocr_rec, cal_rec_boxes), rewritten in Go.
 
 

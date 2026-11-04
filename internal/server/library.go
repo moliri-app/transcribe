@@ -15,8 +15,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/moliri-app/transcribe/internal/fileutil"
-	"github.com/moliri-app/transcribe/internal/model"
+	"github.com/moliri-app/transcribe/fileutil"
+	"github.com/moliri-app/transcribe/model"
 )
 
 // The library page shows each transcribed recording with what it holds: how long, who speaks,

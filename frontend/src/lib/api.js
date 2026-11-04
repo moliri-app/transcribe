@@ -51,7 +51,7 @@ export const MEDIA = /\.(mp3|wav|m4a|ogg|opus|flac|aac|wma|mp4|m4v|mov|webm|mkv|
  */
 
 /**
- * Die frühere Voreinstellung legte nur die Zahl der Sprecher fest (internal/pipeline/run.go: presets);
+ * Die frühere Voreinstellung legte nur die Zahl der Sprecher fest (pipeline/run.go: presets);
  * gespeicherte Vorgaben ohne Sprecherzahl bekommen sie daraus.
  * @param {string} preset @param {number} speakers
  */

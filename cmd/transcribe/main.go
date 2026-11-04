@@ -25,10 +25,10 @@ import (
 
 	"github.com/moliri-app/transcribe/internal/autostart"
 	"github.com/moliri-app/transcribe/internal/media"
-	"github.com/moliri-app/transcribe/internal/models"
-	"github.com/moliri-app/transcribe/internal/pipeline"
 	"github.com/moliri-app/transcribe/internal/prefs"
+	"github.com/moliri-app/transcribe/internal/runner"
 	"github.com/moliri-app/transcribe/internal/server"
+	"github.com/moliri-app/transcribe/internal/setup"
 	"github.com/moliri-app/transcribe/internal/update"
 )
 
@@ -114,13 +114,13 @@ func main() {
 		}
 	}
 	media.SetDataDir(*data)
-	pl := &pipeline.Runner{DataDir: *data}
+	pl := runner.New(*data)
 	upd := newUpdater(exe)
 	srv := server.New(server.Config{DataDir: *data, Runner: pl.Run, Retranscriber: pl, Threads: *threads, Live: pl.OpenLive, Warmer: pl,
 		OCR: ocrEngines(*data, pl), Updater: upd})
 	srv.Live.Warm() // while the live mode is on, recognition is loaded once it can be
 	go func() {
-		if err := models.EnsureAll(context.Background(), *data, prefs.Load(*data).UsesModels()); err != nil {
+		if err := setup.EnsureAll(context.Background(), *data, prefs.Load(*data).UsesModels()); err != nil {
 			log.Println("setup:", err)
 		}
 		srv.Live.Warm() // on the first start, the models it needs have only just come

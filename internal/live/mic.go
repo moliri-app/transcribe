@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/moliri-app/transcribe/internal/media"
-	"github.com/moliri-app/transcribe/internal/proc"
+	"github.com/moliri-app/transcribe/proc"
 )
 
 // The app records the microphone through ffmpeg: DirectShow on Windows, PulseAudio on Linux,

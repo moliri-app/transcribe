@@ -14,8 +14,9 @@ import (
 	"runtime"
 
 	"github.com/moliri-app/transcribe/internal/media"
-	"github.com/moliri-app/transcribe/internal/models"
-	"github.com/moliri-app/transcribe/internal/proc"
+	"github.com/moliri-app/transcribe/internal/setup"
+	"github.com/moliri-app/transcribe/models"
+	"github.com/moliri-app/transcribe/proc"
 )
 
 // dataFolders are the folders the settings page may open in the file manager.
@@ -38,7 +39,7 @@ func (s *Server) settings(w http.ResponseWriter, r *http.Request) {
 	folders := []map[string]any{}
 	for _, f := range dataFolders {
 		p, _ := s.folderPath(f.key)
-		folders = append(folders, map[string]any{"key": f.key, "path": p, "size": models.DirSize(p)})
+		folders = append(folders, map[string]any{"key": f.key, "path": p, "size": setup.DirSize(p)})
 	}
 	items, ready := models.Snapshot()
 	downloading := false
@@ -56,7 +57,7 @@ func (s *Server) settings(w http.ResponseWriter, r *http.Request) {
 		"ready":       ready,
 		"downloading": downloading,
 		"folders":     folders,
-		"components":  models.Info(abs, media.Tool("ffmpeg")),
+		"components":  setup.Info(abs, media.Tool("ffmpeg")),
 	})
 }
 
@@ -72,7 +73,7 @@ func (s *Server) settingsDownload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	known := false
-	for _, c := range models.Info(s.cfg.DataDir, "") {
+	for _, c := range setup.Info(s.cfg.DataDir, "") {
 		known = known || c.Name == body.Name
 	}
 	if !known {
@@ -80,7 +81,7 @@ func (s *Server) settingsDownload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	go func() {
-		if models.Download(context.Background(), s.cfg.DataDir, body.Name) == nil && body.Name == "nvidia" {
+		if setup.Download(context.Background(), s.cfg.DataDir, body.Name) == nil && body.Name == "nvidia" {
 			cachedGPU(s.cfg.DataDir, true) // the libraries are there now
 		}
 	}()

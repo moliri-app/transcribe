@@ -16,7 +16,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/moliri-app/transcribe/internal/ocr"
+	"github.com/moliri-app/transcribe/ocr"
 )
 
 // New gives the engine "os" with Windows.Media.Ocr (Windows 10 and later), through the Windows

@@ -10,7 +10,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/moliri-app/transcribe/internal/models"
+	"github.com/moliri-app/transcribe/internal/setup"
 )
 
 // Lib loads the library from the app's data directory, downloading it first when it is missing.
@@ -26,7 +26,7 @@ type Lib struct {
 
 func New(dataDir string) *Lib { return &Lib{DataDir: dataDir} }
 
-func (l *Lib) Installed() bool { return models.TesseractLibInstalled(l.DataDir) }
+func (l *Lib) Installed() bool { return setup.TesseractLibInstalled(l.DataDir) }
 
 func (l *Lib) Version() string {
 	l.mu.Lock()
@@ -35,7 +35,7 @@ func (l *Lib) Version() string {
 }
 
 func (l *Lib) Load(ctx context.Context) error {
-	if err := models.EnsureTesseractLib(ctx, l.DataDir); err != nil {
+	if err := setup.EnsureTesseractLib(ctx, l.DataDir); err != nil {
 		return err
 	}
 	l.mu.Lock()
@@ -43,7 +43,7 @@ func (l *Lib) Load(ctx context.Context) error {
 	if l.loaded {
 		return nil
 	}
-	v, err := load(models.TesseractLibDir(l.DataDir))
+	v, err := load(setup.TesseractLibDir(l.DataDir))
 	if err != nil {
 		return err
 	}

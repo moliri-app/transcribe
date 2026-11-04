@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/moliri-app/transcribe/internal/ocr"
+	"github.com/moliri-app/transcribe/ocr"
 )
 
 type fakeSystem struct {

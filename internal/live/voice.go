@@ -7,7 +7,7 @@ package live
 import "github.com/moliri-app/transcribe/internal/prefs"
 
 // „Meine Stimme“ on the Live page: the user's own words and spoken punctuation
-// (internal/pipeline/voice.go). Both count from the next recording on.
+// (pipeline/voice.go). Both count from the next recording on.
 
 func voiceMsg(p prefs.Prefs) map[string]any {
 	words := p.LiveWords

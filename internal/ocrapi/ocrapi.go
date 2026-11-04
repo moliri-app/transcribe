@@ -6,7 +6,7 @@
 // interfaces (OpenAI-compatible chat completions, Anthropic Messages, Gemini generateContent),
 // with the user's own key from the app's settings. Prompt and the reading of the answer are those
 // of Moliri's server path (static/api/_func/ai_ocr.php), so both places give the same result:
-// lines with a box in pixels of the image, words without boxes (format 1, internal/ocr).
+// lines with a box in pixels of the image, words without boxes (format 1, ocr).
 //
 // The engine is chosen only by name or as the app's default (ocr.ByChoice): it costs money and the
 // image leaves the computer.
@@ -21,8 +21,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/moliri-app/transcribe/internal/ocr"
 	"github.com/moliri-app/transcribe/internal/prefs"
+	"github.com/moliri-app/transcribe/ocr"
 )
 
 // The interfaces a service speaks.

@@ -15,8 +15,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/moliri-app/transcribe/internal/ocr"
-	"github.com/moliri-app/transcribe/internal/ocr/ocrtest"
+	"github.com/moliri-app/transcribe/ocr"
+	"github.com/moliri-app/transcribe/ocr/ocrtest"
 )
 
 // TestWindows reads the OCR test set with the recognizer of this Windows, when German is

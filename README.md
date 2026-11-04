@@ -174,6 +174,32 @@ Auf Linux und macOS baut `go build ./cmd/transcribe` ein Programm für die jewei
 Ein Tag `v*` baut über die GitHub-Action `.github/workflows/release.yml` Oberfläche und Windows-EXE
 und hängt die EXE an den Release des Tags.
 
+### Die Erkennung als Go-Modul
+
+Die Erkennung selbst (die Engine) liegt in Paketen des Moduls `github.com/moliri-app/transcribe`, die
+andere Programme importieren können. Moliris Server-Dienst nimmt sie so, fest auf eine Version
+(`go get github.com/moliri-app/transcribe@vX.Y.Z`, dann `go mod vendor`).
+
+| Paket | Inhalt |
+|---|---|
+| `pipeline` | eine Aufnahme erkennen: Geräusche, Sprecher, Text, Korrekturen (`Runner.Run`); Stellen neu erkennen (`Retranscribe`); Live-Streams (`OpenLive`) |
+| `annotate` | die Korrekturen auf das Maschinenergebnis legen (`Apply`) |
+| `export` | TXT, VTT, HTML und der Text von Clips |
+| `model` | die JSON-Formen (`_machine.json`, `_final.json`, `model.Result`) |
+| `models` | Modelle und Laufzeit finden und laden; `Set.Offline` lädt nie nach |
+| `sherpa` | sherpa-onnx über purego |
+| `audio` | Dekodieren mit ffmpeg |
+| `ocr`, `ort` | Texterkennung im Format 1: Tesseract als Programm, PP-OCRv5 über onnxruntime; Testsatz in `ocr/ocrtest` |
+| `jobs` | Optionen und Fortschritt eines Auftrags |
+| `stream` | was ein Live-Stream liefert, gesprochene Satzzeichen |
+| `fileutil`, `proc` | Hilfen |
+
+Diese Pakete hängen von nichts aus `internal/` ab und bauen ohne C-Compiler auch für Linux
+(`CGO_ENABLED=0 GOOS=linux go build ./pipeline ./ocr/...`); `TestEngineStandsOnItsOwn` in
+`pipeline` prüft beides. Was nur die App braucht (Fenster, Einstellungen, Download von GPU-Laufzeit
+und ffmpeg, Mikrofon, Warteschlange, Ablage in `data/results`), liegt in `internal/`;
+`internal/runner` bindet die Engine an den Datenordner und die Einstellungen.
+
 ### Oberfläche
 
 Die Oberfläche ist eine SvelteKit-App in `frontend/`. `pnpm build` schreibt sie nach `web/dist`, das

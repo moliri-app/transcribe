@@ -12,8 +12,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/moliri-app/transcribe/internal/jobs"
-	"github.com/moliri-app/transcribe/internal/pipeline"
+	"github.com/moliri-app/transcribe/internal/runner"
+	"github.com/moliri-app/transcribe/jobs"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 	if *data == "" || flag.NArg() != 1 {
 		log.Fatal("usage: tx -data DIR audiofile (a name inside DIR/audio)")
 	}
-	r := &pipeline.Runner{DataDir: *data}
+	r := runner.New(*data)
 	t0 := time.Now()
 	err := r.Run(context.Background(), *data, flag.Arg(0), jobs.Options{Preset: *preset, Speakers: *speakers, Language: *lang, Threads: *threads},
 		func(step, total int, label string) {

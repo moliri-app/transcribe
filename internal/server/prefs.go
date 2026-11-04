@@ -13,12 +13,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/moliri-app/transcribe/internal/jobs"
-	"github.com/moliri-app/transcribe/internal/models"
 	"github.com/moliri-app/transcribe/internal/ocrapi"
 	"github.com/moliri-app/transcribe/internal/prefs"
-	"github.com/moliri-app/transcribe/internal/sherpa"
+	"github.com/moliri-app/transcribe/internal/setup"
 	"github.com/moliri-app/transcribe/internal/sttapi"
+	"github.com/moliri-app/transcribe/jobs"
+	"github.com/moliri-app/transcribe/models"
+	"github.com/moliri-app/transcribe/sherpa"
 )
 
 // prefsView is the stored defaults as the pages see them: the API keys only as their last
@@ -151,7 +152,7 @@ func (s *Server) prefsAPI(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad request", 400)
 		return
 	}
-	if in.Accel != nil && *in.Accel == "cuda" && models.FindLib(models.CudaLibDir(s.cfg.DataDir)) == "" {
+	if in.Accel != nil && *in.Accel == "cuda" && models.FindLib(setup.CudaLibDir(s.cfg.DataDir)) == "" {
 		fail(w, 400, "Die GPU-Runtime ist noch nicht heruntergeladen.")
 		return
 	}
@@ -225,7 +226,7 @@ func (s *Server) prefsAPI(w http.ResponseWriter, r *http.Request) {
 	if p.UsesModels() && !before.UsesModels() {
 		// the models may be used again: fetch what is missing, as on the first start
 		go func() {
-			if err := models.EnsureAll(context.Background(), s.cfg.DataDir, true); err != nil {
+			if err := setup.EnsureAll(context.Background(), s.cfg.DataDir, true); err != nil {
 				log.Println("setup:", err)
 			}
 		}()
@@ -235,16 +236,16 @@ func (s *Server) prefsAPI(w http.ResponseWriter, r *http.Request) {
 
 var (
 	gpuMu    sync.Mutex
-	gpuCache models.GPU
+	gpuCache setup.GPU
 	gpuAt    time.Time
 )
 
 // cachedGPU detects the GPU at most once a minute, or now if fresh.
-func cachedGPU(dataDir string, fresh bool) models.GPU {
+func cachedGPU(dataDir string, fresh bool) setup.GPU {
 	gpuMu.Lock()
 	defer gpuMu.Unlock()
 	if fresh || time.Since(gpuAt) > time.Minute {
-		gpuCache, gpuAt = models.DetectGPU(dataDir), time.Now()
+		gpuCache, gpuAt = setup.DetectGPU(dataDir), time.Now()
 	}
 	return gpuCache
 }
@@ -252,7 +253,7 @@ func cachedGPU(dataDir string, fresh bool) models.GPU {
 // gpuAPI reports the GPU state: what was found, what is installed and what the runtime currently uses.
 func (s *Server) gpuAPI(w http.ResponseWriter, r *http.Request) {
 	p := prefs.Load(s.cfg.DataDir)
-	installed := models.FindLib(models.CudaLibDir(s.cfg.DataDir)) != ""
+	installed := models.FindLib(setup.CudaLibDir(s.cfg.DataDir)) != ""
 	g := cachedGPU(s.cfg.DataDir, r.URL.Query().Get("fresh") != "")
 	active := "cpu"
 	if sherpa.Loaded() {
@@ -298,7 +299,7 @@ func (s *Server) gpuChoice(enable bool) http.HandlerFunc {
 			return
 		}
 		go func() {
-			err := models.SetUpGPU(context.Background(), s.cfg.DataDir, !g.Ready)
+			err := setup.SetUpGPU(context.Background(), s.cfg.DataDir, !g.Ready)
 			if !g.Ready {
 				cachedGPU(s.cfg.DataDir, true)
 			}

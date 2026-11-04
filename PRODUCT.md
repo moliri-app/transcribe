@@ -25,7 +25,7 @@ Starke Automatik ohne Zutun, gekoppelt an eine Korrekturschicht, die von der Mas
 ## Operating Context
 
 - Go-App „Transcribe by Moliri“ (`cmd/transcribe`, portable Windows-EXE mit eingebetteter Oberfläche); läuft lokal bzw. auf einem CPU-vServer, Oberfläche im Browser bzw. App-Fenster: Bibliothek (Startseite, mit den laufenden Aufträgen), Editor, Live und Einstellungen als SvelteKit-Oberfläche aus `frontend/`.
-- Pipeline in Go (`internal/pipeline`, einmalig per `cmd/tx`) mit `--speakers`, `--language`, `--quality` und Presets (auto, interview, gespraech, vortrag, musik), die nur die Sprecherzahl festlegen; die Oberfläche bietet deshalb nur Sprecher und Sprachen an.
+- Pipeline in Go (`pipeline`, einmalig per `cmd/tx`) mit `--speakers`, `--language`, `--quality` und Presets (auto, interview, gespraech, vortrag, musik), die nur die Sprecherzahl festlegen; die Oberfläche bietet deshalb nur Sprecher und Sprachen an.
 - Ergebnisse je Aufnahme in `results/<datei>/`: `_machine.json` (Maschine), `_annotations.json` (Menschen), `_final.json` (zusammengeführt), Versionen in `_annotations_history/`.
 - Material: lange Aufnahmen (bis über 75 Minuten), Mundart, Plattdeutsch, mehrsprachige Passagen, Musik und Applaus.
 

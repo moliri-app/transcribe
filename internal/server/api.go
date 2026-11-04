@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/moliri-app/transcribe/internal/models"
 	"io"
 	"net/http"
 	"os"
@@ -17,11 +16,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/moliri-app/transcribe/internal/annotate"
-	"github.com/moliri-app/transcribe/internal/export"
-	"github.com/moliri-app/transcribe/internal/fileutil"
-	"github.com/moliri-app/transcribe/internal/jobs"
+	"github.com/moliri-app/transcribe/models"
+
+	"github.com/moliri-app/transcribe/annotate"
+	"github.com/moliri-app/transcribe/export"
+	"github.com/moliri-app/transcribe/fileutil"
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/queue"
+	"github.com/moliri-app/transcribe/internal/results"
+	"github.com/moliri-app/transcribe/jobs"
 )
 
 // pyQuote mirrors Python's urllib.parse.quote (safe="/").
@@ -99,7 +102,7 @@ func (s *Server) buildIndex() []map[string]any {
 			"name": name, "stem": stem, "url": "audio/" + pyQuote(name),
 			"video":   media.HasVideo(filepath.Join(s.audioDir(), name)),
 			"engines": engines, "speakers": variants(rdir, stem, "speakers"), "events": variants(rdir, stem, "events"),
-			"added":   added(filepath.Join(s.audioDir(), name)),
+			"added": added(filepath.Join(s.audioDir(), name)),
 		}
 		if sum, ok := summarize(rdir); ok {
 			item["summary"] = sum
@@ -166,8 +169,8 @@ func (s *Server) export(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad format", 400)
 		return
 	}
-	body, ctype, name, err := export.Export(s.cfg.DataDir, stem, format)
-	if errors.Is(err, export.ErrNoTranscript) {
+	body, ctype, name, err := results.Export(s.cfg.DataDir, stem, format)
+	if errors.Is(err, results.ErrNoTranscript) {
 		http.Error(w, "no transcript yet", 404)
 		return
 	} else if err != nil {
@@ -196,8 +199,8 @@ func (s *Server) clipExport(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad format", 400)
 		return
 	}
-	final, ann, err := export.Load(s.cfg.DataDir, stem)
-	if errors.Is(err, export.ErrNoTranscript) {
+	final, ann, err := results.Load(s.cfg.DataDir, stem)
+	if errors.Is(err, results.ErrNoTranscript) {
 		http.Error(w, "no transcript yet", 404)
 		return
 	} else if err != nil {
@@ -345,7 +348,7 @@ func (s *Server) queueAction(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case err == nil:
 		writeJSON(w, 200, map[string]any{"ok": true})
-	case errors.Is(err, jobs.ErrUnknownJob):
+	case errors.Is(err, queue.ErrUnknownJob):
 		fail(w, 404, err.Error())
 	case errors.As(err, &je):
 		fail(w, 400, err.Error())
@@ -417,7 +420,7 @@ func (s *Server) stemPost(w http.ResponseWriter, r *http.Request) (string, bool)
 		return "", false
 	}
 	stem := r.URL.Query().Get("stem")
-	if st, err := os.Stat(annotate.ResultDir(s.cfg.DataDir, stem)); !validStem(stem) || err != nil || !st.IsDir() {
+	if st, err := os.Stat(results.Dir(s.cfg.DataDir, stem)); !validStem(stem) || err != nil || !st.IsDir() {
 		http.Error(w, "unknown stem", 400)
 		return "", false
 	}
@@ -453,7 +456,7 @@ func (s *Server) annotations(w http.ResponseWriter, r *http.Request) {
 	ann := map[string]json.RawMessage{
 		"speakers": pick("speakers", "{}"), "spans": pick("spans", "[]"), "edits": pick("edits", "[]"), "clips": pick("clips", "[]"),
 	}
-	rdir := annotate.ResultDir(s.cfg.DataDir, stem)
+	rdir := results.Dir(s.cfg.DataDir, stem)
 	target := filepath.Join(rdir, "_annotations.json")
 	if old, err := os.ReadFile(target); err == nil {
 		keepHistory(rdir, old)
@@ -490,7 +493,7 @@ func (s *Server) apply(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "audio not found", 404)
 		return
 	}
-	if err := annotate.Apply(r.Context(), s.cfg.DataDir, stem, s.cfg.Retranscriber); err != nil {
+	if err := results.Apply(r.Context(), s.cfg.DataDir, stem, s.cfg.Retranscriber); err != nil {
 		msg := err.Error()
 		if len(msg) > 2000 {
 			msg = msg[len(msg)-2000:]
@@ -498,7 +501,7 @@ func (s *Server) apply(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, msg)
 		return
 	}
-	raw, err := os.ReadFile(filepath.Join(annotate.ResultDir(s.cfg.DataDir, stem), "_final.json"))
+	raw, err := os.ReadFile(filepath.Join(results.Dir(s.cfg.DataDir, stem), "_final.json"))
 	if err != nil {
 		fail(w, 500, err.Error())
 		return

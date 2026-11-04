@@ -16,17 +16,17 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/moliri-app/transcribe/internal/annotate"
-	"github.com/moliri-app/transcribe/internal/jobs"
+	"github.com/moliri-app/transcribe/annotate"
 	"github.com/moliri-app/transcribe/internal/live"
 	"github.com/moliri-app/transcribe/internal/media"
-	"github.com/moliri-app/transcribe/internal/ocr"
+	"github.com/moliri-app/transcribe/internal/queue"
+	"github.com/moliri-app/transcribe/ocr"
 	"github.com/moliri-app/transcribe/internal/update"
 )
 
 type Config struct {
 	DataDir       string
-	Runner        jobs.Runner
+	Runner        queue.Runner
 	Retranscriber annotate.Retranscriber // may be nil
 	Threads       int
 	Live          live.Opener     // may be nil: no live transcription
@@ -37,7 +37,7 @@ type Config struct {
 
 type Server struct {
 	cfg   Config
-	Queue *jobs.Queue
+	Queue *queue.Queue
 	Live  *live.Hub // nil without Config.Live
 	// Dictation is the global shortcut for dictating, nil where there is none; set it before
 	// serving.
@@ -73,7 +73,7 @@ func (s *Server) ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func New(cfg Config) *Server {
-	s := &Server{cfg: cfg, started: time.Now(), Queue: jobs.New(cfg.DataDir, cfg.Runner, cfg.Threads)}
+	s := &Server{cfg: cfg, started: time.Now(), Queue: queue.New(cfg.DataDir, cfg.Runner, cfg.Threads)}
 	if cfg.Live != nil {
 		s.Live = live.NewHub(cfg.DataDir, cfg.Live)
 		s.Live.Warmer = cfg.Warmer

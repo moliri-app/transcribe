@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/moliri-app/transcribe/internal/ocr"
+	"github.com/moliri-app/transcribe/ocr"
 )
 
 // The request of one page and the answer, in each interface's own shape, as Moliri's

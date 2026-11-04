@@ -13,14 +13,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
-	"github.com/moliri-app/transcribe/internal/proc"
+	"github.com/moliri-app/transcribe/audio"
+	"github.com/moliri-app/transcribe/proc"
 )
 
 var (
@@ -29,10 +28,8 @@ var (
 	videoExt = map[string]bool{".mp4": true, ".m4v": true, ".mov": true, ".webm": true, ".mkv": true, ".avi": true}
 )
 
-var dataDirForBin atomic.Value
-
 // SetDataDir makes <dir>/bin a place where ffmpeg and ffprobe are looked up (after PATH and the executable's folder).
-func SetDataDir(dir string) { dataDirForBin.Store(dir) }
+func SetDataDir(dir string) { audio.SetToolDir(filepath.Join(dir, "bin")) }
 
 // IsMedia reports whether the file name has an extension we accept as input.
 func IsMedia(name string) bool {
@@ -61,51 +58,10 @@ func FindMedia(dataDir, stem string) string {
 	return ""
 }
 
-// tool resolves ffmpeg/ffprobe: PATH, then next to the executable, then <data>/bin.
 // Tool returns the path of ffmpeg/ffprobe (PATH, next to the executable, or <data>/bin).
-func Tool(name string) string { return tool(name) }
+func Tool(name string) string { return audio.Tool(name) }
 
-// found remembers where a tool was found: searching a long PATH takes seconds on some Windows
-// machines, and the settings page asks every two seconds. Kept as long as the file is there.
-var found sync.Map
-
-func tool(name string) string {
-	if p, ok := found.Load(name); ok {
-		if st, err := os.Stat(p.(string)); err == nil && !st.IsDir() {
-			return p.(string)
-		}
-		found.Delete(name)
-	}
-	p := lookTool(name)
-	if p != name {
-		found.Store(name, p)
-	}
-	return p
-}
-
-func lookTool(name string) string {
-	if p, err := exec.LookPath(name); err == nil {
-		return p
-	}
-	file := name
-	if runtime.GOOS == "windows" {
-		file += ".exe"
-	}
-	var dirs []string
-	if exe, err := os.Executable(); err == nil {
-		dirs = append(dirs, filepath.Dir(exe))
-	}
-	if d, ok := dataDirForBin.Load().(string); ok && d != "" {
-		dirs = append(dirs, filepath.Join(d, "bin"))
-	}
-	for _, d := range dirs {
-		p := filepath.Join(d, file)
-		if st, err := os.Stat(p); err == nil && !st.IsDir() {
-			return p
-		}
-	}
-	return name
-}
+func tool(name string) string { return audio.Tool(name) }
 
 type hasVideoKey struct {
 	path  string

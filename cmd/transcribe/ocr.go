@@ -7,14 +7,14 @@ package main
 import (
 	"context"
 
-	"github.com/moliri-app/transcribe/internal/models"
-	"github.com/moliri-app/transcribe/internal/ocr"
 	"github.com/moliri-app/transcribe/internal/ocrapi"
-	"github.com/moliri-app/transcribe/internal/ort"
 	"github.com/moliri-app/transcribe/internal/osocr"
-	"github.com/moliri-app/transcribe/internal/pipeline"
 	"github.com/moliri-app/transcribe/internal/prefs"
+	"github.com/moliri-app/transcribe/internal/runner"
+	"github.com/moliri-app/transcribe/internal/setup"
 	"github.com/moliri-app/transcribe/internal/tesslib"
+	"github.com/moliri-app/transcribe/ocr"
+	"github.com/moliri-app/transcribe/ort"
 )
 
 // ocrEngines are the text recognition engines of the app (docs/ocr-api.md). Tesseract is not
@@ -25,23 +25,23 @@ import (
 // with the user's own key from the settings: it reads only when a request names it or the settings
 // make it the default, never as the first usable engine (it costs money, the image leaves the
 // computer). The default engine of requests without one is a setting too, read at every request.
-func ocrEngines(dataDir string, pl *pipeline.Runner) *ocr.Registry {
+func ocrEngines(dataDir string, pl *runner.Runner) *ocr.Registry {
 	t := &ocr.Tesseract{Hint: "apt install tesseract-ocr tesseract-ocr-deu, brew install tesseract tesseract-lang"}
-	if models.TesseractLibSupported() {
+	if setup.TesseractLibSupported() {
 		t = &ocr.Tesseract{
-			TessData:     models.TesseractDataDir(dataDir),
+			TessData:     setup.TesseractDataDir(dataDir),
 			Lib:          tesslib.New(dataDir),
-			Downloadable: models.TesseractModels(),
+			Downloadable: setup.TesseractModels(),
 			Fetch: func(ctx context.Context, model string) error {
-				return models.FetchTesseractModel(ctx, dataDir, model)
+				return setup.FetchTesseractModel(ctx, dataDir, model)
 			},
 		}
 	}
 	p := &ocr.PPOCR{
 		Nets:     &ort.Nets{Runtime: pl.Runtime, Present: pl.RuntimePresent, WantsGPU: pl.WantsGPU},
-		ModelDir: models.PPOCRDir(dataDir),
+		ModelDir: setup.PPOCRDir(dataDir),
 		Fetch: func(ctx context.Context, file string) error {
-			return models.FetchPPOCRModel(ctx, dataDir, file)
+			return setup.FetchPPOCRModel(ctx, dataDir, file)
 		},
 	}
 	engines := []ocr.Engine{t, p}

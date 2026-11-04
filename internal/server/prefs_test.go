@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/moliri-app/transcribe/internal/jobs"
+	"github.com/moliri-app/transcribe/internal/queue"
 )
 
 // Where speech is recognised: the key is kept but never shown, and a job takes the default or
@@ -47,7 +47,7 @@ func TestRecognitionPrefs(t *testing.T) {
 	if w := add(`{"audio":["Über uns ä.mp3"]}`); w.Code != 200 {
 		t.Fatalf("add: %d %s", w.Code, w.Body)
 	}
-	var q struct{ Jobs []jobs.Job }
+	var q struct{ Jobs []queue.Job }
 	_ = json.Unmarshal(do(s, "GET", "/api/queue", "", nil).Body.Bytes(), &q)
 	if len(q.Jobs) != 1 || q.Jobs[0].Options.Engine != "api" {
 		t.Fatalf("default engine: %+v", q.Jobs)

@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/moliri-app/transcribe/internal/fileutil"
+	"github.com/moliri-app/transcribe/fileutil"
 )
 
 const (
