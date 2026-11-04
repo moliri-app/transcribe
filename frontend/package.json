@@ -1,0 +1,47 @@
+{
+	"name": "transcribe-frontend",
+	"version": "0.0.1",
+	"private": true,
+	"license": "MPL-2.0",
+	"description": "Oberfläche von Transcribe by Moliri (SvelteKit); pnpm build schreibt nach ../web/dist, das die EXE einbettet",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"predev": "pnpm run licenses:generate",
+		"build": "vite build",
+		"prebuild": "pnpm run licenses:generate",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"precheck": "pnpm run licenses:generate",
+		"licenses:generate": "node scripts/generate-licenses.mjs",
+		"sync:moliri": "node scripts/sync-moliri.mjs",
+		"sync:check": "node scripts/sync-moliri.mjs --check"
+	},
+	"dependencies": {
+		"@fontsource-variable/atkinson-hyperlegible-mono": "^5.3.0",
+		"@fontsource-variable/atkinson-hyperlegible-next": "^5.3.0",
+		"@svelte-put/lockscroll": "^2.0.1",
+		"@sveltejs/kit": "^2.50.2",
+		"fuzzysort": "^4.0.2",
+		"runed": "^0.37.1",
+		"svelte": "^5.49.2",
+		"svelte-floating-ui": "^1.6.2",
+		"svelte-portal": "^2.2.1"
+	},
+	"devDependencies": {
+		"@iconify-json/eos-icons": "^1.2.4",
+		"@iconify-json/material-symbols": "^1.2.44",
+		"@sveltejs/adapter-static": "^3.0.10",
+		"@sveltejs/vite-plugin-svelte": "^6.2.4",
+		"sass": "^1.97.3",
+		"svelte-check": "^4.4.6",
+		"typescript": "^5.9.3",
+		"unplugin-auto-import": "^21.0.0",
+		"unplugin-icons": "^23.0.1",
+		"vite": "^7.3.1"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
+	}
+}

@@ -1,0 +1,26 @@
+{
+  "id": "20261028-084012-6",
+  "kind": "mic",
+  "client": "Moliri",
+  "started": "2026-10-28T08:40:12+01:00",
+  "ended": "2026-10-28T07:40:27.920Z",
+  "lines": [
+    {
+      "text": "Handschöpfsieb aus Messingdraht, Rahmen aus Eichenholz, um 1890.",
+      "start": 1.2,
+      "end": 4.56
+    },
+    {
+      "text": "Am Rand ein eingeflochtenes Wasserzeichen in Form eines Posthorns.",
+      "start": 5.16,
+      "end": 8.94
+    },
+    {
+      "text": "Leichte Korrosion an der unteren Ecke, sonst gut erhalten.",
+      "start": 9.54,
+      "end": 13.32
+    }
+  ],
+  "source": "mic",
+  "language": "de"
+}

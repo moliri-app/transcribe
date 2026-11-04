@@ -1,0 +1,488 @@
+{
+ "annotated": false,
+ "audio": "Papierfabrik Interview.mp3",
+ "duration": 35.04,
+ "edited_words": 0,
+ "edits_applied": null,
+ "engine": "★ Ergebnis",
+ "engine_used": "parakeet-v3@cutahc2cs+defbr5",
+ "events": [],
+ "events_variant": "ced-w2h0.25-mid-g5",
+ "language": "auto",
+ "preset": "interview",
+ "quality": "fast",
+ "segments": [
+  {
+   "end": 8.82,
+   "speaker": 0,
+   "start": 0.934,
+   "text": "Guten Tag. Habaga Sie haben 40 Jahre in der Papierfabrik gearbeitet. Wie hat das angefangen?",
+   "words": [
+    {
+     "end": 1.254,
+     "p": 1,
+     "speaker": 0,
+     "start": 0.934,
+     "w": "Guten"
+    },
+    {
+     "end": 1.652,
+     "p": 0.643,
+     "speaker": 0,
+     "start": 1.254,
+     "w": "Tag."
+    },
+    {
+     "end": 2.74,
+     "p": 0.639,
+     "speaker": 0,
+     "start": 2.166,
+     "w": "Habaga"
+    },
+    {
+     "end": 3.702,
+     "p": 1,
+     "speaker": 0,
+     "start": 3.462,
+     "w": "Sie"
+    },
+    {
+     "end": 4.102,
+     "p": 1,
+     "speaker": 0,
+     "start": 3.702,
+     "w": "haben"
+    },
+    {
+     "end": 4.422,
+     "p": 1,
+     "speaker": 0,
+     "start": 4.102,
+     "w": "40"
+    },
+    {
+     "end": 4.742,
+     "p": 1,
+     "speaker": 0,
+     "start": 4.422,
+     "w": "Jahre"
+    },
+    {
+     "end": 4.902,
+     "p": 1,
+     "speaker": 0,
+     "start": 4.742,
+     "w": "in"
+    },
+    {
+     "end": 5.062,
+     "p": 1,
+     "speaker": 0,
+     "start": 4.902,
+     "w": "der"
+    },
+    {
+     "end": 6.022,
+     "p": 1,
+     "speaker": 0,
+     "start": 5.062,
+     "w": "Papierfabrik"
+    },
+    {
+     "end": 6.772,
+     "p": 1,
+     "speaker": 0,
+     "start": 6.022,
+     "w": "gearbeitet."
+    },
+    {
+     "end": 7.734,
+     "p": 0.999,
+     "speaker": 0,
+     "start": 7.494,
+     "w": "Wie"
+    },
+    {
+     "end": 7.974,
+     "p": 1,
+     "speaker": 0,
+     "start": 7.734,
+     "w": "hat"
+    },
+    {
+     "end": 8.134,
+     "p": 1,
+     "speaker": 0,
+     "start": 7.974,
+     "w": "das"
+    },
+    {
+     "end": 8.82,
+     "p": 0.999,
+     "speaker": 0,
+     "start": 8.134,
+     "w": "angefangen?"
+    }
+   ]
+  },
+  {
+   "end": 18.316,
+   "speaker": 1,
+   "start": 10.334,
+   "text": "Angefangen hat es im Sommer 1960. Ich war 15 und kam als Lehrling an die große Papiermaschine.",
+   "words": [
+    {
+     "end": 11.054,
+     "p": 0.996,
+     "speaker": 1,
+     "start": 10.334,
+     "w": "Angefangen"
+    },
+    {
+     "end": 11.294,
+     "p": 0.995,
+     "speaker": 1,
+     "start": 11.054,
+     "w": "hat"
+    },
+    {
+     "end": 11.454,
+     "p": 1,
+     "speaker": 1,
+     "start": 11.294,
+     "w": "es"
+    },
+    {
+     "end": 11.614,
+     "p": 1,
+     "speaker": 1,
+     "start": 11.454,
+     "w": "im"
+    },
+    {
+     "end": 12.174,
+     "p": 1,
+     "speaker": 1,
+     "start": 11.614,
+     "w": "Sommer"
+    },
+    {
+     "end": 13.516,
+     "p": 0.894,
+     "speaker": 1,
+     "start": 12.174,
+     "w": "1960."
+    },
+    {
+     "end": 14.51,
+     "p": 1,
+     "speaker": 1,
+     "start": 14.27,
+     "w": "Ich"
+    },
+    {
+     "end": 14.83,
+     "p": 1,
+     "speaker": 1,
+     "start": 14.51,
+     "w": "war"
+    },
+    {
+     "end": 15.31,
+     "p": 1,
+     "speaker": 1,
+     "start": 14.83,
+     "w": "15"
+    },
+    {
+     "end": 15.47,
+     "p": 1,
+     "speaker": 1,
+     "start": 15.31,
+     "w": "und"
+    },
+    {
+     "end": 15.71,
+     "p": 1,
+     "speaker": 1,
+     "start": 15.47,
+     "w": "kam"
+    },
+    {
+     "end": 15.95,
+     "p": 1,
+     "speaker": 1,
+     "start": 15.71,
+     "w": "als"
+    },
+    {
+     "end": 16.59,
+     "p": 0.982,
+     "speaker": 1,
+     "start": 15.95,
+     "w": "Lehrling"
+    },
+    {
+     "end": 16.75,
+     "p": 1,
+     "speaker": 1,
+     "start": 16.59,
+     "w": "an"
+    },
+    {
+     "end": 16.91,
+     "p": 1,
+     "speaker": 1,
+     "start": 16.75,
+     "w": "die"
+    },
+    {
+     "end": 17.23,
+     "p": 0.998,
+     "speaker": 1,
+     "start": 16.91,
+     "w": "große"
+    },
+    {
+     "end": 18.316,
+     "p": 0.999,
+     "speaker": 1,
+     "start": 17.23,
+     "w": "Papiermaschine."
+    }
+   ]
+  },
+  {
+   "end": 21.586,
+   "speaker": 0,
+   "start": 19.876,
+   "text": "Was war ihre erste Aufgabe?",
+   "words": [
+    {
+     "end": 20.116,
+     "p": 0.999,
+     "speaker": 0,
+     "start": 19.876,
+     "w": "Was"
+    },
+    {
+     "end": 20.356,
+     "p": 1,
+     "speaker": 0,
+     "start": 20.116,
+     "w": "war"
+    },
+    {
+     "end": 20.596,
+     "p": 0.801,
+     "speaker": 0,
+     "start": 20.356,
+     "w": "ihre"
+    },
+    {
+     "end": 20.916,
+     "p": 0.999,
+     "speaker": 0,
+     "start": 20.596,
+     "w": "erste"
+    },
+    {
+     "end": 21.586,
+     "p": 0.996,
+     "speaker": 0,
+     "start": 20.916,
+     "w": "Aufgabe?"
+    }
+   ]
+  },
+  {
+   "end": 30.418,
+   "speaker": 1,
+   "start": 23.044,
+   "text": "Ich musste die Filze waschen und die Rollen beschriften. Das war harte Arbeit. Aber wir hatten viel Spaß.",
+   "words": [
+    {
+     "end": 23.204,
+     "p": 1,
+     "speaker": 1,
+     "start": 23.044,
+     "w": "Ich"
+    },
+    {
+     "end": 23.604,
+     "p": 1,
+     "speaker": 1,
+     "start": 23.204,
+     "w": "musste"
+    },
+    {
+     "end": 23.764,
+     "p": 1,
+     "speaker": 1,
+     "start": 23.604,
+     "w": "die"
+    },
+    {
+     "end": 24.324,
+     "p": 0.996,
+     "speaker": 1,
+     "start": 23.764,
+     "w": "Filze"
+    },
+    {
+     "end": 24.724,
+     "p": 0.999,
+     "speaker": 1,
+     "start": 24.324,
+     "w": "waschen"
+    },
+    {
+     "end": 24.804,
+     "p": 1,
+     "speaker": 1,
+     "start": 24.724,
+     "w": "und"
+    },
+    {
+     "end": 24.964,
+     "p": 1,
+     "speaker": 1,
+     "start": 24.804,
+     "w": "die"
+    },
+    {
+     "end": 25.364,
+     "p": 1,
+     "speaker": 1,
+     "start": 24.964,
+     "w": "Rollen"
+    },
+    {
+     "end": 26.034,
+     "p": 0.945,
+     "speaker": 1,
+     "start": 25.364,
+     "w": "beschriften."
+    },
+    {
+     "end": 27.092,
+     "p": 1,
+     "speaker": 1,
+     "start": 26.852,
+     "w": "Das"
+    },
+    {
+     "end": 27.252,
+     "p": 1,
+     "speaker": 1,
+     "start": 27.092,
+     "w": "war"
+    },
+    {
+     "end": 27.732,
+     "p": 0.989,
+     "speaker": 1,
+     "start": 27.252,
+     "w": "harte"
+    },
+    {
+     "end": 28.306,
+     "p": 0.911,
+     "speaker": 1,
+     "start": 27.732,
+     "w": "Arbeit."
+    },
+    {
+     "end": 28.996,
+     "p": 0.999,
+     "speaker": 1,
+     "start": 28.676,
+     "w": "Aber"
+    },
+    {
+     "end": 29.156,
+     "p": 1,
+     "speaker": 1,
+     "start": 28.996,
+     "w": "wir"
+    },
+    {
+     "end": 29.476,
+     "p": 1,
+     "speaker": 1,
+     "start": 29.156,
+     "w": "hatten"
+    },
+    {
+     "end": 29.796,
+     "p": 1,
+     "speaker": 1,
+     "start": 29.476,
+     "w": "viel"
+    },
+    {
+     "end": 30.418,
+     "p": 0.991,
+     "speaker": 1,
+     "start": 29.796,
+     "w": "Spaß."
+    }
+   ]
+  },
+  {
+   "end": 33.618,
+   "speaker": 0,
+   "start": 31.972,
+   "text": "Vielen Dank für das Gespräch.",
+   "words": [
+    {
+     "end": 32.372,
+     "p": 1,
+     "speaker": 0,
+     "start": 31.972,
+     "w": "Vielen"
+    },
+    {
+     "end": 32.612,
+     "p": 1,
+     "speaker": 0,
+     "start": 32.372,
+     "w": "Dank"
+    },
+    {
+     "end": 32.772,
+     "p": 1,
+     "speaker": 0,
+     "start": 32.612,
+     "w": "für"
+    },
+    {
+     "end": 32.932,
+     "p": 1,
+     "speaker": 0,
+     "start": 32.772,
+     "w": "das"
+    },
+    {
+     "end": 33.618,
+     "p": 0.994,
+     "speaker": 0,
+     "start": 32.932,
+     "w": "Gespräch."
+    }
+   ]
+  }
+ ],
+ "speakers": {
+  "0": {
+   "language": "auto",
+   "name": "S1"
+  },
+  "1": {
+   "language": "auto",
+   "name": "S2"
+  }
+ },
+ "speakers_given": 2,
+ "speakers_variant": "ahc2-campplus-n2"
+}

@@ -1,0 +1,15 @@
+_data/
+*.exe
+
+
+data/
+
+# internal tooling and scratch screenshots
+.hippo/
+.impeccable/
+_shots/
+
+# build of the new UI (frontend/, pnpm build); only the placeholder is checked in
+web/dist/*
+!web/dist/PLATZHALTER.txt
+.playwright-mcp/

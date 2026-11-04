@@ -1,0 +1,63 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# A tag v* builds the new UI and the Windows EXE and attaches the EXE to a GitHub release of that tag.
+#   git tag v0.1.0 && git push origin v0.1.0
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Frontend
+        working-directory: frontend
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Tests
+        run: go test ./...
+
+      # the tag is the app's version: it compares it with the latest release to offer updates
+      - name: EXE
+        shell: pwsh
+        env:
+          CGO_ENABLED: '0'
+          TAG: ${{ github.ref_name }}
+        run: go build -trimpath -ldflags "-s -w -H=windowsgui -X main.version=$env:TAG" -o transcribe.exe ./cmd/transcribe
+
+      - name: Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" transcribe.exe --clobber
+          else
+            gh release create "$TAG" transcribe.exe --title "Transcribe by Moliri $TAG" --generate-notes
+          fi

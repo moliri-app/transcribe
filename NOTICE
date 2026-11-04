@@ -1,0 +1,253 @@
+Transcribe by Moliri
+Copyright (c) 2026 Juri Wolf, Moliri
+
+The source code in this repository is licensed under the Mozilla Public
+License, v. 2.0 (see LICENSE), unless a file says otherwise.
+
+
+TRADEMARKS
+==========
+
+"Moliri" and "Transcribe by Moliri" are names of Moliri. The Mozilla Public
+License does not grant any rights in them (MPL 2.0, section 2.3). Modified
+versions and forks are welcome under the MPL, but must not be called
+"Transcribe by Moliri" or otherwise suggest that they come from or are
+endorsed by Moliri. Saying truthfully that a fork is based on Transcribe by
+Moliri is fine.
+
+
+INCLUDED IN THIS REPOSITORY AND THE EXECUTABLE
+==============================================
+
+purego (github.com/ebitengine/purego)
+  Apache License 2.0. Copyright 2022 The Ebitengine Authors.
+  https://github.com/ebitengine/purego
+  https://www.apache.org/licenses/LICENSE-2.0
+
+websocket (github.com/coder/websocket)
+  ISC License. Copyright (c) 2025 Coder.
+  https://github.com/coder/websocket
+
+Go image decoders (golang.org/x/image: BMP, TIFF, WebP, for text recognition)
+  BSD 3-Clause License. Copyright 2009 The Go Authors.
+  https://pkg.go.dev/golang.org/x/image
+
+Atkinson Hyperlegible Next and Atkinson Hyperlegible Mono (in the build of the
+interface, from @fontsource-variable/atkinson-hyperlegible-next and
+@fontsource-variable/atkinson-hyperlegible-mono)
+  SIL Open Font License 1.1, no Reserved Font Name. Self-hosted subsets of
+  the original fonts; the font files remain under the OFL, whose full text
+  is in frontend/static/OFL.txt and in the application under /OFL.txt.
+  Copyright 2020-2024 The Atkinson Hyperlegible Next Project Authors
+  (https://github.com/googlefonts/atkinson-hyperlegible-next)
+  Copyright 2020-2024 The Atkinson Hyperlegible Mono Project Authors
+  (https://github.com/googlefonts/atkinson-hyperlegible-next-mono)
+  https://openfontlicense.org
+
+Material Symbols (icons in the interface, via @iconify-json/material-symbols)
+  Apache License 2.0. Copyright Google LLC.
+  https://github.com/google/material-design-icons
+
+EOS Icons (icons in the interface, via @iconify-json/eos-icons)
+  MIT License. SUSE UX/UI team.
+  https://gitlab.com/SUSE-UIUX/eos-icons
+
+npm packages of the interface (frontend/)
+  Svelte, SvelteKit and the packages they and the interface build on, under
+  MIT, ISC, BSD and Apache-2.0 licenses. The full list with versions is on the
+  page /lizenzen of the application, generated at build time by
+  frontend/scripts/generate-licenses.mjs.
+
+
+TEST DATA AND DEVELOPMENT TOOLS (NOT IN THE EXECUTABLE)
+=======================================================
+
+Test recordings (e2e/testdata/audio/)
+  Staged recordings made for this repository: an invented oral-history
+  interview and a short note, spoken by the Piper voices "kerstin" (low)
+  and "thorsten" (high) and laid out by e2e/make-audio.py. No real person
+  is recorded. The recordings and the prepared results beside them are
+  covered by the MPL like the rest of the repository.
+  The voices: https://huggingface.co/rhasspy/piper-voices, MIT License
+  (Rhasspy, Michael Hansen); thorsten also published by its speaker under
+  the MIT License, https://huggingface.co/Thorsten-Voice/Piper. Trained on
+  the datasets Thorsten-Voice (Thorsten Mueller) and kerstin
+  (https://github.com/rhasspy/dataset-voice-kerstin), both CC0 1.0.
+
+OCR test set (testdata/ocr/)
+  The same three images as Moliri's server/transcribe/testdata/ocr. The index
+  card and the object label are synthetic, generated for Moliri; they are
+  covered by the MPL like the rest of the repository. The Fraktur page is page
+  XV of the preface of the Grimms' "Kinder- und Haus-Maerchen", vol. 1, 1857,
+  a Google Books scan in the public domain, from Wikimedia Commons
+  (File:Kinder_und_Hausmärchen_(Grimm)_1857_I_p_015.jpg). Its ground truth
+  (fraktur.gt.txt) is the proofread transcription of de.wikisource, Creative
+  Commons Attribution-ShareAlike 4.0 (CC BY-SA 4.0),
+  https://creativecommons.org/licenses/by-sa/4.0/; it is not covered by the
+  MPL. Source, authors and changes: testdata/ocr/fraktur.gt.txt.license.
+
+Playwright (@playwright/test, used by the tests in e2e/)
+  Apache License 2.0. Copyright (c) Microsoft Corporation.
+  https://github.com/microsoft/playwright
+  Installed by pnpm for development only; not part of the repository or
+  of the executable.
+
+
+DOWNLOADED AT RUNTIME (NOT INCLUDED)
+====================================
+
+On first use the application downloads the following components from their
+publishers into its data directory. They are not part of this repository or
+of the executable, are not covered by the MPL, and remain under their own
+licenses.
+
+Runtime libraries
+-----------------
+
+sherpa-onnx (shared library, C API)
+  Apache License 2.0. k2-fsa / Xiaomi Corporation.
+  https://github.com/k2-fsa/sherpa-onnx
+  Loaded via purego; the release archives also contain ONNX Runtime.
+
+ONNX Runtime (shipped inside the sherpa-onnx archives, CPU and CUDA builds)
+  MIT License. Copyright (c) Microsoft Corporation.
+  https://github.com/microsoft/onnxruntime
+  Third-party notices: https://github.com/microsoft/onnxruntime/blob/main/ThirdPartyNotices.txt
+  Text recognition with PP-OCRv5 runs on the same library, loaded via purego.
+
+NVIDIA CUDA runtime, cuBLAS, cuFFT and cuDNN (GPU acceleration only)
+  NVIDIA proprietary, redistributable: CUDA Toolkit End User License Agreement
+  (https://docs.nvidia.com/cuda/eula/) and NVIDIA cuDNN Software License
+  Agreement (https://docs.nvidia.com/deeplearning/cudnn/latest/reference/eula.html).
+  Not shipped. If they are not installed, the app fetches the DLLs it needs
+  from NVIDIA's redistribution server (developer.download.nvidia.com) only
+  when the user asks for it: on the settings page or in the question about a
+  detected GPU. Both name the two agreements beside the button and say that
+  the user accepts them with it, as the agreements are accepted by
+  downloading or using the software.
+
+FFmpeg (ffmpeg and ffprobe executables)
+  GNU General Public License v3.0 or later (GPL builds). The FFmpeg developers.
+  https://ffmpeg.org
+  Windows: build "ffmpeg-release-essentials" from https://www.gyan.dev/ffmpeg/builds/
+  Linux:   static builds from https://johnvansickle.com/ffmpeg/
+  FFmpeg runs as a separate program; source code for these builds is
+  available from the respective build pages and from https://ffmpeg.org.
+  If ffmpeg is already on the PATH, that installation is used instead.
+
+Tesseract OCR, Windows only (text recognition, on first use)
+  Apache License 2.0. Copyright the Tesseract OCR authors.
+  https://github.com/tesseract-ocr/tesseract
+  Taken from the NuGet package "Tesseract" 5.2.0 (x64/tesseract50.dll), which
+  is itself Apache License 2.0, Copyright 2012-2020 Charles Weld,
+  https://github.com/charlesw/tesseract, https://www.nuget.org/packages/Tesseract/5.2.0
+  Loaded via purego. On Linux and macOS the tesseract program of the system is
+  used instead; nothing is downloaded there.
+
+Leptonica (image library used by Tesseract, from the same NuGet package)
+  BSD 2-Clause License. Copyright (c) 2001-2022 Leptonica.
+  http://www.leptonica.org, https://github.com/DanBloomberg/leptonica
+
+Models
+------
+
+All models are downloaded in the ONNX format published by the sherpa-onnx
+project (https://github.com/k2-fsa/sherpa-onnx/releases). Several of them
+were converted and quantized (int8) by sherpa-onnx; they are modified
+versions of the original models named below.
+
+NVIDIA Parakeet TDT 0.6B v3 (speech recognition, 25 European languages)
+  Creative Commons Attribution 4.0 International (CC BY 4.0). NVIDIA.
+  Source: https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+  Used as: sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8
+  Changes: converted to ONNX and quantized to int8 by sherpa-onnx.
+  License: https://creativecommons.org/licenses/by/4.0/
+
+NVIDIA STT De FastConformer Hybrid Transducer-CTC Large P&C (German speech recognition)
+  Creative Commons Attribution 4.0 International (CC BY 4.0). NVIDIA.
+  Source: https://huggingface.co/nvidia/stt_de_fastconformer_hybrid_large_pc
+  Used as: sherpa-onnx-nemo-transducer-stt_de_fastconformer_hybrid_large_pc-int8
+  Changes: converted to ONNX and quantized to int8 by sherpa-onnx.
+  License: https://creativecommons.org/licenses/by/4.0/
+
+Kroko ASR, German streaming Zipformer (live transcription of German)
+  Creative Commons Attribution-ShareAlike (CC BY-SA), as Banafo's community
+  models are licensed; Banafo names no version (the current one is 4.0):
+  the model card says "CC-BY-SA", its metadata says "license: other", and
+  the LICENSE file it links is empty. Copyright Banafo (Kroko ASR).
+  Source: https://huggingface.co/Banafo/Kroko-ASR
+  Used as: sherpa-onnx-streaming-zipformer-de-kroko-2025-08-06
+  Changes: none by this app; it downloads the model in the ONNX form sherpa-onnx
+  publishes, on demand, and does not ship it.
+  License: https://creativecommons.org/licenses/by-sa/4.0/
+
+OpenAI Whisper base and large-v3-turbo (speech recognition, other languages)
+  MIT License. Copyright (c) 2022 OpenAI.
+  Source: https://github.com/openai/whisper
+  Used as: sherpa-onnx-whisper-base, sherpa-onnx-whisper-turbo
+
+Silero VAD (voice activity detection)
+  MIT License. Copyright (c) 2020-present Silero Team.
+  Source: https://github.com/snakers4/silero-vad
+  Used as: silero_vad.onnx
+
+pyannote segmentation-3.0 (speaker segmentation)
+  MIT License. Copyright (c) 2023 CNRS.
+  Source: https://huggingface.co/pyannote/segmentation-3.0
+  Used as: sherpa-onnx-pyannote-segmentation-3-0
+  Please cite: Plaquet & Bredin, "Powerset multi-class cross entropy loss
+  for neural speaker diarization", Interspeech 2023; Bredin, "pyannote.audio
+  2.1 speaker diarization pipeline: principle, benchmark, and recipe",
+  Interspeech 2023.
+
+3D-Speaker CAM++ (speaker embeddings, zh/en 16k common advanced)
+  Apache License 2.0. Alibaba Tongyi Lab, 3D-Speaker project.
+  Source: https://github.com/modelscope/3D-Speaker
+          https://modelscope.cn/models/iic/speech_campplus_sv_zh_en_16k-common_advanced
+  Used as: 3dspeaker_speech_campplus_sv_zh_en_16k-common_advanced.onnx
+
+CED small (audio tagging: music, applause, noise)
+  Creative Commons Attribution 4.0 International (CC BY 4.0).
+  Heinrich Dinkel et al. (Xiaomi), "CED: Consistent ensemble distillation
+  for audio tagging".
+  Source: https://zenodo.org/records/8275319, https://github.com/RicherMans/CED
+  Only the model weights (CC BY 4.0, from Zenodo) are used; the CED training
+  code in the GitHub repository (GPL-3.0) is not.
+  Used as: sherpa-onnx-ced-small-audio-tagging-2024-04-19 (model.int8.onnx)
+  Changes: converted to ONNX and quantized to int8 by sherpa-onnx.
+  License: https://creativecommons.org/licenses/by/4.0/
+
+AudioSet class labels (class_labels_indices.csv, shipped with CED)
+  Google LLC. The AudioSet dataset is licensed under CC BY 4.0, the AudioSet
+  ontology from which the label names come under CC BY-SA 4.0.
+  Source: https://research.google.com/audioset/
+          https://github.com/audioset/ontology
+  License: https://creativecommons.org/licenses/by-sa/4.0/
+
+
+Tesseract models (tessdata_fast 4.1.0: deu, eng, frk, script/Fraktur;
+downloaded one by one when a reading first needs them, Windows only)
+  Apache License 2.0. Copyright the Tesseract OCR authors.
+  Source: https://github.com/tesseract-ocr/tessdata_fast
+
+frak2021 (Tesseract model for German Fraktur and other historic prints)
+  CC0 1.0 Universal (public domain dedication). Stefan Weil,
+  Universitätsbibliothek Mannheim (UB Mannheim).
+  Source: https://zenodo.org/records/10125246 (frak2021-0.905.traineddata,
+  tessdata_best)
+  Used as: frak2021.traineddata
+
+PP-OCRv5 (text detection ch_PP-OCRv5_det_mobile and Latin-script recognition
+latin_PP-OCRv5_rec_mobile, as ONNX; downloaded when the engine "onnx" first
+reads)
+  Apache License 2.0. Copyright PaddlePaddle Authors (PaddleOCR).
+  https://github.com/PaddlePaddle/PaddleOCR
+  Converted to ONNX and published by RapidOCR (Apache License 2.0, RapidAI),
+  https://github.com/RapidAI/RapidOCR, from
+  https://www.modelscope.cn/models/RapidAI/RapidOCR (v3.10.0, onnx/PP-OCRv5/).
+  The pre- and post-processing in internal/ocr/ppocr*.go follows RapidOCR's
+  Python code (ch_ppocr_det, ch_ppocr_rec, cal_rec_boxes), rewritten in Go.
+
+
+All licenses were checked again at the sources named above on 2026-11-03,
+PP-OCRv5, RapidOCR and golang.org/x/image when they were added that day.

@@ -1,0 +1,217 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// Gespiegelt aus Moliri (src/scss/components.scss) von frontend/scripts/sync-moliri.mjs.
+// Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri.
+
+// =====================================================
+// Component Template
+// Example of how to use the new CSS architecture
+// =====================================================
+
+@layer components {
+
+  // ===================================
+  // Svelecte Component Styles
+  // ===================================
+  .svelecte-button {
+    --sv-min-height: 2.8em;
+    --sv-bg: hsl(var(--color-neutral-0));;
+    --sv-general-padding: 9px;
+    --sv-icon-size: 16px;
+      .sv-control {
+        border-radius: var(--svelecte-border-radius, 6px) !important;
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+  }
+
+
+  .example-component {
+    // ===================================
+    // Private Variables (Component-scoped)
+    // ===================================
+    --p-bg-color: var(--p-bg-color-default);
+    --p-text-color: var(--p-text-color-default);
+    --p-border-color: var(--p-border-color-default);
+    --p-shadow: var(--p-shadow-default);
+
+    // Light mode defaults
+    --p-bg-color-default: var(--color-bg-primary);
+    --p-text-color-default: var(--color-text-primary);
+    --p-border-color-default: var(--color-border-primary);
+    --p-shadow-default: var(--color-shadow);
+
+    // Hover states
+    --p-bg-color-hover: var(--color-interactive-hover);
+    --p-text-color-hover: var(--p-text-color-default);
+    --p-border-color-hover: var(--color-border-secondary);
+
+    // ===================================
+    // Component Styles
+    // ===================================
+    background-color: hsl(var(--p-bg-color));
+    color: hsl(var(--p-text-color));
+    border: 1px solid hsl(var(--p-border-color));
+    border-radius: 0.5rem; // Flat design, minimal rounded corners
+    padding: 1rem;
+    box-shadow: 0 1px 3px hsl(var(--p-shadow)); // Minimal shadow
+
+    // Interactive states
+    &:hover {
+      --p-bg-color: var(--p-bg-color-hover);
+      --p-text-color: var(--p-text-color-hover);
+      --p-border-color: var(--p-border-color-hover);
+    }
+
+    // ===================================
+    // Dark Mode Overrides
+    // ===================================
+    :where(.theme-dark) & {
+      // Only override what needs to change in dark mode
+      --p-bg-color-default: var(--color-bg-secondary);
+      --p-border-color-default: var(--color-border-secondary);
+      --p-bg-color-hover: var(--color-bg-tertiary);
+    }
+
+    // ===================================
+    // Component Variants
+    // ===================================
+    &.is-primary {
+      --p-bg-color-default: var(--color-interactive-primary);
+      --p-text-color-default: var(--color-text-inverse);
+      --p-border-color-default: var(--color-interactive-primary);
+      
+      --p-bg-color-hover: var(--color-cyan-50);
+      --p-border-color-hover: var(--color-cyan-50);
+    }
+
+    &.is-success {
+      --p-bg-color-default: var(--color-green-10);
+      --p-text-color-default: var(--color-green-200);
+      --p-border-color-default: var(--color-green-100);
+    }
+
+    &.is-error {
+      --p-bg-color-default: var(--color-red-10);
+      --p-text-color-default: var(--color-red-200);
+      --p-border-color-default: var(--color-red-100);
+    }
+
+    &.is-warning {
+      --p-bg-color-default: var(--color-orange-10);
+      --p-text-color-default: var(--color-orange-200);
+      --p-border-color-default: var(--color-orange-100);
+    }
+
+    // ===================================
+    // Nested Elements
+    // ===================================
+    &__header {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: hsl(var(--p-text-color));
+    }
+
+    &__content {
+      line-height: 1.6;
+    }
+
+    &__footer {
+      margin-top: 1rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid hsl(var(--p-border-color));
+      
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+  }
+
+  // ===================================
+  // Drag preview + shadow styles (svelte-dnd-action)
+  // ===================================
+  body > .file.flex { // Excel Export Drag & Drop Item
+    z-index: 999999 !important;
+  }
+  body > .sv-item--container { // Svelecte Drag & Drop Item
+    z-index: 999999 !important;
+  }
+  #dnd-action-dragged-el {
+    pointer-events: none;
+    z-index: 999999;
+    background-color: hsl(var(--color-bg-secondary));
+    color: hsl(var(--color-text-primary));
+    border-radius: 0.375rem;
+    box-shadow: 0 8px 24px hsl(var(--color-shadow));
+    opacity: 0.98;
+    transition: transform .08s ease, opacity .08s ease;
+    overflow: visible;
+  }
+  #dnd-action-dragged-el * {
+    color: inherit;
+  }
+
+  :where(.theme-dark) #dnd-action-dragged-el {
+    background-color: hsl(var(--color-bg-inverse));
+    color: hsl(var(--color-text-inverse));
+  }
+
+  [data-is-dnd-shadow-item-internal] {
+    background-color: hsl(var(--color-interactive-hover) / 0.6);
+    border-radius: 0.25rem;
+    border: 1px dashed hsl(var(--color-border-secondary) / 0.6);
+    box-shadow: inset 0 0 0 1px hsl(var(--color-border-secondary) / 0.08);
+  }
+
+  // ===================================
+  // Svelecte dropdown cursor for items
+  // ===================================
+  .sv-item--wrap:not(.is-disabled) {
+    cursor: pointer;
+  }
+
+  .sv-item--wrap.is-disabled {
+    cursor: not-allowed;
+  }
+
+  .sv-buttons {
+    margin: auto;
+  }
+
+  .sv-item--content {
+    width: 100%;
+  }
+
+
+  .sv_dropdown {
+
+  /* Selected chips/items inside the control */
+  .sv-item--wrap.is-selected {
+    background-color: rgb(0, 0, 0) !important;
+    color: white;
+
+    /* Descendant text nodes set their own colour (e.g. bulk-mode renderer's
+       title/description), so the inherited `color: white` doesn't reach them. */
+    *,
+    .bulk-mode__title,
+    .bulk-mode__description {
+      color: white !important;
+    }
+  }
+}
+
+  /* Firefox interprets the upstream `max-height: max-content` on Svelecte's
+     portaled floating container as if it were unconstrained, leaving the
+     dropdown stretched to the viewport. Force it to size to its child. */
+  .sv_dropdown.portal {
+    max-height: var(--sv-dropdown-height, 320px);
+    height: fit-content;
+
+    .sv-dropdown-scroll {
+      max-height: var(--sv-dropdown-height, 320px);
+    }
+  }
+
+}

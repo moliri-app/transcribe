@@ -1,0 +1,265 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// Gespiegelt aus Moliri (src/scss/colors.scss) von frontend/scripts/sync-moliri.mjs.
+// Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri.
+
+// =====================================================
+// CSS Color Architecture
+// Based on modern CSS practices with layers and HSL
+// =====================================================
+
+// Define layer order at the top
+@layer reset, base, tokens, components, utilities;
+
+@layer tokens {
+  :root {
+    // ===================================
+    // Base Color Hues (Primary Colors)
+    // ===================================
+    --color-primary-hue: 210;    // #1B1C1D background/dark
+    --color-neutral-hue: 190;    // #90A4A8 active gray
+    --color-accent-hue: 156;     // #E8EDEB hover light
+    --color-light-hue: 0;       // #FAFAFA pure light
+    
+    --color-green-hue: 95;       // #98F600 active/online/green
+    --color-red-hue: 356;        // #E53F4B offline/red
+    --color-orange-hue: 18;      // #FF4E00 pause/orange
+    --color-blue-hue: 217;       // #3B82F6 blue
+    --color-cyan-hue: 190;       // #00b5ad cyan
+    --color-yellow-hue: 48;      // #fbbd08 yellow
+    --color-pink-hue: 327;       // #e03997 pink
+    --color-teal-hue: 178;       // #00b5ad teal
+    --color-purple-hue: 285;     // #a333c8 purple
+    --color-violet-hue: 259;     // #6435c9 violet
+    --color-olive-hue: 67;       // #b5cc18 olive
+    --color-grey-hue: 0;         // #767676 grey
+    --color-black-hue: 0;        // #1b1c1d black
+    
+
+    // ===================================
+    // Neutral Color Scale (HSL format)
+    // ===================================
+    --color-neutral-0:   var(--color-light-hue) 0% 98%;        // #FAFAFA
+    --color-neutral-10:  var(--color-accent-hue) 12% 92%;      // #E8EDEB
+    --color-neutral-50:  var(--color-neutral-hue) 12% 61%;     // #90A4A8
+    --color-neutral-100: var(--color-primary-hue) 4% 11%;      // #1B1C1D
+
+    // ===================================
+    // Brand Color Scales
+    // ===================================
+    
+    // Green Scale (Success/Online/Active)
+    --color-green-10:  calc(var(--color-green-hue) - 3) 100% 95%;  // Very light green
+    --color-green-50:  calc(var(--color-green-hue) - 2) 100% 70%;  // Light green
+    --color-green-100: var(--color-green-hue) 100% 46%;            // #98F600 Primary green
+    --color-green-200: calc(var(--color-green-hue) + 2) 100% 35%;  // Dark green
+    // Grün als SCHRIFT: green-100 hat 1,51:1 auf #FAFAFA, green-200 immer noch 2,63:1.
+    // Diese Stufe hat 5,86:1 auf #FAFAFA und 5,18:1 auf #E8EDEB. Nur für Text
+    // (`--color-text-success`); Flächen und Knöpfe bleiben bei green-100 mit Tinte.
+    --color-green-300: calc(var(--color-green-hue) + 2) 100% 22%;  // Text green
+
+    // Red Scale (Error/Offline/Danger)
+    --color-red-10:  calc(var(--color-red-hue) + 4) 76% 95%;       // Very light red
+    --color-red-50:  calc(var(--color-red-hue) + 2) 76% 70%;       // Light red
+    --color-red-100: var(--color-red-hue) 76% 57%;                 // #E53F4B Primary red
+    --color-red-200: calc(var(--color-red-hue) - 2) 76% 40%;       // Dark red
+
+    // Orange Scale (Warning/Pause)
+    --color-orange-10:  calc(var(--color-orange-hue) + 2) 100% 95%; // Very light orange
+    --color-orange-50:  calc(var(--color-orange-hue) + 1) 100% 70%; // Light orange
+    --color-orange-100: var(--color-orange-hue) 100% 50%;           // #FF4E00 Primary orange
+    --color-orange-200: calc(var(--color-orange-hue) - 1) 100% 35%; // Dark orange
+
+    // Blue Scale (Info/Interactive)
+    --color-blue-10:  calc(var(--color-blue-hue) + 3) 91% 95%;     // Very light blue
+    --color-blue-50:  calc(var(--color-blue-hue) + 2) 91% 75%;     // Light blue
+    --color-blue-100: var(--color-blue-hue) 91% 60%;               // #3B82F6 Primary blue
+    --color-blue-200: calc(var(--color-blue-hue) - 2) 91% 45%;     // Dark blue
+
+    // Cyan Scale
+    --color-cyan-10:  var(--color-cyan-hue) 100% 95%;
+    --color-cyan-100: var(--color-cyan-hue) 100% 35%;
+
+    // Yellow Scale
+    --color-yellow-10:  var(--color-yellow-hue) 95% 95%;
+    --color-yellow-100: var(--color-yellow-hue) 95% 50%;
+    --color-yellow-200: var(--color-yellow-hue) 95% 35%;
+
+    // Pink Scale
+    --color-pink-10:  var(--color-pink-hue) 74% 95%;
+    --color-pink-100: var(--color-pink-hue) 74% 55%;
+    --color-pink-200: var(--color-pink-hue) 74% 40%;
+
+    // Teal Scale
+    --color-teal-10:  var(--color-teal-hue) 100% 95%;
+    --color-teal-100: var(--color-teal-hue) 100% 35%;
+
+    // Purple Scale
+    --color-purple-10:  var(--color-purple-hue) 59% 95%;
+    --color-purple-100: var(--color-purple-hue) 59% 49%;
+
+    // Violet Scale
+    --color-violet-10:  var(--color-violet-hue) 58% 95%;
+    --color-violet-100: var(--color-violet-hue) 58% 50%;
+
+    // Olive Scale
+    --color-olive-10:  var(--color-olive-hue) 79% 95%;
+    --color-olive-100: var(--color-olive-hue) 79% 45%;
+
+    // Grey Scale
+    --color-grey-10:  var(--color-grey-hue) 0% 95%;
+    --color-grey-100: var(--color-grey-hue) 0% 46%;
+
+    // Black Scale
+    --color-black-10:  var(--color-black-hue) 0% 95%;
+    --color-black-100: var(--color-black-hue) 0% 11%;
+
+
+    // ===================================
+    // Semantic Color Variables (Global Logic Colors)
+    // ===================================
+    
+    // Text Colors
+    --color-text-primary:   var(--color-neutral-100);    // Primary text
+    // Secondary (muted) text: eigener, dunklerer Grauton statt neutral-50 (#90A4A8, zu hell
+    // auf Weiß ~2.9:1) — nur DIESES Token (Text), Border/BG nutzen neutral-50 direkt und
+    // bleiben unberührt. Dark-Mode-Override (unten) unverändert.
+    // War 45 % Helligkeit: 4,40:1 auf #FAFAFA, 3,88:1 auf #E8EDEB, also unter AA.
+    // Jetzt 5,75:1 auf #FAFAFA und 5,08:1 auf #E8EDEB. Auf Tinte fällt es von 3,71:1
+    // auf 2,84:1 — gedämpfte Schrift gehört nicht auf Tinte, dort `--color-text-inverse`.
+    --color-text-secondary: 195 9% 38%;                  // Secondary text (readable muted)
+    // Tertiary text war `neutral-10` — und das ist der FLÄCHENton #E8EDED, derselbe
+    // Wert wie --color-bg-secondary. Gemessen: 1,13:1 auf #FAFAFA und 1,00:1 auf
+    // der Sekundärfläche, also unsichtbar; im Normdaten-Finder stand damit jede
+    // Kleinschrift praktisch weiß auf weiß. Danach 48 % mit 3,9:1 auf #FAFAFA und
+    // 3,5:1 auf #E8EDED — lesbar, aber für Zähler und Metadaten in kleiner Schrift
+    // unter AA. Jetzt 5,12:1 auf #FAFAFA und 4,52:1 auf #E8EDEB (die hellste Stufe,
+    // die auf der Sekundärfläche noch AA hält) und weiterhin eine Stufe leiser als
+    // `--color-text-secondary`. NICHT wieder auf einen Neutral- oder Flächenton
+    // legen. Dark-Mode-Override unten unberührt: dort war `neutral-50` auf dunklem
+    // Grund immer in Ordnung.
+    --color-text-tertiary:  195 9% 41%;                  // Tertiary text (readable muted)
+    --color-text-inverse:   var(--color-neutral-0);      // Inverse text (on dark backgrounds)
+    
+    // Status Text Colors
+    //
+    // Die dunkle Stufe jeder Signalfarbe, weil die 100er-Stufen als Schrift unter AA
+    // liegen (Signalgrün 1,51:1, Orange 3,19:1, Rot 3,94:1, Blau 3,47:1 auf #FAFAFA).
+    // Werte auf #FAFAFA / #E8EDEB: Grün 5,86 / 5,18, Rot 6,50 / 5,74, Orange 5,96 / 5,27,
+    // Blau 5,35 / 4,72. Flächen und Knöpfe nutzen die 100er-Stufen direkt und bleiben.
+    // Wer `--color-text-error` als Fläche unter weißer Schrift nutzt (Kalenderbalken),
+    // gewinnt mit: Weiß auf red-200 6,79:1 statt 4,11:1.
+    --color-text-success:   var(--color-green-300);
+    --color-text-error:     var(--color-red-200);
+    --color-text-warning:   var(--color-orange-200);
+    --color-text-info:      var(--color-blue-200);
+    
+    // Background Colors
+    --color-bg-primary:     var(--color-neutral-0);      // Primary background
+    --color-bg-secondary:   var(--color-neutral-10);     // Secondary background
+    --color-bg-tertiary:    var(--color-neutral-50);     // Tertiary background
+    --color-bg-inverse:     var(--color-neutral-100);    // Inverse background
+    
+    // Interactive Colors
+    --color-interactive-primary:   var(--color-cyan-100);    // Primary interactive (brand)
+    --color-interactive-secondary: var(--color-blue-100);    // Secondary interactive
+    --color-interactive-hover:     var(--color-neutral-10);  // Hover state
+    --color-interactive-active:    var(--color-neutral-50);  // Active state
+    
+    // Border Colors
+    --color-border-primary:   var(--color-neutral-10);
+    --color-border-secondary: var(--color-neutral-50);
+    --color-border-focus:     var(--color-cyan-100);
+
+    // Selection: a chosen list entry looks like a primary button (ink fill, paper text),
+    // not like a blue tint with a blue frame. The frame only shows in the dark theme,
+    // where the ink fill sits on an almost equally dark ground (as the primary button does).
+    --color-bg-selected:     var(--color-neutral-100);
+    --color-border-selected: var(--color-neutral-100);
+
+    // Syntax-Hervorhebung (CodeMirrorEditor)
+    //
+    // Als Tokens und nicht in der Komponente, weil die Hervorhebung im dunklen Thema andere
+    // Farben braucht als im hellen: CodeMirror schreibt seine Klassen einmal beim Bauen des
+    // Editors, ein Themenwechsel zur Laufzeit erreicht ihn also nicht mehr. Über Variablen
+    // schaltet er mit um wie alles andere auch.
+    --cm-keyword:  265 45% 42%;
+    --cm-string:   135 45% 28%;
+    --cm-comment:  195 9% 41%;   // wie --color-text-tertiary: 5,34:1 auf Weiß (vorher 48 %, 4,11:1)
+    --cm-number:   25 70% 38%;
+    --cm-name:     210 55% 38%;
+    --cm-typ:      190 45% 30%;
+    --cm-invalid:  var(--color-red-100);
+
+    // Special Colors
+    --color-transparent: 0 0% 0% / 0;
+    --color-shadow: var(--color-neutral-100) / 0.1;
+  }
+
+  // ===================================
+  // Dark Mode Theme
+  // ===================================
+  .theme-dark {
+    // Native scrollbars and form controls follow the dark theme too.
+    color-scheme: dark;
+
+    // Override semantic colors for dark mode
+    --color-text-primary:   var(--color-neutral-0);      // Light text on dark
+    --color-text-secondary: var(--color-neutral-10);     // Light secondary text
+    --color-text-tertiary:  var(--color-neutral-50);     // Medium text
+    --color-text-inverse:   var(--color-neutral-100);    // Dark text (on light backgrounds)
+    
+    --color-bg-primary:     var(--color-neutral-100);    // Dark background
+    --color-bg-secondary:   calc(var(--color-primary-hue) + 2) 4% 15%; // Slightly lighter dark
+    --color-bg-tertiary:    var(--color-neutral-50);     // Medium background
+    --color-bg-inverse:     var(--color-neutral-0);      // Light background
+    
+    --color-interactive-hover:  calc(var(--color-primary-hue) + 2) 4% 18%; // Lighter hover on dark
+    --color-interactive-active: var(--color-neutral-50); // Keep active the same
+    
+    --color-border-primary:   calc(var(--color-primary-hue) + 2) 4% 20%; // Lighter border on dark
+    --color-border-secondary: var(--color-neutral-50);   // Keep secondary border
+    --color-border-selected:  var(--color-neutral-0);    // Frame the ink selection on the dark ground
+    
+    --color-shadow: var(--color-neutral-0) / 0.1;        // Light shadow on dark
+
+    // Syntax-Hervorhebung: heller und weniger gesättigt, damit sie auf dunklem Grund trägt.
+    --cm-keyword:  265 70% 78%;
+    --cm-string:   135 45% 65%;
+    --cm-comment:  195 9% 55%;
+    --cm-number:   25 80% 68%;
+    --cm-name:     205 70% 72%;
+    --cm-typ:      185 50% 65%;
+    --cm-invalid:  0 75% 70%;
+  }
+}
+
+// ===================================
+// Utility Classes Layer
+// ===================================
+@layer utilities {
+  // Text Color Utilities
+  .u-color-text-primary   { color: hsl(var(--color-text-primary)); }
+  .u-color-text-secondary { color: hsl(var(--color-text-secondary)); }
+  .u-color-text-tertiary  { color: hsl(var(--color-text-tertiary)); }
+  .u-color-text-inverse   { color: hsl(var(--color-text-inverse)); }
+  
+  .u-color-text-success   { color: hsl(var(--color-text-success)); }
+  .u-color-text-error     { color: hsl(var(--color-text-error)); }
+  .u-color-text-warning   { color: hsl(var(--color-text-warning)); }
+  .u-color-text-info      { color: hsl(var(--color-text-info)); }
+  
+  // Background Color Utilities
+  .u-bg-primary           { background-color: hsl(var(--color-bg-primary)); }
+  .u-bg-secondary         { background-color: hsl(var(--color-bg-secondary)); }
+  .u-bg-tertiary          { background-color: hsl(var(--color-bg-tertiary)); }
+  .u-bg-inverse           { background-color: hsl(var(--color-bg-inverse)); }
+  
+  .u-bg-success           { background-color: hsl(var(--color-green-100)); }
+  .u-bg-error             { background-color: hsl(var(--color-red-100)); }
+  .u-bg-warning           { background-color: hsl(var(--color-orange-100)); }
+  .u-bg-info              { background-color: hsl(var(--color-blue-100)); }
+
+}

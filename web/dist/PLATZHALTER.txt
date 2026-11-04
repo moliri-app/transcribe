@@ -1,0 +1,3 @@
+Build-Ausgabe der neuen Oberfläche (frontend/, pnpm build). Die EXE bettet diesen Ordner ein
+(web/web.go). Eingecheckt ist nur diese Datei, damit go build und go test auch ohne
+Frontend-Build gehen; pnpm build legt sie aus frontend/static/ wieder hierher.

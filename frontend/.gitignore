@@ -1,0 +1,5 @@
+node_modules
+/.svelte-kit
+vite.config.js.timestamp-*
+# erzeugt von scripts/generate-licenses.mjs (vor dev, build und check)
+/src/lib/generated/

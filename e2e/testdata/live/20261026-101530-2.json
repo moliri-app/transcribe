@@ -1,0 +1,11 @@
+{
+  "id": "20261026-101530-2",
+  "kind": "mic",
+  "client": "Moliri",
+  "started": "2026-10-26T10:15:30+01:00",
+  "ended": "2026-10-26T09:15:33Z",
+  "lines": [],
+  "source": "mic",
+  "language": "de",
+  "error": "Das Mikrofon ließ sich nicht öffnen: Das Gerät wird von einem anderen Programm benutzt."
+}

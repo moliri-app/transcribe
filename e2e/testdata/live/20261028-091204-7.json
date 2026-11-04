@@ -1,0 +1,58 @@
+{
+  "id": "20261028-091204-7",
+  "kind": "dauer",
+  "started": "2026-10-28T09:12:04+01:00",
+  "ended": "2026-10-28T08:12:51.480Z",
+  "lines": [
+    {
+      "text": "Guten Morgen zusammen, ich teile mal kurz den Bildschirm mit dem Plan für die Ausstellung.",
+      "start": 1.2,
+      "end": 7.5,
+      "source": "system"
+    },
+    {
+      "text": "Die Papierfabrik bekommt den großen Raum im Erdgeschoss, die Schöpfbütte steht in der Mitte.",
+      "start": 8.1,
+      "end": 13.98,
+      "source": "system"
+    },
+    {
+      "text": "Danke. Wie weit sind wir mit den Texten für die Hörstationen?",
+      "start": 14.58,
+      "end": 19.2,
+      "source": "mic"
+    },
+    {
+      "text": "Die Zeitzeugen-Interviews sind transkribiert, die Korrekturen fehlen noch bei zwei Aufnahmen.",
+      "start": 19.8,
+      "end": 24.42,
+      "source": "mic"
+    },
+    {
+      "text": "Frau Brenner hat angeboten, die Passagen in Plattdeutsch gegenzulesen.",
+      "start": 25.02,
+      "end": 28.8,
+      "source": "system"
+    },
+    {
+      "text": "Das wäre eine große Hilfe, sonst stimmen die Namen der Arbeiter nicht.",
+      "start": 29.4,
+      "end": 34.44,
+      "source": "system"
+    },
+    {
+      "text": "Dann nehmen wir das als Aufgabe mit. Eröffnung bleibt beim vierzehnten November?",
+      "start": 35.04,
+      "end": 40.08,
+      "source": "mic"
+    },
+    {
+      "text": "Ja, der Termin steht. Die Einladungen gehen nächste Woche raus.",
+      "start": 40.68,
+      "end": 44.88,
+      "source": "system"
+    }
+  ],
+  "source": "both",
+  "language": "de"
+}

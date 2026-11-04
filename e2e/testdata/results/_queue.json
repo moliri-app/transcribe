@@ -1,0 +1,34 @@
+{
+ "jobs": [
+  {
+   "id": "a1b2c3d4e5",
+   "audio": "Papierfabrik mit Korrekturen.mp3",
+   "stem": "Papierfabrik mit Korrekturen",
+   "options": { "preset": "interview", "speakers": 2, "quality": null, "language": "auto", "threads": 2 },
+   "status": "done",
+   "progress": 1,
+   "step": null,
+   "log": [],
+   "created": 1792400000,
+   "started": 1792400001,
+   "finished": 1792400014,
+   "error": null,
+   "note": null
+  },
+  {
+   "id": "f6e5d4c3b2",
+   "audio": "Papierfabrik Interview.mp3",
+   "stem": "Papierfabrik Interview",
+   "options": { "preset": "auto", "speakers": null, "quality": null, "language": "auto", "threads": 2 },
+   "status": "error",
+   "progress": 0.25,
+   "step": null,
+   "log": ["[1/4] analyze events", "Speicher voll"],
+   "created": 1792400100,
+   "started": 1792400101,
+   "finished": 1792400103,
+   "error": "Speicher voll",
+   "note": null
+  }
+ ]
+}

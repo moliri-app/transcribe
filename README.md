@@ -1,0 +1,207 @@
+# Transcribe by Moliri
+
+Transcribe by Moliri macht aus Audioaufnahmen ein lesbares, zeitgenaues Transkript mit Sprechern,
+Sprachen und Geräusch-Markern und hilft dabei, es dort zu korrigieren, wo die Maschine scheitert:
+Mundart, Plattdeutsch, Namen, Fremdsprache, Gesang. Gedacht ist es für Archiv- und Sammlungsteams,
+Ehrenamtliche und Forschende in Museen, die Zeitzeugen-Interviews, Rundgänge oder Mitschnitte
+erschließen.
+
+- **Läuft lokal.** Eine portable Windows-EXE mit eingebauter Oberfläche; die Aufnahmen verlassen den
+  Rechner nicht.
+- **Korrekturen bleiben erhalten.** Menschliche Korrekturen liegen getrennt vom Maschinenergebnis.
+  Neu berechnen überschreibt sie nie.
+- **Hören und Mitlesen.** Der Editor spielt die Aufnahme ab und markiert die gesprochene Stelle; Sprecher
+  benennen und zusammenlegen, Text ersetzen, Clips markieren und exportieren.
+
+Die Oberfläche ist deutsch.
+
+## Download
+
+Die fertige Windows-EXE gibt es unter
+[Releases](https://github.com/moliri-app/transcribe/releases). Sie braucht keine Installation: in einen
+Ordner legen und starten. Neben der EXE entsteht ein Ordner `data/` mit Aufnahmen (`audio/`),
+Ergebnissen (`results/`) und Modellen (`models/`).
+
+Beim ersten Start lädt die App aus dem Internet, was sie zum Erkennen braucht: die
+sherpa-onnx-Laufzeit, FFmpeg und die Sprach-, Sprecher- und Geräuschmodelle (zusammen einige hundert
+Megabyte bis wenige Gigabyte, je nach gewählter Qualität). Danach arbeitet sie ohne Internet.
+
+Beim Start und danach einmal am Tag fragt die App bei GitHub nach, ob es ein neueres Release gibt.
+Wenn ja, zeigt sie es in der App-Leiste, in den Einstellungen („Über Transcribe“) und im Menü des
+Symbols im Infobereich. Erst ein Klick auf „Jetzt aktualisieren“ lädt die neue EXE, legt sie an die
+Stelle der alten (die bis zum nächsten Start als `transcribe.old.exe` daneben liegt) und startet die
+App neu, sobald keine Aufträge und Aufnahmen mehr laufen. `data/` bleibt dabei unberührt. Selbst
+gebaute EXEs (`build.ps1`) fragen nie nach.
+
+### Erkennung über eine API
+
+In den **Einstellungen** unter „Erkennung“ lässt sich statt der Modelle auf dem Rechner ein Dienst
+über seine API nutzen:
+
+- **Nur auf diesem Rechner**: wie bisher, keine Aufnahme verlässt den Rechner.
+- **Nur über eine API**: Aufnahmen gehen zur Erkennung an den Dienst. Die App lädt dann keine
+  Modelle, nur FFmpeg.
+- **Beides**: je eine Vorgabe für Live und Diktieren und für ganze Aufnahmen; in der Bibliothek
+  und beim Ablegen von Dateien lässt sich je Aufnahme wählen.
+
+Zur Wahl stehen Dienste mit der OpenAI-kompatiblen Schnittstelle (`/v1/audio/transcriptions`:
+OpenAI, Groq, Mistral oder ein eigener Server wie Speaches oder LocalAI, auch im eigenen Netz) und
+ElevenLabs (Scribe). Adresse, Modell und Schlüssel lassen sich anpassen. Die OpenAI-kompatible
+Schnittstelle unterscheidet keine Sprecher und bekommt lange Aufnahmen in Stücken von höchstens zehn
+Minuten; live geht jede Äußerung nach einer Sprechpause einzeln hin. ElevenLabs unterscheidet
+Sprecher, erkennt Geräusche wie Lachen und zeigt live den Text schon beim Sprechen.
+
+Der Schlüssel liegt in `settings.json` im Datenordner. Für Tests gibt es einen Nachbau beider
+Schnittstellen in `internal/sttapi/sttapitest` (`pnpm start --api` in `e2e/`).
+
+## Starten
+
+```powershell
+.\transcribe.exe
+```
+
+Die App startet einen lokalen Server auf `http://localhost:8765` (ist der Port belegt, auf einem
+freien) und öffnet die Oberfläche in einem eigenen Fenster (Edge, Chrome oder Brave im App-Modus, sonst der Standardbrowser).
+
+| Option | Bedeutung |
+| --- | --- |
+| `--data <ordner>` | Datenordner statt `data/` neben der EXE (auch über `TRANSCRIBE_DATA`) |
+| `--port <zahl>` | anderer Port als 8765 |
+| `--no-browser` | kein Fenster öffnen, nur den Server starten |
+| `--background` | ohne Fenster starten, nur mit dem Symbol im Infobereich (so startet der Autostart) |
+| `--threads <zahl>` | Threads für Aufträge ohne eigene Zahl (sonst etwa einer je Prozessorkern) |
+
+Die Startseite ist die **Bibliothek**: Die transkribierten Aufnahmen stehen dort als Blätter, jedes
+mit dem Anfang seines Transkripts, den Sprechern und den Korrekturen von Hand; ein Klick öffnet es im
+Editor. Darüber steht, was gerade transkribiert wird, und was noch kein Transkript hat. Zu wählen
+sind nur die Sprecher (meist automatisch) und die Sprachen; die Zahl der Threads wählt die App selbst.
+
+Unter Windows zeigt die App ein Symbol im Infobereich der Taskleiste: Ein Klick öffnet das Fenster,
+ein Rechtsklick zeigt „Einstellungen“ und „Beenden“. Läuft die App schon, öffnet ein zweiter Start
+nur ihr Fenster.
+
+### Mit Windows starten, im Hintergrund weiterlaufen
+
+In den **Einstellungen** unter „Andere Programme“:
+
+- **Im Hintergrund bereit** (anfangs an): Andere Programme dürfen die Live-API nutzen, und die
+  Erkennung bleibt geladen, damit alles sofort startet (etwa 1 GB Arbeitsspeicher). Aus werden
+  Programme abgewiesen, und nichts bleibt geladen; von Hand aufnehmen und diktieren geht trotzdem,
+  es lädt die Erkennung dann beim Start.
+
+- **Mit Windows starten** trägt die App für den angemeldeten Benutzer in den Autostart ein
+  (`HKCU\…\CurrentVersion\Run`, ohne Administratorrechte; im Task-Manager unter „Autostart-Apps“).
+  Sie startet dann beim Anmelden ohne Fenster, mit `--background`.
+- **Nach dem Schließen weiterlaufen**: Schließt man das Fenster, bleibt die App im
+  Infobereich und nimmt weiter Aufträge und Live-Anfragen an. Sonst beendet sie sich, sobald kein
+  Auftrag und keine Live-Transkription mehr läuft.
+
+Ein Windows-Dienst ist das bewusst nicht: Dienste laufen ohne angemeldeten Benutzer, ohne Symbol in
+der Taskleiste, ohne Fenster und ohne Zugriff aufs Mikrofon.
+
+## Live-Transkription
+
+Die Seite **Live** macht aus Sprache sofort Text: selbst aufnehmen, übers Mikrofon, den Systemton
+(was der Rechner abspielt, etwa die anderen in einem Online-Meeting) oder beides gemischt (auf
+Wunsch mit gespeicherter Aufnahme, die sich danach vollständig mit Sprechern transkribieren lässt),
+oder andere Programme wie Moliri verbinden. Die tragen `ws://localhost:8765/api/live` als Adresse
+ein und schicken entweder selbst Ton, oder lassen Transcribe mithören und bekommen den Text laufend
+zurück. Jede Anfrage bleibt als Notiz stehen. Das Protokoll steht in
+[docs/live-api.md](docs/live-api.md).
+
+Der Schalter **Im Hintergrund bereit** unten auf der Seite (derselbe wie in den Einstellungen) hält
+die Erkennung geladen und lässt Programme zu, solange er an ist (so ist es anfangs): Eine Aufnahme
+beginnt dann sofort, ohne Ladezeit, und belegt dafür etwa 1 GB Arbeitsspeicher. Aus werden Programme
+abgewiesen, und nichts bleibt geladen; von Hand aufnehmen geht immer. Ein gewähltes Mikrofon nimmt
+die App unter Windows über WASAPI auf, auch ein Bluetooth-Headset liefert so nach etwa einer Sekunde
+Ton. Eine gespeicherte Aufnahme lässt sich neben ihrem Text abspielen; ein Klick auf die Zeit eines
+Satzes spielt ab dort.
+
+### Texterkennung für andere Programme
+
+Programme wie Moliri lassen Transcribe auch den Text von Bildern lesen (OCR): `POST
+http://localhost:8765/api/ocr` mit dem Bild, zurück kommen Zeilen und Wörter mit ihrer Lage im Bild.
+Webseiten brauchen dieselbe Erlaubnis wie für die Live-Transkription (Seite **Live**, „Wer sich
+verbinden darf“). Tesseract wird nicht mitgeliefert: Unter Windows lädt die App es beim ersten Lesen
+herunter (etwa 6 MB, dazu je Sprache 2–11 MB), unter Linux und macOS liest das installierte
+`tesseract`. Als zweite Erkennung liest PP-OCRv5 gedruckte lateinische Schrift genauer, auch auf der
+Grafikkarte; seine Modelle (13 MB) kommen ebenfalls erst beim ersten Lesen. Unter Windows liest auf
+Wunsch auch die Texterkennung von Windows selbst, mit den dort installierten Sprachen: sofort da und
+sehr schnell, aber ohne Fraktur und Handschrift. Mit einem eigenen Schlüssel liest außerdem ein
+KI-Dienst (OpenAI, Anthropic, Google Gemini, Mistral oder ein eigener Server wie Ollama), auch
+Handschrift; das Bild geht dann an den Dienst. Er liest nur, wenn ein Programm ihn nennt oder er in
+den Einstellungen als Vorgabe für Programme gewählt ist, nie von selbst; sein Schlüssel ist ein
+anderer als der für die Sprache und liegt ebenfalls nur in `settings.json`. Ausprobieren und
+einrichten lässt sich alles unter **Einstellungen → Texterkennung**. Das Protokoll steht in
+[docs/ocr-api.md](docs/ocr-api.md).
+
+### Diktieren in jedem Programm
+
+Unter Windows diktiert man mit einem Tastenkürzel in jedes Programm: **Strg + Alt + Leertaste**
+drücken und sprechen, dann noch einmal drücken. Transcribe schreibt das Gesagte dorthin, wo der
+Cursor steht, und legt es außerdem in die Zwischenablage. **Esc** bricht ab. Ein kleines Fenster
+über der Taskleiste zeigt wie ein Untertitel, dass Transcribe zuhört und was es schon verstanden
+hat; ein Klick darauf öffnet das Diktat auf der Seite Live. Diktiert wird mit dem Mikrofon und der
+Sprache der Seite Live; jedes Diktat steht danach auch dort.
+
+In den **Einstellungen** unter „Diktieren in jedem Programm“ lässt sich ein anderes Kürzel wählen
+(Strg + Umschalt + Leertaste, Strg + Alt + D) oder es ausschalten. Zwei Schalter bestimmen, wohin
+der Text geht: „Am Cursor einfügen“ und „In die Zwischenablage“. Mit beiden wird über Strg + V
+eingefügt; nur mit dem ersten tippt Transcribe den Text ein und lässt die Zwischenablage, wie sie
+war; sind beide aus, bleibt das Diktat nur im Fenster und auf der Seite Live, als Notiz oder zum
+Kopieren von Hand. Das Kürzel wirkt, solange Transcribe mit seinem Symbol im Infobereich
+läuft, also auch im Hintergrund oder nach dem Autostart. In Programme, die als Administrator laufen,
+kann Windows nicht einfügen lassen; dort liegt der Text in der Zwischenablage.
+
+`cmd/tx` ist ein Kommandozeilenprogramm, das die Erkennung einmal auf einer Datei laufen lässt, ohne
+Server: `go run ./cmd/tx -data <ordner> <datei in ordner/audio>`.
+
+## Bauen
+
+Voraussetzungen sind [Go](https://go.dev/dl/) 1.25 oder neuer und [Node](https://nodejs.org/) mit
+[pnpm](https://pnpm.io/) für die Oberfläche. Es braucht keinen C-Compiler; die Erkennungsbibliothek
+wird zur Laufzeit geladen.
+
+```powershell
+.uild.ps1                     # baut die Oberfläche (frontend/ -> web/dist), dann transcribe.exe
+go test ./...                   # Tests
+go run ./cmd/transcribe         # direkt starten, mit Konsolenausgabe
+```
+
+Auf Linux und macOS baut `go build ./cmd/transcribe` ein Programm für die jeweilige Plattform (vorher
+`pnpm build` in `frontend/`).
+
+Ein Tag `v*` baut über die GitHub-Action `.github/workflows/release.yml` Oberfläche und Windows-EXE
+und hängt die EXE an den Release des Tags.
+
+### Oberfläche
+
+Die Oberfläche ist eine SvelteKit-App in `frontend/`. `pnpm build` schreibt sie nach `web/dist`, das
+per `go:embed` in die EXE kommt (eingecheckt ist dort nur ein Platzhalter, damit `go build` auch ohne
+Frontend-Build geht).
+
+- **Seiten:** Welche Adressen die App ausliefert, steht in `internal/server/pages.go`; die Adressen
+  der früheren statischen Seiten (`/editor.html` …) leiten dorthin weiter.
+- **Entwickeln:** die EXE oder `go run ./cmd/transcribe` starten, dann in `frontend/` `pnpm dev`;
+  Vite reicht `/api`, `/audio` und `/results` an `http://localhost:8765` weiter (anderer Port:
+  `TRANSCRIBE_URL`).
+- **Moliri-Komponenten** (Knöpfe, Schalter, Reiter, Dialoge, Stile und der Transkript-Editor) liegen
+  gespiegelt unter `frontend/src/lib/moliri/` und werden nur in Moliri geändert. `pnpm sync:moliri`
+  gleicht sie an, `pnpm sync:check` meldet Abweichungen; beides braucht einen Moliri-Checkout
+  (`MOLIRI_SRC`). Woher der Editor seine Daten hat und wohin er speichert, sagt sein Speicher in
+  `frontend/src/lib/editor/speicher.js` (die API der EXE); die Seite `/editor` verbindet beides.
+- **Lizenzen** der mitgelieferten Pakete, Icons und Schriften zeigt die Seite `/lizenzen`; die
+  Liste entsteht bei jedem Build (`pnpm licenses:generate`).
+
+Die Oberfläche prüfen Playwright-Tests in `e2e/` (Node mit pnpm und `ffmpeg` im `PATH`):
+`cd e2e; pnpm install; pnpm exec playwright install chromium; pnpm test`. `pnpm start` startet die
+App mit den Testdaten zum Ausprobieren. Mehr dazu in [e2e/README.md](e2e/README.md).
+
+## Lizenz
+
+Der Quelltext steht unter der [Mozilla Public License 2.0](LICENSE). Drittkomponenten, Modelle und
+Schriften stehen unter eigenen Lizenzen; welche das sind und welche Namensnennungen dazugehören, steht
+in [NOTICE](NOTICE).
+
+„Moliri“ und „Transcribe by Moliri“ sind Namen von Moliri. Die MPL gibt keine Rechte an ihnen: Wer
+den Code weitergibt oder verändert, darf das gern tun, aber unter eigenem Namen.

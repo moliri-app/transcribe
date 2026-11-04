@@ -1,0 +1,20 @@
+<!doctype html>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+     License, v. 2.0. If a copy of the MPL was not distributed with this
+     file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
+<html lang="de">
+	<head>
+		<meta charset="utf-8" />
+		<!-- Reihenfolge der CSS-Layer wie in Moliri, BEVOR irgendein Stil lädt: die erste Nennung
+		     eines Layers legt seine Stelle fest, und eine Komponente mit `@layer components`
+		     dürfte sonst vor `reset` rutschen. -->
+		<style>@layer reset, base, tokens, components, utilities;</style>
+		<link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Transcribe by Moliri</title>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-code="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

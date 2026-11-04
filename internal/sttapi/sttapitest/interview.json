@@ -1,0 +1,923 @@
+{
+ "language_code": "deu",
+ "language_probability": 0.98,
+ "text": "Guten Tag. Herr Berger. Sie haben 40 Jahre in der Papierfabrik gearbeitet. Wie hat das angefangen? Angefangen hat es im Sommer 1960. Ich war 15 und kam als Lehrling an die große Papiermaschine. Was war ihre erste Aufgabe? Ich musste die Filze waschen und die Rollen beschriften. Das war harte Arbeit. Aber wir hatten viel Spaß. Vielen Dank für das Gespräch.",
+ "words": [
+  {
+   "text": "Guten",
+   "type": "word",
+   "start": 0.934,
+   "end": 1.254,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 1.254,
+   "end": 1.254,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "Tag.",
+   "type": "word",
+   "start": 1.254,
+   "end": 1.652,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 1.652,
+   "end": 2.166,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "Herr",
+   "type": "word",
+   "start": 2.166,
+   "end": 2.4530000000000003,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 2.4530000000000003,
+   "end": 2.4530000000000003,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "Berger.",
+   "type": "word",
+   "start": 2.4530000000000003,
+   "end": 2.74,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 2.74,
+   "end": 3.462,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "Sie",
+   "type": "word",
+   "start": 3.462,
+   "end": 3.702,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 3.702,
+   "end": 3.702,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "haben",
+   "type": "word",
+   "start": 3.702,
+   "end": 4.102,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 4.102,
+   "end": 4.102,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "40",
+   "type": "word",
+   "start": 4.102,
+   "end": 4.422,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 4.422,
+   "end": 4.422,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "Jahre",
+   "type": "word",
+   "start": 4.422,
+   "end": 4.742,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 4.742,
+   "end": 4.742,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "in",
+   "type": "word",
+   "start": 4.742,
+   "end": 4.902,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 4.902,
+   "end": 4.902,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "der",
+   "type": "word",
+   "start": 4.902,
+   "end": 5.062,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 5.062,
+   "end": 5.062,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "Papierfabrik",
+   "type": "word",
+   "start": 5.062,
+   "end": 6.022,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 6.022,
+   "end": 6.022,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "gearbeitet.",
+   "type": "word",
+   "start": 6.022,
+   "end": 6.772,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 6.772,
+   "end": 7.494,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "Wie",
+   "type": "word",
+   "start": 7.494,
+   "end": 7.734,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 7.734,
+   "end": 7.734,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "hat",
+   "type": "word",
+   "start": 7.734,
+   "end": 7.974,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 7.974,
+   "end": 7.974,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "das",
+   "type": "word",
+   "start": 7.974,
+   "end": 8.134,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 8.134,
+   "end": 8.134,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "angefangen?",
+   "type": "word",
+   "start": 8.134,
+   "end": 8.82,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 8.82,
+   "end": 10.334,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "Angefangen",
+   "type": "word",
+   "start": 10.334,
+   "end": 11.054,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 11.054,
+   "end": 11.054,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "hat",
+   "type": "word",
+   "start": 11.054,
+   "end": 11.294,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 11.294,
+   "end": 11.294,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "es",
+   "type": "word",
+   "start": 11.294,
+   "end": 11.454,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 11.454,
+   "end": 11.454,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "im",
+   "type": "word",
+   "start": 11.454,
+   "end": 11.614,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 11.614,
+   "end": 11.614,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "Sommer",
+   "type": "word",
+   "start": 11.614,
+   "end": 12.174,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 12.174,
+   "end": 12.174,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "1960.",
+   "type": "word",
+   "start": 12.174,
+   "end": 13.516,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 13.516,
+   "end": 14.27,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "Ich",
+   "type": "word",
+   "start": 14.27,
+   "end": 14.51,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 14.51,
+   "end": 14.51,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "war",
+   "type": "word",
+   "start": 14.51,
+   "end": 14.83,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 14.83,
+   "end": 14.83,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "15",
+   "type": "word",
+   "start": 14.83,
+   "end": 15.31,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 15.31,
+   "end": 15.31,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "und",
+   "type": "word",
+   "start": 15.31,
+   "end": 15.47,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 15.47,
+   "end": 15.47,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "kam",
+   "type": "word",
+   "start": 15.47,
+   "end": 15.71,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 15.71,
+   "end": 15.71,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "als",
+   "type": "word",
+   "start": 15.71,
+   "end": 15.95,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 15.95,
+   "end": 15.95,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "Lehrling",
+   "type": "word",
+   "start": 15.95,
+   "end": 16.59,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 16.59,
+   "end": 16.59,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "an",
+   "type": "word",
+   "start": 16.59,
+   "end": 16.75,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 16.75,
+   "end": 16.75,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "die",
+   "type": "word",
+   "start": 16.75,
+   "end": 16.91,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 16.91,
+   "end": 16.91,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "große",
+   "type": "word",
+   "start": 16.91,
+   "end": 17.23,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 17.23,
+   "end": 17.23,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "Papiermaschine.",
+   "type": "word",
+   "start": 17.23,
+   "end": 18.316,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 18.316,
+   "end": 19.876,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "Was",
+   "type": "word",
+   "start": 19.876,
+   "end": 20.116,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 20.116,
+   "end": 20.116,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "war",
+   "type": "word",
+   "start": 20.116,
+   "end": 20.356,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 20.356,
+   "end": 20.356,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "ihre",
+   "type": "word",
+   "start": 20.356,
+   "end": 20.596,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 20.596,
+   "end": 20.596,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "erste",
+   "type": "word",
+   "start": 20.596,
+   "end": 20.916,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 20.916,
+   "end": 20.916,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "Aufgabe?",
+   "type": "word",
+   "start": 20.916,
+   "end": 21.586,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 21.586,
+   "end": 23.044,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "Ich",
+   "type": "word",
+   "start": 23.044,
+   "end": 23.204,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 23.204,
+   "end": 23.204,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "musste",
+   "type": "word",
+   "start": 23.204,
+   "end": 23.604,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 23.604,
+   "end": 23.604,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "die",
+   "type": "word",
+   "start": 23.604,
+   "end": 23.764,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 23.764,
+   "end": 23.764,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "Filze",
+   "type": "word",
+   "start": 23.764,
+   "end": 24.324,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 24.324,
+   "end": 24.324,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "waschen",
+   "type": "word",
+   "start": 24.324,
+   "end": 24.724,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 24.724,
+   "end": 24.724,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "und",
+   "type": "word",
+   "start": 24.724,
+   "end": 24.804,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 24.804,
+   "end": 24.804,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "die",
+   "type": "word",
+   "start": 24.804,
+   "end": 24.964,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 24.964,
+   "end": 24.964,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "Rollen",
+   "type": "word",
+   "start": 24.964,
+   "end": 25.364,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 25.364,
+   "end": 25.364,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "beschriften.",
+   "type": "word",
+   "start": 25.364,
+   "end": 26.034,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 26.034,
+   "end": 26.852,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "Das",
+   "type": "word",
+   "start": 26.852,
+   "end": 27.092,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 27.092,
+   "end": 27.092,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "war",
+   "type": "word",
+   "start": 27.092,
+   "end": 27.252,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 27.252,
+   "end": 27.252,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "harte",
+   "type": "word",
+   "start": 27.252,
+   "end": 27.732,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 27.732,
+   "end": 27.732,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "Arbeit.",
+   "type": "word",
+   "start": 27.732,
+   "end": 28.306,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 28.306,
+   "end": 28.676,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "Aber",
+   "type": "word",
+   "start": 28.676,
+   "end": 28.996,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 28.996,
+   "end": 28.996,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "wir",
+   "type": "word",
+   "start": 28.996,
+   "end": 29.156,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 29.156,
+   "end": 29.156,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "hatten",
+   "type": "word",
+   "start": 29.156,
+   "end": 29.476,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 29.476,
+   "end": 29.476,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "viel",
+   "type": "word",
+   "start": 29.476,
+   "end": 29.796,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 29.796,
+   "end": 29.796,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "Spaß.",
+   "type": "word",
+   "start": 29.796,
+   "end": 30.418,
+   "logprob": -0.05,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": "(laughter)",
+   "type": "audio_event",
+   "start": 30.5,
+   "end": 31.6,
+   "speaker_id": "speaker_1"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 31.6,
+   "end": 31.972,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "Vielen",
+   "type": "word",
+   "start": 31.972,
+   "end": 32.372,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 32.372,
+   "end": 32.372,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "Dank",
+   "type": "word",
+   "start": 32.372,
+   "end": 32.612,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 32.612,
+   "end": 32.612,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "für",
+   "type": "word",
+   "start": 32.612,
+   "end": 32.772,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 32.772,
+   "end": 32.772,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "das",
+   "type": "word",
+   "start": 32.772,
+   "end": 32.932,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": " ",
+   "type": "spacing",
+   "start": 32.932,
+   "end": 32.932,
+   "speaker_id": "speaker_0"
+  },
+  {
+   "text": "Gespräch.",
+   "type": "word",
+   "start": 32.932,
+   "end": 33.618,
+   "logprob": -0.05,
+   "speaker_id": "speaker_0"
+  }
+ ],
+ "audio_duration_secs": 35.136
+}

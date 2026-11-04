@@ -1,0 +1,10 @@
+{
+  "preset": "auto",
+  "speakers": 0,
+  "language": "auto",
+  "quality": "",
+  "threads": 2,
+  "dropMode": "ask",
+  "accel": "cpu",
+  "gpuAsked": true
+}

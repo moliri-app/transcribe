@@ -1,0 +1,202 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+// Grundstile: Moliris Reset, Tokens und Komponentenstile (gespiegelt unter lib/moliri/scss),
+// darüber die Pflichten aus PRODUCT.md, wo Moliri kleiner ist: Schrift nicht unter 16px,
+// Klickziele ab 44px, deutlicher Fokus.
+@use 'sass:meta';
+
+@layer reset, base, tokens, components, utilities;
+
+@layer reset {
+	@include meta.load-css('lib/moliri/scss/reset');
+}
+@layer tokens {
+	@include meta.load-css('lib/moliri/scss/colors');
+}
+@layer components {
+	@include meta.load-css('lib/moliri/scss/components');
+}
+
+@layer base {
+	:root {
+		// Fläche, auf der die Seiten liegen: Moliris Nebelgrau
+		--page-bg: var(--color-bg-secondary);
+		// Mindesthöhe für alles, was man anklickt (PRODUCT.md: große Klickziele)
+		--hit: 44px;
+		// Schriften wie in Moliri (dort in src/app.scss): Atkinson Hyperlegible Next für die
+		// Bedienung, die Mono-Schwester nur für Code. Ausgeliefert über Fontsource, eingebunden
+		// in routes/+layout.svelte. Die Moliri-Komponenten fragen `var(--font-ui)` an.
+		--font-ui: 'Atkinson Hyperlegible Next Variable', 'Segoe UI', system-ui, sans-serif;
+		--font-mono: 'Atkinson Hyperlegible Mono Variable', ui-monospace, monospace;
+		// Sprecherfarben für alle Seiten (Editor, Modelle vergleichen): kräftig, lesbar als Schrift
+		// auf Papier und unter weißer Schrift, fern von Rotstift und Regie-Blau (DESIGN.md)
+		--spk0: #0b6f78;
+		--spk1: #6f42c1;
+		--spk2: #9a5b00;
+		--spk3: #2b7a4b;
+		--spk4: #93398a;
+		--spk5: #5f7012;
+		--spk6: #8a5a3c;
+		--spk7: #434b5c;
+	}
+
+	html,
+	body {
+		min-height: 100%;
+	}
+
+	body {
+		font-family: var(--font-ui);
+		font-size: 1rem;
+		line-height: 1.6;
+		background-color: hsl(var(--page-bg));
+		color: hsl(var(--color-text-primary));
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	h1,
+	h2,
+	h3 {
+		line-height: 1.2;
+		font-weight: 700;
+	}
+
+	a {
+		color: inherit;
+	}
+
+	// Fokus wie in Moliri: Archivcyan, 2px mit 2px Abstand
+	:focus-visible {
+		outline: 2px solid hsl(var(--color-border-focus));
+		outline-offset: 2px;
+	}
+
+	::selection {
+		// Blau, damit sich die Auswahl vom gerade gesprochenen Wort (Signalgrün) unterscheidet
+		background: hsl(var(--color-blue-50) / 0.55);
+		color: hsl(var(--color-neutral-100));
+	}
+
+	// Native Auswahl- und Eingabefelder (die Tests und Screenreader brauchen echte <select> und
+	// <input>), im Look der Moliri-Felder: Papier, Schieferrahmen, 0,5rem, Klickhöhe 44px.
+	.feld {
+		height: var(--hit);
+		padding: 0 0.75rem;
+		border: 1px solid hsl(var(--color-border-secondary));
+		border-radius: 0.5rem;
+		background-color: hsl(var(--color-bg-primary));
+		color: hsl(var(--color-text-primary));
+		font: inherit;
+		font-size: 1rem;
+		transition: border-color 0.15s;
+	}
+	.feld:hover {
+		border-color: hsl(var(--color-text-secondary));
+	}
+	.feld::placeholder {
+		color: hsl(var(--color-text-tertiary));
+	}
+	select.feld {
+		appearance: none;
+		// ohne Browserdarstellung sitzt der Text sonst oben im Feld
+		height: auto;
+		min-height: var(--hit);
+		padding-block: 0.55rem;
+		line-height: 1.4;
+		padding-right: 2.25rem;
+		cursor: pointer;
+		// Pfeil als Hintergrund, in Tinte
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%231b1c1d' d='M12 15.4 6.6 10l1.4-1.4 4 4 4-4 1.4 1.4z'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: right 0.6rem center;
+		background-size: 1.25rem;
+	}
+
+	// Beschriftung über einem Feld
+	.feldname {
+		display: grid;
+		gap: 0.3rem;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		color: hsl(var(--color-text-secondary));
+	}
+
+	// Moliris Reset nimmt allen Feldern die Browserdarstellung (all: unset). Kontrollkästchen,
+	// Optionsfelder und Schieber bekommen sie zurück, in Tinte statt Browserblau.
+	input[type='checkbox'],
+	input[type='radio'],
+	input[type='range'] {
+		appearance: auto;
+		accent-color: hsl(var(--color-neutral-100));
+		cursor: pointer;
+	}
+	input[type='checkbox'],
+	input[type='radio'] {
+		width: 1.25rem;
+		height: 1.25rem;
+		flex: none;
+		margin: 0;
+	}
+
+	// Aufklapper mit Pfeil (der Reset nimmt den Marker)
+	summary {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		cursor: pointer;
+	}
+	summary::before {
+		content: '';
+		width: 0.45rem;
+		height: 0.45rem;
+		border-right: 2px solid currentColor;
+		border-bottom: 2px solid currentColor;
+		transform: rotate(-45deg);
+		transition: transform 0.15s;
+	}
+	details[open] > summary::before {
+		transform: rotate(45deg);
+	}
+
+	.sr {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		white-space: nowrap;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			transition-duration: 0.01ms !important;
+			animation-duration: 0.01ms !important;
+		}
+	}
+}
+
+// PRODUCT.md vor Moliri: Moliris große Knöpfe haben die Bedienschrift (16px), sind mit 64px aber
+// höher als nötig. Hier 48px, ohne die gespiegelte Komponente zu ändern. Ungeschichtet und mit
+// body davor, damit es die Stile der Komponente schlägt.
+body .moliri-button.moliri-button-large {
+	padding-block: 0.25rem;
+}
+
+// Ebenso Moliris Schalter: Titel 14px und Beschreibung 12px sind unter der Mindestgröße. Hier
+// 16px und 15px, die Fläche mindestens so hoch wie ein großer Knopf.
+body .toggle-item {
+	min-height: 3rem;
+	padding: 0.75rem 1rem;
+	gap: 1rem;
+}
+body .toggle-item .toggle-title {
+	font-size: 1rem;
+}
+body .toggle-item .toggle-desc {
+	font-size: 0.9375rem;
+}

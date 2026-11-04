@@ -1,0 +1,30 @@
+{
+  "id": "20261024-153010-1",
+  "kind": "dauer",
+  "started": "2026-10-24T15:30:10+02:00",
+  "ended": "2026-10-24T13:30:36.180Z",
+  "lines": [
+    {
+      "text": "Welcome everyone to this webinar on oral history in industrial museums.",
+      "start": 1.2,
+      "end": 5.82
+    },
+    {
+      "text": "Today we will look at how volunteers can correct machine transcripts without losing the dialect.",
+      "start": 6.42,
+      "end": 12.72
+    },
+    {
+      "text": "Our first speaker works at a paper mill museum in Lower Saxony.",
+      "start": 13.32,
+      "end": 18.36
+    },
+    {
+      "text": "She will show how they mark uncertain passages instead of guessing.",
+      "start": 18.96,
+      "end": 23.58
+    }
+  ],
+  "source": "system",
+  "language": "en"
+}
