@@ -1318,7 +1318,10 @@
 		color: hsl(var(--color-text-tertiary));
 		overflow-wrap: anywhere;
 	}
+	/* über dem Link der Zeile, damit sein Hinweis zu sehen ist */
 	.neben {
+		position: relative;
+		z-index: 1;
 		display: inline-flex;
 		align-self: center;
 		color: hsl(var(--color-text-tertiary));
