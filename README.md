@@ -150,6 +150,17 @@ anderer als der für die Sprache und liegt ebenfalls nur in `settings.json`. Aus
 einrichten lässt sich alles unter **Einstellungen → Texterkennung**. Das Protokoll steht in
 [docs/ocr-api.md](docs/ocr-api.md).
 
+### Suche nach Bedeutung für Moliri
+
+Moliris Feldauswahl findet Felder auch nach ihrer Bedeutung („Künstler“ findet *Urheber*), mit dem
+Sprachmodell EmbeddingGemma. Statt es in jeden Browser zu laden, kann Moliri Transcribe rechnen
+lassen: `POST http://localhost:8765/api/embed` mit Texten, zurück kommen ihre Vektoren, dieselben
+wie im Browser. Das Modell (295 MB) kommt erst, wenn Moliri oder die Einstellungen danach fragen,
+und rechnet auf dem Prozessor, etwa eine Zehntelsekunde je Suchwort; geladen belegt es rund 1,4 GB
+Arbeitsspeicher und gibt sie nach einer Viertelstunde ohne Anfrage wieder frei. Webseiten brauchen
+dieselbe Erlaubnis wie für die Texterkennung. Das Protokoll steht in
+[docs/embed-api.md](docs/embed-api.md).
+
 ### Diktieren in jedem Programm
 
 Unter Windows diktiert man mit einem Tastenkürzel in jedes Programm: **Strg + Alt + Leertaste**
@@ -205,6 +216,7 @@ andere Programme importieren können. Moliris Server-Dienst nimmt sie so, fest a
 | `sherpa` | sherpa-onnx über purego |
 | `audio` | Dekodieren mit ffmpeg |
 | `ocr`, `ort` | Texterkennung im Format 1: Tesseract als Programm, PP-OCRv5 über onnxruntime; Testsatz in `ocr/ocrtest` |
+| `embed` | Vektoren für die Suche nach Bedeutung: EmbeddingGemma über onnxruntime, mit Gemmas Tokenizer in Go |
 | `jobs` | Optionen und Fortschritt eines Auftrags |
 | `stream` | was ein Live-Stream liefert, gesprochene Satzzeichen |
 | `fileutil`, `proc` | Hilfen |

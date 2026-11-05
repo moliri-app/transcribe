@@ -248,6 +248,19 @@ reads)
   The pre- and post-processing in ocr/ppocr*.go follows RapidOCR's
   Python code (ch_ppocr_det, ch_ppocr_rec, cal_rec_boxes), rewritten in Go.
 
+EmbeddingGemma (embeddinggemma-300m, 8-bit ONNX export; downloaded when Moliri
+or the settings page asks for it, never shipped)
+  Gemma Terms of Use, https://ai.google.dev/gemma/terms, and the Gemma
+  Prohibited Use Policy, https://ai.google.dev/gemma/prohibited_use_policy.
+  Copyright Google LLC.
+  Converted to ONNX and published by onnx-community on Hugging Face,
+  https://huggingface.co/onnx-community/embeddinggemma-300m-ONNX (revision
+  5090578d9565bb06545b4552f76e6bc2c93e4a66: tokenizer.json,
+  onnx/model_quantized.onnx, onnx/model_quantized.onnx_data).
+  The tokenizer in embed/tokenizer.go follows that tokenizer.json as
+  transformers.js reads it (Apache License 2.0, Hugging Face), rewritten in Go.
+
 
 All licenses were checked again at the sources named above on 2026-11-03,
-PP-OCRv5, RapidOCR and golang.org/x/image when they were added that day.
+PP-OCRv5, RapidOCR and golang.org/x/image when they were added that day,
+EmbeddingGemma on 2026-11-05.
