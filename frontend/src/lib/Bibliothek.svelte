@@ -7,7 +7,7 @@
      oder gescheitert ist, und die Aufnahmen, die noch kein Transkript haben, zum Einreihen.
      Steht unter / und, für alte Lesezeichen, unter /queue. -->
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import Button from '$lib/moliri/components/ui/Button.svelte';
 	import AuftragsOptionen from '$lib/AuftragsOptionen.svelte';
 	import { auftraege, geaendert } from '$lib/auftraege.svelte.js';
@@ -281,10 +281,13 @@
 	}
 
 	// Nach dem Ablegen von Dateien im Fenster (Einrichtung.svelte) oder einer eigenen Aktion sofort neu laden
+	// (nur auf auftraege.stand hören: ladeAuftraege liest die Aufträge, die es selbst setzt, und lüde sonst endlos neu)
 	$effect(() => {
 		auftraege.stand;
-		ladeAufnahmen();
-		ladeAuftraege();
+		untrack(() => {
+			ladeAufnahmen();
+			ladeAuftraege();
+		});
 	});
 
 	onMount(() => {
@@ -1073,7 +1076,7 @@
 	}
 
 	.rueckfrage {
-		width: min(32rem, calc(100vw - 2rem));
+		width: min(36rem, calc(100vw - 2rem));
 		margin: auto;
 		padding: 1.5rem 1.75rem;
 		border: 0;
