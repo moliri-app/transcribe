@@ -53,6 +53,11 @@
 	let sorte = $state(/** @type {'zuletzt' | 'name' | 'laenge'} */ ('zuletzt'));
 	/** Uhr für die Laufzeit laufender Aufträge, in Sekunden */
 	let jetzt = $state(Date.now() / 1000);
+	/** die Aufnahme, nach deren Löschen gerade gefragt wird */
+	let loeschen = $state(/** @type {Aufnahme | null} */ (null));
+	let loescht = $state(false);
+	/** @type {HTMLDialogElement} */
+	let rueckfrage;
 
 	/** je Aufnahme ihr jüngster Auftrag (die Warteschlange führt sie in der Reihenfolge des Einreihens) */
 	const letzter = $derived(new Map((jobs ?? []).map((j) => [j.audio, j])));
@@ -218,6 +223,37 @@
 		}
 	}
 
+	/** Wird die Aufnahme gerade transkribiert? Dann lässt sie sich nicht löschen; wartet sie nur, wird der Auftrag mit ihr abgebrochen.
+	 * @param {Aufnahme} a */
+	function inBearbeitung(a) {
+		const s = letzter.get(a.name)?.status;
+		return s === 'running' || s === 'canceling';
+	}
+
+	/** @param {Aufnahme} a */
+	function fragLoeschen(a) {
+		loeschen = a;
+		rueckfrage.showModal();
+	}
+
+	async function loeschenBestaetigt() {
+		const a = loeschen;
+		if (!a) return;
+		loescht = true;
+		try {
+			await post(`/api/delete?name=${encodeURIComponent(a.name)}`);
+			meldung = `„${titel(a.name)}“ ist gelöscht.`;
+			gewaehlt = gewaehlt.filter((n) => n !== a.name);
+		} catch (e) {
+			meldung = /** @type {Error} */ (e).message;
+		} finally {
+			loescht = false;
+			rueckfrage.close();
+		}
+		ladeAufnahmen();
+		geaendert();
+	}
+
 	/** Der Editor öffnet die Aufnahme, die hier zuletzt gewählt wurde. */
 	function imEditor(/** @type {string} */ stem) {
 		try {
@@ -225,6 +261,17 @@
 		} catch {
 			// ohne Speicher öffnet der Editor die zuletzt dort gewählte Aufnahme
 		}
+	}
+
+	/** was von Hand am Transkript getan wurde: „2 Korrekturen von Hand und 1 Clip“
+	 * @param {Inhalt} s */
+	function arbeitInWorten(s) {
+		return [
+			s.edits === 1 ? '1 Korrektur von Hand' : s.edits ? `${s.edits} Korrekturen von Hand` : '',
+			s.clips === 1 ? '1 Clip' : s.clips ? `${s.clips} Clips` : ''
+		]
+			.filter(Boolean)
+			.join(' und ');
 	}
 
 	/** @param {Auftrag} j */
@@ -337,14 +384,19 @@
 			</div>
 			<div class="aufnahmen" role="group" aria-label="Aufnahmen ohne Transkript">
 				{#each neu as a (a.name)}
-					<label class="aufnahme" class:gewaehlt={gewaehlt.includes(a.name)}>
-						<input type="checkbox" value={a.name} bind:group={gewaehlt} />
-						<span class="name">{a.name}</span>
-						{#if a.video}
-							<span class="art" title="Video"><IconMaterialSymbolsMovieOutlineRounded aria-hidden="true" /><span class="sr">Video</span></span>
-						{/if}
-						<span class="hinzu">{wann(a.added)}</span>
-					</label>
+					<div class="aufnahme" class:gewaehlt={gewaehlt.includes(a.name)}>
+						<label>
+							<input type="checkbox" value={a.name} bind:group={gewaehlt} />
+							<span class="name">{a.name}</span>
+							{#if a.video}
+								<span class="art" title="Video"><IconMaterialSymbolsMovieOutlineRounded aria-hidden="true" /><span class="sr">Video</span></span>
+							{/if}
+							<span class="hinzu">{wann(a.added)}</span>
+						</label>
+						<button class="weg" type="button" title="Löschen" aria-label="{titel(a.name)} löschen" onclick={() => fragLoeschen(a)}>
+							<IconMaterialSymbolsDeleteOutlineRounded aria-hidden="true" />
+						</button>
+					</div>
 				{/each}
 			</div>
 			<AuftragsOptionen bind:optionen {erkennung} />
@@ -453,12 +505,51 @@
 							>
 								<IconMaterialSymbolsRefreshRounded aria-hidden="true" />
 							</button>
+							<button
+								class="weg"
+								type="button"
+								disabled={inBearbeitung(a)}
+								title={inBearbeitung(a) ? 'Wird gerade transkribiert; erst abbrechen, dann löschen' : 'Löschen'}
+								aria-label="{titel(a.name)} löschen"
+								onclick={() => fragLoeschen(a)}
+							>
+								<IconMaterialSymbolsDeleteOutlineRounded aria-hidden="true" />
+							</button>
 						</div>
 					</li>
 				{/each}
 			</ul>
 		{/if}
 	</section>
+
+	<dialog class="rueckfrage" bind:this={rueckfrage} aria-labelledby="h-loeschen" onclose={() => (loeschen = null)}>
+		{#if loeschen}
+			{@const s = loeschen.summary}
+			<h2 id="h-loeschen">„{titel(loeschen.name)}“ löschen?</h2>
+			{#if s}
+				<p>
+					Die Aufnahme wird von diesem Computer gelöscht, und mit ihr das Transkript samt allen Korrekturen, Sprechernamen und
+					Clips.
+				</p>
+				{#if s.edits || s.clips}
+					<p>Darin stecken {arbeitInWorten(s)}.</p>
+				{/if}
+			{:else}
+				<p>Die Datei wird aus der Bibliothek und von diesem Computer gelöscht.</p>
+			{/if}
+			{#if letzter.get(loeschen.name)?.status === 'queued'}
+				<p>Sie wartet gerade darauf, transkribiert zu werden; der Auftrag wird abgebrochen.</p>
+			{/if}
+			<p><strong>Das lässt sich nicht rückgängig machen.</strong></p>
+			<div class="knoepfe">
+				<Button type="secondary" size="large" autofocus onclick={() => rueckfrage.close()}>Abbrechen</Button>
+				<button class="endgueltig" type="button" disabled={loescht} onclick={loeschenBestaetigt}>
+					<IconMaterialSymbolsDeleteOutlineRounded aria-hidden="true" />
+					{s ? 'Aufnahme und Transkript löschen' : 'Aufnahme löschen'}
+				</button>
+			</div>
+		{/if}
+	</dialog>
 </main>
 
 <style>
@@ -693,12 +784,18 @@
 	.aufnahme {
 		display: flex;
 		align-items: center;
+		gap: 0.25rem;
+		border-radius: 0.375rem;
+		transition: background-color 0.15s;
+	}
+	.aufnahme label {
+		flex: 1;
+		display: flex;
+		align-items: center;
 		gap: 0.75rem;
 		min-height: var(--hit);
-		padding: 0.25rem 0.75rem;
-		border-radius: 0.375rem;
+		padding: 0.25rem 0 0.25rem 0.75rem;
 		cursor: pointer;
-		transition: background-color 0.15s;
 	}
 	.aufnahme:hover {
 		background: hsl(var(--color-interactive-hover));
@@ -943,6 +1040,94 @@
 	.neu-tx :global(svg) {
 		width: 1.375rem;
 		height: 1.375rem;
+	}
+
+	/* Löschen: leise, bis man darauf zeigt; im Blatt unten rechts, in der Zeile am Ende */
+	.weg {
+		flex: none;
+		width: var(--hit);
+		height: var(--hit);
+		display: grid;
+		place-items: center;
+		border-radius: 50%;
+		color: hsl(var(--color-text-tertiary));
+		cursor: pointer;
+		transition: background-color 0.15s, color 0.15s;
+	}
+	.weg:hover:not(:disabled) {
+		background: hsl(var(--color-red-10));
+		color: hsl(var(--color-text-error));
+	}
+	.weg:disabled {
+		opacity: 0.4;
+		cursor: default;
+	}
+	.weg :global(svg) {
+		width: 1.25rem;
+		height: 1.25rem;
+	}
+	.karte .weg {
+		position: relative;
+		z-index: 1;
+		margin: -0.5rem -0.75rem -0.5rem auto;
+	}
+
+	.rueckfrage {
+		width: min(32rem, calc(100vw - 2rem));
+		margin: auto;
+		padding: 1.5rem 1.75rem;
+		border: 0;
+		border-radius: 0.75rem;
+		background: hsl(var(--color-bg-primary));
+		color: hsl(var(--color-text-primary));
+		box-shadow: 0 24px 64px -24px hsl(var(--color-neutral-100) / 0.5);
+	}
+	.rueckfrage::backdrop {
+		background: hsl(var(--color-neutral-100) / 0.3);
+		backdrop-filter: blur(4px);
+	}
+	.rueckfrage h2 {
+		margin-bottom: 0.75rem;
+		overflow-wrap: anywhere;
+	}
+	.rueckfrage p {
+		margin-bottom: 0.6rem;
+		color: hsl(var(--color-text-secondary));
+		line-height: 1.5;
+	}
+	.rueckfrage strong {
+		color: hsl(var(--color-text-primary));
+	}
+	.knoepfe {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: 0.75rem;
+		margin-top: 1.25rem;
+	}
+	.endgueltig {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		min-height: 3rem;
+		padding: 0 1.25rem 0 1rem;
+		border-radius: 2rem;
+		background: hsl(var(--color-text-error));
+		color: hsl(var(--color-neutral-0));
+		font-weight: 600;
+		letter-spacing: 0.05em;
+		cursor: pointer;
+	}
+	.endgueltig:hover:not(:disabled) {
+		filter: brightness(0.9);
+	}
+	.endgueltig:disabled {
+		opacity: 0.6;
+		cursor: default;
+	}
+	.endgueltig :global(svg) {
+		width: 1.25rem;
+		height: 1.25rem;
 	}
 
 	/* Leer: das Blatt lädt zum ersten Ablegen ein */

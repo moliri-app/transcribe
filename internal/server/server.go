@@ -111,6 +111,7 @@ func New(cfg Config) *Server {
 	m.HandleFunc("/api/queue", s.queueList)
 	m.HandleFunc("/api/queue/", s.queueAction)
 	m.HandleFunc("/api/upload", s.upload)
+	m.HandleFunc("/api/delete", s.deleteRecording)
 	m.HandleFunc("/api/annotations", s.annotations)
 	m.HandleFunc("/api/apply", s.apply)
 	m.HandleFunc("/api/live", s.liveSocket)

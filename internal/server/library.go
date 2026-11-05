@@ -6,6 +6,8 @@ package server
 
 import (
 	"cmp"
+	"errors"
+	"net/http"
 	"os"
 	"path/filepath"
 	"slices"
@@ -16,6 +18,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/moliri-app/transcribe/fileutil"
+	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/queue"
 	"github.com/moliri-app/transcribe/model"
 )
 
@@ -131,4 +135,51 @@ func added(path string) int64 {
 		return time.Now().Unix()
 	}
 	return st.ModTime().Unix()
+}
+
+// deleteRecording handles POST /api/delete?name=<file in audio/>: the recording goes from the
+// library with all it has in results/<stem>/, transcript and corrections included. A job of it
+// still waiting in the queue is cancelled; while one runs, the recording stays (409).
+func (s *Server) deleteRecording(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.NotFound(w, r)
+		return
+	}
+	if !allowedPost(r) {
+		http.Error(w, "forbidden", 403)
+		return
+	}
+	name := r.URL.Query().Get("name")
+	if name == "" || strings.ContainsAny(name, `/\:`) || !media.IsMedia(name) {
+		fail(w, 400, "unknown file")
+		return
+	}
+	if st, err := os.Stat(filepath.Join(s.audioDir(), name)); err != nil || st.IsDir() {
+		fail(w, 404, "unknown file")
+		return
+	}
+	if err := s.Queue.Forget(name); errors.Is(err, queue.ErrBusy) {
+		fail(w, 409, "Die Aufnahme wird gerade transkribiert. Brich das zuerst ab.")
+		return
+	}
+	if err := s.removeRecording(name); err != nil {
+		fail(w, 500, err.Error())
+		return
+	}
+	writeJSON(w, 200, map[string]any{"ok": true})
+}
+
+// removeRecording deletes audio/<name> and, unless another recording of the same stem is left,
+// results/<stem>/.
+func (s *Server) removeRecording(name string) error {
+	if err := os.Remove(filepath.Join(s.audioDir(), name)); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	stem := media.Stem(name)
+	if media.FindMedia(s.cfg.DataDir, stem) != "" {
+		return nil
+	}
+	rdir := filepath.Join(s.resultsDir(), stem)
+	summaries.Delete(rdir)
+	return os.RemoveAll(rdir)
 }
