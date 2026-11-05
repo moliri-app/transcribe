@@ -1,0 +1,130 @@
+/*
+ * Moliri's look for the shared Obeya demo pages: the same file in moliri-sveltekit, moliri-app and
+ * transcribe-go, so every demo page of the three looks alike. Obeya puts it after its own style
+ * (its markup is the interface: docs/design/sharing-demos.md in Obeya, "A repository's theme").
+ *
+ * "Das Depot" (DESIGN.md): a mid grey ground, a paper surface on it, the ink bar on top as in the
+ * app, Atkinson Hyperlegible Next, colour only as a signal: signal green for the one main action
+ * (playing the video), ink for what is selected, archive cyan for focus. Light only, as the app is.
+ * Change it in all three repositories at once.
+ */
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  src: url('theme/atkinson-hyperlegible-next.woff2') format('woff2');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root,
+:root:not(#light) {
+  color-scheme: light;
+  --ground: #919191;
+  --bg: #919191;
+  --card: #ffffff;
+  --paper: hsl(0 0% 98%);
+  --ink: hsl(210 4% 11%);
+  --muted: hsl(195 9% 38%);
+  --line: hsl(190 12% 82%);
+  --chip: hsl(156 12% 92%);
+  --slate: hsl(190 12% 61%);
+  --accent: hsl(190 100% 35%);
+  --signal: hsl(95 100% 46%);
+  --signal-light: hsl(93 100% 70%);
+  --font: 'Atkinson Hyperlegible Next', 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font: 16px/1.6 var(--font);
+}
+
+/* the ink bar of the app, with the Moliri mark and name in line with the page */
+body::before {
+  content: 'Moliri';
+  display: block;
+  height: 54px;
+  line-height: 54px;
+  background: var(--ink) url('theme/moliri-mark.svg') no-repeat left max(30px, calc((100% - 1080px) / 2 + 32px)) center / 26px 26px;
+  padding-left: calc(max(30px, (100% - 1080px) / 2 + 32px) + 38px);
+  color: var(--paper);
+  font: 700 18px/54px var(--font);
+  letter-spacing: 0.01em;
+}
+
+/* the page itself is a paper surface on the grey ground */
+main {
+  background: var(--paper);
+  border-radius: 8px;
+  margin: 24px auto 40px;
+  padding: 28px 32px 32px;
+  max-width: 1080px;
+}
+@media (max-width: 1128px) {
+  main { margin: 16px 12px 24px; padding: 22px 18px 26px; }
+}
+
+a { color: var(--ink); text-decoration-color: var(--slate); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:hover { text-decoration-color: var(--ink); text-decoration-thickness: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.top { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+.top a { color: var(--muted); text-decoration: none; }
+.top a::before { content: '← '; }
+.top a:hover { color: var(--ink); }
+
+h1 { font: 700 32px/1.2 var(--font); letter-spacing: -0.01em; margin: 0 0 6px; }
+.when { color: var(--muted); font-size: 14px; }
+.text p { max-width: 70ch; }
+
+.tags { margin: 0 0 18px; }
+.tag { font-size: 12px; font-weight: 600; letter-spacing: 0.05em; padding: 3px 11px; background: var(--chip); }
+.tag span { font-weight: 400; letter-spacing: 0; }
+a.tag:hover { border-color: var(--ink); }
+
+/* the video and its chapters */
+.grid { grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; }
+@media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+video { border-radius: 6px; background: var(--ink); }
+.start span { background: var(--signal); box-shadow: 0 0 0 6px rgb(0 0 0 / 0.18); }
+.start:hover span { background: var(--signal-light); }
+.start svg { fill: var(--ink); }
+
+ol { background: var(--chip); border-radius: 6px; padding: 6px; }
+ol button { border-radius: 6px; padding: 6px 10px; font-size: 14px; }
+ol button:hover { background: var(--card); }
+ol button.on { background: var(--ink); color: var(--paper); font-weight: 600; }
+ol button.on .t { color: var(--slate); }
+ol .t { color: var(--muted); }
+
+.pr { font-size: 14px; }
+.links { font-size: 14px; }
+
+.artifact { border: 1px solid var(--line); border-radius: 6px; }
+
+/* several versions on one page */
+.sections { font-size: 14px; }
+section.addendum { border-top: 1px solid var(--line); }
+section.addendum h2 { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; }
+section.addendum h3 { font: 700 24px/1.2 var(--font); letter-spacing: -0.01em; }
+
+/* the overview of a site */
+.filter input { font: inherit; border-radius: 4px; border-color: var(--line); background: var(--card); padding: 8px 12px; }
+.filter input:focus { border-color: var(--accent); }
+.dim > span { font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+.chip { font-size: 13px; font-weight: 600; padding: 3px 12px; border-radius: 2rem; border-color: var(--line); background: var(--card); }
+.chip:hover { border-color: var(--ink); }
+.chip[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.bar { border-top-color: var(--line); }
+.copy-all, .copy { color: var(--ink); }
+ul.demos { gap: 10px; }
+ul.demos a { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 14px 52px 14px 18px; }
+ul.demos a:hover { border-color: var(--ink); }
+ul.demos b { font: 700 19px/1.3 var(--font); letter-spacing: -0.005em; }
+ul.demos i em { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; background: var(--chip); color: var(--muted); padding: 1px 9px; }
+.copy:hover { background: var(--chip); }
+
+.credit { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; }
+.credit a { color: var(--muted); }
