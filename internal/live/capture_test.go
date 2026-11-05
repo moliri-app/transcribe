@@ -6,6 +6,7 @@ package live
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -151,5 +152,53 @@ func TestDictationRecordsTheMicrophone(t *testing.T) {
 	defer h.StopDauer()
 	if _, err := h.Dictate(context.Background(), func(Event) {}); err != errSystemOnly {
 		t.Errorf("dictating during a recording of the system sound: %v", err)
+	}
+}
+
+// Once the recording on the Live page is stopped, the page is told so last: an older state of the
+// microphone, still naming the recording, never comes after it.
+func TestStopDauerTellsTheLivePageLast(t *testing.T) {
+	if _, err := exec.LookPath(media.Tool("ffmpeg")); err != nil {
+		t.Skip("no ffmpeg")
+	}
+	dir := t.TempDir()
+	writeTone(t, filepath.Join(dir, "mic.wav"), 440)
+	t.Setenv("TRANSCRIBE_LIVE_INPUT", filepath.Join(dir, "mic.wav"))
+	if err := os.MkdirAll(media.AudioDir(dir), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	h := NewHub(dir, func(context.Context, string) (Stream, error) { return &fakeStream{}, nil })
+	for range 5 {
+		if err := h.StartDauer(context.Background(), true); err != nil {
+			t.Fatal(err)
+		}
+		if err := h.StartDauer(context.Background(), true); err == nil {
+			t.Fatal("a second recording started")
+		}
+		_, updates, cancel := h.Subscribe()
+		time.Sleep(300 * time.Millisecond)
+		h.StopDauer()
+		if d := h.micState().Dauer; d != "" {
+			t.Fatalf("still recording %s once stopped", d)
+		}
+		last := ""
+		for quiet := false; !quiet; {
+			select {
+			case b := <-updates:
+				var m struct {
+					Type string
+					Mic  MicState
+				}
+				if json.Unmarshal(b, &m) == nil && m.Type == "mic" {
+					last = m.Mic.Dauer
+				}
+			case <-time.After(300 * time.Millisecond):
+				quiet = true
+			}
+		}
+		cancel()
+		if last != "" {
+			t.Fatalf("the Live page was told last that %s still records", last)
+		}
 	}
 }

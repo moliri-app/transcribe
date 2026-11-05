@@ -226,7 +226,7 @@ const editKey = (/** @type {Edit} */ e) =>
  */
 export function buildWords(/** @type {any} */ final, /** @type {Annotationen} */ ann) {
 	/** @type {Wort[]} */
-	let ws = final.segments.flatMap((/** @type {any} */ s) => s.words.map((/** @type {Wort} */ w) => ({ ...w }))).sort((/** @type {Wort} */ x, /** @type {Wort} */ y) => x.start - y.start);
+	let ws = (final.segments || []).flatMap((/** @type {any} */ s) => (s.words || []).map((/** @type {Wort} */ w) => ({ ...w }))).sort((/** @type {Wort} */ x, /** @type {Wort} */ y) => x.start - y.start);
 	const done = final.edits_applied || [];
 	let k = 0;
 	while (k < done.length && k < ann.edits.length && editKey(done[k]) === editKey(ann.edits[k])) k++;

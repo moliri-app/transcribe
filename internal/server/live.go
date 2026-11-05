@@ -10,10 +10,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -21,7 +24,9 @@ import (
 	"github.com/coder/websocket"
 
 	"github.com/moliri-app/transcribe/internal/live"
+	"github.com/moliri-app/transcribe/internal/media"
 	"github.com/moliri-app/transcribe/internal/prefs"
+	"github.com/moliri-app/transcribe/internal/queue"
 	"github.com/moliri-app/transcribe/jobs"
 )
 
@@ -414,7 +419,10 @@ func (s *Server) liveAPI(w http.ResponseWriter, r *http.Request) {
 	case "stop":
 		s.Live.StopDauer()
 	case "delete":
-		err = s.Live.Delete(in.ID)
+		n := s.Live.Note(in.ID)
+		if err = s.Live.Delete(in.ID); err == nil && n != nil && n.Audio != "" {
+			s.dropRecording(n.Audio)
+		}
 	case "allow":
 		err = s.Live.Allow(in.Origin, true)
 	case "forbid":
@@ -428,4 +436,28 @@ func (s *Server) liveAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, 200, map[string]any{"ok": true})
+}
+
+// dropRecording removes the recording a deleted Live note saved in audio/, so the library does not
+// offer it for transcription any more. One that was transcribed in full stays: it has a place in
+// the library of its own, as does one waiting in the queue.
+func (s *Server) dropRecording(name string) {
+	if strings.ContainsAny(name, `/\`) || !media.IsMedia(name) {
+		return
+	}
+	stem := media.Stem(name)
+	rdir := filepath.Join(s.resultsDir(), stem)
+	if _, err := os.Stat(filepath.Join(rdir, "_final.json")); err == nil {
+		return
+	}
+	for _, j := range s.Queue.List() {
+		if j.Audio == name && (j.Status == queue.Queued || j.Status == queue.Running || j.Status == queue.Canceling) {
+			return
+		}
+	}
+	if err := os.Remove(filepath.Join(s.audioDir(), name)); err != nil && !os.IsNotExist(err) {
+		log.Println("live: removing the recording of a deleted note:", err)
+		return
+	}
+	_ = os.RemoveAll(rdir) // what a cancelled transcription left
 }

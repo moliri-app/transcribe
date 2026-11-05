@@ -188,7 +188,7 @@ func smoothSentences(words []Word) {
 
 // ToSegments groups words into segments: a new one at every speaker change or sentence end after a pause.
 func ToSegments(words []Word) []Word {
-	var segs []Word
+	segs := []Word{} // nothing recognised is no segments, not null
 	for _, w := range words {
 		var last Word
 		if len(segs) > 0 {

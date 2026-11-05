@@ -67,8 +67,10 @@
 <div class="leiste" role="group" aria-label="Aufnehmen">
 	<div class="links">
 		{#if live.laufend}
-			<button class="beenden" type="button" onclick={() => live.beenden()}>
-				<IconMaterialSymbolsStopRounded aria-hidden="true" />Beenden
+			<button class="beenden" type="button" disabled={live.beendet} aria-busy={live.beendet} onclick={() => live.beenden()}>
+				{#if live.beendet}<IconEosIconsLoading aria-hidden="true" />Wird beendet …{:else}<IconMaterialSymbolsStopRounded
+						aria-hidden="true"
+					/>Beenden{/if}
 			</button>
 			<div class="jetzt">
 				{#if live.laufend.loading || live.laufend.waiting}
@@ -334,8 +336,11 @@
 		cursor: pointer;
 		transition: background-color 0.15s;
 	}
-	.beenden:hover {
+	.beenden:hover:not(:disabled) {
 		background: hsl(var(--color-neutral-10));
+	}
+	.beenden:disabled {
+		cursor: progress;
 	}
 	.beenden :global(svg) {
 		width: 1.625rem;

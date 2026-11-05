@@ -19,7 +19,7 @@ func (s *Server) WindowSeen() bool { return s.lastPing.Load() != 0 }
 // instance names the data dir this app serves, so a second start can find it (cmd/transcribe/instance.go).
 func (s *Server) instance(w http.ResponseWriter, r *http.Request) {
 	abs, _ := filepath.Abs(s.cfg.DataDir)
-	writeJSON(w, 200, map[string]any{"app": "transcribe", "dataDir": abs})
+	writeJSON(w, 200, map[string]any{"app": "transcribe", "dataDir": abs, "window": s.WindowOpen()})
 }
 
 // background reads (GET) or changes (POST) whether the app starts with Windows, whether it keeps

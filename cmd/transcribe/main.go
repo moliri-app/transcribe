@@ -87,13 +87,11 @@ func main() {
 	}
 
 	// before setupLog, which would empty the running app's log
-	if url := runningInstance(*data); url != "" {
-		fmt.Println("Transcribe läuft schon:", url)
-		if !*noBrowser && !*background {
-			openAppWindow(url, *data)
-		}
+	unlock, ok := claimInstance(*data, !*noBrowser && !*background)
+	if !ok {
 		return
 	}
+	defer unlock()
 	setupLog(*data)
 	log.Println("Transcribe", version)
 
@@ -103,6 +101,7 @@ func main() {
 	defer func() {
 		if restartArgs != nil {
 			log.Println("starting the new version")
+			unlock() // the new version may serve the data dir now
 			relaunch(exe, restartArgs)
 		}
 	}()
@@ -170,7 +169,7 @@ func main() {
 
 	if !*noBrowser || *background {
 		tr = startTray(trayActions{
-			open:     func() { openAppWindow(url, *data) },
+			open:     func() { showAppWindow(url, *data, srv.WindowOpen()) },
 			settings: func() { openAppWindow(url+"/settings", *data) },
 			quit:     stop,
 
