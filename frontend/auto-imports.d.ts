@@ -28,6 +28,7 @@ declare global {
   const IconMaterialSymbolsDescriptionOutlineRounded: typeof import('~icons/material-symbols/description-outline-rounded').default
   const IconMaterialSymbolsDocumentScannerOutlineRounded: typeof import('~icons/material-symbols/document-scanner-outline-rounded').default
   const IconMaterialSymbolsDownloadRounded: typeof import('~icons/material-symbols/download-rounded').default
+  const IconMaterialSymbolsDriveFileMoveOutlineRounded: typeof import('~icons/material-symbols/drive-file-move-outline-rounded').default
   const IconMaterialSymbolsEditOutlineRounded: typeof import('~icons/material-symbols/edit-outline-rounded').default
   const IconMaterialSymbolsErrorOutlineRounded: typeof import('~icons/material-symbols/error-outline-rounded').default
   const IconMaterialSymbolsFilterCenterFocusRounded: typeof import('~icons/material-symbols/filter-center-focus-rounded').default

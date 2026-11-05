@@ -19,8 +19,13 @@ Die Oberfläche ist deutsch.
 
 Die fertige Windows-EXE gibt es unter
 [Releases](https://github.com/moliri-app/transcribe/releases). Sie braucht keine Installation: in einen
-Ordner legen und starten. Neben der EXE entsteht ein Ordner `data/` mit Aufnahmen (`audio/`),
-Ergebnissen (`results/`) und Modellen (`models/`).
+Ordner legen und starten. Die Daten, also Aufnahmen (`audio/`), Ergebnisse (`results/`), Modelle
+(`models/`) und Einstellungen, liegen im Benutzerprofil unter `%LOCALAPPDATA%\Transcribe by Moliri`,
+nicht neben der EXE: Die EXE lässt sich verschieben oder ersetzen, ohne dass etwas verloren geht oder
+die Modelle neu geladen werden. In den Einstellungen („Speicher und Modelle“) lässt sich ein anderer
+Ort wählen, etwa ein Laufwerk mit mehr Platz; die App zieht die Daten dann dorthin um und startet neu.
+Hatte eine frühere Version die Daten noch in `data/` neben der EXE, bleiben sie dort, bis man sie in
+den Einstellungen umzieht.
 
 Beim ersten Start lädt die App aus dem Internet, was sie zum Erkennen braucht: die
 sherpa-onnx-Laufzeit, FFmpeg und die Sprach-, Sprecher- und Geräuschmodelle (zusammen einige hundert
@@ -30,7 +35,7 @@ Beim Start und danach einmal am Tag fragt die App bei GitHub nach, ob es ein neu
 Wenn ja, zeigt sie es in der App-Leiste, in den Einstellungen („Über Transcribe“) und im Menü des
 Symbols im Infobereich. Erst ein Klick auf „Jetzt aktualisieren“ lädt die neue EXE, legt sie an die
 Stelle der alten (die bis zum nächsten Start als `transcribe.old.exe` daneben liegt) und startet die
-App neu, sobald keine Aufträge und Aufnahmen mehr laufen. `data/` bleibt dabei unberührt. Selbst
+App neu, sobald keine Aufträge und Aufnahmen mehr laufen. Die Daten bleiben dabei unberührt. Selbst
 gebaute EXEs (`build.ps1`) fragen nie nach.
 
 ### Erkennung über eine API
@@ -65,7 +70,7 @@ freien) und öffnet die Oberfläche in einem eigenen Fenster (Edge, Chrome oder 
 
 | Option | Bedeutung |
 | --- | --- |
-| `--data <ordner>` | Datenordner statt `data/` neben der EXE (auch über `TRANSCRIBE_DATA`) |
+| `--data <ordner>` | Datenordner statt des in den Einstellungen gewählten (auch über `TRANSCRIBE_DATA`); er lässt sich dann nicht in der App umziehen |
 | `--port <zahl>` | anderer Port als 8765 |
 | `--no-browser` | kein Fenster öffnen, nur den Server starten |
 | `--background` | ohne Fenster starten, nur mit dem Symbol im Infobereich (so startet der Autostart) |
@@ -212,7 +217,7 @@ andere Programme importieren können. Moliris Server-Dienst nimmt sie so, fest a
 Diese Pakete hängen von nichts aus `internal/` ab und bauen ohne C-Compiler auch für Linux
 (`CGO_ENABLED=0 GOOS=linux go build ./pipeline ./ocr/...`); `TestEngineStandsOnItsOwn` in
 `pipeline` prüft beides. Was nur die App braucht (Fenster, Einstellungen, Download von GPU-Laufzeit
-und ffmpeg, Mikrofon, Warteschlange, Ablage in `data/results`), liegt in `internal/`;
+und ffmpeg, Mikrofon, Warteschlange, Ablage im Datenordner und dessen Ort, `internal/datadir`), liegt in `internal/`;
 `internal/runner` bindet die Engine an den Datenordner und die Einstellungen.
 
 ### Oberfläche

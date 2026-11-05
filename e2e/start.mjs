@@ -7,14 +7,19 @@
 //   node start.mjs                 (or: pnpm start)
 //   node start.mjs --missing whisper-base   (leave a model out: the first-run download fails offline)
 //   node start.mjs --api                   (and the stand-in for speech recognition services, internal/sttapi/sttapitest)
+//   node start.mjs --home                  (without --data: the data in a user profile of its own, movable in the settings;
+//                                           --pick <folder> stands in for the folder chosen in the dialog)
 import { buildExe, buildFake, startApp } from './app.mjs';
 
 const i = process.argv.indexOf('--missing');
 const missing = i > 0 ? process.argv[i + 1].split(',') : [];
 const api = process.argv.includes('--api');
+const home = process.argv.includes('--home');
+const p = process.argv.indexOf('--pick');
+const env = p > 0 ? { TRANSCRIBE_PICK_FOLDER: process.argv[p + 1] } : {};
 const exe = buildExe();
 if (api) buildFake();
-const app = await startApp({ exe, missing, api });
+const app = await startApp({ exe, missing, api, home, env });
 console.log(`\nTranscribe läuft: ${app.url}\nTestdaten (Kopie): ${app.dataDir}\n${api ? `API-Nachbau: ${app.apiUrl}/v1 (OpenAI-kompatibel), ${app.apiUrl} (ElevenLabs)\n` : ''}Strg+C beendet.\n`);
 let stopping = false;
 const quit = async () => { if (stopping) return; stopping = true; await app.stop(); process.exit(0); };

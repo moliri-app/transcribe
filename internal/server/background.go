@@ -41,7 +41,11 @@ func (s *Server) background(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if in.Autostart != nil {
-			if err := autostart.Set(*in.Autostart, s.cfg.DataDir); err != nil {
+			fixed := "" // the app finds the data dir itself (internal/datadir)
+			if s.Restart == nil {
+				fixed = s.cfg.DataDir
+			}
+			if err := autostart.Set(*in.Autostart, fixed); err != nil {
 				fail(w, 500, "Autostart ließ sich nicht ändern: "+err.Error())
 				return
 			}

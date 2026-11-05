@@ -20,8 +20,10 @@
 	/** @typedef {{ key: string, path: string, size: number }} Ordner */
 	/** @typedef {{ name: string, label: string, path: string, installed: boolean, size: number, state: string,
 	 *   done: number, total: number, error?: string, onDemand: boolean }} Komponente */
+	/** @typedef {{ target: string, done: number, total: number, state: string, error: string }} Umzug */
+	/** @typedef {{ dataDir: string, default: string, fixed: boolean, pick: boolean, move: Umzug | null }} Ort */
 	/** @typedef {{ dataDir: string, exe: string, log: string, os: string, sherpa: string,
-	 *   folders: Ordner[], components: Komponente[] }} Stand */
+	 *   folders: Ordner[], components: Komponente[], location: Ort }} Stand */
 	/** @typedef {{ gpu: { present: boolean, supported: boolean, ready: boolean, name: string, memoryMB: number,
 	 *   driver: string, cudaMajor: number, missing: string[], fetch?: number }, installed: boolean, accel: string, active: string,
 	 *   restartNeeded: boolean }} Gpu */
@@ -203,6 +205,72 @@
 			if (vorher === 'downloading' && nvidia?.state !== 'downloading') ladeGpu(true);
 		} catch {
 			offline = true;
+		}
+	}
+
+	// ---- Ort des Datenordners: wählen, prüfen, umziehen (internal/server/location.go) ----
+	const ort = $derived(stand?.location ?? null);
+	const umzug = $derived(ort?.move ?? null);
+	/** der geprüfte neue Ort, der auf „Umziehen“ wartet */
+	let ortZiel = $state(/** @type {{ target: string, size: number } | null} */ (null));
+	/** der Ort, an den die Daten gerade ziehen; bis die App dort neu gestartet ist */
+	let ortUnterwegs = $state('');
+	let ortFertig = $state('');
+	let ortFehler = $state('');
+	let ortEingabe = $state('');
+	let ortLaeuft = $state('');
+	const gleich = (/** @type {string} */ a, /** @type {string} */ b) => a.toLowerCase() === b.toLowerCase();
+	const amStandard = $derived(!!ort && gleich(ort.dataDir, ort.default));
+
+	$effect(() => {
+		// neu gestartet: die App liegt jetzt am neuen Ort
+		if (ortUnterwegs && ort && gleich(ort.dataDir, ortUnterwegs)) {
+			ortFertig = ortUnterwegs;
+			ortUnterwegs = '';
+		}
+	});
+
+	async function ortWaehlen() {
+		ortFehler = '';
+		ortFertig = '';
+		ortLaeuft = 'waehlen';
+		try {
+			const r = await post('/api/settings/location/pick', {});
+			if (r.target) ortZiel = { target: r.target, size: r.size };
+		} catch (e) {
+			ortFehler = /** @type {Error} */ (e).message;
+		} finally {
+			ortLaeuft = '';
+		}
+	}
+
+	/** @param {string} pfad ein leerer Pfad ist der Standardort */
+	async function ortPruefen(pfad) {
+		ortFehler = '';
+		ortFertig = '';
+		ortLaeuft = pfad ? 'pruefen' : 'standard';
+		try {
+			ortZiel = await post('/api/settings/location', { path: pfad, check: true });
+		} catch (e) {
+			ortFehler = /** @type {Error} */ (e).message;
+		} finally {
+			ortLaeuft = '';
+		}
+	}
+
+	async function umziehen() {
+		if (!ortZiel) return;
+		ortFehler = '';
+		ortLaeuft = 'umziehen';
+		try {
+			await post('/api/settings/location', { path: ortZiel.target });
+			ortUnterwegs = ortZiel.target;
+			ortZiel = null;
+			await ladeStand();
+		} catch (e) {
+			ortFehler = /** @type {Error} */ (e).message;
+		} finally {
+			ortLaeuft = '';
 		}
 	}
 
@@ -1300,11 +1368,82 @@
 			<section id="speicher" class="blatt" aria-labelledby="h-speicher">
 				<h2 id="h-speicher">Speicher und Modelle</h2>
 				<p class="hinweis">
-					Alles liegt im Datenordner. Zum Sichern, Umziehen oder Aufräumen genügt es, diesen Ordner zu kopieren oder zu
-					löschen.
+					Alles liegt im Datenordner: Aufnahmen, Ergebnisse, Modelle und Einstellungen. Zum Sichern genügt es, diesen Ordner
+					zu kopieren. Wo die EXE liegt, spielt keine Rolle.
 				</p>
+				{#if ort}
+					<h3 class="teil">Ort des Datenordners</h3>
+					<p class="ortzeile">
+						<span class="pfad">{ort.dataDir}</span>
+						{#if amStandard}<span class="zustand da">Standard</span>{/if}
+					</p>
+					{#if ort.fixed}
+						<p class="hinweis">
+							Beim Start mit <code>--data</code> oder <code>TRANSCRIBE_DATA</code> festgelegt; deshalb lässt er sich hier nicht
+							ändern.
+						</p>
+					{:else if umzug?.state === 'restarting' || (ortUnterwegs && (offline || !umzug))}
+						<!-- kopiert ist es oft zwischen zwei Abfragen, dann ist die App schon beim Neustart -->
+						<p role="status">Die Daten sind umgezogen. Transcribe startet neu …</p>
+					{:else if umzug?.state === 'copying'}
+						<div class="umzug" role="status">
+							<p>Die Daten ziehen nach <span class="pfad">{umzug.target}</span> um: {groesse(umzug.done)} von {groesse(umzug.total)}</p>
+							<div
+								class="balken"
+								role="progressbar"
+								aria-label="Umzug des Datenordners"
+								aria-valuenow={umzug.total ? Math.round((umzug.done * 100) / umzug.total) : 0}
+								aria-valuemin="0"
+								aria-valuemax="100"
+							>
+								<i style:width="{umzug.total ? Math.round((umzug.done * 100) / umzug.total) : 0}%"></i>
+							</div>
+						</div>
+					{:else if ortZiel}
+						<div class="umzug">
+							<h4>Datenordner umziehen?</h4>
+							<p>
+								Die Daten ({groesse(ortZiel.size)}) ziehen nach <span class="pfad">{ortZiel.target}</span>. Danach startet
+								Transcribe neu und löscht den alten Ordner.
+							</p>
+							<div class="handeln">
+								<Button type="primary" size="large" loading={ortLaeuft === 'umziehen'} onclick={umziehen}>
+									{#snippet iconLeft()}<IconMaterialSymbolsDriveFileMoveOutlineRounded />{/snippet}
+									Umziehen
+								</Button>
+								<Button type="secondary" size="large" onclick={() => (ortZiel = null)}>Abbrechen</Button>
+							</div>
+						</div>
+					{:else}
+						{#if !ort.pick}
+							<div class="schluesselzeile">
+								<input class="feld" spellcheck="false" placeholder="Neuer Ort, z. B. /mnt/daten/transcribe" bind:value={ortEingabe} aria-label="Neuer Ort des Datenordners" />
+							</div>
+						{/if}
+						<div class="handeln">
+							<Button
+								type="secondary"
+								size="large"
+								loading={ortLaeuft === 'waehlen' || ortLaeuft === 'pruefen'}
+								disabled={!ort.pick && !ortEingabe.trim()}
+								onclick={() => (ort.pick ? ortWaehlen() : ortPruefen(ortEingabe.trim()))}
+							>
+								{#snippet iconLeft()}<IconMaterialSymbolsDriveFileMoveOutlineRounded />{/snippet}
+								Anderen Ort wählen …
+							</Button>
+							{#if !amStandard}
+								<Button type="secondary" size="large" loading={ortLaeuft === 'standard'} onclick={() => ortPruefen('')}>
+									Zurück an den Standardort
+								</Button>
+							{/if}
+						</div>
+						{#if ortFertig}<p role="status">Die Daten liegen jetzt in <span class="pfad">{ortFertig}</span>.</p>{/if}
+					{/if}
+					{#if umzug?.state === 'error'}<p class="warnung">{umzug.error}</p>{/if}
+					{#if ortFehler}<p class="warnung">{ortFehler}</p>{/if}
+				{/if}
 				<h3 class="teil">Speicherorte</h3>
-				{#if offline}
+				{#if offline && !ortUnterwegs}
 					<p class="leer fehler">Server nicht erreichbar. Läuft das Programm noch?</p>
 				{:else if !stand}
 					<p class="leer">Lade …</p>
@@ -1846,6 +1985,29 @@
 		border-radius: inherit;
 		background: hsl(var(--color-green-100));
 		transition: width 0.4s ease-out;
+	}
+
+	.ortzeile {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.4rem 0.75rem;
+	}
+	.ortzeile .pfad {
+		color: hsl(var(--color-text-primary));
+		font-weight: 600;
+	}
+	/* der Umzug des Datenordners: abgesetzt wie eine Karte im Blatt */
+	.umzug {
+		display: grid;
+		gap: 0.75rem;
+		max-width: 44rem;
+		padding: 1rem 1.25rem 1.25rem;
+		border-radius: 0.75rem;
+		background: hsl(var(--color-bg-secondary));
+	}
+	.umzug h4 {
+		font-size: 1.0625rem;
 	}
 
 	/* eine neuere Version: abgesetzt wie eine Karte im Blatt */

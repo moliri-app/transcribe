@@ -9,3 +9,9 @@ package main
 import "fmt"
 
 func showError(msg string) { fmt.Println(msg) }
+
+// confirm says msg and answers no: without a window there is no one to ask.
+func confirm(msg string) bool {
+	fmt.Println(msg)
+	return false
+}

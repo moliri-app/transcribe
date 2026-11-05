@@ -12,7 +12,7 @@ import (
 func TestCommand(t *testing.T) {
 	dir := t.TempDir()
 	exe := filepath.Join(dir, "transcribe.exe")
-	if got, want := command(exe, filepath.Join(dir, "data")), `"`+exe+`" --background`; got != want {
+	if got, want := command(exe, ""), `"`+exe+`" --background`; got != want {
 		t.Errorf("default data dir: got %s, want %s", got, want)
 	}
 	other := filepath.Join(dir, "elsewhere")

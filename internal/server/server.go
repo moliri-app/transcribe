@@ -42,10 +42,15 @@ type Server struct {
 	// Dictation is the global shortcut for dictating, nil where there is none; set it before
 	// serving.
 	Dictation Dictation
+	// Restart ends the app and starts it anew, once the data moved to another folder; nil when a
+	// start parameter (--data, TRANSCRIBE_DATA) fixes the data dir, which then cannot move. Set it
+	// before serving.
+	Restart func()
 	mux       *http.ServeMux
 	started   time.Time
 	lastPing  atomic.Int64 // unix nanos of the last UI heartbeat
 	lastBye   atomic.Int64
+	move      moving
 }
 
 // WindowGone reports whether the UI stopped sending heartbeats: no ping for
@@ -99,6 +104,8 @@ func New(cfg Config) *Server {
 	m.HandleFunc("/api/settings", s.settings)
 	m.HandleFunc("/api/settings/download", s.settingsDownload)
 	m.HandleFunc("/api/settings/open", s.settingsOpen)
+	m.HandleFunc("/api/settings/location", s.locationMove)
+	m.HandleFunc("/api/settings/location/pick", s.locationPick)
 	m.HandleFunc("/api/prefs", s.prefsAPI)
 	m.HandleFunc("/api/gpu", s.gpuAPI)
 	m.HandleFunc("/api/gpu/enable", s.gpuChoice(true))
