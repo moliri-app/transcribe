@@ -17,11 +17,12 @@ import (
 	"time"
 
 	"github.com/moliri-app/transcribe/annotate"
+	"github.com/moliri-app/transcribe/embed"
 	"github.com/moliri-app/transcribe/internal/live"
 	"github.com/moliri-app/transcribe/internal/media"
 	"github.com/moliri-app/transcribe/internal/queue"
-	"github.com/moliri-app/transcribe/ocr"
 	"github.com/moliri-app/transcribe/internal/update"
+	"github.com/moliri-app/transcribe/ocr"
 )
 
 type Config struct {
@@ -33,6 +34,9 @@ type Config struct {
 	Warmer        live.Warmer     // may be nil: live recognition is loaded only when a recording starts
 	OCR           *ocr.Registry   // may be nil: no text recognition
 	Updater       *update.Updater // may be nil: a build that never looks for updates
+	Embed         *embed.Model    // may be nil: no embeddings for Moliri's field search
+	// EmbedFetch downloads the embedding model's files (may be nil: they are not downloadable).
+	EmbedFetch func(ctx context.Context) error
 }
 
 type Server struct {
@@ -128,6 +132,8 @@ func New(cfg Config) *Server {
 	m.HandleFunc("/api/ocr", s.ocrRead)
 	m.HandleFunc("/api/ocr/engines", s.ocrEngines)
 	m.HandleFunc("/api/ocr/schema", s.ocrSchema)
+	m.HandleFunc("/api/embed", s.embedAPI)
+	m.HandleFunc("/api/embed/download", s.embedDownload)
 	s.mux = m
 	return s
 }

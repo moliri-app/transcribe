@@ -25,6 +25,12 @@ const maxOCRImage = 64 << 20
 
 // ocrAccess answers the preflight and sets the CORS headers; false = the request is answered.
 func (s *Server) ocrAccess(w http.ResponseWriter, r *http.Request) bool {
+	return s.pageAccess(w, r, "die Texterkennung")
+}
+
+// pageAccess lets programs and approved pages use a service of the app (what, in the refusal):
+// it answers the preflight and sets the CORS headers; false = the request is answered.
+func (s *Server) pageAccess(w http.ResponseWriter, r *http.Request, what string) bool {
 	if !fromLocalHost(r) {
 		http.Error(w, "forbidden", http.StatusForbidden)
 		return false
@@ -48,7 +54,7 @@ func (s *Server) ocrAccess(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 	if !s.originAllowed(origin, clientName(r)) {
-		fail(w, http.StatusForbidden, "Diese Seite darf die Texterkennung nicht nutzen. In Transcribe auf der Seite „Live“ erlauben: "+live.Origin(origin))
+		fail(w, http.StatusForbidden, "Diese Seite darf "+what+" nicht nutzen. In Transcribe auf der Seite „Live“ erlauben: "+live.Origin(origin))
 		return false
 	}
 	return true

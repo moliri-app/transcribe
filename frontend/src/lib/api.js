@@ -4,9 +4,9 @@
 
 // Zugriff auf die HTTP-API der EXE (internal/server) und was mehrere Seiten daran brauchen.
 
-/** @param {string} url */
-export async function getJSON(url) {
-	const r = await fetch(url);
+/** @param {string} url @param {RequestInit} [init] */
+export async function getJSON(url, init) {
+	const r = await fetch(url, init);
 	if (!r.ok) throw new Error(r.statusText || `Fehler ${r.status}`);
 	return r.json();
 }

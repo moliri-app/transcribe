@@ -7,6 +7,7 @@ package main
 import (
 	"context"
 
+	"github.com/moliri-app/transcribe/embed"
 	"github.com/moliri-app/transcribe/internal/ocrapi"
 	"github.com/moliri-app/transcribe/internal/osocr"
 	"github.com/moliri-app/transcribe/internal/prefs"
@@ -52,4 +53,18 @@ func ocrEngines(dataDir string, pl *runner.Runner) *ocr.Registry {
 	r := ocr.NewRegistry("desktop", engines...)
 	r.Default = func() string { return prefs.Load(dataDir).OCREngine }
 	return r
+}
+
+// embedModel is EmbeddingGemma for Moliri's field search by meaning (docs/embed-api.md): its files
+// come when Moliri or the settings page asks for them, and it runs on the onnxruntime of speech
+// recognition, on the CPU.
+func embedModel(dataDir string, pl *runner.Runner, threads int) *embed.Model {
+	return &embed.Model{
+		Dir:     setup.EmbedDir(dataDir),
+		Threads: threads,
+		Runtime: func(ctx context.Context) (string, error) {
+			dir, _, err := pl.Runtime(ctx)
+			return dir, err
+		},
+	}
 }

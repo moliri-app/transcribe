@@ -20,6 +20,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -88,6 +89,13 @@ func setupLog(dataDir string) {
 	if err == nil {
 		log.SetOutput(io.MultiWriter(f, os.Stderr))
 	}
+	// What a crash leaves (a panic, a fatal runtime error, an exception in the speech recognition
+	// libraries) goes to stderr only, which the Windows build does not have: keep it in crash.log,
+	// appended, as the next start empties transcribe.log.
+	if c, err := os.OpenFile(filepath.Join(dataDir, "crash.log"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644); err == nil {
+		_ = debug.SetCrashOutput(c, debug.CrashOptions{})
+		c.Close() // SetCrashOutput keeps a duplicate
+	}
 }
 
 func main() {
@@ -138,7 +146,8 @@ func main() {
 	pl := runner.New(*data)
 	upd := newUpdater(exe)
 	srv := server.New(server.Config{DataDir: *data, Runner: pl.Run, Retranscriber: pl, Threads: *threads, Live: pl.OpenLive, Warmer: pl,
-		OCR: ocrEngines(*data, pl), Updater: upd})
+		OCR: ocrEngines(*data, pl), Updater: upd, Embed: embedModel(*data, pl, *threads),
+		EmbedFetch: func(ctx context.Context) error { return setup.FetchEmbedModel(ctx, *data) }})
 	srv.Live.Warm() // while the live mode is on, recognition is loaded once it can be
 	go func() {
 		if err := setup.EnsureAll(context.Background(), *data, prefs.Load(*data).UsesModels()); err != nil {

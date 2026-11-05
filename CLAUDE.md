@@ -7,7 +7,7 @@ As soon as a piece of work has landed on main, update the main checkout at `C:\G
 ## The engine is a module of its own
 
 The top-level packages (`pipeline`, `annotate`, `export`, `model`, `models`, `sherpa`, `audio`,
-`ocr`, `ort`, `jobs`, `stream`, `fileutil`, `proc`) are the engine that Moliri's
+`ocr`, `ort`, `embed`, `jobs`, `stream`, `fileutil`, `proc`) are the engine that Moliri's
 `server/transcribe` imports at a tagged version. They must not import anything from `internal/` and
 must build with `CGO_ENABLED=0` for Linux (`TestEngineStandsOnItsOwn` in `pipeline` checks both).
 What only the desktop app has (settings, GPU download, window, microphone) reaches the engine as an

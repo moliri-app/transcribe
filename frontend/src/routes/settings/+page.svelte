@@ -196,15 +196,19 @@
 	/** pending: wartet in „GPU einrichten“ auf die NVIDIA-Bibliotheken */
 	const imGang = (/** @type {Komponente | null} */ c) => c?.state === 'downloading' || c?.state === 'pending';
 
+	/** Abfragen hintereinander ohne Antwort: eine einzelne verlorene ist noch kein Ausfall */
+	let fehlschlaege = 0;
+
 	async function ladeStand() {
 		const vorher = nvidia?.state;
 		try {
-			stand = await getJSON('/api/settings');
+			stand = await getJSON('/api/settings', { signal: AbortSignal.timeout(8000) });
+			fehlschlaege = 0;
 			offline = false;
 			// sind die Bibliotheken fertig, gleich neu prüfen statt mit der gemerkten Antwort
 			if (vorher === 'downloading' && nvidia?.state !== 'downloading') ladeGpu(true);
 		} catch {
-			offline = true;
+			offline = ++fehlschlaege >= 2;
 		}
 	}
 
@@ -1444,7 +1448,7 @@
 				{/if}
 				<h3 class="teil">Speicherorte</h3>
 				{#if offline && !ortUnterwegs}
-					<p class="leer fehler">Server nicht erreichbar. Läuft das Programm noch?</p>
+					<p class="leer fehler">Keine Verbindung zu Transcribe. Läuft das Programm noch?</p>
 				{:else if !stand}
 					<p class="leer">Lade …</p>
 				{:else}

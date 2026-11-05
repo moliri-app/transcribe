@@ -93,6 +93,10 @@ func TestLifecycle(t *testing.T) {
 	waitFor(t, q, ids["a.mp3"], Done)
 	waitFor(t, q, ids["b.mp3"], Failed)
 	waitFor(t, q, ids["c.mp3"], Running)
+	// the job is running before its first progress report
+	for i := 0; i < 400 && q.List()[2].Step != nil && *q.List()[2].Step != "Schritt"; i++ {
+		time.Sleep(10 * time.Millisecond)
+	}
 	for _, j := range q.List() {
 		switch j.Audio {
 		case "a.mp3":
@@ -168,15 +172,16 @@ func TestRestartRecovery(t *testing.T) {
 
 	q2 := New(d, nil, 0)
 	l := q2.List()
-	if l[0].Status != Queued || l[0].Progress != 0 || l[0].Note == nil || *l[0].Note != "nach Neustart erneut eingereiht" {
-		t.Errorf("running not requeued: %+v", l[0])
+	// still running after a restart: the app crashed on it, so it is not run again by itself
+	if l[0].Status != Failed || l[0].Error == nil || *l[0].Error != Interrupted || l[0].Finished == nil {
+		t.Errorf("running not marked as interrupted: %+v", l[0])
 	}
 	if l[1].Status != Canceled || l[1].Finished == nil {
 		t.Errorf("canceling not canceled: %+v", l[1])
 	}
 }
 
-func TestShutdownKeepsRunning(t *testing.T) {
+func TestShutdownRequeues(t *testing.T) {
 	d := newData(t, "a.mp3")
 	started := make(chan struct{})
 	q := New(d, func(ctx context.Context, _, _ string, _ jobs.Options, _ jobs.Progress) error {
@@ -190,8 +195,8 @@ func TestShutdownKeepsRunning(t *testing.T) {
 	<-started
 	stop()
 	q.Wait()
-	if s := q.List()[0].Status; s != Running {
-		t.Errorf("status after shutdown: %s", s)
+	if j := q.List()[0]; j.Status != Queued || j.Note == nil || *j.Note != "nach Neustart erneut eingereiht" {
+		t.Errorf("after shutdown: %+v", j)
 	}
 	if s := New(d, nil, 0).List()[0].Status; s != Queued {
 		t.Errorf("after restart: %s", s)

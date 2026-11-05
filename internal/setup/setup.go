@@ -3,8 +3,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 // Package setup prepares what the app needs beside the engine's models: ffmpeg, the GPU runtime
-// and NVIDIA's libraries, Tesseract and PP-OCR for text recognition; it lists them all for the
-// settings page and downloads them on request.
+// and NVIDIA's libraries, Tesseract and PP-OCR for text recognition, EmbeddingGemma for Moliri's
+// field search; it lists them all for the settings page and downloads them on request.
 package setup
 
 import (
@@ -28,6 +28,7 @@ func init() {
 		"tesseract-Fraktur":  "Texterkennung Fraktur-Schrift",
 		"tesseract-frak2021": "Texterkennung Fraktur (frak2021)",
 		"ppocr":              "Texterkennung (PP-OCRv5)",
+		"embed":              "Suche nach Bedeutung (EmbeddingGemma)",
 	} {
 		models.SetLabel(name, label)
 	}
