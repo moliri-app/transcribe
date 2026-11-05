@@ -26,6 +26,7 @@ import (
 	"github.com/moliri-app/transcribe/internal/live"
 	"github.com/moliri-app/transcribe/internal/media"
 	"github.com/moliri-app/transcribe/internal/prefs"
+	"github.com/moliri-app/transcribe/internal/queue"
 	"github.com/moliri-app/transcribe/jobs"
 )
 
@@ -450,7 +451,7 @@ func (s *Server) dropRecording(name string) {
 		return
 	}
 	for _, j := range s.Queue.List() {
-		if j.Audio == name && (j.Status == jobs.Queued || j.Status == jobs.Running || j.Status == jobs.Canceling) {
+		if j.Audio == name && (j.Status == queue.Queued || j.Status == queue.Running || j.Status == queue.Canceling) {
 			return
 		}
 	}
