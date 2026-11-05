@@ -51,9 +51,11 @@
 			return;
 		}
 		const seq = ++openSeq;
-		let data;
+		const next_ = new Editor(transcribeStore(next));
 		try {
-			data = await loadRecording(f);
+			const data = await loadRecording(f);
+			if (seq !== openSeq) return;
+			next_.load(data);
 		} catch {
 			if (seq !== openSeq) return;
 			phase = 'fehler';
@@ -61,10 +63,7 @@
 			ed = null;
 			return;
 		}
-		if (seq !== openSeq) return;
 		ed?.media?.pause();
-		const next_ = new Editor(transcribeStore(next));
-		next_.load(data);
 		stem = next;
 		merken.set('stem', next);
 		ed = next_;

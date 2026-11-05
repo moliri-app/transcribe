@@ -174,6 +174,8 @@ class Live {
 	/** angesagte Satzzeichen („Komma“, „neuer Absatz“) werden zu Zeichen */
 	ansagen = $state(true);
 	startet = $state(false);
+	/** „Beenden“ wurde gedrückt, das Programm erkennt noch, was bis dahin gesagt wurde */
+	beendet = $state(false);
 	meldung = $state('');
 	jetzt = $state(Date.now());
 
@@ -364,10 +366,14 @@ class Live {
 	}
 
 	async beenden() {
+		if (this.beendet) return;
+		this.beendet = true;
 		try {
 			await post('/api/live/stop', {});
 		} catch (e) {
 			this.meldung = /** @type {Error} */ (e).message;
+		} finally {
+			this.beendet = false;
 		}
 	}
 

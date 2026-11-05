@@ -53,9 +53,12 @@ type Hub struct {
 
 	pruneMu sync.Mutex // one look for old notes at a time
 
-	micMu sync.Mutex // starting and stopping the microphone
-	mic   *run
-	dauer *tap
+	micMu    sync.Mutex // starting and stopping the microphone
+	mic      *run
+	dauer    *tap
+	starting bool // StartDauer is starting the recording
+
+	sendMicMu sync.Mutex // one mic state told at a time, so an older one never comes after a newer
 }
 
 // Refusal is a page that asked for live transcription without being allowed to.
@@ -219,9 +222,10 @@ func (r *run) inputChanged() {
 }
 
 // drain recognises the audio recorded until now that still waits for recognition (on a busy
-// computer, recognition falls behind); inside the loop.
+// computer, recognition falls behind); inside the loop. What is recorded meanwhile is not waited
+// for: where recognition is slower than speech, that would never end.
 func (r *run) drain() {
-	for {
+	for range len(r.audio) {
 		select {
 		case c, ok := <-r.audio:
 			if !ok {
@@ -446,7 +450,7 @@ func (h *Hub) Note(id string) *Note {
 	return nil
 }
 
-// Delete removes a note that has ended (the recording it saved stays in audio/).
+// Delete removes a note that has ended; the recording it saved in audio/ is the caller's to remove.
 func (h *Hub) Delete(id string) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -551,7 +555,8 @@ func (h *Hub) Dictate(ctx context.Context, send func(Event)) (*Listener, error) 
 // recording goes to audio/ as well, to be transcribed in full afterwards.
 func (h *Hub) StartDauer(ctx context.Context, save bool) error {
 	h.micMu.Lock()
-	busy := h.dauer != nil
+	busy := h.dauer != nil || h.starting
+	h.starting = !busy
 	h.micMu.Unlock()
 	if busy {
 		return errors.New("Die Aufnahme läuft schon.")
@@ -561,12 +566,19 @@ func (h *Hub) StartDauer(ctx context.Context, save bool) error {
 		wav = h.recordingName()
 	}
 	t, err := h.tapMic(ctx, KindDauer, "", nil, wav, "")
+	h.micMu.Lock()
+	h.starting = false
+	if err == nil {
+		select {
+		case <-t.ended: // the recording failed right away
+		default:
+			h.dauer = t
+		}
+	}
+	h.micMu.Unlock()
 	if err != nil {
 		return err
 	}
-	h.micMu.Lock()
-	h.dauer = t
-	h.micMu.Unlock()
 	h.sendMic()
 	go func() {
 		<-t.ended
@@ -585,10 +597,12 @@ func (h *Hub) StopDauer() {
 	h.micMu.Lock()
 	t := h.dauer
 	h.micMu.Unlock()
-	if t != nil {
-		h.untap(t, nil)
-		<-t.ended
+	if t == nil {
+		h.sendMic() // the Live page may think one runs
+		return
 	}
+	h.untap(t, nil)
+	<-t.ended
 }
 
 // recordingName is a free name in audio/ for a recording starting now.
@@ -738,6 +752,9 @@ func (h *Hub) untap(t *tap, err error) {
 		h.mic = nil
 		r.cancel()
 	}
+	if h.dauer == t {
+		h.dauer = nil
+	}
 	h.micMu.Unlock()
 	if !ok {
 		<-t.ended // the run has ended and finishes its taps itself
@@ -776,6 +793,8 @@ func (h *Hub) micState() MicState {
 }
 
 func (h *Hub) sendMic() {
+	h.sendMicMu.Lock()
+	defer h.sendMicMu.Unlock()
 	h.broadcast(map[string]any{"type": "mic", "mic": h.micState()})
 }
 

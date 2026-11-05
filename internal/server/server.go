@@ -62,6 +62,13 @@ func (s *Server) WindowGone(grace, firstWait time.Duration) bool {
 	return time.Since(time.Unix(0, last)) > grace
 }
 
+// WindowOpen reports whether a window of the app is open: it sent a heartbeat a moment ago (one
+// comes every 5 s) and did not say goodbye since.
+func (s *Server) WindowOpen() bool {
+	last := s.lastPing.Load()
+	return last != 0 && s.lastBye.Load() < last && time.Since(time.Unix(0, last)) < 12*time.Second
+}
+
 func (s *Server) bye(w http.ResponseWriter, r *http.Request) {
 	s.lastBye.Store(time.Now().UnixNano())
 	w.WriteHeader(http.StatusNoContent)
