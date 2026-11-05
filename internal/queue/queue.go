@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
+
 	"sync"
 	"time"
 
@@ -34,7 +34,8 @@ const (
 
 var ErrUnknownJob = errors.New("unknown job")
 
-// Runner must produce results/<stem>/_final.json; audioFile is a file name inside <data>/audio.
+// Runner must produce results/<stem>/_final.json; audioFile is a file name inside <data>/audio or
+// the name of a recording in a connected folder (media.Path finds both).
 type Runner func(ctx context.Context, dataDir, audioFile string, o jobs.Options, p jobs.Progress) error
 
 type Job struct {
@@ -173,10 +174,7 @@ func (q *Queue) Add(audio []string, raw map[string]any) (int, error) {
 	defer q.mu.Unlock()
 	added := 0
 	for _, name := range audio {
-		if name == "" || strings.ContainsAny(name, `/\`) || !media.IsMedia(name) {
-			return added, jobs.JobError("unknown file: " + name)
-		}
-		if st, err := os.Stat(filepath.Join(media.AudioDir(q.DataDir), name)); err != nil || st.IsDir() {
+		if media.Path(q.DataDir, name) == "" {
 			return added, jobs.JobError("unknown file: " + name)
 		}
 		dup := false

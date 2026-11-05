@@ -2,7 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-// Package media finds recordings in <data>/audio and derives waveform peaks, video thumbnails and PCM via ffmpeg.
+// Package media finds recordings in <data>/audio and the connected folders and derives waveform peaks, video thumbnails and PCM via ffmpeg.
 package media
 
 import (
@@ -46,6 +46,10 @@ func ResultsDir(dataDir string) string { return filepath.Join(dataDir, "results"
 
 // FindMedia returns the path of the recording whose stem is `stem`, or "".
 func FindMedia(dataDir, stem string) string {
+	if IsLinked(stem) {
+		l, _ := findLinked(dataDir, stem, true)
+		return l.Path
+	}
 	entries, err := os.ReadDir(AudioDir(dataDir))
 	if err != nil {
 		return ""

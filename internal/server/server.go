@@ -80,7 +80,7 @@ func (s *Server) ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func New(cfg Config) *Server {
-	s := &Server{cfg: cfg, started: time.Now(), Queue: queue.New(cfg.DataDir, cfg.Runner, cfg.Threads)}
+	s := &Server{cfg: cfg, started: time.Now(), Queue: queue.New(cfg.DataDir, withSidecar(cfg.Runner), cfg.Threads)}
 	if cfg.Live != nil {
 		s.Live = live.NewHub(cfg.DataDir, cfg.Live)
 		s.Live.Warmer = cfg.Warmer
@@ -111,6 +111,8 @@ func New(cfg Config) *Server {
 	m.HandleFunc("/api/queue", s.queueList)
 	m.HandleFunc("/api/queue/", s.queueAction)
 	m.HandleFunc("/api/upload", s.upload)
+	m.HandleFunc("/api/folders", s.folders)
+	m.HandleFunc("/api/folders/pick", s.folderPick)
 	m.HandleFunc("/api/annotations", s.annotations)
 	m.HandleFunc("/api/apply", s.apply)
 	m.HandleFunc("/api/live", s.liveSocket)
@@ -214,6 +216,15 @@ func (s *Server) audio(w http.ResponseWriter, r *http.Request) {
 	name := strings.TrimPrefix(r.URL.Path, "/audio/")
 	if name == "" || strings.Contains(name, "/") {
 		http.NotFound(w, r)
+		return
+	}
+	if media.IsLinked(name) {
+		p := media.Path(s.cfg.DataDir, name)
+		if p == "" {
+			http.NotFound(w, r)
+			return
+		}
+		http.ServeFile(w, r, p)
 		return
 	}
 	s.serveBelow(s.audioDir(), "/audio/", w, r)

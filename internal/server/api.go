@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -22,8 +23,10 @@ import (
 	"github.com/moliri-app/transcribe/export"
 	"github.com/moliri-app/transcribe/fileutil"
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/queue"
 	"github.com/moliri-app/transcribe/internal/results"
+	"github.com/moliri-app/transcribe/internal/sidecar"
 	"github.com/moliri-app/transcribe/jobs"
 )
 
@@ -59,6 +62,12 @@ func variants(rdir, stem, kind string) []variant {
 	return out
 }
 
+// liveName matches the recordings the Live page saves (internal/live: recordingName).
+var liveName = regexp.MustCompile(`^Live \d{4}-\d{2}-\d{2} \d{2}-\d{2}( \(\d+\))?\.wav$`)
+
+// buildIndex lists the recordings: those in audio/ (uploaded or recorded on the Live page), then
+// those in the connected folders, each with what there is of its transcript. A recording in a
+// connected folder takes a sidecar someone else changed first.
 func (s *Server) buildIndex() []map[string]any {
 	items := []map[string]any{}
 	entries, _ := os.ReadDir(s.audioDir())
@@ -70,46 +79,62 @@ func (s *Server) buildIndex() []map[string]any {
 		if e.IsDir() || !media.IsMedia(name) {
 			continue
 		}
-		stem := media.Stem(name)
-		rdir := filepath.Join(s.resultsDir(), stem)
-		engines := []map[string]any{}
-		if _, err := os.Stat(filepath.Join(rdir, "_final.json")); err == nil {
-			engines = append(engines, map[string]any{
-				"id": "★ Ergebnis", "file": "results/" + stem + "/_final.json", "final": true})
-		}
-		files, _ := filepath.Glob(filepath.Join(rdir, "*.json"))
-		sort.Strings(files)
-		for _, f := range files {
-			base := filepath.Base(f)
-			if strings.HasPrefix(base, "_") {
-				continue
-			}
-			var meta struct {
-				Engine  json.RawMessage `json:"engine"`
-				Speed   json.RawMessage `json:"speed"`
-				Elapsed json.RawMessage `json:"elapsed"`
-				Threads json.RawMessage `json:"threads"`
-			}
-			if fileutil.ReadJSON(f, &meta) != nil || len(meta.Engine) == 0 {
-				continue
-			}
-			engines = append(engines, map[string]any{
-				"id": meta.Engine, "file": "results/" + stem + "/" + base,
-				"speed": rawOrNull(meta.Speed), "elapsed": rawOrNull(meta.Elapsed), "threads": rawOrNull(meta.Threads),
-			})
-		}
-		item := map[string]any{
-			"name": name, "stem": stem, "url": "audio/" + pyQuote(name),
-			"video":   media.HasVideo(filepath.Join(s.audioDir(), name)),
-			"engines": engines, "speakers": variants(rdir, stem, "speakers"), "events": variants(rdir, stem, "events"),
-			"added": added(filepath.Join(s.audioDir(), name)),
-		}
-		if sum, ok := summarize(rdir); ok {
-			item["summary"] = sum
-		}
+		item := s.indexItem(name, filepath.Join(s.audioDir(), name))
+		item["source"] = map[bool]string{true: "live", false: "upload"}[liveName.MatchString(name)]
+		items = append(items, item)
+	}
+	write := !prefs.Load(s.cfg.DataDir).SidecarOff
+	for _, l := range media.LinkedIn(s.cfg.DataDir) {
+		sidecar.Sync(s.cfg.DataDir, media.Stem(l.Name), l.Path, write)
+		item := s.indexItem(l.Name, l.Path)
+		item["source"], item["folder"], item["dir"], item["path"] = "folder", l.Folder, l.Dir, l.Path
+		_, err := os.Stat(sidecar.Path(l.Path))
+		item["sidecar"] = err == nil
 		items = append(items, item)
 	}
 	return items
+}
+
+// indexItem is what the pages know of the recording called name, which is at path.
+func (s *Server) indexItem(name, path string) map[string]any {
+	stem := media.Stem(name)
+	rdir := filepath.Join(s.resultsDir(), stem)
+	engines := []map[string]any{}
+	if _, err := os.Stat(filepath.Join(rdir, "_final.json")); err == nil {
+		engines = append(engines, map[string]any{
+			"id": "★ Ergebnis", "file": "results/" + stem + "/_final.json", "final": true})
+	}
+	files, _ := filepath.Glob(filepath.Join(rdir, "*.json"))
+	sort.Strings(files)
+	for _, f := range files {
+		base := filepath.Base(f)
+		if strings.HasPrefix(base, "_") {
+			continue
+		}
+		var meta struct {
+			Engine  json.RawMessage `json:"engine"`
+			Speed   json.RawMessage `json:"speed"`
+			Elapsed json.RawMessage `json:"elapsed"`
+			Threads json.RawMessage `json:"threads"`
+		}
+		if fileutil.ReadJSON(f, &meta) != nil || len(meta.Engine) == 0 {
+			continue
+		}
+		engines = append(engines, map[string]any{
+			"id": meta.Engine, "file": "results/" + stem + "/" + base,
+			"speed": rawOrNull(meta.Speed), "elapsed": rawOrNull(meta.Elapsed), "threads": rawOrNull(meta.Threads),
+		})
+	}
+	item := map[string]any{
+		"name": name, "stem": stem, "title": media.Title(stem), "url": "audio/" + pyQuote(name),
+		"video":   media.HasVideo(path),
+		"engines": engines, "speakers": variants(rdir, stem, "speakers"), "events": variants(rdir, stem, "events"),
+		"added": added(path),
+	}
+	if sum, ok := summarize(rdir); ok {
+		item["summary"] = sum
+	}
+	return item
 }
 
 func rawOrNull(r json.RawMessage) json.RawMessage {
@@ -224,7 +249,7 @@ func (s *Server) clipExport(w http.ResponseWriter, r *http.Request) {
 	sort.SliceStable(clips, func(i, j int) bool { return clips[i].Start < clips[j].Start })
 	name := clipFileName(clips[0].Title)
 	if len(clips) > 1 {
-		name = fmt.Sprintf("%s – Zusammenschnitt (%d Clips)", stem, len(clips))
+		name = fmt.Sprintf("%s – Zusammenschnitt (%d Clips)", media.Title(stem), len(clips))
 	}
 	disposition := "attachment; filename*=UTF-8''" + pyQuote(name+"."+format)
 	if format == "txt" {
@@ -374,6 +399,9 @@ func (s *Server) upload(w http.ResponseWriter, r *http.Request) {
 		fail(w, 400, "unsupported file type")
 		return
 	}
+	if media.IsLinked(name) { // the names of recordings in connected folders are not for files in audio/
+		name = "_" + name
+	}
 	dir := s.audioDir()
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		fail(w, 500, err.Error())
@@ -465,6 +493,7 @@ func (s *Server) annotations(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, err.Error())
 		return
 	}
+	sidecar.Schedule(s.cfg.DataDir, stem)
 	writeJSON(w, 200, map[string]any{"ok": true})
 }
 
@@ -501,6 +530,7 @@ func (s *Server) apply(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, msg)
 		return
 	}
+	sidecar.Schedule(s.cfg.DataDir, stem)
 	raw, err := os.ReadFile(filepath.Join(results.Dir(s.cfg.DataDir, stem), "_final.json"))
 	if err != nil {
 		fail(w, 500, err.Error())

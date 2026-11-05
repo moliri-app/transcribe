@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 	"sync"
 	"unicode/utf8"
@@ -63,6 +64,14 @@ type Prefs struct {
 	DictateKey         string `json:"dictateKey,omitempty"`         // global shortcut for dictating: one of DictateKeys, or "off"
 	DictateNoInsert    bool   `json:"dictateNoInsert,omitempty"`    // dictated text is not inserted at the cursor
 	DictateNoClipboard bool   `json:"dictateNoClipboard,omitempty"` // dictated text does not go to the clipboard
+
+	// Folders are the connected folders: their recordings (also in subfolders) stand in the
+	// library where they are, without a copy in audio/ (internal/media.Linked). Unless SidecarOff,
+	// a transcript of one is kept next to it as well (internal/sidecar), for others who open the
+	// folder. FolderHint is the folder next to the EXE once the user declined to connect it.
+	Folders    []string `json:"folders,omitempty"`
+	SidecarOff bool     `json:"sidecarOff,omitempty"`
+	FolderHint string   `json:"folderHint,omitempty"`
 }
 
 // Service is a service the app sends recordings or images to: the speech recognition service
@@ -172,6 +181,7 @@ func (p *Prefs) normalize() {
 	}
 	p.LiveAPIKeepHours = max(0, p.LiveAPIKeepHours)
 	p.LiveWords = normWords(p.LiveWords)
+	p.Folders = normFolders(p.Folders)
 	if p.DictateKey != "off" && DictateLabel(p.DictateKey) == p.DictateKey {
 		p.DictateKey = DictateKeys[0].Key
 	}
@@ -188,6 +198,30 @@ func engineID(s string) bool {
 		}
 	}
 	return true
+}
+
+// normFolders keeps the connected folders that are absolute paths, each once.
+func normFolders(in []string) []string {
+	var out []string
+	for _, f := range in {
+		f = strings.TrimSpace(f)
+		if f == "" || !filepath.IsAbs(f) {
+			continue
+		}
+		f = filepath.Clean(f)
+		if !slices.ContainsFunc(out, func(o string) bool { return SamePath(o, f) }) {
+			out = append(out, f)
+		}
+	}
+	return out
+}
+
+// SamePath reports whether two cleaned paths name the same folder (on Windows regardless of case).
+func SamePath(a, b string) bool {
+	if runtime.GOOS == "windows" {
+		return strings.EqualFold(a, b)
+	}
+	return a == b
 }
 
 // MaxLiveWords is how many own words one may keep; MaxLiveWord how long one may be (in letters).

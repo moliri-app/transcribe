@@ -108,6 +108,29 @@
 		speichertSchluessel = false;
 	}
 
+	// ---- Verbundene Ordner (internal/server/folders.go) ----
+	/** @type {{ folders: { path: string, name: string, exists: boolean }[], sidecar: boolean } | null} */
+	let verbunden = $state(null);
+	let nebenAn = $state(true);
+	let ordnerStand = $state('');
+
+	async function ladeVerbunden() {
+		verbunden = await getJSON('/api/folders');
+		nebenAn = verbunden?.sidecar ?? true;
+	}
+
+	/** @param {{ action: 'remove' | 'sidecar', path?: string, on?: boolean }} body */
+	async function verbundenAendern(body) {
+		ordnerStand = '';
+		try {
+			verbunden = await post('/api/folders', body);
+			nebenAn = verbunden?.sidecar ?? true;
+			ordnerStand = body.action === 'remove' ? 'Getrennt. Die Aufnahmen und Transkripte im Ordner bleiben, wo sie sind.' : 'Gespeichert.';
+		} catch (e) {
+			ordnerStand = 'Nicht gespeichert: ' + /** @type {Error} */ (e).message;
+		}
+	}
+
 	// ---- Vorgaben ----
 	/** @type {import('$lib/api.js').Optionen} */
 	let optionen = $state({ speakers: '', language: 'auto' });
@@ -494,6 +517,7 @@
 	const ABSCHNITTE = /** @type {const} */ ([
 		['erkennung', 'Erkennung'],
 		['neu', 'Neue Aufnahmen'],
+		['ordner', 'Ordner'],
 		['programme', 'Andere Programme'],
 		['ocr', 'Texterkennung'],
 		['diktieren', 'Diktieren'],
@@ -585,6 +609,7 @@
 			ladeHintergrund(),
 			ladeDiktat(),
 			ladeVorgaben().catch(() => (gespeichert = 'Die Vorgaben ließen sich nicht laden.')),
+			ladeVerbunden().catch(() => {}),
 			ladeStand(),
 			ladeGpu()
 		]);
@@ -793,6 +818,48 @@
 							? 'Die Aufnahmen werden gleich transkribiert.'
 							: 'Aus: Die App fragt erst nach Sprechern und Sprachen und startet, wenn du bestätigst.'}
 						onclick={() => speichern({ dropMode: sofort ? 'auto' : 'ask' })}
+					/>
+				</div>
+			</section>
+
+			<section id="ordner" class="blatt" aria-labelledby="h-ordner">
+				<div class="zeile">
+					<h2 id="h-ordner">Verbundene Ordner</h2>
+					<!-- nur da, wenn es etwas sagt: die Seite hat sonst einen Status, den der übrigen Vorgaben -->
+					{#if ordnerStand}<p class="gespeichert" class:fehler={ordnerStand.startsWith('Nicht')} role="status">{ordnerStand}</p>{/if}
+				</div>
+				<p class="hinweis">
+					Die Aufnahmen eines verbundenen Ordners stehen in der Bibliothek, ohne kopiert zu werden, auch die in seinen
+					Unterordnern. Verbinden lässt sich ein Ordner in der <a href="/">Bibliothek</a>. Transcribe löscht darin nie etwas.
+				</p>
+				{#if verbunden?.folders.length}
+					<ul class="liste" aria-label="Verbundene Ordner">
+						{#each verbunden.folders as f (f.path)}
+							<li class="eintrag">
+								<div class="was">
+									<span class="name">{f.name}</span>
+									<span class="pfad">{f.path}{f.exists ? '' : ' (nicht erreichbar)'}</span>
+								</div>
+								<span></span>
+								<div class="tun">
+									<Button type="secondary" size="large" aria-label="{f.name} trennen" onclick={() => verbundenAendern({ action: 'remove', path: f.path })}>
+										{#snippet iconLeft()}<IconMaterialSymbolsLinkOffRounded />{/snippet}
+										Trennen
+									</Button>
+								</div>
+							</li>
+						{/each}
+					</ul>
+				{/if}
+				<div class="ablegen">
+					<Toggle
+						bind:checked={nebenAn}
+						disabled={!verbunden}
+						title="Transkripte neben die Aufnahmen legen"
+						description={nebenAn
+							? 'Jedes Transkript liegt auch als Datei neben seiner Aufnahme („Interview.mp3.transcribe.json“), mit Korrekturen und Clips. Wer den Ordner teilt, etwa über Nextcloud, sieht und bearbeitet dieselben Transkripte.'
+							: 'Aus: Transkripte bleiben nur in Transcribe. Liegt schon eins neben einer Aufnahme, liest die App es trotzdem.'}
+						onclick={() => verbundenAendern({ action: 'sidecar', on: nebenAn })}
 					/>
 				</div>
 			</section>
