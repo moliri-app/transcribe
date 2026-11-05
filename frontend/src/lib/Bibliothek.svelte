@@ -215,14 +215,25 @@
 		if (!['alle', 'upload', 'live'].includes(bereich) && !ordner.folders.some((o) => o.path === bereich)) zeige('alle');
 	}
 
+	/** Abfragen der Warteschlange hintereinander ohne Antwort */
+	let fehlschlaege = 0;
+	let fragt = false;
+
 	async function ladeAuftraege() {
+		// ein langsamer Server bekommt keine zweite Frage, solange die erste offen ist
+		if (fragt) return;
+		fragt = true;
 		const vorher = laufend.length;
 		try {
-			jobs = (await getJSON('/api/queue')).jobs;
+			jobs = (await getJSON('/api/queue', { signal: AbortSignal.timeout(8000) })).jobs;
+			fehlschlaege = 0;
 			offline = false;
 		} catch {
-			offline = true;
+			// eine einzelne verlorene Antwort ist noch kein Ausfall; erst die zweite in Folge zählt
+			offline = ++fehlschlaege >= 2;
 			return;
+		} finally {
+			fragt = false;
 		}
 		// ein Auftrag ist fertig geworden: sein Transkript steht jetzt in der Liste
 		if (laufend.length < vorher) ladeAufnahmen();
@@ -431,7 +442,11 @@
 	<p class="meldung" role="status">{meldung}</p>
 
 	{#if offline}
-		<p class="leer fehler">Server nicht erreichbar. Läuft das Programm noch?</p>
+		<p class="leer fehler" role="alert">
+			Keine Verbindung zu Transcribe. Läuft das Programm noch?
+			{#if laufend.length}Wurde es beendet, ist auch die Transkription stehen geblieben: Nach einem Neustart lässt sie sich mit
+				„Erneut“ wieder anstoßen.{/if}
+		</p>
 	{/if}
 
 	{#if ordner.hint}
@@ -556,12 +571,16 @@
 								<div class="kopfzeile">
 									<div class="was">
 										<span class="name">{titel(j.audio)}</span>
-										<span class="status {j.status}">{STATUS[j.status] || j.status}</span>
-										<span class="meta">{wie(j)}{#if j.started}&nbsp;· <span class="zeit">{laufzeit(j)}</span>{/if}</span>
+										{#if offline && laeuft}
+											<span class="status unbekannt">unbekannt</span>
+										{:else}
+											<span class="status {j.status}">{STATUS[j.status] || j.status}</span>
+										{/if}
+										<span class="meta">{wie(j)}{#if j.started && !(offline && laeuft)}&nbsp;· <span class="zeit">{laufzeit(j)}</span>{/if}</span>
 									</div>
 									<div class="tun">
 										{#if laeuft}
-											<Button type="secondary" size="large" disabled={j.status === 'canceling'} onclick={() => aktion(j, 'cancel')}>Abbrechen</Button>
+											<Button type="secondary" size="large" disabled={offline || j.status === 'canceling'} onclick={() => aktion(j, 'cancel')}>Abbrechen</Button>
 										{:else}
 											<Button type="secondary" size="large" onclick={() => aktion(j, 'retry')}>
 												{#snippet iconLeft()}<IconMaterialSymbolsRefreshRounded />{/snippet}
@@ -571,7 +590,7 @@
 										{/if}
 									</div>
 								</div>
-								{#if j.status === 'running'}
+								{#if j.status === 'running' && !offline}
 									<div class="balken" role="progressbar" aria-label="Fortschritt {titel(j.audio)}" aria-valuenow={pct} aria-valuemin="0" aria-valuemax="100">
 										<i style:width="{pct}%"></i>
 									</div>

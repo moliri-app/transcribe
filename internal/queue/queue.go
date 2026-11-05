@@ -34,6 +34,9 @@ const (
 
 var ErrUnknownJob = errors.New("unknown job")
 
+// Interrupted is the error of a job that was running when the app ended without shutting down.
+const Interrupted = "Transcribe wurde während dieser Transkription unerwartet beendet. „Erneut“ startet sie noch einmal."
+
 // Runner must produce results/<stem>/_final.json; audioFile is a file name inside <data>/audio or
 // the name of a recording in a connected folder (media.Path finds both).
 type Runner func(ctx context.Context, dataDir, audioFile string, o jobs.Options, p jobs.Progress) error
@@ -95,8 +98,10 @@ func (q *Queue) load() {
 	for _, j := range f.Jobs {
 		switch j.Status {
 		case Running:
-			j.Status, j.Progress, j.Step = Queued, 0, nil
-			j.Note = ptr("nach Neustart erneut eingereiht")
+			// a shutdown puts its job back in the queue (runNext), so this one was running when the
+			// app crashed or was killed; running it again at once could crash it again, at every start
+			j.Status, j.Finished = Failed, ptr(now())
+			j.Error = ptr(Interrupted)
 		case Canceling:
 			j.Status, j.Finished = Canceled, ptr(now())
 		}
@@ -353,7 +358,11 @@ func (q *Queue) runNext(parent context.Context) bool {
 	defer q.mu.Unlock()
 	q.cancel = nil
 	if parent.Err() != nil && j.Status == Running {
-		return true // shutting down: stays "running", requeued on next start
+		// shutting down: the job runs again on the next start
+		j.Status, j.Progress, j.Step, j.Started = Queued, 0, nil, nil
+		j.Note = ptr("nach Neustart erneut eingereiht")
+		q.save()
+		return true
 	}
 	j.Finished = ptr(now())
 	switch {
