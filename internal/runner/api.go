@@ -16,6 +16,7 @@ import (
 
 	"github.com/moliri-app/transcribe/audio"
 	"github.com/moliri-app/transcribe/fileutil"
+	"github.com/moliri-app/transcribe/internal/media"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/results"
 	"github.com/moliri-app/transcribe/internal/sttapi"
@@ -61,11 +62,11 @@ func (r *Runner) runAPI(ctx context.Context, dataDir, audioFile string, o jobs.O
 	if p != nil {
 		p(1, 2, "transcribe ("+c.Label()+")")
 	}
-	path := filepath.Join(dataDir, "audio", audioFile)
+	path := media.Path(dataDir, audioFile)
 	var res *sttapi.Result
 	var err error
 	if c.WholeFile() {
-		res, err = apiWhole(ctx, c, path, audioFile, req)
+		res, err = apiWhole(ctx, c, path, filepath.Base(path), req)
 	} else {
 		res, err = apiPieces(ctx, c, path, req)
 	}

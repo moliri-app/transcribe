@@ -1,13 +1,14 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Bibliothek, die Startseite: die transkribierten Aufnahmen als Blätter, jedes mit dem Anfang
-     seines Transkripts wie im Manuskript, wer spricht und wie viel schon von Hand korrigiert ist;
-     ein Klick öffnet es im Editor. Darüber, nur wenn es sie gibt, was gerade transkribiert wird
-     oder gescheitert ist, und die Aufnahmen, die noch kein Transkript haben, zum Einreihen.
-     Steht unter / und, für alte Lesezeichen, unter /queue. -->
+<!-- Bibliothek, die Startseite. Links die Bereiche: alle Aufnahmen, hochgeladene, Live-Aufnahmen
+     und die verbundenen Ordner, deren Aufnahmen bleiben, wo sie sind (ihr Transkript liegt als
+     „….transcribe.json“ daneben, internal/sidecar). Rechts für den Bereich: was gerade transkribiert
+     wird oder gescheitert ist, die Aufnahmen ohne Transkript zum Einreihen und die transkribierten
+     als Liste, jede mit dem Anfang ihres Transkripts, wer spricht und wie viel schon von Hand
+     korrigiert ist; ein Klick öffnet sie im Editor. Steht unter / und, für alte Lesezeichen, unter /queue. -->
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import Button from '$lib/moliri/components/ui/Button.svelte';
 	import AuftragsOptionen from '$lib/AuftragsOptionen.svelte';
 	import { auftraege, geaendert } from '$lib/auftraege.svelte.js';
@@ -16,10 +17,13 @@
 
 	/** @typedef {{ id: number, name: string }} Sprecher */
 	/** @typedef {{ duration: number, speakers: Sprecher[], preview: string, edits: number, clips: number, done: number }} Inhalt */
-	/** @typedef {{ name: string, stem: string, video: boolean, added: number, summary?: Inhalt }} Aufnahme */
+	/** @typedef {{ name: string, stem: string, title: string, video: boolean, added: number, summary?: Inhalt,
+	 *   source: 'upload' | 'live' | 'folder', folder?: string, dir?: string, path?: string, sidecar?: boolean }} Aufnahme */
 	/** @typedef {{ id: string, audio: string, stem: string, status: string, progress: number, step: string | null,
 	 *   log: string[] | null, started: number | null, finished: number | null, error: string | null, note: string | null,
 	 *   options: { preset: string, speakers: number | null, language?: string, engine?: string } }} Auftrag */
+	/** @typedef {{ path: string, name: string, exists: boolean }} Ordner */
+	/** @typedef {{ folders: Ordner[], sidecar: boolean, pick: boolean, hint?: { path: string, name: string, count: number } }} Ordnerstand */
 
 	const STATUS = /** @type {Record<string, string>} */ ({
 		queued: 'wartet',
@@ -35,10 +39,19 @@
 		['laenge', 'Länge']
 	]);
 
+	/** die Bereiche ohne die Ordner; ein Ordner ist sein Pfad */
+	const BEREICHE = /** @type {const} */ ([
+		['alle', 'Alle Aufnahmen'],
+		['upload', 'Hochgeladen'],
+		['live', 'Live-Aufnahmen']
+	]);
+
 	/** @type {Aufnahme[] | null} */
 	let aufnahmen = $state(null);
 	/** @type {Auftrag[] | null} */
 	let jobs = $state(null);
+	/** @type {Ordnerstand} */
+	let ordner = $state({ folders: [], sidecar: true, pick: false });
 	let offline = $state(false);
 	/** Namen der angekreuzten Aufnahmen */
 	let gewaehlt = $state(/** @type {string[]} */ ([]));
@@ -51,37 +64,98 @@
 	let reiht = $state(false);
 	let suche = $state('');
 	let sorte = $state(/** @type {'zuletzt' | 'name' | 'laenge'} */ ('zuletzt'));
+	/** der gewählte Bereich: alle, upload, live oder der Pfad eines Ordners */
+	let bereich = $state(gemerkt());
+	/** „Ordner verbinden“ ist offen */
+	let verbinden = $state(false);
+	let pfad = $state('');
+	let waehlt = $state(false);
 	/** Uhr für die Laufzeit laufender Aufträge, in Sekunden */
 	let jetzt = $state(Date.now() / 1000);
 
+	function gemerkt() {
+		try {
+			return localStorage.getItem('bib:bereich') || 'alle';
+		} catch {
+			return 'alle';
+		}
+	}
+
+	/** @param {string} b */
+	function zeige(b) {
+		bereich = b;
+		verbinden = false;
+		gewaehlt = [];
+		suche = '';
+		try {
+			localStorage.setItem('bib:bereich', b);
+		} catch {
+			// ohne Speicher beginnt die Bibliothek wieder bei allen Aufnahmen
+		}
+	}
+
+	/** @param {Aufnahme} a @param {string} b */
+	const gehoert = (a, b) => b === 'alle' || a.source === b || (a.source === 'folder' && a.folder === b);
+
+	const nachName = $derived(new Map((aufnahmen ?? []).map((a) => [a.name, a])));
 	/** je Aufnahme ihr jüngster Auftrag (die Warteschlange führt sie in der Reihenfolge des Einreihens) */
 	const letzter = $derived(new Map((jobs ?? []).map((j) => [j.audio, j])));
-	/** was gerade transkribiert wird oder zuletzt gescheitert ist */
-	const inArbeit = $derived([...letzter.values()].filter((j) => LAUFEND.includes(j.status) || j.status === 'error'));
+	/** der gewählte Ordner, wenn einer gewählt ist */
+	const imOrdner = $derived(ordner.folders.find((o) => o.path === bereich) ?? null);
+	/** was gerade transkribiert wird oder zuletzt gescheitert ist, im Bereich */
+	const inArbeit = $derived(
+		[...letzter.values()].filter((j) => {
+			if (!LAUFEND.includes(j.status) && j.status !== 'error') return false;
+			const a = nachName.get(j.audio);
+			return a ? gehoert(a, bereich) : bereich === 'alle';
+		})
+	);
 	const laufend = $derived(inArbeit.filter((j) => LAUFEND.includes(j.status)));
+	const imBereich = $derived((aufnahmen ?? []).filter((a) => gehoert(a, bereich)));
 	/** Aufnahmen ohne Transkript, die auch nicht gerade in Arbeit sind */
-	const neu = $derived((aufnahmen ?? []).filter((a) => !a.summary && !inArbeit.some((j) => j.audio === a.name)));
-	const fertig = $derived((aufnahmen ?? []).filter((a) => a.summary));
+	const neu = $derived(imBereich.filter((a) => !a.summary && !inArbeit.some((j) => j.audio === a.name)));
+	const fertig = $derived(imBereich.filter((a) => a.summary));
+
+	/** wie viele Aufnahmen ein Bereich hat, und wie viele davon noch kein Transkript */
+	const zahlen = $derived.by(() => {
+		/** @type {Record<string, { alle: number, offen: number }>} */
+		const z = {};
+		for (const b of [...BEREICHE.map(([b]) => b), ...ordner.folders.map((o) => o.path)]) {
+			const in_ = (aufnahmen ?? []).filter((a) => gehoert(a, b));
+			z[b] = { alle: in_.length, offen: in_.filter((a) => !a.summary).length };
+		}
+		return z;
+	});
 
 	const regal = $derived.by(() => {
 		const q = suche.trim().toLowerCase();
 		const treffer = q
 			? fertig.filter((a) =>
-					[a.name, a.summary?.preview ?? '', ...(a.summary?.speakers ?? []).map((s) => s.name)].some((t) =>
+					[a.title, a.dir ?? '', a.summary?.preview ?? '', ...(a.summary?.speakers ?? []).map((s) => s.name)].some((t) =>
 						t.toLowerCase().includes(q)
 					)
 				)
 			: fertig;
 		const nach = {
 			zuletzt: (/** @type {Aufnahme} */ a, /** @type {Aufnahme} */ b) => (b.summary?.done ?? 0) - (a.summary?.done ?? 0),
-			name: (/** @type {Aufnahme} */ a, /** @type {Aufnahme} */ b) => a.name.localeCompare(b.name, 'de'),
+			name: (/** @type {Aufnahme} */ a, /** @type {Aufnahme} */ b) => a.title.localeCompare(b.title, 'de'),
 			laenge: (/** @type {Aufnahme} */ a, /** @type {Aufnahme} */ b) => (b.summary?.duration ?? 0) - (a.summary?.duration ?? 0)
 		}[sorte];
 		return treffer.toSorted(nach);
 	});
 
-	/** der Name ohne Endung */
-	const titel = (/** @type {string} */ name) => name.replace(/\.[^.]+$/, '');
+	/** wie ein Auftrag seine Aufnahme nennt: wie die Bibliothek, sonst der Name ohne Endung
+	 * @param {string} name */
+	const titel = (name) => nachName.get(name)?.title ?? name.replace(/^~[0-9a-f]{10}~/, '').replace(/\.[^.]+$/, '');
+
+	/** wo eine Aufnahme liegt, wenn das neben ihrem Namen etwas sagt: ihr Unterordner und, unter
+	 * allen Aufnahmen, ihr Ordner
+	 * @param {Aufnahme} a */
+	function ort(a) {
+		if (a.source !== 'folder') return bereich === 'alle' && a.source === 'live' ? 'Live' : '';
+		const name = ordner.folders.find((o) => o.path === a.folder)?.name ?? '';
+		return [bereich === 'alle' ? name : '', a.dir ?? ''].filter(Boolean).join(' / ');
+	}
 
 	/** wann, so kurz wie möglich: heute um 14:05, gestern, 12. Okt. oder 12. Okt. 2025
 	 * @param {number} sek */
@@ -131,6 +205,16 @@
 		}
 	}
 
+	async function ladeOrdner() {
+		try {
+			ordner = await getJSON('/api/folders');
+		} catch {
+			// bleibt, wie es war
+		}
+		// ein Ordner, der nicht mehr verbunden ist, ist kein Bereich mehr
+		if (!['alle', 'upload', 'live'].includes(bereich) && !ordner.folders.some((o) => o.path === bereich)) zeige('alle');
+	}
+
 	async function ladeAuftraege() {
 		const vorher = laufend.length;
 		try {
@@ -140,8 +224,58 @@
 			offline = true;
 			return;
 		}
-		// ein Auftrag ist fertig geworden: sein Transkript steht jetzt im Regal
+		// ein Auftrag ist fertig geworden: sein Transkript steht jetzt in der Liste
 		if (laufend.length < vorher) ladeAufnahmen();
+	}
+
+	/** Einen Ordner verbinden (action add) oder trennen (remove), den Vorschlag ablehnen (decline).
+	 * @param {'add' | 'remove' | 'decline'} action @param {string} path */
+	async function ordnerAendern(action, path) {
+		try {
+			ordner = await post('/api/folders', { action, path });
+		} catch (e) {
+			meldung = /** @type {Error} */ (e).message;
+			return false;
+		}
+		await ladeAufnahmen();
+		return true;
+	}
+
+	/** @param {string} path */
+	async function verbinde(path) {
+		if (!path.trim()) {
+			meldung = 'Bitte einen Ordner wählen oder seinen Pfad einfügen.';
+			return;
+		}
+		if (!(await ordnerAendern('add', path))) return;
+		const neuer = ordner.folders.at(-1);
+		pfad = '';
+		if (neuer) {
+			zeige(neuer.path);
+			const n = zahlen[neuer.path]?.alle ?? 0;
+			meldung = `„${neuer.name}“ ist verbunden: ${n === 1 ? 'eine Aufnahme' : `${n} Aufnahmen`}.`;
+		}
+	}
+
+	/** Den Ordner im Dialog von Windows wählen und gleich verbinden. */
+	async function waehlen() {
+		waehlt = true;
+		try {
+			const { path } = await post('/api/folders/pick');
+			if (path) await verbinde(path);
+		} catch (e) {
+			meldung = /** @type {Error} */ (e).message;
+		} finally {
+			waehlt = false;
+		}
+	}
+
+	/** @param {Ordner} o */
+	async function trennen(o) {
+		if (await ordnerAendern('remove', o.path)) {
+			zeige('alle');
+			meldung = `„${o.name}“ ist getrennt. Die Aufnahmen und Transkripte darin bleiben, wo sie sind.`;
+		}
 	}
 
 	async function transkribieren() {
@@ -167,7 +301,7 @@
 	async function neuTranskribieren(a) {
 		try {
 			const n = await einreihen([a.name], optionen);
-			meldung = n ? `„${titel(a.name)}“ wird neu transkribiert. Deine Korrekturen bleiben erhalten.` : 'Schon in Arbeit.';
+			meldung = n ? `„${a.title}“ wird neu transkribiert. Deine Korrekturen bleiben erhalten.` : 'Schon in Arbeit.';
 			geaendert();
 		} catch (e) {
 			meldung = /** @type {Error} */ (e).message;
@@ -210,7 +344,8 @@
 			}
 			input.value = '';
 			meldung = namen.length === 1 ? 'Hochgeladen. Sie steht jetzt unter „Noch nicht transkribiert“.' : 'Hochgeladen.';
-			// das Hochgeladene ist gleich angekreuzt, ein Klick auf „Transkribieren“ genügt
+			// Hochgeladenes steht unter „Hochgeladen“ und ist gleich angekreuzt, ein Klick auf „Transkribieren“ genügt
+			if (bereich !== 'alle' && bereich !== 'upload') zeige('upload');
 			gewaehlt = [...new Set([...gewaehlt, ...namen])];
 			ladeAufnahmen();
 		} finally {
@@ -236,11 +371,15 @@
 	// Nach dem Ablegen von Dateien im Fenster (Einrichtung.svelte) oder einer eigenen Aktion sofort neu laden
 	$effect(() => {
 		auftraege.stand;
-		ladeAufnahmen();
-		ladeAuftraege();
+		// nur auftraege.stand löst aus: was die beiden lesen (laufend, die Aufnahmen), ändern sie selbst
+		untrack(() => {
+			ladeAufnahmen();
+			ladeAuftraege();
+		});
 	});
 
 	onMount(() => {
+		ladeOrdner();
 		vorgaben()
 			.then(({ dropMode: _, erkennung: e, ...o }) => {
 				optionen = o;
@@ -251,11 +390,30 @@
 			ladeAuftraege();
 			jetzt = Date.now() / 1000;
 		}, 2000);
-		return () => clearInterval(t);
+		// neue Aufnahmen in den Ordnern, und was andere dort transkribiert oder korrigiert haben
+		const o = setInterval(() => {
+			if (ordner.folders.length && !document.hidden) ladeAufnahmen();
+		}, 10000);
+		return () => {
+			clearInterval(t);
+			clearInterval(o);
+		};
 	});
 </script>
 
 <svelte:head><title>Bibliothek · Transcribe by Moliri</title></svelte:head>
+
+{#snippet bereichsknopf(/** @type {string} */ b, /** @type {string} */ name, /** @type {any} */ Icon, /** @type {string} */ hinweis)}
+	{@const z = zahlen[b]}
+	<li>
+		<button type="button" class="bereich" aria-current={bereich === b ? 'page' : undefined} title={hinweis || undefined} onclick={() => zeige(b)}>
+			<Icon aria-hidden="true" />
+			<span class="bname">{name}</span>
+			{#if z?.offen}<span class="offen" title="{z.offen} ohne Transkript">{z.offen}</span>{/if}
+			<span class="bzahl">{z?.alle ?? 0}</span>
+		</button>
+	</li>
+{/snippet}
 
 <main>
 	<header class="kopf">
@@ -276,194 +434,316 @@
 		<p class="leer fehler">Server nicht erreichbar. Läuft das Programm noch?</p>
 	{/if}
 
-	{#if inArbeit.length}
-		<section class="blatt" aria-labelledby="h-arbeit">
-			<div class="zeile">
-				<h2 id="h-arbeit">In Arbeit</h2>
-				{#if laufend.length}<span class="zaehler">{laufend.length}</span>{/if}
-				<span class="platz"></span>
-				{#if laufend.length > 1}
-					<Button type="secondary" size="large" onclick={alleAbbrechen}>Alle abbrechen</Button>
-				{/if}
+	{#if ordner.hint}
+		{@const h = ordner.hint}
+		<aside class="vorschlag" aria-labelledby="h-vorschlag">
+			<IconMaterialSymbolsCreateNewFolderOutlineRounded aria-hidden="true" />
+			<div class="vtext">
+				<h2 id="h-vorschlag">
+					Neben Transcribe {h.count === 1 ? 'liegt eine Aufnahme' : `liegen ${h.count >= 1000 ? 'viele' : h.count} Aufnahmen`}
+				</h2>
+				<p>
+					Im Ordner „{h.name}“{h.count === 1 ? '' : ' und seinen Unterordnern'}. Verbunden steht {h.count === 1 ? 'sie' : 'alles'}
+					hier, ohne kopiert zu werden, und die Transkripte liegen gleich daneben.
+				</p>
 			</div>
-			<ul class="auftraege" aria-label="Aufträge">
-				{#each inArbeit as j (j.id)}
-					{@const pct = Math.round((j.progress || 0) * 100)}
-					{@const laeuft = LAUFEND.includes(j.status)}
-					<li class="auftrag">
-						<div class="kopfzeile">
-							<div class="was">
-								<span class="name">{titel(j.audio)}</span>
-								<span class="status {j.status}">{STATUS[j.status] || j.status}</span>
-								<span class="meta">{wie(j)}{#if j.started}&nbsp;· <span class="zeit">{laufzeit(j)}</span>{/if}</span>
-							</div>
-							<div class="tun">
-								{#if laeuft}
-									<Button type="secondary" size="large" disabled={j.status === 'canceling'} onclick={() => aktion(j, 'cancel')}>Abbrechen</Button>
-								{:else}
-									<Button type="secondary" size="large" onclick={() => aktion(j, 'retry')}>
-										{#snippet iconLeft()}<IconMaterialSymbolsRefreshRounded />{/snippet}
-										Erneut
-									</Button>
-									<Button type="tertiary" size="large" onclick={() => aktion(j, 'remove')}>Entfernen</Button>
-								{/if}
-							</div>
-						</div>
-						{#if j.status === 'running'}
-							<div class="balken" role="progressbar" aria-label="Fortschritt {j.audio}" aria-valuenow={pct} aria-valuemin="0" aria-valuemax="100">
-								<i style:width="{pct}%"></i>
-							</div>
-							<p class="schritt">{j.step || 'startet …'} ({pct} %)</p>
-						{/if}
-						{#if j.note}<p class="schritt">{j.note}</p>{/if}
-						{#if j.error}<p class="fehler">{j.error}</p>{/if}
-						{#if j.log?.length && j.status === 'error'}
-							<details>
-								<summary>Protokoll</summary>
-								<pre>{j.log.join('\n')}</pre>
-							</details>
-						{/if}
-					</li>
-				{/each}
+			<div class="vtun">
+				<Button type="primary" size="large" onclick={() => verbinde(h.path)}>Ordner verbinden</Button>
+				<Button type="tertiary" size="large" onclick={() => ordnerAendern('decline', h.path)}>Nein, danke</Button>
+			</div>
+		</aside>
+	{/if}
+
+	<div class="rahmen">
+		<nav class="bereiche" aria-label="Bereiche der Bibliothek">
+			<ul>
+				{@render bereichsknopf('alle', 'Alle Aufnahmen', IconMaterialSymbolsLibraryMusicOutlineRounded, '')}
+				{@render bereichsknopf('upload', 'Hochgeladen', IconMaterialSymbolsUploadFileOutlineRounded, 'Ins Fenster gezogen oder hinzugefügt; liegen im Datenordner von Transcribe')}
+				{#if zahlen.live?.alle}
+					{@render bereichsknopf('live', 'Live-Aufnahmen', IconMaterialSymbolsMicOutlineRounded, 'Auf der Seite Live gespeicherte Aufnahmen')}
+				{/if}
 			</ul>
-		</section>
-	{/if}
+			<h2 class="bkopf">Ordner</h2>
+			{#if ordner.folders.length}
+				<ul>
+					{#each ordner.folders as o (o.path)}
+						{@render bereichsknopf(o.path, o.name, o.exists ? IconMaterialSymbolsFolderOutlineRounded : IconMaterialSymbolsFolderOffOutlineRounded, o.exists ? o.path : `${o.path} (nicht erreichbar)`)}
+					{/each}
+				</ul>
+			{/if}
+			<button type="button" class="bereich verbinden" aria-expanded={verbinden} onclick={() => (verbinden = !verbinden)}>
+				<IconMaterialSymbolsCreateNewFolderOutlineRounded aria-hidden="true" />
+				<span class="bname">Ordner verbinden</span>
+			</button>
+		</nav>
 
-	{#if neu.length}
-		<section class="blatt" aria-labelledby="h-neu">
-			<div class="zeile">
-				<h2 id="h-neu">Noch nicht transkribiert</h2>
-				<span class="anzahl">{neu.length}</span>
-			</div>
-			<div class="aufnahmen" role="group" aria-label="Aufnahmen ohne Transkript">
-				{#each neu as a (a.name)}
-					<label class="aufnahme" class:gewaehlt={gewaehlt.includes(a.name)}>
-						<input type="checkbox" value={a.name} bind:group={gewaehlt} />
-						<span class="name">{a.name}</span>
-						{#if a.video}
-							<span class="art" title="Video"><IconMaterialSymbolsMovieOutlineRounded aria-hidden="true" /><span class="sr">Video</span></span>
+		<div class="inhalt">
+			{#if verbinden}
+				<section class="blatt" aria-labelledby="h-verbinden">
+					<div class="zeile">
+						<h2 id="h-verbinden">Ordner verbinden</h2>
+						<span class="platz"></span>
+						<button type="button" class="zu" aria-label="Schließen" onclick={() => (verbinden = false)}><IconMaterialSymbolsCloseRounded /></button>
+					</div>
+					<p class="erklaert">
+						Alle Aufnahmen im Ordner und in seinen Unterordnern stehen dann hier, ohne kopiert zu werden. Neue kommen von selbst
+						dazu. {#if ordner.sidecar}Jedes Transkript legt Transcribe als Datei neben seine Aufnahme („Interview.mp3.transcribe.json“):
+							Wer den Ordner mit dir teilt, etwa über Nextcloud, sieht dieselben Transkripte und Korrekturen.{:else}Transkripte
+							bleiben nur in Transcribe; neben die Aufnahmen legen lässt es sich in den Einstellungen.{/if}
+					</p>
+					<div class="wege">
+						{#if ordner.pick}
+							<Button type="primary" size="large" loading={waehlt} onclick={waehlen}>
+								{#snippet iconLeft()}<IconMaterialSymbolsFolderOpenOutlineRounded />{/snippet}
+								Ordner wählen …
+							</Button>
+							<span class="oder">oder</span>
 						{/if}
-						<span class="hinzu">{wann(a.added)}</span>
-					</label>
-				{/each}
-			</div>
-			<AuftragsOptionen bind:optionen {erkennung} />
-			<div class="handeln">
-				<Button type="primary" size="large" loading={reiht} onclick={transkribieren}>
-					{#snippet iconLeft()}<IconMaterialSymbolsGraphicEqRounded />{/snippet}
-					{gewaehlt.length > 1 ? `${gewaehlt.length} Aufnahmen transkribieren` : 'Transkribieren'}
-				</Button>
-				{#if neu.length > 1}
-					<button
-						class="alle"
-						type="button"
-						onclick={() => (gewaehlt = gewaehlt.length === neu.length ? [] : neu.map((a) => a.name))}
-					>
-						{gewaehlt.length === neu.length ? 'Keine auswählen' : 'Alle auswählen'}
-					</button>
-				{/if}
-			</div>
-		</section>
-	{/if}
-
-	<section class="regal" aria-labelledby="h-fertig">
-		<div class="regalkopf">
-			<h2 id="h-fertig">Transkribiert</h2>
-			{#if fertig.length}<span class="anzahl">{fertig.length}</span>{/if}
-			<span class="platz"></span>
-			{#if fertig.length > 3}
-				<label class="suche">
-					<IconMaterialSymbolsSearchRounded aria-hidden="true" />
-					<span class="sr">In Transkripten suchen</span>
-					<input class="feld" type="search" placeholder="Name, Sprecher oder Text" bind:value={suche} />
-				</label>
+						<div class="pfad">
+							<label class="sr" for="pfad">Pfad des Ordners</label>
+							<input
+								id="pfad"
+								class="feld"
+								type="text"
+								placeholder="Pfad einfügen, etwa C:\Nextcloud\Interviews"
+								bind:value={pfad}
+								onkeydown={(e) => e.key === 'Enter' && verbinde(pfad)}
+							/>
+							<Button type="secondary" size="large" onclick={() => verbinde(pfad)}>Verbinden</Button>
+						</div>
+					</div>
+				</section>
 			{/if}
-			{#if fertig.length > 1}
-				<label class="sortieren">
-					<span class="sr">Sortieren nach</span>
-					<select class="feld" bind:value={sorte}>
-						{#each SORTEN as [wert, name] (wert)}<option value={wert}>{name}</option>{/each}
-					</select>
-				</label>
-			{/if}
-		</div>
 
-		{#if aufnahmen === null}
-			<p class="leer">Lade die Bibliothek …</p>
-		{:else if !aufnahmen.length}
-			<label class="willkommen">
-				<IconMaterialSymbolsLibraryMusicOutlineRounded aria-hidden="true" />
-				<strong>Noch keine Aufnahmen</strong>
-				<span>Zieh Audio- oder Videodateien in dieses Fenster, oder wähle sie hier aus. Transcribe schreibt mit, wer was sagt.</span>
-				<span class="knopf">Dateien auswählen</span>
-				<input class="sr" type="file" accept="audio/*,video/*" multiple onchange={hochladen} />
-			</label>
-		{:else if !fertig.length}
-			<p class="leer">Noch kein Transkript fertig. Was du oben transkribierst, steht danach hier.</p>
-		{:else if !regal.length}
-			<p class="leer">Nichts gefunden zu „{suche}“.</p>
-		{:else}
-			<ul class="karten" aria-label="Transkribierte Aufnahmen">
-				{#each regal as a (a.name)}
-					{@const s = /** @type {Inhalt} */ (a.summary)}
-					{@const j = letzter.get(a.name)}
-					{@const arbeitet = !!j && LAUFEND.includes(j.status)}
-					{@const erster = s.speakers[0]}
-					<li class="karte" class:arbeitet>
-						<h3 class="titel">
-							<a href="/editor" data-sveltekit-reload onclick={() => imEditor(a.stem)} title="{a.name} im Editor öffnen">{titel(a.name)}</a>
-						</h3>
-						<p class="stand">
-							{#if a.video}<IconMaterialSymbolsMovieOutlineRounded aria-label="Video" />{/if}
-							<span class="zeit">{dauer(s.duration)}</span>
-							<span aria-hidden="true">·</span>
-							<span>{s.speakers.length === 1 ? '1 Sprecher' : `${s.speakers.length} Sprecher`}</span>
-							<span aria-hidden="true">·</span>
-							<span>{wann(s.done)}</span>
-							{#if arbeitet}
-								<span class="status running">wird neu transkribiert</span>
-							{:else if frisch(a)}
-								<span class="status done">neu</span>
+			{#if imOrdner}
+				<div class="ordnerkopf">
+					<div>
+						<h2>{imOrdner.name}</h2>
+						<p class="ordnerpfad">{imOrdner.path}</p>
+						<p class="ordnerinfo">
+							{#if !imOrdner.exists}
+								<span class="fehler">Der Ordner ist gerade nicht erreichbar.</span>
+							{:else if ordner.sidecar}
+								<IconMaterialSymbolsDescriptionOutlineRounded aria-hidden="true" />
+								Transkripte liegen als Datei neben den Aufnahmen, für alle, die den Ordner teilen.
+							{:else}
+								Transkripte bleiben nur in Transcribe (Einstellungen, Ordner).
 							{/if}
 						</p>
-						<p class="auszug">
-							{#if erster}<span class="wer" style:--c="var(--spk{erster.id % 8})">{erster.name}</span>{/if}
-							{s.preview || 'Kein Text erkannt.'}
-						</p>
-						<div class="fuss">
-							<ul class="stimmen" aria-label="Sprecher">
-								{#each s.speakers.slice(0, 4) as p (p.id)}
-									<li><span class="punkt" style:--c="var(--spk{p.id % 8})" aria-hidden="true"></span>{p.name}</li>
-								{/each}
-								{#if s.speakers.length > 4}<li class="mehr">+{s.speakers.length - 4}</li>{/if}
-							</ul>
-							{#if s.edits || s.clips}
+					</div>
+					<Button type="tertiary" size="large" onclick={() => trennen(imOrdner)}>
+						{#snippet iconLeft()}<IconMaterialSymbolsLinkOffRounded />{/snippet}
+						Ordner trennen
+					</Button>
+				</div>
+			{/if}
+
+			{#if inArbeit.length}
+				<section class="blatt" aria-labelledby="h-arbeit">
+					<div class="zeile">
+						<h2 id="h-arbeit">In Arbeit</h2>
+						{#if laufend.length}<span class="zaehler">{laufend.length}</span>{/if}
+						<span class="platz"></span>
+						{#if laufend.length > 1}
+							<Button type="secondary" size="large" onclick={alleAbbrechen}>Alle abbrechen</Button>
+						{/if}
+					</div>
+					<ul class="auftraege" aria-label="Aufträge">
+						{#each inArbeit as j (j.id)}
+							{@const pct = Math.round((j.progress || 0) * 100)}
+							{@const laeuft = LAUFEND.includes(j.status)}
+							<li class="auftrag">
+								<div class="kopfzeile">
+									<div class="was">
+										<span class="name">{titel(j.audio)}</span>
+										<span class="status {j.status}">{STATUS[j.status] || j.status}</span>
+										<span class="meta">{wie(j)}{#if j.started}&nbsp;· <span class="zeit">{laufzeit(j)}</span>{/if}</span>
+									</div>
+									<div class="tun">
+										{#if laeuft}
+											<Button type="secondary" size="large" disabled={j.status === 'canceling'} onclick={() => aktion(j, 'cancel')}>Abbrechen</Button>
+										{:else}
+											<Button type="secondary" size="large" onclick={() => aktion(j, 'retry')}>
+												{#snippet iconLeft()}<IconMaterialSymbolsRefreshRounded />{/snippet}
+												Erneut
+											</Button>
+											<Button type="tertiary" size="large" onclick={() => aktion(j, 'remove')}>Entfernen</Button>
+										{/if}
+									</div>
+								</div>
+								{#if j.status === 'running'}
+									<div class="balken" role="progressbar" aria-label="Fortschritt {titel(j.audio)}" aria-valuenow={pct} aria-valuemin="0" aria-valuemax="100">
+										<i style:width="{pct}%"></i>
+									</div>
+									<p class="schritt">{j.step || 'startet …'} ({pct} %)</p>
+								{/if}
+								{#if j.note}<p class="schritt">{j.note}</p>{/if}
+								{#if j.error}<p class="fehler">{j.error}</p>{/if}
+								{#if j.log?.length && j.status === 'error'}
+									<details>
+										<summary>Protokoll</summary>
+										<pre>{j.log.join('\n')}</pre>
+									</details>
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				</section>
+			{/if}
+
+			{#if neu.length}
+				<section class="blatt" aria-labelledby="h-neu">
+					<div class="zeile">
+						<h2 id="h-neu">Noch nicht transkribiert</h2>
+						<span class="anzahl">{neu.length}</span>
+					</div>
+					<div class="aufnahmen" role="group" aria-label="Aufnahmen ohne Transkript">
+						{#each neu as a (a.name)}
+							{@const wo = ort(a)}
+							<label class="aufnahme" class:gewaehlt={gewaehlt.includes(a.name)} title={a.path}>
+								<input type="checkbox" value={a.name} bind:group={gewaehlt} />
+								<span class="name">{a.source === 'folder' ? a.name.replace(/^~[0-9a-f]{10}~/, '') : a.name}</span>
+								{#if wo}<span class="wo">{wo}</span>{/if}
+								{#if a.video}
+									<span class="art" title="Video"><IconMaterialSymbolsMovieOutlineRounded aria-hidden="true" /><span class="sr">Video</span></span>
+								{/if}
+								<span class="hinzu">{wann(a.added)}</span>
+							</label>
+						{/each}
+					</div>
+					<AuftragsOptionen bind:optionen {erkennung} />
+					<div class="handeln">
+						<Button type="primary" size="large" loading={reiht} onclick={transkribieren}>
+							{#snippet iconLeft()}<IconMaterialSymbolsGraphicEqRounded />{/snippet}
+							{gewaehlt.length > 1 ? `${gewaehlt.length} Aufnahmen transkribieren` : 'Transkribieren'}
+						</Button>
+						{#if neu.length > 1}
+							<button
+								class="alle"
+								type="button"
+								onclick={() => (gewaehlt = gewaehlt.length === neu.length ? [] : neu.map((a) => a.name))}
+							>
+								{gewaehlt.length === neu.length ? 'Keine auswählen' : 'Alle auswählen'}
+							</button>
+						{/if}
+					</div>
+				</section>
+			{/if}
+
+			<section class="regal" aria-labelledby="h-fertig">
+				<div class="regalkopf">
+					<h2 id="h-fertig">Transkribiert</h2>
+					{#if fertig.length}<span class="anzahl">{fertig.length}</span>{/if}
+					<span class="platz"></span>
+					{#if fertig.length > 3}
+						<label class="suche">
+							<IconMaterialSymbolsSearchRounded aria-hidden="true" />
+							<span class="sr">In Transkripten suchen</span>
+							<input class="feld" type="search" placeholder="Name, Sprecher oder Text" bind:value={suche} />
+						</label>
+					{/if}
+					{#if fertig.length > 1}
+						<label class="sortieren">
+							<span class="sr">Sortieren nach</span>
+							<select class="feld" bind:value={sorte}>
+								{#each SORTEN as [wert, name] (wert)}<option value={wert}>{name}</option>{/each}
+							</select>
+						</label>
+					{/if}
+				</div>
+
+				{#if aufnahmen === null}
+					<p class="leer">Lade die Bibliothek …</p>
+				{:else if !aufnahmen.length}
+					<div class="willkommen">
+						<IconMaterialSymbolsLibraryMusicOutlineRounded aria-hidden="true" />
+						<strong>Noch keine Aufnahmen</strong>
+						<span>
+							Zieh Audio- oder Videodateien in dieses Fenster, wähle sie aus, oder verbinde einen Ordner, in dem sie liegen.
+							Transcribe schreibt mit, wer was sagt.
+						</span>
+						<div class="wkn">
+							<label class="knopf">
+								Dateien auswählen
+								<input class="sr" type="file" accept="audio/*,video/*" multiple onchange={hochladen} />
+							</label>
+							<button type="button" class="knopf hell" onclick={() => (verbinden = true)}>Ordner verbinden</button>
+						</div>
+					</div>
+				{:else if !fertig.length}
+					<p class="leer">
+						{imBereich.length ? 'Hier ist noch kein Transkript fertig. Was du oben transkribierst, steht danach hier.' : 'Hier liegen keine Aufnahmen.'}
+					</p>
+				{:else if !regal.length}
+					<p class="leer">Nichts gefunden zu „{suche}“.</p>
+				{:else}
+					<ul class="liste" aria-label="Transkribierte Aufnahmen">
+						{#each regal as a (a.name)}
+							{@const s = /** @type {Inhalt} */ (a.summary)}
+							{@const j = letzter.get(a.name)}
+							{@const arbeitet = !!j && LAUFEND.includes(j.status)}
+							{@const erster = s.speakers[0]}
+							{@const wo = ort(a)}
+							<li class="eintrag" class:arbeitet>
+								<div class="haupt">
+									<h3 class="titel">
+										<a href="/editor" data-sveltekit-reload onclick={() => imEditor(a.stem)} title="{a.title} im Editor öffnen">{a.title}</a>
+									</h3>
+									{#if wo}<span class="wo">{wo}</span>{/if}
+									{#if a.sidecar}
+										<span class="neben" title="Das Transkript liegt als Datei neben der Aufnahme">
+											<IconMaterialSymbolsDescriptionOutlineRounded aria-hidden="true" /><span class="sr">Transkript neben der Aufnahme</span>
+										</span>
+									{/if}
+									{#if arbeitet}
+										<span class="status running">wird neu transkribiert</span>
+									{:else if frisch(a)}
+										<span class="status done">neu</span>
+									{/if}
+									<p class="auszug">
+										{#if erster}<span class="wer" style:--c="var(--spk{erster.id % 8})">{erster.name}</span>{/if}
+										{s.preview || 'Kein Text erkannt.'}
+									</p>
+								</div>
+								<ul class="stimmen" aria-label="Sprecher">
+									{#each s.speakers.slice(0, 3) as p (p.id)}
+										<li><span class="punkt" style:--c="var(--spk{p.id % 8})" aria-hidden="true"></span>{p.name}</li>
+									{/each}
+									{#if s.speakers.length > 3}<li class="mehr">+{s.speakers.length - 3}</li>{/if}
+								</ul>
+								<p class="stand">
+									{#if a.video}<IconMaterialSymbolsMovieOutlineRounded aria-label="Video" />{/if}
+									<span class="zeit">{dauer(s.duration)}</span>
+									<span class="sr">,</span>
+									<span class="leise">{s.speakers.length === 1 ? '1 Sprecher' : `${s.speakers.length} Sprecher`}</span>
+								</p>
 								<p class="arbeit">
 									{#if s.edits}<span title="Von Hand korrigiert"><IconMaterialSymbolsEditOutlineRounded aria-hidden="true" />{s.edits === 1 ? '1 Korrektur' : `${s.edits} Korrekturen`}</span>{/if}
 									{#if s.clips}<span title="Clips"><IconMaterialSymbolsContentCutRounded aria-hidden="true" />{s.clips === 1 ? '1 Clip' : `${s.clips} Clips`}</span>{/if}
 								</p>
-							{/if}
-							<button
-								class="neu-tx"
-								type="button"
-								disabled={arbeitet}
-								title="Neu transkribieren; Korrekturen von Hand bleiben erhalten"
-								aria-label="{titel(a.name)} neu transkribieren"
-								onclick={() => neuTranskribieren(a)}
-							>
-								<IconMaterialSymbolsRefreshRounded aria-hidden="true" />
-							</button>
-						</div>
-					</li>
-				{/each}
-			</ul>
-		{/if}
-	</section>
+								<p class="wann">{wann(s.done)}</p>
+								<button
+									class="neu-tx"
+									type="button"
+									disabled={arbeitet}
+									title="Neu transkribieren; Korrekturen von Hand bleiben erhalten"
+									aria-label="{a.title} neu transkribieren"
+									onclick={() => neuTranskribieren(a)}
+								>
+									<IconMaterialSymbolsRefreshRounded aria-hidden="true" />
+								</button>
+							</li>
+						{/each}
+					</ul>
+				{/if}
+			</section>
+		</div>
+	</div>
 </main>
 
 <style>
 	main {
-		max-width: 76rem;
+		max-width: 84rem;
 		margin: 0 auto;
 		padding: 2rem 1.5rem 4rem;
 		display: grid;
@@ -570,6 +850,200 @@
 	.fehler {
 		color: hsl(var(--color-text-error));
 		font-weight: 600;
+	}
+
+	/* ---- Bereiche: links wie das Menü der Einstellungen, rechts ihr Inhalt ---- */
+	.rahmen {
+		display: grid;
+		grid-template-columns: 15rem minmax(0, 1fr);
+		gap: 2rem;
+		align-items: start;
+	}
+	.inhalt {
+		display: grid;
+		gap: 1.5rem;
+		min-width: 0;
+	}
+	.bereiche {
+		position: sticky;
+		top: calc(60px + 1.5rem);
+		display: grid;
+		gap: 0.25rem;
+	}
+	.bereiche ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.125rem;
+	}
+	.bkopf {
+		margin: 1rem 0 0.25rem 1rem;
+		font-size: 0.8125rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: hsl(var(--color-text-tertiary));
+	}
+	.bereich {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		min-height: var(--hit);
+		padding: 0 0.9rem;
+		border-radius: 2rem;
+		font-weight: 600;
+		text-align: left;
+		color: hsl(var(--color-text-secondary));
+		cursor: pointer;
+		transition: background-color 0.15s, color 0.15s;
+	}
+	.bereich:hover {
+		background: hsl(var(--color-bg-primary));
+		color: hsl(var(--color-text-primary));
+	}
+	.bereich :global(svg) {
+		flex: none;
+		width: 1.25rem;
+		height: 1.25rem;
+		margin: 0;
+	}
+	/* wo man ist: Tintenpille wie der aktive Tab der App-Leiste, umgekehrt */
+	.bereich[aria-current='page'] {
+		background: hsl(var(--color-neutral-100));
+		color: hsl(var(--color-neutral-0));
+	}
+	.bname {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.bzahl {
+		font-size: 0.875rem;
+		font-variant-numeric: tabular-nums;
+		opacity: 0.75;
+	}
+	/* ohne Transkript: eine grüne Zahl, die zum Transkribieren einlädt */
+	.offen {
+		min-width: 1.4rem;
+		padding: 0 0.4rem;
+		border-radius: 999px;
+		background: hsl(var(--color-green-100));
+		color: hsl(var(--color-neutral-100));
+		font-size: 0.8125rem;
+		font-weight: 700;
+		text-align: center;
+		font-variant-numeric: tabular-nums;
+	}
+	.verbinden {
+		margin-top: 0.25rem;
+		color: hsl(var(--color-text-primary));
+	}
+	.verbinden[aria-expanded='true'] {
+		background: hsl(var(--color-bg-primary));
+	}
+
+	/* ---- Ordner verbinden ---- */
+	.zu {
+		width: var(--hit);
+		height: var(--hit);
+		display: grid;
+		place-items: center;
+		margin: -0.5rem -0.75rem -0.5rem 0;
+		border-radius: 50%;
+		color: hsl(var(--color-text-secondary));
+		cursor: pointer;
+	}
+	.zu:hover {
+		background: hsl(var(--color-bg-secondary));
+		color: hsl(var(--color-text-primary));
+	}
+	.erklaert {
+		max-width: 64ch;
+		color: hsl(var(--color-text-secondary));
+	}
+	.wege {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem 1rem;
+	}
+	.oder {
+		color: hsl(var(--color-text-tertiary));
+	}
+	.pfad {
+		flex: 1 1 24rem;
+		display: flex;
+		gap: 0.5rem;
+	}
+	.pfad .feld {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.ordnerkopf {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 0.5rem 1.5rem;
+	}
+	.ordnerkopf h2 {
+		font-size: 1.5rem;
+		letter-spacing: -0.01em;
+	}
+	.ordnerpfad {
+		font-size: 0.9375rem;
+		color: hsl(var(--color-text-tertiary));
+		overflow-wrap: anywhere;
+	}
+	.ordnerinfo {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		margin-top: 0.35rem;
+		font-size: 0.9375rem;
+		color: hsl(var(--color-text-secondary));
+	}
+	.ordnerinfo :global(svg) {
+		width: 1.125rem;
+		height: 1.125rem;
+		margin: 0;
+	}
+
+	/* ---- Vorschlag: der Ordner neben der EXE ---- */
+	.vorschlag {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem 1.25rem;
+		padding: 1.25rem 1.5rem;
+		border-radius: 0.75rem;
+		background: hsl(var(--color-green-10));
+		box-shadow: inset 0 0 0 1px hsl(var(--color-green-100) / 0.5);
+	}
+	.vorschlag > :global(svg) {
+		flex: none;
+		width: 2rem;
+		height: 2rem;
+		margin: 0;
+	}
+	.vtext {
+		flex: 1 1 24rem;
+	}
+	.vtext h2 {
+		font-size: 1.125rem;
+	}
+	.vtext p {
+		color: hsl(var(--color-text-secondary));
+	}
+	.vtun {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
 	}
 
 	/* ---- In Arbeit ---- */
@@ -715,6 +1189,9 @@
 	.aufnahme .name {
 		overflow-wrap: anywhere;
 	}
+	.aufnahme .wo {
+		white-space: nowrap;
+	}
 	.art {
 		display: inline-flex;
 		color: hsl(var(--color-text-secondary));
@@ -774,44 +1251,49 @@
 		padding-left: 2.5rem;
 	}
 
-	.karten {
+	/* Eine Zeile je Aufnahme: Titel mit dem Anfang des Transkripts, wer spricht, wie lang, wie viel
+	   von Hand getan ist, wann zuletzt. Der Titel ist der Link; er deckt die ganze Zeile ab, nur
+	   „Neu transkribieren“ liegt darüber. */
+	.liste {
 		list-style: none;
 		margin: 0;
-		padding: 0;
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
-		gap: 1.25rem;
-	}
-
-	/* Ein Blatt je Aufnahme: oben der Titel, darunter der Anfang des Transkripts wie im Manuskript,
-	   mit dem ersten Sprecher in Versalien und seiner Farbe. Der Titel ist der Link; er deckt das
-	   ganze Blatt ab, nur „Neu transkribieren“ liegt darüber. */
-	.karte {
-		position: relative;
-		display: grid;
-		grid-template-rows: auto auto 1fr auto;
-		gap: 0.5rem;
-		padding: 1.25rem 1.375rem 1rem;
+		padding: 0.25rem 0;
 		border-radius: 0.75rem;
 		background: hsl(var(--color-bg-primary));
 		box-shadow: 0 1px 2px hsl(var(--color-shadow)), 0 12px 32px -20px hsl(var(--color-neutral-100) / 0.25);
-		transition: box-shadow 0.2s ease-out, transform 0.2s ease-out;
 	}
-	.karte:hover {
-		box-shadow: 0 1px 2px hsl(var(--color-shadow)), 0 18px 36px -18px hsl(var(--color-neutral-100) / 0.38);
-		transform: translateY(-2px);
+	.eintrag {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 11rem 6.5rem 8.5rem 6.5rem var(--hit);
+		align-items: center;
+		gap: 0.25rem 1rem;
+		padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+		border-top: 1px solid hsl(var(--color-border-primary));
+		transition: background-color 0.15s;
 	}
-	.karte:has(.titel a:focus-visible) {
+	.eintrag:first-child {
+		border-top: 0;
+	}
+	.eintrag:hover {
+		background: hsl(var(--color-interactive-hover));
+	}
+	.eintrag:has(.titel a:focus-visible) {
 		outline: 2px solid hsl(var(--color-border-focus));
-		outline-offset: 2px;
+		outline-offset: -2px;
 	}
-	.karte.arbeitet {
-		box-shadow: inset 0 0 0 2px hsl(var(--color-green-100)), 0 12px 32px -20px hsl(var(--color-neutral-100) / 0.25);
+	.eintrag.arbeitet {
+		box-shadow: inset 3px 0 0 hsl(var(--color-green-100));
+	}
+	.haupt {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.15rem 0.6rem;
+		min-width: 0;
 	}
 	.titel {
-		padding-right: 2.5rem;
-		font-size: 1.1875rem;
-		letter-spacing: -0.005em;
+		font-size: 1.0625rem;
 		overflow-wrap: anywhere;
 	}
 	.titel a {
@@ -824,75 +1306,64 @@
 		content: '';
 		position: absolute;
 		inset: 0;
-		border-radius: inherit;
 	}
-	.karte:hover .titel a {
+	.eintrag:hover .titel a {
 		text-decoration: underline;
 		text-decoration-color: hsl(var(--color-green-100));
 		text-decoration-thickness: 2px;
 		text-underline-offset: 0.2em;
 	}
-	.stand {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.25rem 0.4rem;
-		font-size: 0.9375rem;
-		color: hsl(var(--color-text-secondary));
+	.wo {
+		font-size: 0.875rem;
+		color: hsl(var(--color-text-tertiary));
+		overflow-wrap: anywhere;
 	}
-	.stand :global(svg) {
-		width: 1.125rem;
-		height: 1.125rem;
+	.neben {
+		display: inline-flex;
+		align-self: center;
+		color: hsl(var(--color-text-tertiary));
 	}
-	.stand .status {
-		margin-left: 0.25rem;
+	.neben :global(svg) {
+		width: 1.0625rem;
+		height: 1.0625rem;
+		margin: 0;
 	}
 	.auszug {
-		align-self: start;
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 4;
-		line-clamp: 4;
+		flex: 1 1 100%;
 		overflow: hidden;
-		margin-top: 0.25rem;
-		padding-top: 0.75rem;
-		border-top: 1px solid hsl(var(--color-border-primary));
-		font-size: 1rem;
-		line-height: 1.65;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		font-size: 0.9375rem;
 		color: hsl(var(--color-text-secondary));
-		text-wrap: pretty;
 	}
 	.wer {
 		margin-right: 0.4rem;
 		color: var(--c);
-		font-size: 0.8125rem;
+		font-size: 0.75rem;
 		font-weight: 700;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
-	}
-	.fuss {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.25rem 1rem;
-		padding-top: 0.5rem;
 	}
 	.stimmen {
 		list-style: none;
 		margin: 0;
 		padding: 0;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.15rem 0.75rem;
-		font-size: 0.9375rem;
+		display: grid;
+		gap: 0.1rem;
+		font-size: 0.875rem;
 		font-weight: 600;
+		min-width: 0;
 	}
 	.stimmen li {
-		display: inline-flex;
+		display: flex;
 		align-items: center;
 		gap: 0.35rem;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 	.punkt {
+		flex: none;
 		width: 0.625rem;
 		height: 0.625rem;
 		border-radius: 50%;
@@ -901,10 +1372,25 @@
 	.mehr {
 		color: hsl(var(--color-text-tertiary));
 	}
-	.arbeit {
-		display: flex;
-		gap: 0.75rem;
+	.stand {
+		display: grid;
 		font-size: 0.9375rem;
+	}
+	.stand :global(svg) {
+		width: 1.125rem;
+		height: 1.125rem;
+		margin: 0;
+		color: hsl(var(--color-text-secondary));
+	}
+	.leise,
+	.wann {
+		font-size: 0.875rem;
+		color: hsl(var(--color-text-secondary));
+	}
+	.arbeit {
+		display: grid;
+		gap: 0.1rem;
+		font-size: 0.875rem;
 		color: hsl(var(--color-text-secondary));
 	}
 	.arbeit span {
@@ -916,13 +1402,12 @@
 	.arbeit :global(svg) {
 		width: 1.0625rem;
 		height: 1.0625rem;
+		margin: 0;
 	}
-	/* oben rechts, über dem Link des Blatts */
+	/* über dem Link der Zeile */
 	.neu-tx {
-		position: absolute;
+		position: relative;
 		z-index: 1;
-		top: 0.625rem;
-		right: 0.625rem;
 		width: var(--hit);
 		height: var(--hit);
 		display: grid;
@@ -955,14 +1440,6 @@
 		border-radius: 0.75rem;
 		background: hsl(var(--color-bg-primary));
 		text-align: center;
-		cursor: pointer;
-	}
-	.willkommen:hover {
-		border-color: hsl(var(--color-neutral-100));
-	}
-	.willkommen:focus-within {
-		outline: 2px solid hsl(var(--color-border-focus));
-		outline-offset: 2px;
 	}
 	.willkommen :global(svg) {
 		width: 2.75rem;
@@ -972,7 +1449,7 @@
 	.willkommen strong {
 		font-size: 1.25rem;
 	}
-	.willkommen > span:not(.knopf) {
+	.willkommen > span {
 		max-width: 44ch;
 		color: hsl(var(--color-text-secondary));
 	}
@@ -989,12 +1466,66 @@
 		letter-spacing: 0.05em;
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.karte {
-			transition: none;
+	.wkn {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.75rem;
+		margin-top: 0.5rem;
+	}
+	.knopf.hell {
+		background: hsl(var(--color-bg-primary));
+		color: hsl(var(--color-text-primary));
+		box-shadow: inset 0 0 0 2px hsl(var(--color-neutral-100));
+	}
+	.knopf {
+		cursor: pointer;
+	}
+	.knopf:focus-within,
+	.knopf:focus-visible {
+		outline: 2px solid hsl(var(--color-border-focus));
+		outline-offset: 2px;
+	}
+
+	/* schmaler: die Spalten der Liste rücken neben den Titel */
+	@media (max-width: 1100px) {
+		.eintrag {
+			grid-template-columns: minmax(0, 1fr) auto var(--hit);
 		}
-		.karte:hover {
-			transform: none;
+		.stimmen,
+		.arbeit,
+		.wann {
+			display: none;
+		}
+		.stand {
+			text-align: right;
+		}
+	}
+
+	@media (max-width: 900px) {
+		.rahmen {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 1rem;
+		}
+		.bereiche {
+			position: static;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.25rem;
+		}
+		.bereiche ul {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.25rem;
+		}
+		.bkopf {
+			display: none;
+		}
+		.bereich {
+			width: auto;
+		}
+		.verbinden {
+			margin-top: 0;
 		}
 	}
 
@@ -1011,3 +1542,4 @@
 		}
 	}
 </style>
+

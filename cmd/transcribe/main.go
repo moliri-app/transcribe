@@ -29,6 +29,7 @@ import (
 	"github.com/moliri-app/transcribe/internal/runner"
 	"github.com/moliri-app/transcribe/internal/server"
 	"github.com/moliri-app/transcribe/internal/setup"
+	"github.com/moliri-app/transcribe/internal/sidecar"
 	"github.com/moliri-app/transcribe/internal/update"
 )
 
@@ -223,4 +224,5 @@ func main() {
 	defer cancel()
 	_ = hs.Shutdown(sctx)
 	srv.Queue.Wait()
+	sidecar.Flush()
 }

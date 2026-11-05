@@ -147,5 +147,5 @@ func Export(dataDir, stem, format string) ([]byte, string, string, error) {
 		return nil, "", "", err
 	}
 	body, ctype, err := export.Render(format, final, ann, "")
-	return body, ctype, stem + "." + format, err
+	return body, ctype, media.Title(stem) + "." + format, err
 }

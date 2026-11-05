@@ -9,10 +9,10 @@
 // Vorschaubilder, Export, Clips und „Neu berechnen“ über /api/apply. Ohne Versionsstand: es gibt nur
 // diesen einen Nutzer. Sprache und Zusammenlegen rechnet erst „Neu berechnen“, deshalb `recompute`.
 
-/** @typedef {{ name: string, stem: string, url: string, video: boolean, engines: { final?: boolean }[] }} Datei */
+/** @typedef {{ name: string, stem: string, title?: string, url: string, video: boolean, engines: { final?: boolean }[] }} Datei */
 
-/** Name einer Aufnahme ohne Endung, wie in der Auswahl */
-export const recordingName = (/** @type {Datei} */ f) => f.name.replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+/** Name einer Aufnahme ohne Endung, wie in der Auswahl (eine in einem verbundenen Ordner ohne das Kürzel davor) */
+export const recordingName = (/** @type {Datei} */ f) => (f.title ?? f.name.replace(/\.[^.]+$/, '')).replace(/_/g, ' ');
 
 /** Gemerktes im Browser (Präfix ed:, wie bisher); im privaten Fenster eben nicht */
 export const merken = {

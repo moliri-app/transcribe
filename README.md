@@ -80,6 +80,21 @@ Unter Windows zeigt die App ein Symbol im Infobereich der Taskleiste: Ein Klick 
 ein Rechtsklick zeigt „Einstellungen“ und „Beenden“. Läuft die App schon, öffnet ein zweiter Start
 nur ihr Fenster.
 
+### Ordner verbinden
+
+Links in der Bibliothek stehen die Bereiche: alle Aufnahmen, die hochgeladenen (ins Fenster gezogen
+oder hinzugefügt; sie werden in den Datenordner kopiert), die Live-Aufnahmen und die verbundenen
+Ordner. Unter „Ordner verbinden“ wählt man einen Ordner (oder fügt seinen Pfad ein); alle Aufnahmen
+darin und in seinen Unterordnern stehen dann in der Bibliothek, ohne kopiert zu werden, und neue
+kommen von selbst dazu. Liegen neben der EXE Aufnahmen, schlägt die Bibliothek vor, diesen Ordner zu
+verbinden. Trennen nimmt einen Ordner nur aus der Bibliothek; Transcribe löscht darin nie etwas.
+
+Das Transkript einer Aufnahme aus einem verbundenen Ordner legt die App außerdem als Datei daneben
+(`Interview.mp3.transcribe.json`, mit Korrekturen und Clips), und liest beim Laden, was dort liegt.
+So arbeiten mehrere Menschen über einen geteilten Ordner (etwa Nextcloud) an denselben Transkripten.
+Abschalten lässt sich das in den **Einstellungen** unter „Ordner“. Das Format steht in
+[docs/sidecar.md](docs/sidecar.md).
+
 ### Mit Windows starten, im Hintergrund weiterlaufen
 
 In den **Einstellungen** unter „Andere Programme“:

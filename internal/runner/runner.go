@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/moliri-app/transcribe/internal/media"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/results"
 	"github.com/moliri-app/transcribe/internal/setup"
@@ -153,7 +154,8 @@ func (r *Runner) cudaLib() string {
 	return dir
 }
 
-// Run executes events -> speakers -> text -> annotate on <data>/audio/<audioFile> and writes
+// Run executes events -> speakers -> text -> annotate on <data>/audio/<audioFile> (or the linked
+// recording of that name, media.Path) and writes
 // results/<stem>/: _machine.json, _final.json and the re-recognition cache.
 func (r *Runner) Run(ctx context.Context, dataDir, audioFile string, o jobs.Options, p jobs.Progress) error {
 	if o.Engine == prefs.API {
@@ -170,7 +172,7 @@ func (r *Runner) Run(ctx context.Context, dataDir, audioFile string, o jobs.Opti
 	o.Quality = quality
 	eng := *r.engine
 	eng.Models = models.Set{Dir: filepath.Join(dataDir, "models")}
-	res, err := eng.Run(ctx, filepath.Join(dataDir, "audio", audioFile), o, ann, cache, p)
+	res, err := eng.Run(ctx, media.Path(dataDir, audioFile), o, ann, cache, p)
 	if err != nil {
 		return err
 	}
