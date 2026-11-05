@@ -3,7 +3,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 // Package ort binds the few calls of the ONNX Runtime C API (onnxruntime_c_api.h) that run a model
-// with one float input and one float output, at runtime via purego (no cgo). The library is the
+// with float or int64 inputs and a float output, at runtime via purego (no cgo). The library is the
 // onnxruntime of the speech recognition runtime (sherpa-onnx ships it next to its own library), so
 // both share one runtime in the process, on the CPU or, in the CUDA build, on the graphics card.
 package ort
@@ -35,6 +35,8 @@ const (
 	fnSetSessionGraphOptimization    = 23
 	fnSetIntraOpNumThreads           = 24
 	fnSetInterOpNumThreads           = 25
+	fnSessionGetInputCount           = 30
+	fnSessionGetOutputCount          = 31
 	fnSessionGetInputName            = 36
 	fnSessionGetOutputName           = 37
 	fnCreateTensorWithDataAsOrtValue = 49
@@ -50,6 +52,7 @@ const (
 	fnReleaseValue                   = 96
 	fnReleaseTensorTypeAndShapeInfo  = 99
 	fnReleaseSessionOptions          = 100
+	fnAddSessionConfigEntry          = 130
 	fnAppendCUDAV2                   = 204
 	fnCreateCUDAProviderOptions      = 205
 	fnUpdateCUDAProviderOptions      = 206
@@ -62,6 +65,7 @@ const (
 	arenaAllocator    = 1  // OrtArenaAllocator
 	memTypeDefault    = 0  // OrtMemTypeDefault
 	elementTypeFloat  = 1  // ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT
+	elementTypeInt64  = 7  // ONNX_TENSOR_ELEMENT_DATA_TYPE_INT64
 	runtimeLogID      = "transcribe-ocr\x00"
 	cudaDefaultDevice = "0"
 )
@@ -174,18 +178,34 @@ type Session struct {
 	h       uintptr
 	in, out []byte // the names of the first input and output, NUL-terminated
 	GPU     bool   // runs on the graphics card
-	mu      sync.Mutex
+	// Inputs and Outputs are the names of the model's inputs and outputs, in its order.
+	Inputs, Outputs []string
+	mu              sync.Mutex
 }
 
 // NewSession loads the model at path. threads bounds the cores one run uses (0: the runtime's
 // default); cuda puts it on the graphics card when the runtime is the CUDA build, else it runs on
 // the CPU.
 func (rt *Runtime) NewSession(path string, threads int, cuda bool) (*Session, error) {
+	return rt.NewSessionWith(path, threads, cuda, nil)
+}
+
+// NewSessionWith is NewSession with entries of the session's configuration
+// (onnxruntime_session_options_config_keys.h), e.g. "session.disable_quant_qdq": "1".
+func (rt *Runtime) NewSessionWith(path string, threads int, cuda bool, config map[string]string) (*Session, error) {
 	var so uintptr
 	if err := rt.call(fnCreateSessionOptions, uintptr(unsafe.Pointer(&so))); err != nil {
 		return nil, err
 	}
 	defer purego.SyscallN(rt.fn(fnReleaseSessionOptions), so)
+	for k, v := range config {
+		c := newCStrings(k, v)
+		err := rt.call(fnAddSessionConfigEntry, so, c.p[0], c.p[1])
+		runtime.KeepAlive(c)
+		if err != nil {
+			return nil, fmt.Errorf("onnxruntime: %s: %w", k, err)
+		}
+	}
 	if threads > 0 {
 		if err := rt.call(fnSetIntraOpNumThreads, so, uintptr(threads)); err != nil {
 			return nil, err
@@ -213,13 +233,17 @@ func (rt *Runtime) NewSession(path string, threads int, cuda bool) (*Session, er
 	if err != nil {
 		return nil, fmt.Errorf("onnxruntime: %s: %w", filepath.Base(path), err)
 	}
-	if s.in, err = s.name(fnSessionGetInputName); err == nil {
-		s.out, err = s.name(fnSessionGetOutputName)
+	if s.Inputs, err = s.names(fnSessionGetInputCount, fnSessionGetInputName); err == nil {
+		s.Outputs, err = s.names(fnSessionGetOutputCount, fnSessionGetOutputName)
+	}
+	if err == nil && (len(s.Inputs) == 0 || len(s.Outputs) == 0) {
+		err = fmt.Errorf("onnxruntime: %s has no input or no output", filepath.Base(path))
 	}
 	if err != nil {
 		s.Close()
 		return nil, err
 	}
+	s.in, s.out = append([]byte(s.Inputs[0]), 0), append([]byte(s.Outputs[0]), 0)
 	return s, nil
 }
 
@@ -243,25 +267,50 @@ func (rt *Runtime) appendCUDA(so uintptr) error {
 	return rt.call(fnAppendCUDAV2, so, opts)
 }
 
-func (s *Session) name(fn int) ([]byte, error) {
-	var p uintptr
-	if err := s.rt.call(fn, s.h, 0, s.rt.alloc, uintptr(unsafe.Pointer(&p))); err != nil {
+// names lists the inputs or outputs of the session.
+func (s *Session) names(countFn, nameFn int) ([]string, error) {
+	var n uintptr
+	if err := s.rt.call(countFn, s.h, uintptr(unsafe.Pointer(&n))); err != nil {
 		return nil, err
 	}
-	name := append([]byte(goString(p)), 0)
-	_ = s.rt.call(fnAllocatorFree, s.rt.alloc, p)
-	return name, nil
+	out := make([]string, 0, n)
+	for i := uintptr(0); i < n; i++ {
+		var p uintptr
+		if err := s.rt.call(nameFn, s.h, i, s.rt.alloc, uintptr(unsafe.Pointer(&p))); err != nil {
+			return nil, err
+		}
+		out = append(out, goString(p))
+		_ = s.rt.call(fnAllocatorFree, s.rt.alloc, p)
+	}
+	return out, nil
 }
 
 // Run runs the model on one float tensor of the given shape and returns its first output and the
 // output's shape.
 func (s *Session) Run(input []float32, shape []int64) ([]float32, []int64, error) {
-	n := int64(1)
-	for _, d := range shape {
-		n *= d
+	return s.run([]Input{{Float: input, Shape: shape}}, [][]byte{s.in}, s.out)
+}
+
+// Input is one tensor of a run: float or int64 values (one of the two) in the given shape.
+type Input struct {
+	Name  string
+	Float []float32
+	Int64 []int64
+	Shape []int64
+}
+
+// RunNamed runs the model on the named inputs and returns the named float output and its shape.
+func (s *Session) RunNamed(inputs []Input, output string) ([]float32, []int64, error) {
+	names := make([][]byte, len(inputs))
+	for i, in := range inputs {
+		names[i] = append([]byte(in.Name), 0)
 	}
-	if n != int64(len(input)) || n == 0 {
-		return nil, nil, fmt.Errorf("onnxruntime: %d values for shape %v", len(input), shape)
+	return s.run(inputs, names, append([]byte(output), 0))
+}
+
+func (s *Session) run(inputs []Input, inNames [][]byte, outName []byte) ([]float32, []int64, error) {
+	if len(inputs) == 0 {
+		return nil, nil, errors.New("onnxruntime: no input")
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -271,27 +320,57 @@ func (s *Session) Run(input []float32, shape []int64) ([]float32, []int64, error
 	rt := s.rt
 	var pin runtime.Pinner
 	defer pin.Unpin()
-	pin.Pin(&input[0])
-	pin.Pin(&shape[0])
-	pin.Pin(&s.in[0])
-	pin.Pin(&s.out[0])
 
-	var in uintptr
-	if err := rt.call(fnCreateTensorWithDataAsOrtValue, rt.mem, uintptr(unsafe.Pointer(&input[0])), uintptr(len(input)*4),
-		uintptr(unsafe.Pointer(&shape[0])), uintptr(len(shape)), elementTypeFloat, uintptr(unsafe.Pointer(&in))); err != nil {
-		return nil, nil, err
+	names := make([]uintptr, len(inputs)+1)
+	values := make([]uintptr, len(inputs)+1)
+	defer func() {
+		for _, v := range values[:len(inputs)] {
+			if v != 0 {
+				purego.SyscallN(rt.fn(fnReleaseValue), v)
+			}
+		}
+	}()
+	for i, in := range inputs {
+		n := int64(1)
+		for _, d := range in.Shape {
+			n *= d
+		}
+		var data unsafe.Pointer
+		var size, count int
+		elem := uintptr(elementTypeFloat)
+		if in.Int64 != nil {
+			count, size, elem = len(in.Int64), len(in.Int64)*8, elementTypeInt64
+			if count > 0 {
+				data = unsafe.Pointer(&in.Int64[0])
+			}
+		} else {
+			count, size = len(in.Float), len(in.Float)*4
+			if count > 0 {
+				data = unsafe.Pointer(&in.Float[0])
+			}
+		}
+		if n != int64(count) || n == 0 {
+			return nil, nil, fmt.Errorf("onnxruntime: %d values for shape %v", count, in.Shape)
+		}
+		pin.Pin(data)
+		pin.Pin(&in.Shape[0])
+		pin.Pin(&inNames[i][0])
+		if err := rt.call(fnCreateTensorWithDataAsOrtValue, rt.mem, uintptr(data), uintptr(size),
+			uintptr(unsafe.Pointer(&in.Shape[0])), uintptr(len(in.Shape)), elem, uintptr(unsafe.Pointer(&values[i]))); err != nil {
+			return nil, nil, err
+		}
+		names[i] = uintptr(unsafe.Pointer(&inNames[i][0]))
 	}
-	defer purego.SyscallN(rt.fn(fnReleaseValue), in)
-
-	names := []uintptr{uintptr(unsafe.Pointer(&s.in[0])), uintptr(unsafe.Pointer(&s.out[0]))}
-	values := []uintptr{in, 0}
+	pin.Pin(&outName[0])
+	names[len(inputs)] = uintptr(unsafe.Pointer(&outName[0]))
 	pin.Pin(&names[0])
 	pin.Pin(&values[0])
-	if err := rt.call(fnRun, s.h, 0, uintptr(unsafe.Pointer(&names[0])), uintptr(unsafe.Pointer(&values[0])), 1,
-		uintptr(unsafe.Pointer(&names[1])), 1, uintptr(unsafe.Pointer(&values[1]))); err != nil {
+	k := uintptr(len(inputs))
+	if err := rt.call(fnRun, s.h, 0, uintptr(unsafe.Pointer(&names[0])), uintptr(unsafe.Pointer(&values[0])), k,
+		uintptr(unsafe.Pointer(&names[k])), 1, uintptr(unsafe.Pointer(&values[k]))); err != nil {
 		return nil, nil, err
 	}
-	out := values[1]
+	out := values[k]
 	defer purego.SyscallN(rt.fn(fnReleaseValue), out)
 
 	var info, dims uintptr

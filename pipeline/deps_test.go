@@ -12,7 +12,7 @@ import (
 )
 
 // enginePackages are the packages other programs import (Moliri's server/transcribe among them).
-var enginePackages = []string{"annotate", "audio", "export", "fileutil", "jobs", "model", "models",
+var enginePackages = []string{"annotate", "audio", "embed", "export", "fileutil", "jobs", "model", "models",
 	"ocr", "ocr/ocrtest", "ort", "pipeline", "proc", "sherpa", "stream"}
 
 // The engine depends on nothing of the desktop app (internal/) and builds for Linux without cgo,

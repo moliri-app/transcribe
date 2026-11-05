@@ -125,7 +125,8 @@ func main() {
 	pl := runner.New(*data)
 	upd := newUpdater(exe)
 	srv := server.New(server.Config{DataDir: *data, Runner: pl.Run, Retranscriber: pl, Threads: *threads, Live: pl.OpenLive, Warmer: pl,
-		OCR: ocrEngines(*data, pl), Updater: upd})
+		OCR: ocrEngines(*data, pl), Updater: upd, Embed: embedModel(*data, pl, *threads),
+		EmbedFetch: func(ctx context.Context) error { return setup.FetchEmbedModel(ctx, *data) }})
 	srv.Live.Warm() // while the live mode is on, recognition is loaded once it can be
 	go func() {
 		if err := setup.EnsureAll(context.Background(), *data, prefs.Load(*data).UsesModels()); err != nil {
