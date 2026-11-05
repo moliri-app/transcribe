@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/moliri-app/transcribe/internal/autostart"
+	"github.com/moliri-app/transcribe/internal/datadir"
 	"github.com/moliri-app/transcribe/internal/media"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/runner"
@@ -34,16 +35,31 @@ import (
 	"github.com/moliri-app/transcribe/internal/update"
 )
 
-func defaultDataDir() string {
-	if d := os.Getenv("TRANSCRIBE_DATA"); d != "" {
-		return d
+// dataDir is the data dir a start parameter fixes (--data, TRANSCRIBE_DATA), else the one
+// internal/datadir finds; fixed tells which.
+func dataDir(flagged string) (dir string, fixed bool) {
+	if flagged != "" {
+		return flagged, true
 	}
-	// portable: everything lives in a folder next to the executable
+	if d := os.Getenv("TRANSCRIBE_DATA"); d != "" {
+		return d, true
+	}
 	exe, err := os.Executable()
 	if err != nil {
-		return "data"
+		return datadir.Default(), false
 	}
-	return filepath.Join(filepath.Dir(exe), "data")
+	dir, missing := datadir.Resolve(exe)
+	if missing == "" {
+		return dir, false
+	}
+	if !confirm("Der Datenordner " + missing + " ist nicht erreichbar. Ist das Laufwerk angeschlossen?\n\n" +
+		"„Ja“ startet Transcribe mit dem Standardordner " + datadir.Default() + ", „Nein“ beendet es.") {
+		os.Exit(1)
+	}
+	if err := datadir.Forget(); err != nil {
+		fail(err)
+	}
+	return datadir.Default(), false
 }
 
 func openBrowser(url string) {
@@ -83,7 +99,7 @@ func setupLog(dataDir string) {
 }
 
 func main() {
-	data := flag.String("data", defaultDataDir(), "data directory (audio/, results/, models/)")
+	data := flag.String("data", "", "data directory (audio/, results/, models/); default: the one chosen in the settings, else "+datadir.Default())
 	port := flag.Int("port", 8765, "HTTP port")
 	noBrowser := flag.Bool("no-browser", false, "do not open the browser")
 	background := flag.Bool("background", false, "start without a window, in the notification area (as at sign-in)")
@@ -94,6 +110,8 @@ func main() {
 		fmt.Println(version)
 		return
 	}
+	var fixed bool
+	*data, fixed = dataDir(*data)
 
 	// before setupLog, which would empty the running app's log
 	unlock, ok := claimInstance(*data, !*noBrowser && !*background)
@@ -115,6 +133,9 @@ func main() {
 		}
 	}()
 	go update.Cleanup(exe) // the EXE the last update replaced
+	if !fixed {
+		go datadir.Cleanup(*data) // the folder the data was moved from
+	}
 
 	for _, d := range []string{"audio", "results", "models"} {
 		if err := os.MkdirAll(filepath.Join(*data, d), 0o755); err != nil {
@@ -153,6 +174,13 @@ func main() {
 	}
 	url := fmt.Sprintf("http://localhost:%d", ln.Addr().(*net.TCPAddr).Port)
 	fmt.Println(url, "(data:", *data+")")
+	restart := func() {
+		restartArgs = relaunchArgs(os.Args[1:], ln.Addr().(*net.TCPAddr).Port, *noBrowser && !*background)
+		stop()
+	}
+	if !fixed {
+		srv.Restart = restart // once the data moved to another folder
+	}
 	hs := &http.Server{Handler: srv.Handler()}
 	go func() {
 		if err := hs.Serve(ln); !errors.Is(err, http.ErrServerClosed) {
@@ -164,10 +192,7 @@ func main() {
 	var tr *tray
 	if upd != nil {
 		upd.Idle = func() bool { return !srv.Queue.Busy() && !srv.Live.Busy() }
-		upd.Restart = func() {
-			restartArgs = relaunchArgs(os.Args[1:], ln.Addr().(*net.TCPAddr).Port, *noBrowser && !*background)
-			stop()
-		}
+		upd.Restart = restart
 		upd.Found = func(v string) {
 			tr.notify("Transcribe "+strings.TrimPrefix(v, "v")+" ist da",
 				"Ein Klick auf „Aktualisieren“ im Menü des Symbols oder in den Einstellungen installiert die neue Version.")

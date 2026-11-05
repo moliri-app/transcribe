@@ -104,17 +104,20 @@ function freePort() {
 
 /**
  * Starts the EXE on a fresh copy of the test data.
+ * home: without --data, with the copy where the app finds it itself (internal/datadir), in a user
+ * profile of its own (LOCALAPPDATA); home is then that profile.
  * missing: names from PLACEHOLDERS to leave out (their download then fails, the app is offline).
  * api: start the stand-in for speech recognition services too; its address is apiUrl.
  * env: more environment variables for the app.
- * Returns { url, dataDir, apiUrl, stop }.
+ * Returns { url, dataDir, home, apiUrl, stop }.
  */
-export async function startApp({ missing = [], exe = exePath(), api = false, env = {} } = {}) {
+export async function startApp({ missing = [], exe = exePath(), api = false, env = {}, home = false } = {}) {
   if (!existsSync(exe)) throw new Error(`EXE fehlt: ${exe} (erst buildExe() oder TRANSCRIBE_EXE setzen)`);
   if (!onPath('ffmpeg') || !onPath('ffprobe')) {
     throw new Error('ffmpeg und ffprobe müssen im PATH liegen (Wellenform, Clip-Export); sonst lädt die App sie bei jedem Start herunter.');
   }
-  const dataDir = mkdtempSync(join(tmpdir(), 'tx-e2e-'));
+  const root = mkdtempSync(join(tmpdir(), 'tx-e2e-'));
+  const dataDir = home ? join(root, 'Transcribe by Moliri') : root;
   cpSync(TESTDATA, dataDir, { recursive: true });
   for (const [name, files] of Object.entries(PLACEHOLDERS)) {
     if (missing.includes(name)) continue;
@@ -123,14 +126,15 @@ export async function startApp({ missing = [], exe = exePath(), api = false, env
 
   const fake = api ? await startFakeAPI() : null;
   const port = await freePort();
-  const child = spawn(exe, ['--data', dataDir, '--no-browser', '--port', String(port), '--threads', '2'], {
+  const where = home ? { LOCALAPPDATA: root, XDG_DATA_HOME: root, HOME: root } : {};
+  const child = spawn(exe, [...(home ? [] : ['--data', dataDir]), '--no-browser', '--port', String(port), '--threads', '2'], {
     windowsHide: true,
     stdio: ['ignore', 'pipe', 'pipe'],
     // offline: every download fails at once instead of fetching gigabytes; SHERPA_LIB would point elsewhere.
     // MIKROFONE, once written, stands in for the microphones connected (see internal/live/devices.go).
     env: {
       ...withToolsFirst(process.env), HTTP_PROXY: 'http://127.0.0.1:9', HTTPS_PROXY: 'http://127.0.0.1:9', NO_PROXY: '', SHERPA_LIB: '', TRANSCRIBE_DATA: '',
-      TRANSCRIBE_LIVE_DEVICES: join(dataDir, MIKROFONE), ...env,
+      TRANSCRIBE_LIVE_DEVICES: join(dataDir, MIKROFONE), ...where, ...env,
     },
   });
   let output = '';
@@ -143,8 +147,8 @@ export async function startApp({ missing = [], exe = exePath(), api = false, env
       else child.kill();
       await exited;
     }
-    try { rmSync(dataDir, { recursive: true, force: true, maxRetries: 20, retryDelay: 150 }); }
-    catch (err) { console.warn(`Testdaten nicht gelöscht (${dataDir}): ${err.message}`); }
+    try { rmSync(root, { recursive: true, force: true, maxRetries: 20, retryDelay: 150 }); }
+    catch (err) { console.warn(`Testdaten nicht gelöscht (${root}): ${err.message}`); }
   };
   try {
     // the EXE prints the address it took (another one if the port was taken meanwhile)
@@ -164,7 +168,7 @@ export async function startApp({ missing = [], exe = exePath(), api = false, env
       if (i > 100) throw new Error('App antwortet nicht: ' + url);
       await new Promise(r => setTimeout(r, 100));
     }
-    return { url, dataDir, apiUrl: fake?.url, stop, log: () => output };
+    return { url, dataDir, home: home ? root : undefined, apiUrl: fake?.url, stop, log: () => output };
   } catch (err) {
     await stop();
     throw err;

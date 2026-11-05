@@ -17,3 +17,13 @@ func showError(msg string) {
 	syscall.NewLazyDLL("user32.dll").NewProc("MessageBoxW").Call(0,
 		uintptr(unsafe.Pointer(text)), uintptr(unsafe.Pointer(title)), mbOK|mbIconError)
 }
+
+// confirm asks a yes-or-no question in a message box.
+func confirm(msg string) bool {
+	title, _ := syscall.UTF16PtrFromString("Transcribe by Moliri")
+	text, _ := syscall.UTF16PtrFromString(msg)
+	const mbYesNo, mbIconWarning, idYes = 0x4, 0x30, 6
+	r, _, _ := syscall.NewLazyDLL("user32.dll").NewProc("MessageBoxW").Call(0,
+		uintptr(unsafe.Pointer(text)), uintptr(unsafe.Pointer(title)), mbYesNo|mbIconWarning)
+	return r == idYes
+}

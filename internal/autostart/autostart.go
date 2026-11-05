@@ -8,21 +8,21 @@
 // microphone.
 package autostart
 
-import (
-	"path/filepath"
-	"strings"
-)
+import "path/filepath"
 
 // Name is the entry shown in the Task Manager's startup apps.
 const Name = "Transcribe by Moliri"
 
-// command is what Windows runs at sign-in: the EXE in background mode, with
-// --data only when the data dir is not the portable default next to the EXE.
+// command is what Windows runs at sign-in: the EXE in background mode, with --data when a start
+// parameter fixed the data dir (dataDir is "" when the app finds it itself, internal/datadir).
 func command(exe, dataDir string) string {
 	q := func(s string) string { return `"` + s + `"` }
 	cmd := q(exe) + " --background"
-	if abs, err := filepath.Abs(dataDir); err == nil && !strings.EqualFold(abs, filepath.Join(filepath.Dir(exe), "data")) {
-		cmd += " --data " + q(abs)
+	if dataDir == "" {
+		return cmd
 	}
-	return cmd
+	if abs, err := filepath.Abs(dataDir); err == nil {
+		dataDir = abs
+	}
+	return cmd + " --data " + q(dataDir)
 }

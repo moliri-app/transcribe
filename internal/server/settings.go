@@ -57,6 +57,7 @@ func (s *Server) settings(w http.ResponseWriter, r *http.Request) {
 		"ready":       ready,
 		"downloading": downloading,
 		"folders":     folders,
+		"location":    s.location(),
 		"components":  setup.Info(abs, media.Tool("ffmpeg")),
 	})
 }

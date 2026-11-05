@@ -107,7 +107,11 @@ test.describe('Einstellungen', () => {
   test('zeigt Datenordner, Modelle und Programm', async ({ page, app }) => {
     await page.goto('/settings');
     await expect(page.getByRole('heading', { name: 'Speicherorte' })).toBeVisible();
-    await expect(page.getByText(app.dataDir, { exact: true })).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Speicherorte' }).getByText(app.dataDir, { exact: true })).toBeVisible();
+    // started with --data: the place is fixed, and cannot move here
+    await expect(page.getByRole('heading', { name: 'Ort des Datenordners' })).toBeVisible();
+    await expect(page.getByText('Beim Start mit')).toContainText('festgelegt');
+    await expect(page.getByRole('button', { name: 'Anderen Ort wählen …' })).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'Modelle und Komponenten' })).toBeVisible();
     for (const label of ['Erkennungs-Runtime (sherpa-onnx)', 'Spracherkennung (Parakeet v3)', 'Sprechertrennung (pyannote)']) {
       await expect(page.getByText(label, { exact: true })).toBeVisible();
