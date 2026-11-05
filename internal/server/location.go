@@ -14,7 +14,7 @@ import (
 	"sync"
 
 	"github.com/moliri-app/transcribe/internal/datadir"
-	"github.com/moliri-app/transcribe/internal/folderpick"
+	"github.com/moliri-app/transcribe/internal/pick"
 	"github.com/moliri-app/transcribe/internal/setup"
 	"github.com/moliri-app/transcribe/models"
 )
@@ -49,7 +49,7 @@ func (s *Server) location() map[string]any {
 		"dataDir": abs,
 		"default": datadir.Default(),
 		"fixed":   s.Restart == nil,
-		"pick":    folderpick.Supported() || os.Getenv("TRANSCRIBE_PICK_FOLDER") != "",
+		"pick":    pick.Supported() || os.Getenv("TRANSCRIBE_PICK_FOLDER") != "",
 		"move":    s.move.snapshot(),
 	}
 }
@@ -85,7 +85,7 @@ func (s *Server) locationPick(w http.ResponseWriter, r *http.Request) {
 	// TRANSCRIBE_PICK_FOLDER stands in for the user's choice in the dialog (e2e tests)
 	dir, err := os.Getenv("TRANSCRIBE_PICK_FOLDER"), error(nil)
 	if dir == "" {
-		dir, err = folderpick.Pick("Wohin sollen die Daten von Transcribe?", filepath.Dir(s.cfg.DataDir))
+		dir, err = pick.Folder("Wohin sollen die Daten von Transcribe?")
 	}
 	if err != nil {
 		fail(w, 500, err.Error())
