@@ -166,6 +166,20 @@ Arbeitsspeicher und gibt sie nach einer Viertelstunde ohne Anfrage wieder frei. 
 dieselbe Erlaubnis wie für die Texterkennung. Das Protokoll steht in
 [docs/embed-api.md](docs/embed-api.md).
 
+### Filter in eigenen Worten für Moliri
+
+Moliris Detailsuche macht aus einem Satz wie „Gemälde nach 1900 ohne Standort“ die Bedingungen
+eines Filters. Statt das KI-Konto der Instanz zu fragen, kann Moliri Transcribe fragen: Ein
+Sprachmodell auf dem Rechner (Qwen 2.5 7B auf dem Server-Programm von llama.cpp) liest den Satz und
+den Feldkatalog des Projekts, beides verlässt den Rechner nicht. Modell und Programm (zusammen
+4,5 GB) kommen erst, wenn Moliri oder die Einstellungen danach fragen. Auf dem Prozessor eines
+Laptops dauert die erste Frage zu einem Projekt knapp zwei Minuten, jede weitere etwa eine halbe bis
+eine Minute, weil das Modell den gelesenen Feldkatalog behält, auch über einen Neustart. Die Frage
+läuft im Hintergrund, Moliri zeigt, wie weit sie ist. Geladen belegt das Modell rund 5,5 GB
+Arbeitsspeicher und gibt sie nach einer Viertelstunde ohne Frage wieder frei. Webseiten brauchen
+dieselbe Erlaubnis wie für die Texterkennung. Das Protokoll steht in
+[docs/filter-api.md](docs/filter-api.md).
+
 ### Diktieren in jedem Programm
 
 Unter Windows diktiert man mit einem Tastenkürzel in jedes Programm: **Strg + Alt + Leertaste**

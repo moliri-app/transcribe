@@ -6,12 +6,15 @@ package main
 
 import (
 	"context"
+	"path/filepath"
 
 	"github.com/moliri-app/transcribe/embed"
+	"github.com/moliri-app/transcribe/internal/llm"
 	"github.com/moliri-app/transcribe/internal/ocrapi"
 	"github.com/moliri-app/transcribe/internal/osocr"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/runner"
+	"github.com/moliri-app/transcribe/internal/server"
 	"github.com/moliri-app/transcribe/internal/setup"
 	"github.com/moliri-app/transcribe/internal/tesslib"
 	"github.com/moliri-app/transcribe/ocr"
@@ -66,5 +69,20 @@ func embedModel(dataDir string, pl *runner.Runner, threads int) *embed.Model {
 			dir, _, err := pl.Runtime(ctx)
 			return dir, err
 		},
+	}
+}
+
+// filterModel is Qwen 2.5 7B on llama.cpp's server for Moliri's filter in plain words
+// (docs/filter-api.md): program and model come when Moliri or the settings page asks for them.
+// nil where llama.cpp has no build for this system.
+func filterModel(dataDir string) server.Chatter {
+	if !setup.LLMSupported() {
+		return nil
+	}
+	return &llm.Server{
+		Program:   setup.LlamaServer(dataDir),
+		Model:     setup.LLMModel(dataDir),
+		CacheDir:  filepath.Join(setup.LLMDir(dataDir), "cache"),
+		Installed: func() bool { return setup.LLMInstalled(dataDir) },
 	}
 }
