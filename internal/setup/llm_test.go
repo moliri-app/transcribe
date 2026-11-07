@@ -54,10 +54,11 @@ func TestResumeDownload(t *testing.T) {
 	}
 }
 
-// TestVulkanDevice: the first graphics card in what llama-server --list-devices prints.
+// TestVulkanDevice: the graphics cards in what llama-server --list-devices prints.
 func TestVulkanDevice(t *testing.T) {
 	out := "load_backend: loaded Vulkan backend from ggml-vulkan.dll\nAvailable devices:\n  Vulkan0: Intel(R) UHD Graphics (32631 MiB, 32631 MiB free)\n  Vulkan1: NVIDIA RTX A3000 Laptop GPU (5989 MiB, 5221 MiB free)\n"
-	if m := vulkanLine.FindStringSubmatch(out); m == nil || m[1] != "Intel(R) UHD Graphics" {
+	m := vulkanLine.FindAllStringSubmatch(out, -1)
+	if len(m) != 2 || m[0][1] != "Intel(R) UHD Graphics" || m[1][1] != "NVIDIA RTX A3000 Laptop GPU" {
 		t.Errorf("got %q", m)
 	}
 	if vulkanLine.MatchString("Available devices:\n") {

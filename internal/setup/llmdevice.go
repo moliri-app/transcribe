@@ -223,7 +223,8 @@ func measure(ctx context.Context, b llm.Build, model string) (llm.Speed, error) 
 	return sp, err
 }
 
-// vulkanDevice names the first graphics card the Vulkan build finds ("" for none).
+// vulkanDevice names the graphics cards the Vulkan build finds ("" for none): llama.cpp spreads
+// the model over all of them.
 var vulkanLine = regexp.MustCompile(`(?m)^\s*Vulkan\d+:\s*(.+?)\s*\(\d+ MiB`)
 
 func vulkanDevice(ctx context.Context, program string) string {
@@ -232,8 +233,9 @@ func vulkanDevice(ctx context.Context, program string) string {
 	cmd := proc.Hide(exec.CommandContext(ctx, program, "--list-devices"))
 	cmd.Dir = filepath.Dir(program)
 	out, _ := cmd.CombinedOutput()
-	if m := vulkanLine.FindStringSubmatch(string(out)); m != nil {
-		return strings.TrimSpace(m[1])
+	var names []string
+	for _, m := range vulkanLine.FindAllStringSubmatch(string(out), -1) {
+		names = append(names, strings.TrimSpace(m[1]))
 	}
-	return ""
+	return strings.Join(names, " + ")
 }
