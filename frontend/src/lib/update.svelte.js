@@ -10,8 +10,9 @@ import { getJSON, post } from '$lib/api.js';
 
 /** state: '' noch nicht nachgesehen (oder offline), 'current', 'available', 'downloading',
  * 'waiting' (installiert, wartet auf laufende Aufträge), 'restarting', 'failed' (error)
- * @typedef {{ version: string, checks: boolean, state: string, latest?: string, page?: string,
- *   progress?: number, error?: string, checked?: number }} UpdateStand */
+ * manual: eine fertige Version, die sich nicht selbst aktualisiert (Linux, macOS)
+ * @typedef {{ version: string, checks: boolean, manual?: boolean, state: string, latest?: string,
+ *   page?: string, progress?: number, error?: string, checked?: number }} UpdateStand */
 
 export const update = $state({
 	/** @type {UpdateStand | null} */

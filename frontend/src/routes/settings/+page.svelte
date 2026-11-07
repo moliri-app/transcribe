@@ -1553,7 +1553,12 @@
 					{#if vorher}
 						<p class="gespeichert" role="status">Aktualisiert von Version {versionText(vorher)} auf {versionText(u.version)}.</p>
 					{/if}
-					{#if !u.checks}
+					{#if u.manual}
+						<p class="hinweis">
+							Unter Linux und macOS aktualisiert sich Transcribe nicht selbst. Neue Versionen gibt es unter
+							<a href="https://github.com/moliri-app/transcribe/releases" target="_blank" rel="noreferrer">Releases</a>.
+						</p>
+					{:else if !u.checks}
 						<p class="hinweis">
 							Eine Entwicklerversion sucht nicht nach Updates. Fertige Versionen gibt es unter
 							<a href="https://github.com/moliri-app/transcribe/releases" target="_blank" rel="noreferrer">Releases</a>.

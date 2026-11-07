@@ -45,6 +45,7 @@ const (
 type Status struct {
 	Version  string  `json:"version"`          // of this app; "" or dev-… for a development build
 	Checks   bool    `json:"checks"`           // false for a development build: it never looks
+	Manual   bool    `json:"manual,omitempty"` // a release that does not update itself (Linux, macOS)
 	State    string  `json:"state"`            // one of the states above
 	Latest   string  `json:"latest,omitempty"` // the newest release, once known
 	Page     string  `json:"page,omitempty"`   // its page on GitHub, with what is new
@@ -61,9 +62,12 @@ type release struct {
 // Updater keeps the update state of the running app.
 type Updater struct {
 	Current string // the app's own version (main.version)
-	API     string // where to ask for the latest release; LatestURL unless a test points elsewhere
-	Exe     string // the running EXE
-	Client  *http.Client
+	// Manual: the app never looks for or installs updates (Linux and macOS, where the user fetches
+	// a new release's archive), but its status still names the version.
+	Manual bool
+	API    string // where to ask for the latest release; LatestURL unless a test points elsewhere
+	Exe    string // the running EXE
+	Client *http.Client
 	// Idle reports whether no job or recording runs, so the app may restart.
 	Idle func() bool
 	// Restart ends the app so that it starts again from Exe (cmd/transcribe).
@@ -92,13 +96,16 @@ func (u *Updater) Status() Status {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	st := u.st
-	st.Version, st.Checks = u.Current, IsRelease(u.Current)
+	st.Version, st.Checks, st.Manual = u.Current, u.checks(), u.Manual
 	return st
 }
 
+// checks reports whether the app looks for newer releases: a release build that updates itself.
+func (u *Updater) checks() bool { return IsRelease(u.Current) && !u.Manual }
+
 // Run looks at once and then every Every until ctx ends. A development build never looks.
 func (u *Updater) Run(ctx context.Context) {
-	if !IsRelease(u.Current) {
+	if !u.checks() {
 		return
 	}
 	t := time.NewTicker(Every)
@@ -117,8 +124,8 @@ func (u *Updater) Run(ctx context.Context) {
 
 // Check asks for the latest release. A failure leaves the state as it was.
 func (u *Updater) Check(ctx context.Context) error {
-	if !IsRelease(u.Current) {
-		return errors.New("development build")
+	if !u.checks() {
+		return errors.New("development build or manual updates")
 	}
 	rel, err := u.latest(ctx)
 	if err != nil {
