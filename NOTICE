@@ -260,7 +260,20 @@ or the settings page asks for it, never shipped)
   The tokenizer in embed/tokenizer.go follows that tokenizer.json as
   transformers.js reads it (Apache License 2.0, Hugging Face), rewritten in Go.
 
+llama.cpp (llama-server and its libraries, release b12110, the CPU builds;
+downloaded when Moliri or the settings page asks for the filter in plain
+words, never shipped)
+  MIT License. Copyright (c) 2023-2026 The ggml authors.
+  https://github.com/ggml-org/llama.cpp
+  The Windows builds bring the LLVM OpenMP runtime (libomp.dll, Apache License
+  2.0 with LLVM Exceptions), whose licence comes along as LICENSE-LLVM-OpenMP.
+
+Qwen2.5-7B-Instruct (Q4_K_M GGUF, two files; downloaded with llama.cpp, never
+shipped)
+  Apache License 2.0. Copyright (c) Alibaba Cloud (Qwen team).
+  https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF (revision
+  bb5d59e06d9551d752d08b292a50eb208b07ab1f).
 
 All licenses were checked again at the sources named above on 2026-11-03,
 PP-OCRv5, RapidOCR and golang.org/x/image when they were added that day,
-EmbeddingGemma on 2026-11-05.
+EmbeddingGemma on 2026-11-05, llama.cpp and Qwen2.5 on 2026-11-07.

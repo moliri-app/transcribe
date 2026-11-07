@@ -37,6 +37,12 @@ type Config struct {
 	Embed         *embed.Model    // may be nil: no embeddings for Moliri's field search
 	// EmbedFetch downloads the embedding model's files (may be nil: they are not downloadable).
 	EmbedFetch func(ctx context.Context) error
+	// Filter is the language model for Moliri's filter in plain words (may be nil: none);
+	// FilterModel names it, FilterSizeMB is its download, FilterFetch downloads it (may be nil).
+	Filter       Chatter
+	FilterModel  string
+	FilterSizeMB int
+	FilterFetch  func(ctx context.Context) error
 }
 
 type Server struct {
@@ -55,6 +61,7 @@ type Server struct {
 	lastPing  atomic.Int64 // unix nanos of the last UI heartbeat
 	lastBye   atomic.Int64
 	move      moving
+	filters   filterQueue
 }
 
 // WindowGone reports whether the UI stopped sending heartbeats: no ping for
@@ -134,6 +141,9 @@ func New(cfg Config) *Server {
 	m.HandleFunc("/api/ocr/schema", s.ocrSchema)
 	m.HandleFunc("/api/embed", s.embedAPI)
 	m.HandleFunc("/api/embed/download", s.embedDownload)
+	m.HandleFunc("/api/filter", s.filterAPI)
+	m.HandleFunc("/api/filter/cancel", s.filterCancel)
+	m.HandleFunc("/api/filter/download", s.filterDownload)
 	s.mux = m
 	return s
 }

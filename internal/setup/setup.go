@@ -4,7 +4,8 @@
 
 // Package setup prepares what the app needs beside the engine's models: ffmpeg, the GPU runtime
 // and NVIDIA's libraries, Tesseract and PP-OCR for text recognition, EmbeddingGemma for Moliri's
-// field search; it lists them all for the settings page and downloads them on request.
+// field search, Qwen 2.5 and llama.cpp for its filter in plain words; it lists them all for the
+// settings page and downloads them on request.
 package setup
 
 import (
@@ -29,6 +30,7 @@ func init() {
 		"tesseract-frak2021": "Texterkennung Fraktur (frak2021)",
 		"ppocr":              "Texterkennung (PP-OCRv5)",
 		"embed":              "Suche nach Bedeutung (EmbeddingGemma)",
+		"llm":                "Filter in eigenen Worten (Qwen 2.5 7B)",
 	} {
 		models.SetLabel(name, label)
 	}

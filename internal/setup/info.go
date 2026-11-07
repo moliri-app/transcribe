@@ -98,6 +98,10 @@ func Info(dataDir, ffmpegPath string) []Component {
 	add(Component{Name: "ppocr", Path: ppocr, Installed: PPOCRInstalled(dataDir), Size: sizeOf(ppocr), OnDemand: true})
 	emb := EmbedDir(dataDir)
 	add(Component{Name: "embed", Path: emb, Installed: EmbedInstalled(dataDir), Size: sizeOf(emb), OnDemand: true})
+	if LLMSupported() {
+		llm := LLMDir(dataDir)
+		add(Component{Name: "llm", Path: llm, Installed: LLMInstalled(dataDir), Size: sizeOf(llm), OnDemand: true})
+	}
 
 	s := models.Set{Dir: filepath.Join(dataDir, "models")}
 	for _, n := range modelOrder {
@@ -167,6 +171,8 @@ func Download(ctx context.Context, dataDir, name string) error {
 		return nil
 	case "embed":
 		return FetchEmbedModel(ctx, dataDir)
+	case "llm":
+		return FetchLLM(ctx, dataDir)
 	}
 	return models.Set{Dir: filepath.Join(dataDir, "models")}.Ensure(ctx, nil, name)
 }
