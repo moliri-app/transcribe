@@ -260,13 +260,18 @@ or the settings page asks for it, never shipped)
   The tokenizer in embed/tokenizer.go follows that tokenizer.json as
   transformers.js reads it (Apache License 2.0, Hugging Face), rewritten in Go.
 
-llama.cpp (llama-server and its libraries, release b12110, the CPU builds;
-downloaded when Moliri or the settings page asks for the filter in plain
-words, never shipped)
+llama.cpp (llama-server and its libraries, release b12110, the CPU builds and
+on Windows x64 the CUDA 12.4/13.4 and Vulkan builds; downloaded when Moliri or
+the settings page asks for the filter in plain words, a GPU build only where
+the computer has a graphics card it is for, never shipped)
   MIT License. Copyright (c) 2023-2026 The ggml authors.
   https://github.com/ggml-org/llama.cpp
   The Windows builds bring the LLVM OpenMP runtime (libomp.dll, Apache License
   2.0 with LLVM Exceptions), whose licence comes along as LICENSE-LLVM-OpenMP.
+  The CUDA builds come with NVIDIA's CUDA runtime and cuBLAS (cudart64,
+  cublas64, cublasLt64), which llama.cpp redistributes beside each release
+  (cudart-llama-bin-win-cuda-*.zip) under the CUDA Toolkit End User License
+  Agreement (https://docs.nvidia.com/cuda/eula/).
 
 Qwen2.5-7B-Instruct (Q4_K_M GGUF, two files; downloaded with llama.cpp, never
 shipped)

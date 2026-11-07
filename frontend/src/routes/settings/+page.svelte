@@ -19,7 +19,7 @@
 
 	/** @typedef {{ key: string, path: string, size: number }} Ordner */
 	/** @typedef {{ name: string, label: string, path: string, installed: boolean, size: number, state: string,
-	 *   done: number, total: number, error?: string, onDemand: boolean }} Komponente */
+	 *   done: number, total: number, error?: string, onDemand: boolean, device?: string }} Komponente */
 	/** @typedef {{ target: string, done: number, total: number, state: string, error: string }} Umzug */
 	/** @typedef {{ dataDir: string, default: string, fixed: boolean, pick: boolean, move: Umzug | null }} Ort */
 	/** @typedef {{ dataDir: string, exe: string, log: string, os: string, sherpa: string,
@@ -1490,6 +1490,7 @@
 							<li class="eintrag">
 								<div class="was">
 									<span class="name">{c.label || c.name}</span>
+									{#if c.device}<span class="geraet">läuft auf der Grafikkarte: {c.device}</span>{/if}
 									<span class="pfad">{c.path}</span>
 								</div>
 								<span class="groesse">{laedt && c.total ? `${groesse(c.done)} / ${groesse(c.total)}` : groesse(c.size)}</span>
@@ -1919,6 +1920,10 @@
 		font-size: 0.9375rem;
 		color: hsl(var(--color-text-secondary));
 		overflow-wrap: anywhere;
+	}
+	.geraet {
+		font-size: 0.9375rem;
+		color: hsl(var(--color-text-primary));
 	}
 	.groesse {
 		font-variant-numeric: tabular-nums;
