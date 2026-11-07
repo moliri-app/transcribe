@@ -22,8 +22,8 @@ import (
 // dev-<commit>; a build without a release version never looks for updates.
 var version string
 
-// newUpdater looks for newer releases of the Windows EXE; nil elsewhere (releases only carry the
-// Windows EXE). TRANSCRIBE_UPDATE_URL points it at another server than GitHub (e2e tests).
+// newUpdater looks for newer releases of the Windows EXE; nil elsewhere (on Linux and macOS the
+// user fetches a new release's archive). TRANSCRIBE_UPDATE_URL points it at another server than GitHub (e2e tests).
 func newUpdater(exe string) *update.Updater {
 	if runtime.GOOS != "windows" {
 		return nil
