@@ -378,7 +378,10 @@
 		color: hsl(var(--color-text-secondary));
 	}
 
+	/* relative: the absolutely placed .sr labels in the entries belong to the list and scroll with
+	   it; otherwise they hang off the page and make the whole window scroll */
 	.liste {
+		position: relative;
 		overflow-y: auto;
 		overscroll-behavior: contain;
 		padding: 0.25rem 0.5rem 1rem;
