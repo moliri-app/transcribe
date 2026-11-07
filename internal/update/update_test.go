@@ -178,6 +178,15 @@ func TestCheck(t *testing.T) {
 		t.Errorf("a development build looked: %+v", u.Status())
 	}
 
+	// a release on Linux or macOS names its version but never asks
+	u = &Updater{Current: "v1.0.0", API: srv.URL + "/latest", Manual: true}
+	if err := u.Check(ctx); err == nil {
+		t.Error("a manual release looked")
+	}
+	if st := u.Status(); st.Checks || !st.Manual || st.Version != "v1.0.0" || st.State != Unknown {
+		t.Errorf("manual release: status = %+v", st)
+	}
+
 	// offline: the state stays as it was, without an error to show
 	u = &Updater{Current: "v1.0.0", API: "http://127.0.0.1:9/latest"}
 	if err := u.Check(ctx); err == nil {

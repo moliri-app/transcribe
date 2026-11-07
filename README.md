@@ -38,6 +38,26 @@ Stelle der alten (die bis zum nächsten Start als `transcribe.old.exe` daneben l
 App neu, sobald keine Aufträge und Aufnahmen mehr laufen. Die Daten bleiben dabei unberührt. Selbst
 gebaute EXEs (`build.ps1`) fragen nie nach.
 
+### Linux und macOS
+
+Für Linux und macOS liegt jedem Release ein Archiv mit dem Programm `transcribe` bei:
+`transcribe-linux-x64.tar.gz`, `transcribe-linux-arm64.tar.gz`, `transcribe-macos-arm64.tar.gz`
+(Apple Silicon) und `transcribe-macos-x64.tar.gz` (Intel). Entpacken und im Terminal starten:
+
+```sh
+tar -xzf transcribe-linux-x64.tar.gz
+./transcribe
+```
+
+Die App öffnet sich in Chrome, Edge, Chromium oder Brave als eigenes Fenster, sonst im
+Standardbrowser. Die Daten liegen unter Linux in `~/.local/share/transcribe`, unter macOS in
+`~/Library/Application Support/Transcribe by Moliri`. Die Erkennung und unter Linux auch FFmpeg lädt
+die App beim ersten Start wie unter Windows; unter macOS braucht sie ein installiertes FFmpeg (`brew
+install ffmpeg`). Das Entpacken der Downloads braucht `tar` mit bzip2 und xz, was Desktop-Systeme
+mitbringen. Das macOS-Programm ist nicht von Apple beglaubigt: Aus dem Browser geladen, startet es
+erst nach `xattr -d com.apple.quarantine transcribe`. Symbol im Infobereich, Diktat per Tastenkürzel
+und die Aktualisierung aus der App gibt es nur unter Windows; ein neues Release lädt man hier selbst.
+
 ### Erkennung über eine API
 
 In den **Einstellungen** unter „Erkennung“ lässt sich statt der Modelle auf dem Rechner ein Dienst
@@ -216,8 +236,10 @@ go run ./cmd/transcribe         # direkt starten, mit Konsolenausgabe
 Auf Linux und macOS baut `go build ./cmd/transcribe` ein Programm für die jeweilige Plattform (vorher
 `pnpm build` in `frontend/`).
 
-Ein Tag `v*` baut über die GitHub-Action `.github/workflows/release.yml` Oberfläche und Windows-EXE
-und hängt die EXE an den Release des Tags.
+Ein Tag `v*` baut über die GitHub-Action `.github/workflows/release.yml` Oberfläche, Windows-EXE und
+die Programme für Linux und macOS und hängt sie an den Release des Tags. Von Hand gestartet (Actions →
+Release → Run workflow, mit einem vorhandenen Tag) baut sie nur die Linux- und macOS-Programme dieses
+Tags und legt sie seinem Release bei.
 
 ### Die Erkennung als Go-Modul
 

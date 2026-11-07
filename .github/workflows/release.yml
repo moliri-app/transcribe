@@ -2,19 +2,28 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-# A tag v* builds the new UI and the Windows EXE and attaches the EXE to a GitHub release of that tag.
+# A tag v* builds the new UI, the Windows EXE and the Linux and macOS programs and attaches them to a
+# GitHub release of that tag.
 #   git tag v0.1.0 && git push origin v0.1.0
+# Run by hand (Actions -> Release -> Run workflow) with an existing tag, it only builds the Linux and
+# macOS programs of that tag and adds them to its release.
 name: Release
 
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag (v1.2.3) whose release gets the Linux and macOS programs'
+        required: true
 
 permissions:
   contents: write
 
 jobs:
   windows:
+    if: github.event_name == 'push'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,4 +69,61 @@ jobs:
             gh release upload "$TAG" transcribe.exe --clobber
           else
             gh release create "$TAG" transcribe.exe --title "Transcribe by Moliri $TAG" --generate-notes
+          fi
+
+  # The programs need no C compiler (the recognition libraries are loaded at run time), so one
+  # Linux runner builds them all. They wait for the Windows job, which creates the release.
+  unix:
+    needs: windows
+    if: ${{ !failure() && !cancelled() }}
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Frontend
+        working-directory: frontend
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      # one archive per system, holding the program `transcribe` (tar keeps it executable); the Go
+      # linker signs the Apple Silicon build ad hoc, as macOS requires
+      - name: Programs
+        env:
+          CGO_ENABLED: '0'
+        run: |
+          for target in linux/amd64:linux-x64 linux/arm64:linux-arm64 darwin/arm64:macos-arm64 darwin/amd64:macos-x64; do
+            platform=${target%%:*}
+            name=transcribe-${target#*:}
+            mkdir -p "dist/$name"
+            GOOS=${platform%/*} GOARCH=${platform#*/} go build -trimpath -ldflags "-s -w -X main.version=$TAG" -o "dist/$name/transcribe" ./cmd/transcribe
+            tar -czf "$name.tar.gz" -C "dist/$name" transcribe
+          done
+
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" transcribe-*.tar.gz --clobber
+          else
+            gh release create "$TAG" transcribe-*.tar.gz --title "Transcribe by Moliri $TAG" --generate-notes
           fi
