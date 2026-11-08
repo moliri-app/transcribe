@@ -2,7 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { TESTDATA } from '../app.mjs';
 import { expect, INTERVIEW, KORRIGIERT, test, transcript } from './fixtures';
@@ -78,5 +78,51 @@ test.describe('Bibliothek', () => {
     await expect(page.getByRole('status')).toContainText('Hochgeladen.');
     await expect(page.getByRole('checkbox', { name: /^Hochgeladen Test\.mp3/ })).toBeChecked();
     expect(readFileSync(join(app.dataDir, 'audio', 'Hochgeladen Test.mp3')).length).toBeGreaterThan(1000);
+  });
+
+  test('eine noch nicht transkribierte Aufnahme löschen, nach einer Rückfrage', async ({ page, app }) => {
+    await page.goto('/');
+    const row = page.getByRole('checkbox', { name: /^Neue Aufnahme\.mp3/ });
+    await page.getByRole('button', { name: 'Neue Aufnahme löschen' }).click();
+    const ask = page.getByRole('dialog', { name: '„Neue Aufnahme“ löschen?' });
+    await expect(ask).toContainText('von diesem Computer gelöscht');
+    await expect(ask).toContainText('nicht rückgängig');
+
+    // cancelled: nothing happens
+    await ask.getByRole('button', { name: 'Abbrechen' }).click();
+    await expect(ask).toBeHidden();
+    await expect(row).toBeVisible();
+    expect(existsSync(join(app.dataDir, 'audio', 'Neue Aufnahme.mp3'))).toBe(true);
+
+    await page.getByRole('button', { name: 'Neue Aufnahme löschen' }).click();
+    await ask.getByRole('button', { name: 'Aufnahme löschen' }).click();
+    await expect(ask).toBeHidden();
+    await expect(page.getByRole('status')).toHaveText('„Neue Aufnahme“ ist gelöscht.');
+    await expect(row).toHaveCount(0);
+    expect(existsSync(join(app.dataDir, 'audio', 'Neue Aufnahme.mp3'))).toBe(false);
+  });
+
+  test('eine transkribierte Aufnahme löschen: die Rückfrage sagt, dass Transkript und Korrekturen mitgehen', async ({ page, app }) => {
+    await page.goto('/');
+    await expect(shelf(page)).toHaveCount(2);
+    await card(page, KORRIGIERT).getByRole('button', { name: `${KORRIGIERT} löschen` }).click();
+    const ask = page.getByRole('dialog', { name: `„${KORRIGIERT}“ löschen?` });
+    await expect(ask).toContainText('das Transkript samt allen Korrekturen, Sprechernamen und Clips');
+    await expect(ask).toContainText('1 Korrektur von Hand und 2 Clips');
+
+    // Escape closes the question like „Abbrechen“
+    await page.keyboard.press('Escape');
+    await expect(ask).toBeHidden();
+    await expect(shelf(page)).toHaveCount(2);
+
+    await card(page, KORRIGIERT).getByRole('button', { name: `${KORRIGIERT} löschen` }).click();
+    await ask.getByRole('button', { name: 'Aufnahme und Transkript löschen' }).click();
+    await expect(page.getByRole('status')).toHaveText(`„${KORRIGIERT}“ ist gelöscht.`);
+    await expect(shelf(page)).toHaveCount(1);
+    await expect(card(page, KORRIGIERT)).toHaveCount(0);
+    expect(existsSync(join(app.dataDir, 'audio', `${KORRIGIERT}.mp3`))).toBe(false);
+    expect(existsSync(join(app.dataDir, 'results', KORRIGIERT))).toBe(false);
+    // its finished job went from the queue with it
+    expect(app.json('results/_queue.json').jobs.map((j: { audio: string }) => j.audio)).not.toContain(`${KORRIGIERT}.mp3`);
   });
 });

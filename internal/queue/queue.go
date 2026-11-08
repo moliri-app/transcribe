@@ -274,6 +274,29 @@ func (q *Queue) Remove(id string) error {
 	return nil
 }
 
+// ErrBusy is Forget's answer while the recording is being transcribed.
+var ErrBusy = errors.New("the recording is being transcribed")
+
+// Forget drops every job of the recording audio, so it can be deleted: one still waiting is
+// cancelled with it. While one is running (or cancelling) it keeps them all and returns ErrBusy.
+func (q *Queue) Forget(audio string) error {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	keep := q.jobs[:0:0]
+	for _, j := range q.jobs {
+		if j.Audio != audio {
+			keep = append(keep, j)
+		} else if j.Status == Running || j.Status == Canceling {
+			return ErrBusy
+		}
+	}
+	if len(keep) != len(q.jobs) {
+		q.jobs = keep
+		q.save()
+	}
+	return nil
+}
+
 type logKey struct{}
 
 // Logf appends a line to the log of the job running under ctx.

@@ -455,9 +455,7 @@ func (s *Server) dropRecording(name string) {
 			return
 		}
 	}
-	if err := os.Remove(filepath.Join(s.audioDir(), name)); err != nil && !os.IsNotExist(err) {
+	if err := s.removeRecording(name); err != nil { // with what a cancelled transcription left
 		log.Println("live: removing the recording of a deleted note:", err)
-		return
 	}
-	_ = os.RemoveAll(rdir) // what a cancelled transcription left
 }
