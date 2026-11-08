@@ -192,10 +192,6 @@ components:
     backgroundColor: "{colors.paper}"
     textColor: "{colors.ink}"
     typography: "{typography.recording-title}"
-  player-deck:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.paper}"
-    rounded: "2.25rem"
   tool-bar:
     backgroundColor: "{colors.paper}"
     textColor: "{colors.ink}"
@@ -248,7 +244,7 @@ components:
 
 **Creative North Star: "Das Sendemanuskript im Moliri-Look"**
 
-Das Transkript bleibt ein Manuskript, an dem eine Redaktion arbeitet. Es trägt jetzt die Kleider von Moliri: helles Papier (`paper`) liegt auf Nebelgrau (`mist`), Tinte (`ink`) ist die einzige dunkle Fläche und rahmt die Arbeit oben ein (App-Leiste); im Editor liegt darunter, im Kopf, das Abspielpult. Was gerade läuft, ist Signalgrün: der Abspielknopf, der Kopf der Zeitleiste, das gesprochene Wort, ein laufender Auftrag. Darunter liegen unverändert die redaktionellen Bedeutungen: Rotstift für die menschliche Hand, Regie-Blau für Musik und Applaus, Zweifel-Gelb für unsichere Wörter, acht Sprecherfarben.
+Das Transkript bleibt ein Manuskript, an dem eine Redaktion arbeitet. Es trägt jetzt die Kleider von Moliri: helles Papier (`paper`) liegt auf Nebelgrau (`mist`), Tinte (`ink`) ist die einzige dunkle Fläche und rahmt die Arbeit oben ein (App-Leiste). Was gerade läuft, ist Signalgrün: der Abspielknopf, der Kopf der Zeitleiste, das gesprochene Wort, ein laufender Auftrag. Darunter liegen unverändert die redaktionellen Bedeutungen: Rotstift für die menschliche Hand, Regie-Blau für Musik und Applaus, Zweifel-Gelb für unsichere Wörter, acht Sprecherfarben.
 
 Die Oberfläche ist dicht, aber nicht eng. Im Editor gehört jede Zeile Höhe dem Text: Titel und Stand stehen auf einer Zeile, leere Spuren der Zeitleiste entfallen, auf niedrigen Bildschirmen rücken die Spuren zusammen, das Abspielen sitzt oben im Kopf, gleich über der Zeitleiste, die es bewegt, und die seltener gebrauchten Werkzeuge (Suche, Rückgängig, Neu berechnen, Export, Bedienung) liegen in einer Leiste am unteren Rand. Der Lesetext ist groß (20 px, Zeilenhöhe 1,75), denn die Nutzer sind oft ältere Ehrenamtliche und arbeiten lange am Stück. Moliri-Komponenten werden übernommen, wo sie passen; wo Moliri kleiner oder kontrastärmer ist als PRODUCT.md verlangt (Klickziele ab 44 px, Bedienschrift ab 16 px, deutlicher Fokus), gewinnen diese Pflichten.
 
@@ -262,7 +258,7 @@ Abgelehnt bleibt der Standard-Editor mit grauer Fläche, blauem Allzweck-Akzent 
 **Die früheren Seiten:** Die statischen Seiten unter `web/` mit tintenblauem Kopf und eigenen Farbwerten sind entfernt; ihre Adressen (`/editor.html` …) leiten auf die neuen Seiten weiter. Neue Arbeit richtet sich nur nach dieser Datei.
 
 **Key Characteristics:**
-- Papier auf Nebelgrau; Tinte nur als Rahmen (App-Leiste), als Abspielpult im Editor-Kopf und für schwebende Leisten (Wortleiste, Laufband).
+- Papier auf Nebelgrau; Tinte nur als Rahmen (App-Leiste) und für schwebende Leisten (Wortleiste, Laufband).
 - Pillen: Knöpfe, Tabs, Schalter und Leisten sind voll gerundet (2rem), Abspielknöpfe sind Kreise.
 - Signalgrün heißt „läuft“: Abspielen, gesprochenes Wort, aktiver Auftrag, Fortschritt.
 - Redaktionsrot im Editor ausschließlich für die menschliche Hand, in Text und Zeitleiste.
@@ -276,7 +272,7 @@ Abgelehnt bleibt der Standard-Editor mit grauer Fläche, blauem Allzweck-Akzent 
 Moliris ruhige Papier-Tinte-Nebel-Palette mit einem Signalgrün, darauf vier redaktionelle Farben, die je genau eine Bedeutung tragen. Die Editor-Rollen heißen wie in der Tabelle unten und liegen auf Moliri-Stufen; nur Sprecher- und Sprachfarben sind eigene Hex-Werte.
 
 ### Primary
-- **Signalgrün** (`signal`, Moliri `green-100`): was gerade läuft. Abspielknopf im Abspielpult, „Ab hier“ in der Wortleiste, gespielter Teil des Positionsreglers, Punkt am Kopf des Abspielkopfs, Badge der aktiven Aufträge, laufender Auftrag, Fortschrittsbalken, Punkt vor dem gespeicherten Stand, das Wortsignal im Laufband, eingeschalteter Schalter, Fokusring auf Tinte. Immer mit Tinte als Schrift, nie selbst als Schrift auf Papier (1,5:1).
+- **Signalgrün** (`signal`, Moliri `green-100`): was gerade läuft. Abspielknopf im Editor-Kopf, „Ab hier“ in der Wortleiste, gespielter Teil des Positionsreglers, Punkt am Kopf des Abspielkopfs, Badge der aktiven Aufträge, laufender Auftrag, Fortschrittsbalken, Punkt vor dem gespeicherten Stand, das Wortsignal im Laufband, eingeschalteter Schalter, Fokusring auf Tinte. Immer mit Tinte als Schrift, nie selbst als Schrift auf Papier (1,5:1).
 - **Textmarker** (`marker`, `green-50`): das gerade gesprochene Wort im Manuskript und die Textauswahl im Editor (`::selection`).
 - **Signal-Hauch** (`signal-soft`, `green-10`): angekreuzte Aufnahme in der Bibliothek, Fläche hinter „fertig“ und „neu“.
 - **Signal als Schrift** (`signal-text`, `green-300`, als `--color-text-success`): „fertig“ und andere Erfolgsmeldungen in Schrift auf Papier.
@@ -299,7 +295,7 @@ Moliris ruhige Papier-Tinte-Nebel-Palette mit einem Signalgrün, darauf vier red
 - **Sprachfarben** (`lang-en`, `lang-fr`, `lang-nl`, `lang-it`, `lang-es`, `lang-x`): Balken der Sprache-Spur für Fremdsprachen. Deutsch erscheint neutral (`mist` als Standard, `ink-3` wenn erkannt oder festgelegt).
 
 ### Neutral
-- **Tinte** (`ink`, `neutral-100`, als `--color-text-primary` und `--color-bg-inverse`): Text, gesprochene Wörter, App-Leiste, Abspielpult, Wortleiste, Laufband, primärer Knopf, Abspielkopf.
+- **Tinte** (`ink`, `neutral-100`, als `--color-text-primary` und `--color-bg-inverse`): Text, gesprochene Wörter, App-Leiste, Wortleiste, Laufband, primärer Knopf, Abspielkopf.
 - **Papier** (`paper`, `neutral-0`): Blätter, Kopf des Editors, Zeitleiste, Seitenspalte, Menüs; Schrift auf Tinte.
 - **Nebelgrau** (`mist`, `neutral-10`): Seitenfläche (`--page-bg`), Hover-Fläche, Haarlinien (`--rule`), ausgeblendete Stellen im Manuskript, Grund der Übersicht. Auf Tinte gedämpfte Schrift (`--head-ink-2`, 14,6:1).
 - **Schiefer** (`slate`, `neutral-50`): Feldrahmen (`--color-border-secondary`), noch nicht gespielte Welle. Nie als Schrift auf Papier (2,9:1).
@@ -355,11 +351,11 @@ Moliris ruhige Papier-Tinte-Nebel-Palette mit einem Signalgrün, darauf vier red
 
 Jede Seite liegt unter der App-Leiste (60 px, sticky). Editor und Live füllen die Höhe darunter (siehe Komponenten). Einfache Seiten (Bibliothek, Einstellungen) sind eine zentrierte Spalte von höchstens 76rem mit 2rem/1,5rem Innenabstand, darin Blätter im Abstand von 1,5rem. Die Einstellungen teilen sie in ein Menü (14rem, klebt beim Scrollen) und die Abschnitte (höchstens 56rem); unter 900 px wird das Menü eine seitlich scrollende Leiste oben.
 
-Der Editor füllt die Höhe darunter (`100dvh − 60px`) als Raster in vier Zeilen: Kopf (mit dem Abspielpult), Zeitleiste, Arbeitsfläche, Werkzeugleiste. Die Arbeitsfläche teilt sich in Manuskript (flexibel, scrollt) und Seitenspalte (21,25rem). Die Zeitleiste besteht aus Übersicht (34 px, mit Video-Vorschau 58 px) und Spuren mit einer Beschriftungsspalte von 108 px, in deren Zeitlineal-Zeile (26 px) die Zoomtasten sitzen. Spurreihenfolge und Grundhöhen: Welle 70, Text 26, Sprecher 30, Sprache 24, Regie 22, Zweifel 12, Rotstift 18, Clips 22, Abstand 6 px. Regie, Zweifel, Rotstift und Clips entfallen, solange sie leer sind. Bis 920 px Fensterhöhe schrumpfen die Spuren auf 85 %, bis 820 px Höhe oder 720 px Breite auf 70 %, jede aber nicht unter 16 px.
+Der Editor füllt die Höhe darunter (`100dvh − 60px`) als Raster in vier Zeilen: Kopf (mit dem Abspielen), Zeitleiste, Arbeitsfläche, Werkzeugleiste. Die Arbeitsfläche teilt sich in Manuskript (flexibel, scrollt) und Seitenspalte (21,25rem). Die Zeitleiste besteht aus Übersicht (34 px, mit Video-Vorschau 58 px) und Spuren mit einer Beschriftungsspalte von 108 px, in deren Zeitlineal-Zeile (26 px) die Zoomtasten sitzen. Spurreihenfolge und Grundhöhen: Welle 70, Text 26, Sprecher 30, Sprache 24, Regie 22, Zweifel 12, Rotstift 18, Clips 22, Abstand 6 px. Regie, Zweifel, Rotstift und Clips entfallen, solange sie leer sind. Bis 920 px Fensterhöhe schrumpfen die Spuren auf 85 %, bis 820 px Höhe oder 720 px Breite auf 70 %, jede aber nicht unter 16 px.
 
 Das Manuskriptblatt ist höchstens 1040 px breit und zentriert (Innenabstand 1rem/2,75rem/3rem, auf dem Tisch 0,75rem/2rem). Jeder Absatz ist ein Zweispalter: Randspalte 10,5rem rechtsbündig (Name, Zeitmarke, gegebenenfalls Video-Bildchen), Abstand 1,75rem, Text bis 42rem. Ein Sprecherwechsel trennt eine Haarlinie in Nebelgrau mit 0,75rem Luft darüber und darunter; Fortsetzungen desselben Sprechers rücken auf 0,5rem heran, Regiezeilen stehen eng. Unter dem Text liegt ein Abstandhalter von 40vh (unter 1180 px 30vh), damit die letzten Zeilen auf Lesehöhe scrollen.
 
-Responsiv: Unter 1180 px wird die Seitenspalte ein aufklappbarer Block unter dem Manuskript (höchstens 42vh). Unter 720 px steht die Randspalte als Zeile über dem Text, das Blatt hat 1,125rem/1rem Innenabstand, Video-Bildchen entfallen, das Abspielpult bricht um, Mitlaufen und die Knöpfe der Werkzeugleiste zeigen nur ihr Symbol, die App-Leiste nur das Wellensymbol (ab 760 px).
+Responsiv: Unter 1180 px wird die Seitenspalte ein aufklappbarer Block unter dem Manuskript (höchstens 42vh). Unter 720 px steht die Randspalte als Zeile über dem Text, das Blatt hat 1,125rem/1rem Innenabstand, Video-Bildchen entfallen, der Kopf bricht um, Mitlaufen und die Knöpfe der Werkzeugleiste zeigen nur ihr Symbol, die App-Leiste nur das Wellensymbol (ab 760 px).
 
 ## Elevation & Depth
 
@@ -399,7 +395,7 @@ Moliris Knopf (`$lib/moliri/components/ui/Button.svelte`): Pille mit 4 px Rahmen
 ### Chips
 - **Status-Pille** (Bibliothek): 999px, 700, 0,875rem. Wartet Nebelgrau mit `ink-2`, läuft Signalgrün mit Tinte, fertig Signal-Hauch mit `signal-text`, Fehler `red-10` mit `red-200`, bricht ab Orange-Hauch mit Moliris Warnorange (`--color-text-warning`).
 - **Badge:** Signalgrün mit Tinte, 1,5rem hoch, Tabellenziffern; in der App-Leiste die Zahl aktiver Aufträge.
-- **Filter-Chip** (Abspielpult): Signalgrün 14 % auf Tinte, Schrift Signalgrün, mit „alle zeigen“ als Pille darin. Erklärt, warum das Abspielen springt.
+- **Filter-Chip** (Editor-Kopf): Signal-Hauch mit Tinte, mit „alle zeigen“ als Pille darin. Erklärt, warum das Abspielen springt.
 - **Pillen-Schalter:** `aria-pressed`, gedrückt Papier auf Tinte (Mitlaufen) oder Tinte auf Papier mit Signal-Symbol (Auge und Zielscheibe der Seitenspalte).
 
 ### Cards / Containers
@@ -418,23 +414,18 @@ Moliris Knopf (`$lib/moliri/components/ui/Button.svelte`): Pille mit 4 px Rahmen
 ### Navigation
 - **App-Leiste:** 60 px, Tinte, sticky. Marke links (vier Wellenbalken in Papier, der zweite in Signalgrün; „Transcribe“ 700, „by Moliri“ 500 in Nebelgrau). Tabs als Pillen, 600 / 0,9375rem in Papier, Hover Tinte mit 18 % Papier, aktiv Papier-Pille mit Tinte. „Einstellungen“ rechts abgesetzt. Fokus Signalgrün, nach innen versetzt. Jeder Eintrag lädt die Seite vom Server neu; so speichert der Editor beim Verlassen, was noch aussteht.
 
-### Editor-Kopf
-Papierband mit Haarlinie darunter. Links (höchstens 30rem) der Aufnahmetitel als Auswahl, daneben „Schlagworte“ als leise Pille mit Etikett-Symbol (mit Schlagworten nur das Symbol, dahinter die Schlagworte als Nebel-Marken), die Name und Schlagworte öffnet; darunter der Stand (Länge, Sprecher, Erkennung, Korrekturen) und „alle Korrekturen gespeichert“ mit einem Signalpunkt. Rechts das Abspielpult; ist es zu schmal für eine Zeile, rückt es unter den Titel.
-
-**Warum oben.** Die Aufnahme ist die Wahrheit (PRODUCT.md): Abspielen ist, womit jede Sitzung beginnt, und gehört dahin, wo das Auge beginnt, gleich über die Zeitleiste, deren Abspielkopf es bewegt. Suche, Rückgängig, Neu berechnen, Export, Vollbild und Bedienung braucht man seltener; sie liegen unten.
-
-### Abspielpult (Signatur)
-Tintenpille (Radius 2,25rem) im Editor-Kopf, alles auf einer Zeile.
-- **Transport:** 5 Sekunden zurück und vor als 44-px-Kreise (Hover Papier 10 %), dazwischen der Abspielknopf: 3,25rem-Kreis in Signalgrün mit Tintensymbol, Hover vergrößert auf 1,05.
-- **Spur:** gespielte Zeit (600, Papier), die Stelle als gerundeter Schieberegler (6 px, Hover und Fokus 10 px, gespielt Signalgrün, der Rest Papier 16 %, Griff 14 px Signalgrün mit Tintenrand), die ganze Länge; die Spur nimmt den freien Platz.
-- **Wer spricht:** Punkt in Sprecherfarbe mit Papierring, Name als Sprecher-Label in Papier, mit festem Platz (11rem), damit die Spur beim Sprecherwechsel nicht springt.
-- **Rechts:** Tempo als Pille mit 1 px Papier-22-%-Rahmen und eingebetteter Auswahl (0,75× bis 2×), Mitlaufen als Pillen-Schalter.
+### Editor-Kopf mit Abspielen (Signatur)
+Papierband mit Haarlinie darunter, eine Zeile, gleich über der Zeitleiste, die es bewegt.
+- **Vorn das Abspielen:** 5 Sekunden zurück und vor als 44-px-Kreise (`ink-2`, Hover Nebel), dazwischen der Abspielknopf: 3,25rem-Kreis in Signalgrün mit Tintensymbol und feinem Rand, Hover vergrößert auf 1,05.
+- **Daneben der Titel:** die Aufnahme als Auswahl in Titelgröße, dahinter „Schlagworte“ als leise Pille mit Etikett-Symbol (mit Schlagworten nur das Symbol und die Schlagworte als Nebel-Marken), die Name und Schlagworte öffnet. Darunter die Zeit (gespielt 600 in Tinte, die ganze Länge in `ink-2`), wer gerade spricht (Punkt und Sprecher-Label in seiner Farbe, wie in der Randspalte), Schleife und Sprecherfilter als Signal-Hauch-Pillen.
+- **Rechts:** Tempo als Pille mit 1 px `rule-2`-Rahmen und eingebetteter Auswahl (0,75× bis 2×), Mitlaufen als Pillen-Schalter (gedrückt Nebel mit Tintenrand).
+- **Keine eigene Spur für die Stelle:** die Übersicht der Zeitleiste direkt darunter ist sie. Länge, Sprecherzahl und Erkennung stehen nicht im Kopf (die Länge steht in der Zeit, die Sprecher in der Seitenspalte).
 - **Tasten:** Leertaste spielt und hält an, Pfeile springen 5 s, jede Funktion hat auch einen Knopf.
 
-### Werkzeugleiste
-Papier mit Haarlinie darüber am unteren Rand des Editors. Vorn die Suche (Pille mit 1 px `rule-2`-Rahmen, bis 26rem), dann „Rückgängig“ und „Neu berechnen“; rechts „Exportieren“, Vollbild und die Hilfe als Pillen und Kreise mit 2 px Tintenrahmen (Hover und offen invertiert). Die Liste der Formate und die Hilfe gehen nach oben auf, über der Leiste. Die Knöpfe behalten ihren Namen bis 720 px Breite.
+**Warum oben.** Die Aufnahme ist die Wahrheit (PRODUCT.md): Abspielen ist, womit jede Sitzung beginnt, und gehört dahin, wo das Auge beginnt, vor den Titel und über die Zeitleiste. Suche, Rückgängig, Neu berechnen, Export, Vollbild und Bedienung braucht man seltener; sie liegen unten. So in transcribe-go wie im Dateifenster von Moliri (dort ohne Titel, etwas kleiner).
 
-In Moliri, wo der Editor in einem Fenster steht, bleiben die Werkzeuge im Kopf und der Player als Tintenleiste unten (`TranscriptEditor` ohne `playerInHead`).
+### Werkzeugleiste
+Papier mit Haarlinie darüber am unteren Rand des Editors. Vorn die Suche (Pille mit 1 px `rule-2`-Rahmen, bis 26rem), dann „Rückgängig“ und „Neu berechnen“, daneben „alle Korrekturen gespeichert“ mit einem Signalpunkt (nimmt den freien Platz); rechts „Exportieren“, Vollbild und die Hilfe als Pillen und Kreise mit 2 px Tintenrahmen (Hover und offen invertiert). Die Liste der Formate und die Hilfe gehen nach oben auf, über der Leiste. Unter 1180 px zeigen die Knöpfe nur ihr Symbol.
 
 ### Manuskript (Signatur)
 Absätze auf dem Blatt, Randspalte mit Sprechername (Sprecher-Label in Sprecherfarbe, daneben gegebenenfalls die Sprache) und Zeitmarke als Pille, die den Absatz abspielt; rechts der Text.
@@ -469,7 +460,7 @@ Papier mit Haarlinie links, 1,375rem Innenabstand. Oben das Video (klebt beim Sc
 Füllt die Höhe unter der App-Leiste wie der Editor, als Raster aus Seitenleiste (22rem), Hauptfläche und Aufnahmeleiste. Unter 900 px eine Spalte: Liste oder Aufnahme, mit „Alle Aufnahmen“ zurück.
 - **Seitenleiste:** Papier mit Haarlinie rechts. Oben das Suchfeld (unscharf mit fuzzysort, Wort für Wort über alle Sätze, Namen und Arten; Strg+F oder „/“ springt hinein, Esc leert), darunter die Herkunft als Umschalter in einer Nebel-Pille (Alle, Von Hand, Per API, je mit Zahl; gewählt in Tinte), dann Anzahl und Sortierung (randlose Auswahl; beim Suchen „Beste Treffer“). Die Liste gruppiert nach Tagen unter Abschnitts-Labels, die beim Scrollen kleben. Ein Eintrag: Herkunft mit Symbol (Hand für von Hand, Kabel für per API) und Name, Uhrzeit rechts, zwei Zeilen Vorschau (beim Suchen der getroffene Satz, Treffer im Textmarker), darunter Dauer, Quelle und ein Speichern-Symbol. Gewählt im Signal-Hauch mit feinem Signal-Rand. Unten „Programme verbinden“ als ganze Zeile, mit Signal-Badge, wenn Webseiten abgewiesen wurden.
 - **Aufnahme:** Kopf wie der Editor-Kopf (Papierband, Haarlinie): Tag und Uhrzeit als Aufnahmetitel, Stand (Herkunft, Länge, Quelle, Sprache, beim Suchen die Zahl der Sätze mit Treffer), rechts Pillen wie „Bedienung“ (Vollständig transkribieren als Tintenpille, Text kopieren, Teilen, Löschen ohne Rand). Darunter das Blatt auf Nebel: Satz für Satz im Zweispalter, Randspalte 7,5rem mit Zeitmarke und beim Quellenwechsel der Quelle als Sprecher-Label (Mikrofon `spk0`, Systemaudio `spk1`), Text in Manuskriptgröße. Der Satz, der gerade gesprochen wird, steht in `ink-2` mit atmendem Signalpunkt; der Text scrollt mit, solange man unten ist.
-- **Aufnahmeleiste (Signatur):** Tintenleiste unten, wie Moliris Player-Leiste. Aufnehmen ist der Signalkreis (3,25rem, Mikrofon in Tinte) mit Beschriftung und dem eingestellten Stand darunter; läuft die Aufnahme, Papierpille „Beenden“ und die Laufzeit mit Signalpunkt. Pegel als 0,5rem-Balken in Signalgrün auf Papier 16 %, ohne Aufnahme gedämpft. Rechts „Einrichten“ wie die Tempo-Pille; es öffnet über der Leiste ein Papierfenster (1rem, Schwebend hell) mit der Quelle als drei Zeilen zum Wählen, Mikrofon, Sprache und Speichern.
+- **Aufnahmeleiste (Signatur):** Tintenleiste unten. Aufnehmen ist der Signalkreis (3,25rem, Mikrofon in Tinte) mit Beschriftung und dem eingestellten Stand darunter; läuft die Aufnahme, Papierpille „Beenden“ und die Laufzeit mit Signalpunkt. Pegel als 0,5rem-Balken in Signalgrün auf Papier 16 %, ohne Aufnahme gedämpft. Rechts „Einrichten“ wie die Tempo-Pille; es öffnet über der Leiste ein Papierfenster (1rem, Schwebend hell) mit der Quelle als drei Zeilen zum Wählen, Mikrofon, Sprache und Speichern.
 - **Programme verbinden:** eigene Ansicht in der Hauptfläche, Blätter für Adresse (mit den beiden Arten als Begriffsliste), wer sich verbinden darf, und das Protokoll für Entwickler; wer sich verbinden wollte, steht zuoberst auf Signal-Hauch.
 
 ### Einfache Seiten
@@ -489,7 +480,7 @@ Bibliothek, Einstellungen und Lizenzen: Seitentitel mit Einleitung in `ink-2` (h
 - **Do** Moliri-Komponenten aus `$lib/moliri` nehmen, wo es sie gibt, und Abweichungen für PRODUCT.md in `app.scss` vornehmen, nicht in der gespiegelten Datei.
 - **Do** Zeiten mit Tabellenziffern setzen (The Ziffern-Heißt-Zeit Rule).
 - **Do** Zustände durch Linienart unterscheiden: durchgezogen für Feststehendes, gepunktet für Zweifel, gestrichelt für Eingeklapptes.
-- **Do** für neue Seiten dieselbe App-Leiste, Papier auf Nebelgrau und Pillen verwenden; Editor-Seiten tragen Tinte nur als Abspielpult und schwebende Leisten.
+- **Do** für neue Seiten dieselbe App-Leiste, Papier auf Nebelgrau und Pillen verwenden; Editor-Seiten tragen Tinte nur als schwebende Leisten.
 
 ### Don't:
 - **Don't** Redaktionsrot im Editor für Fehler, Warnungen, Löschen ohne menschlichen Bezug oder Hervorhebung einsetzen.

@@ -117,7 +117,7 @@
 <div class="seite">
 	{#if ed && phase === 'bereit'}
 		{#key ed}
-			<TranscriptEditor {ed} compact={false} title={wahl} playerInHead />
+			<TranscriptEditor {ed} compact={false} title={wahl} />
 		{/key}
 	{:else}
 		<header class="kopf">{@render wahl()}</header>

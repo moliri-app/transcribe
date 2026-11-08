@@ -7,19 +7,17 @@
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
 <!-- Ported from transcribe-go (frontend/src/routes/editor/+page.svelte); in Moliri the body of the
-     transcript tab. Der Editor: oben Stand des Speicherns, Suche, Rückgängig, Neu transkribieren,
-     Export, Vollbild und Bedienung, darunter die Zeitleiste, dann Manuskript und Seitenspalte, unten
-     der Player. Lesen, Abspielen, Korrigieren (Text, Bereiche, Zeitanker), Sprecher (Name, Sprache,
+     transcript tab. Der Editor: oben der Kopf mit dem Abspielen vorn (Player.svelte), darunter die
+     Zeitleiste, die es bewegt, dann Manuskript und Seitenspalte, unten die Werkzeugleiste mit Suche,
+     Rückgängig, Neu berechnen bzw. Neu transkribieren, dem Stand des Speicherns, Export, Vollbild und
+     Bedienung. Lesen, Abspielen, Korrigieren (Text, Bereiche, Zeitanker), Sprecher (Name, Sprache,
      Zusammenlegen) und Clips (Titel, Schlagworte, Abspielen, einzeln oder als Zusammenschnitt
      exportieren). Gespeichert wird von selbst; in Moliri wendet der Server Zusammenlegen gleich an und
      erkennt eine festgelegte Sprache von selbst neu. Kann der Speicher das nicht (transcribe-go, das
-     diesen Editor spiegelt), steht oben „Neu berechnen“. Mit playerInHead (transcribe-go, wo der
-     Editor die ganze Seite ist) steht das Abspielen als Tintenpult im Kopf, über der Zeitleiste, die
-     es bewegt, und Suche, Rückgängig, Neu berechnen, Export, Vollbild und Bedienung als Werkzeugleiste
-     unten. -->
+     diesen Editor spiegelt), steht unten „Neu berechnen“. -->
 <script>
 	import * as m from '$lib/moliri/texte.js';
-	import { fmt, presetName, searchItems } from './model.js';
+	import { searchItems } from './model.js';
 	import Zeitleiste from './Zeitleiste.svelte';
 	import Manuskript from './Manuskript.svelte';
 	import Seitenspalte from './Seitenspalte.svelte';
@@ -32,11 +30,9 @@
 	 *  the match at the time is the one shown, the player stands there.
 	 *  compact: little room (Moliri's file window), so a one-line head and a smaller timeline until
 	 *  fullscreen; false where the editor is the whole page (transcribe-go).
-	 *  title: shown above the figures in the head (transcribe-go: the choice of recording).
-	 *  playerInHead: the player in the head, the tools in a bar at the bottom (transcribe-go); else
-	 *  the tools in the head and the player as the bar at the bottom.
-	 *  @type {{ ed: import('./editor.svelte.js').Editor, onrerun?: () => void, rerunOpen?: boolean, start?: { time: number | null, query: string } | null, compact?: boolean, title?: import('svelte').Snippet, playerInHead?: boolean }} */
-	let { ed, onrerun, rerunOpen = false, start = null, compact = true, title, playerInHead = false } = $props();
+	 *  title: shown in the head beside the play button (transcribe-go: the choice of recording).
+	 *  @type {{ ed: import('./editor.svelte.js').Editor, onrerun?: () => void, rerunOpen?: boolean, start?: { time: number | null, query: string } | null, compact?: boolean, title?: import('svelte').Snippet }} */
+	let { ed, onrerun, rerunOpen = false, start = null, compact = true, title } = $props();
 
 	let help = $state(false);
 	/** @type {HTMLButtonElement | undefined} */ let helpBtn = $state();
@@ -211,6 +207,14 @@
 			</button>
 		{/if}
 	{/if}
+	<!-- ob die Korrekturen gespeichert sind: neben Rückgängig, wo man korrigiert -->
+	<div class="meta">
+		{#if ed.canEdit || ed.saveKind !== 'ok'}
+			<span class="stand {ed.languagesBusy ? 'offen' : ed.saveKind}" role="status" aria-live="polite" title={ed.saveText}
+				>{ed.languagesBusy && ed.saveKind === 'ok' ? m.te_languages_running() : ed.saveText}</span
+			>
+		{/if}
+	</div>
 	<div class="export" bind:this={exportBox}>
 		<button
 			class="hilfe-btn"
@@ -246,27 +250,9 @@
 	</button>
 {/snippet}
 
-<div class="editor" class:vollbild={fullscreen} class:eng class:player-oben={playerInHead} bind:this={root}>
+<div class="editor" class:vollbild={fullscreen} class:eng bind:this={root}>
 	<header class="kopf">
-		<div class="titel">
-			{@render title?.()}
-			<div class="meta">
-				<span>{m.te_length()} <b>{fmt(ed.final.duration)}</b></span>
-				<span>{m.transcript_speakers()} <b>{ed.speakers.length}</b></span>
-				{#if ed.final.preset}<span>{m.te_recognition()} <b>{presetName(ed.final.preset)}</b></span>{/if}
-				<span>{m.te_corrections()} <b>{ed.nCorrections}</b></span>
-				{#if ed.canEdit || ed.saveKind !== 'ok'}
-					<span class="stand {ed.languagesBusy ? 'offen' : ed.saveKind}" role="status" aria-live="polite" title={ed.saveText}
-						>{ed.languagesBusy && ed.saveKind === 'ok' ? m.te_languages_running() : ed.saveText}</span
-					>
-				{/if}
-			</div>
-		</div>
-		{#if playerInHead}
-			<Player {ed} inHead />
-		{:else}
-			{@render tools()}
-		{/if}
+		<Player {ed} {title} />
 	</header>
 
 	<Zeitleiste {ed} />
@@ -276,11 +262,7 @@
 		<Seitenspalte {ed} />
 	</main>
 
-	{#if playerInHead}
-		<footer class="werkzeug">{@render tools()}</footer>
-	{:else}
-		<Player {ed} />
-	{/if}
+	<footer class="werkzeug">{@render tools()}</footer>
 	<!-- schwebend, aber im Editor: sie brauchen dessen Farben (und erscheinen im Vollbild) -->
 	<SprecherMenue {ed} />
 	<Bereich {ed} />
@@ -439,23 +421,18 @@
 	}
 
 	.kopf {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		padding: 0.5rem 1rem 0.5rem 1.25rem;
+		padding: 0.5rem 1rem 0.5rem 0.75rem;
 		background: var(--paper);
 		border-bottom: 1px solid var(--rule);
 	}
-	.titel {
-		min-width: 0;
-		flex: 1;
-	}
+	/* der Stand in der Werkzeugleiste; nimmt den freien Platz */
 	.meta {
+		flex: 1 1 12rem;
 		min-width: 0;
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 0.25rem 1.25rem;
+		gap: 0.125rem 1.25rem;
 		font-size: 0.9375rem;
 		color: var(--ink-2);
 	}
@@ -659,14 +636,6 @@
 		color: var(--ink-3);
 	}
 
-	/* Player im Kopf: links Titel und Stand, rechts das Tintenpult, das bei wenig Breite darunter rückt */
-	.player-oben .kopf {
-		flex-wrap: wrap;
-		gap: 0.5rem 1.5rem;
-	}
-	.player-oben .titel {
-		flex: 0 1 30rem;
-	}
 	/* die Werkzeuge unten: Papier mit Haarlinie, die Suche vorn und breit, Export und Bedienung rechts */
 	.werkzeug {
 		display: flex;
@@ -681,19 +650,11 @@
 	.werkzeug .suche {
 		flex: 0 1 26rem;
 	}
-	.werkzeug .export {
-		margin-left: auto;
-	}
 	/* die Formate gehen nach oben auf, über der Leiste */
 	.werkzeug .formate {
 		top: auto;
 		bottom: calc(100% + 0.5rem);
 	}
-	.player-oben .hilfe {
-		top: auto;
-		bottom: 4.5rem;
-	}
-
 	.arbeit {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) 21.25rem;
@@ -704,7 +665,7 @@
 	.hilfe {
 		position: absolute;
 		right: 1.25rem;
-		top: 4rem;
+		bottom: 4.5rem;
 		width: 26rem;
 		max-width: calc(100% - 2.5rem);
 		max-height: calc(100% - 8rem);
@@ -750,6 +711,10 @@
 		padding: 0.375rem 0.75rem;
 		gap: 0.5rem;
 	}
+	.eng .werkzeug {
+		padding: 0.375rem 0.75rem;
+		gap: 0.5rem;
+	}
 	.eng .meta {
 		font-size: 0.875rem;
 		gap: 0.125rem 0.875rem;
@@ -772,29 +737,7 @@
 			grid-template-columns: 1fr;
 			grid-template-rows: minmax(0, 1fr) auto;
 		}
-		/* im Kopf wird es eng; die Leiste unten hat Platz für die Namen bis 720px */
-		.kopf .hilfe-btn:not(.rund) {
-			width: var(--hit);
-			padding: 0;
-			justify-content: center;
-		}
-		.kopf .hilfe-btn .lbl {
-			position: absolute;
-			width: 1px;
-			height: 1px;
-			overflow: hidden;
-			clip: rect(0 0 0 0);
-		}
-	}
-	@media (max-width: 720px) {
-		.kopf,
-		.werkzeug {
-			flex-wrap: wrap;
-			padding: 0.5rem 0.75rem;
-		}
-		.werkzeug .suche {
-			flex: 1 1 100%;
-		}
+		/* die Werkzeuge zeigen nur noch ihr Symbol (ihr Name steht im Hinweis) */
 		.werkzeug .hilfe-btn:not(.rund) {
 			width: var(--hit);
 			padding: 0;
@@ -806,6 +749,15 @@
 			height: 1px;
 			overflow: hidden;
 			clip: rect(0 0 0 0);
+		}
+	}
+	@media (max-width: 720px) {
+		.werkzeug {
+			flex-wrap: wrap;
+			padding: 0.5rem 0.75rem;
+		}
+		.werkzeug .suche {
+			flex: 1 1 100%;
 		}
 		.meta {
 			font-size: 0.875rem;
