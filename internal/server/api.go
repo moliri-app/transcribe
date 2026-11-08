@@ -5,6 +5,7 @@
 package server
 
 import (
+	"cmp"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -26,6 +27,7 @@ import (
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/queue"
 	"github.com/moliri-app/transcribe/internal/results"
+	"github.com/moliri-app/transcribe/internal/shelf"
 	"github.com/moliri-app/transcribe/internal/sidecar"
 	"github.com/moliri-app/transcribe/jobs"
 )
@@ -70,6 +72,7 @@ var liveName = regexp.MustCompile(`^Live \d{4}-\d{2}-\d{2} \d{2}-\d{2}( \(\d+\))
 // connected folder takes a sidecar someone else changed first.
 func (s *Server) buildIndex() []map[string]any {
 	items := []map[string]any{}
+	shelved := shelf.All(s.cfg.DataDir)
 	entries, _ := os.ReadDir(s.audioDir())
 	sort.SliceStable(entries, func(i, j int) bool {
 		return strings.ToLower(entries[i].Name()) < strings.ToLower(entries[j].Name())
@@ -79,14 +82,14 @@ func (s *Server) buildIndex() []map[string]any {
 		if e.IsDir() || !media.IsMedia(name) {
 			continue
 		}
-		item := s.indexItem(name, filepath.Join(s.audioDir(), name))
+		item := s.indexItem(name, filepath.Join(s.audioDir(), name), shelved)
 		item["source"] = map[bool]string{true: "live", false: "upload"}[liveName.MatchString(name)]
 		items = append(items, item)
 	}
 	write := !prefs.Load(s.cfg.DataDir).SidecarOff
 	for _, l := range media.LinkedIn(s.cfg.DataDir) {
 		sidecar.Sync(s.cfg.DataDir, media.Stem(l.Name), l.Path, write)
-		item := s.indexItem(l.Name, l.Path)
+		item := s.indexItem(l.Name, l.Path, shelved)
 		item["source"], item["folder"], item["dir"], item["path"] = "folder", l.Folder, l.Dir, l.Path
 		_, err := os.Stat(sidecar.Path(l.Path))
 		item["sidecar"] = err == nil
@@ -95,8 +98,9 @@ func (s *Server) buildIndex() []map[string]any {
 	return items
 }
 
-// indexItem is what the pages know of the recording called name, which is at path.
-func (s *Server) indexItem(name, path string) map[string]any {
+// indexItem is what the pages know of the recording called name, which is at path; shelved is what
+// people said about the recordings (a name of their own, tags, hidden).
+func (s *Server) indexItem(name, path string, shelved map[string]shelf.Entry) map[string]any {
 	stem := media.Stem(name)
 	rdir := filepath.Join(s.resultsDir(), stem)
 	engines := []map[string]any{}
@@ -126,7 +130,8 @@ func (s *Server) indexItem(name, path string) map[string]any {
 		})
 	}
 	item := map[string]any{
-		"name": name, "stem": stem, "title": media.Title(stem), "url": "audio/" + pyQuote(name),
+		"name": name, "stem": stem, "title": cmp.Or(shelved[stem].Title, media.Title(stem)), "file": media.Title(stem),
+		"tags": append([]string{}, shelved[stem].Tags...), "hidden": shelved[stem].Hidden, "url": "audio/" + pyQuote(name),
 		"video":   media.HasVideo(path),
 		"engines": engines, "speakers": variants(rdir, stem, "speakers"), "events": variants(rdir, stem, "events"),
 		"added": added(path),
@@ -249,7 +254,7 @@ func (s *Server) clipExport(w http.ResponseWriter, r *http.Request) {
 	sort.SliceStable(clips, func(i, j int) bool { return clips[i].Start < clips[j].Start })
 	name := clipFileName(clips[0].Title)
 	if len(clips) > 1 {
-		name = fmt.Sprintf("%s – Zusammenschnitt (%d Clips)", media.Title(stem), len(clips))
+		name = fmt.Sprintf("%s – Zusammenschnitt (%d Clips)", shelf.FileName(s.cfg.DataDir, stem), len(clips))
 	}
 	disposition := "attachment; filename*=UTF-8''" + pyQuote(name+"."+format)
 	if format == "txt" {
