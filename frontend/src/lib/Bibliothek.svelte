@@ -6,18 +6,24 @@
      „….transcribe.json“ daneben, internal/sidecar). Rechts für den Bereich: was gerade transkribiert
      wird oder gescheitert ist, die Aufnahmen ohne Transkript zum Einreihen und die transkribierten
      als Liste, jede mit dem Anfang ihres Transkripts, wer spricht und wie viel schon von Hand
-     korrigiert ist; ein Klick öffnet sie im Editor. Steht unter / und, für alte Lesezeichen, unter /queue. -->
+     korrigiert ist; ein Klick öffnet sie im Editor. Jede Aufnahme lässt sich benennen und
+     verschlagworten (Beschriften.svelte); die Schlagworte stehen links als Bereiche. Ausgeblendete
+     verschwinden aus allen Bereichen und stehen nur unter „Ausgeblendet“; so lässt sich auch in einem
+     verbundenen Ordner aufräumen, in dem Transcribe nichts löscht. Steht unter / und, für alte
+     Lesezeichen, unter /queue. -->
 <script>
 	import { onMount, untrack } from 'svelte';
 	import Button from '$lib/moliri/components/ui/Button.svelte';
 	import AuftragsOptionen from '$lib/AuftragsOptionen.svelte';
+	import Beschriften from '$lib/Beschriften.svelte';
 	import { auftraege, geaendert } from '$lib/auftraege.svelte.js';
-	import { dauer, einreihen, getJSON, post, upload, vorgaben } from '$lib/api.js';
+	import { beschriften, dauer, einreihen, getJSON, post, upload, vorgaben } from '$lib/api.js';
 	import { sprachname } from '$lib/live/stand.svelte.js';
 
 	/** @typedef {{ id: number, name: string }} Sprecher */
 	/** @typedef {{ duration: number, speakers: Sprecher[], preview: string, edits: number, clips: number, done: number }} Inhalt */
-	/** @typedef {{ name: string, stem: string, title: string, video: boolean, added: number, summary?: Inhalt,
+	/** title: der Name in Transcribe (sonst der der Datei), file: der Name der Datei ohne Endung
+	 * @typedef {{ name: string, stem: string, title: string, file: string, tags: string[], hidden: boolean, video: boolean, added: number, summary?: Inhalt,
 	 *   source: 'upload' | 'live' | 'folder', folder?: string, dir?: string, path?: string, sidecar?: boolean }} Aufnahme */
 	/** @typedef {{ id: string, audio: string, stem: string, status: string, progress: number, step: string | null,
 	 *   log: string[] | null, started: number | null, finished: number | null, error: string | null, note: string | null,
@@ -77,6 +83,10 @@
 	let loescht = $state(false);
 	/** @type {HTMLDialogElement} */
 	let rueckfrage;
+	/** @type {Beschriften} */
+	let beschrifter;
+	/** „Rückgängig“ neben der Meldung, solange sie steht */
+	let zurueck = $state(/** @type {{ meldung: string, tun: () => void } | null} */ (null));
 
 	function gemerkt() {
 		try {
@@ -99,12 +109,26 @@
 		}
 	}
 
-	/** @param {Aufnahme} a @param {string} b */
-	const gehoert = (a, b) => b === 'alle' || a.source === b || (a.source === 'folder' && a.folder === b);
+	/** Gehört die Aufnahme in den Bereich? Ausgeblendete nur unter „Ausgeblendet“; ein Schlagwort ist „tag:…“.
+	 * @param {Aufnahme} a @param {string} b */
+	const gehoert = (a, b) =>
+		b === 'versteckt'
+			? a.hidden
+			: !a.hidden &&
+				(b === 'alle' ||
+					a.source === b ||
+					(a.source === 'folder' && a.folder === b) ||
+					(b.startsWith('tag:') && a.tags.includes(b.slice(4))));
 
 	const nachName = $derived(new Map((aufnahmen ?? []).map((a) => [a.name, a])));
 	/** je Aufnahme ihr jüngster Auftrag (die Warteschlange führt sie in der Reihenfolge des Einreihens) */
 	const letzter = $derived(new Map((jobs ?? []).map((j) => [j.audio, j])));
+	/** die Schlagworte der sichtbaren Aufnahmen, nach dem Alphabet */
+	const schlagworte = $derived(
+		[...new Set((aufnahmen ?? []).filter((a) => !a.hidden).flatMap((a) => a.tags))].sort((x, y) => x.localeCompare(y, 'de'))
+	);
+	/** alle vergebenen, auch an ausgeblendeten, zum Antippen beim Beschriften */
+	const alleSchlagworte = $derived([...new Set((aufnahmen ?? []).flatMap((a) => a.tags))]);
 	/** der gewählte Ordner, wenn einer gewählt ist */
 	const imOrdner = $derived(ordner.folders.find((o) => o.path === bereich) ?? null);
 	/** was gerade transkribiert wird oder zuletzt gescheitert ist, im Bereich */
@@ -125,7 +149,7 @@
 	const zahlen = $derived.by(() => {
 		/** @type {Record<string, { alle: number, offen: number }>} */
 		const z = {};
-		for (const b of [...BEREICHE.map(([b]) => b), ...ordner.folders.map((o) => o.path)]) {
+		for (const b of [...BEREICHE.map(([b]) => b), ...ordner.folders.map((o) => o.path), ...schlagworte.map((t) => 'tag:' + t), 'versteckt']) {
 			const in_ = (aufnahmen ?? []).filter((a) => gehoert(a, b));
 			z[b] = { alle: in_.length, offen: in_.filter((a) => !a.summary).length };
 		}
@@ -136,7 +160,7 @@
 		const q = suche.trim().toLowerCase();
 		const treffer = q
 			? fertig.filter((a) =>
-					[a.title, a.dir ?? '', a.summary?.preview ?? '', ...(a.summary?.speakers ?? []).map((s) => s.name)].some((t) =>
+					[a.title, a.file, a.dir ?? '', a.summary?.preview ?? '', ...a.tags, ...(a.summary?.speakers ?? []).map((s) => s.name)].some((t) =>
 						t.toLowerCase().includes(q)
 					)
 				)
@@ -207,7 +231,10 @@
 			aufnahmen = await getJSON('/api/index');
 		} catch {
 			aufnahmen ??= [];
+			return;
 		}
+		// ein Schlagwort, das keine Aufnahme mehr trägt, und „Ausgeblendet“ ohne Aufnahme sind keine Bereiche mehr
+		if ((bereich.startsWith('tag:') || bereich === 'versteckt') && !zahlen[bereich]?.alle) zeige('alle');
 	}
 
 	async function ladeOrdner() {
@@ -401,6 +428,44 @@
 		geaendert();
 	}
 
+	/** @param {Aufnahme} a */
+	function fragBeschriften(a) {
+		beschrifter.open(a);
+	}
+
+	/** Gespeichert im Dialog: gleich zeigen, dann vom Server holen.
+	 * @param {{ stem: string }} a @param {{ title: string, tags: string[], hidden: boolean }} stand */
+	function beschriftet(a, stand) {
+		const vorher = aufnahmen?.find((x) => x.stem === a.stem);
+		for (const x of aufnahmen ?? []) if (x.stem === a.stem) Object.assign(x, stand);
+		if (vorher && stand.hidden !== vorher.hidden) sichtbarGemacht(a.stem, stand.title, stand.hidden);
+		else meldung = `„${stand.title}“ ist gespeichert.`;
+		ladeAufnahmen();
+	}
+
+	/** Ausblenden oder wieder einblenden, ohne Dialog, mit „Rückgängig“.
+	 * @param {Aufnahme} a @param {boolean} hidden */
+	async function ausblenden(a, hidden) {
+		try {
+			const stand = await beschriften(a.stem, { hidden });
+			for (const x of aufnahmen ?? []) if (x.stem === a.stem) Object.assign(x, stand);
+			sichtbarGemacht(a.stem, stand.title, hidden);
+		} catch (e) {
+			meldung = /** @type {Error} */ (e).message;
+		}
+		gewaehlt = gewaehlt.filter((n) => n !== a.name);
+		ladeAufnahmen();
+	}
+
+	/** @param {string} stem @param {string} title @param {boolean} hidden */
+	function sichtbarGemacht(stem, title, hidden) {
+		meldung = hidden
+			? `„${title}“ ist ausgeblendet. Die Datei bleibt, wo sie ist; links unter „Ausgeblendet“ lässt sie sich wieder einblenden.`
+			: `„${title}“ ist wieder eingeblendet.`;
+		const a = aufnahmen?.find((x) => x.stem === stem);
+		zurueck = a ? { meldung, tun: () => ausblenden(a, !hidden) } : null;
+	}
+
 	/** was von Hand am Transkript getan wurde: „2 Korrekturen von Hand und 1 Clip“
 	 * @param {Inhalt} s */
 	function arbeitInWorten(s) {
@@ -474,6 +539,40 @@
 	</li>
 {/snippet}
 
+<!-- je Aufnahme: Name und Schlagworte, dann Löschen oder, wo Transcribe nichts löscht (verbundene
+     Ordner), Ausblenden; unter „Ausgeblendet“ statt beidem Einblenden -->
+{#snippet knoepfe(/** @type {Aufnahme} */ a)}
+	<button class="neu-tx" type="button" title="Name und Schlagworte" aria-label="Name und Schlagworte von {a.title}" onclick={() => fragBeschriften(a)}>
+		<IconMaterialSymbolsSellOutline aria-hidden="true" />
+	</button>
+	{#if a.hidden}
+		<button class="neu-tx" type="button" title="Wieder einblenden" aria-label="{a.title} wieder einblenden" onclick={() => ausblenden(a, false)}>
+			<IconMaterialSymbolsVisibilityOutlineRounded aria-hidden="true" />
+		</button>
+	{:else if a.source === 'folder'}
+		<button
+			class="neu-tx"
+			type="button"
+			title="Ausblenden; die Datei im Ordner bleibt"
+			aria-label="{a.title} ausblenden"
+			onclick={() => ausblenden(a, true)}
+		>
+			<IconMaterialSymbolsVisibilityOffOutlineRounded aria-hidden="true" />
+		</button>
+	{:else}
+		<button
+			class="weg"
+			type="button"
+			disabled={inBearbeitung(a)}
+			title={inBearbeitung(a) ? 'Wird gerade transkribiert; erst abbrechen, dann löschen' : 'Löschen'}
+			aria-label="{a.title} löschen"
+			onclick={() => fragLoeschen(a)}
+		>
+			<IconMaterialSymbolsDeleteOutlineRounded aria-hidden="true" />
+		</button>
+	{/if}
+{/snippet}
+
 <main>
 	<header class="kopf">
 		<div class="kopftext">
@@ -487,7 +586,12 @@
 		</label>
 	</header>
 
-	<p class="meldung" role="status">{meldung}</p>
+	<p class="meldung" role="status">
+		{meldung}
+		{#if zurueck && zurueck.meldung === meldung}
+			<button type="button" class="zurueck" onclick={() => zurueck?.tun()}>Rückgängig</button>
+		{/if}
+	</p>
 
 	{#if offline}
 		<p class="leer fehler" role="alert">
@@ -526,6 +630,14 @@
 					{@render bereichsknopf('live', 'Live-Aufnahmen', IconMaterialSymbolsMicOutlineRounded, 'Auf der Seite Live gespeicherte Aufnahmen')}
 				{/if}
 			</ul>
+			{#if schlagworte.length}
+				<h2 class="bkopf">Schlagworte</h2>
+				<ul>
+					{#each schlagworte as t (t)}
+						{@render bereichsknopf('tag:' + t, t, IconMaterialSymbolsSellOutline, '')}
+					{/each}
+				</ul>
+			{/if}
 			<h2 class="bkopf">Ordner</h2>
 			{#if ordner.folders.length}
 				<ul>
@@ -538,6 +650,11 @@
 				<IconMaterialSymbolsCreateNewFolderOutlineRounded aria-hidden="true" />
 				<span class="bname">Ordner verbinden</span>
 			</button>
+			{#if zahlen.versteckt?.alle}
+				<ul class="unten">
+					{@render bereichsknopf('versteckt', 'Ausgeblendet', IconMaterialSymbolsVisibilityOffOutlineRounded, 'Aufnahmen, die du ausgeblendet hast; gelöscht ist nichts')}
+				</ul>
+			{/if}
 		</nav>
 
 		<div class="inhalt">
@@ -598,6 +715,22 @@
 						{#snippet iconLeft()}<IconMaterialSymbolsLinkOffRounded />{/snippet}
 						Ordner trennen
 					</Button>
+				</div>
+			{/if}
+
+			{#if bereich === 'versteckt'}
+				<div class="ordnerkopf">
+					<div>
+						<h2>Ausgeblendet</h2>
+						<p class="ordnerinfo">Diese Aufnahmen stehen in keinem anderen Bereich. Gelöscht ist nichts, auch nicht ihr Transkript.</p>
+					</div>
+				</div>
+			{:else if bereich.startsWith('tag:')}
+				<div class="ordnerkopf">
+					<div>
+						<h2><IconMaterialSymbolsSellOutline aria-hidden="true" />{bereich.slice(4)}</h2>
+						<p class="ordnerinfo">Alle Aufnahmen mit diesem Schlagwort.</p>
+					</div>
 				</div>
 			{/if}
 
@@ -670,18 +803,15 @@
 							<div class="aufnahme" class:gewaehlt={gewaehlt.includes(a.name)}>
 								<label title={a.path}>
 									<input type="checkbox" value={a.name} bind:group={gewaehlt} />
-									<span class="name">{a.source === 'folder' ? a.name.replace(/^~[0-9a-f]{10}~/, '') : a.name}</span>
+									<span class="name">{a.title !== a.file ? a.title : a.source === 'folder' ? a.name.replace(/^~[0-9a-f]{10}~/, '') : a.name}</span>
 									{#if wo}<span class="wo">{wo}</span>{/if}
+									{#each a.tags as t (t)}<span class="marke">{t}</span>{/each}
 									{#if a.video}
 										<span class="art" title="Video"><IconMaterialSymbolsMovieOutlineRounded aria-hidden="true" /><span class="sr">Video</span></span>
 									{/if}
 									<span class="hinzu">{wann(a.added)}</span>
 								</label>
-								{#if a.source !== 'folder'}
-									<button class="weg" type="button" title="Löschen" aria-label="{a.title} löschen" onclick={() => fragLoeschen(a)}>
-										<IconMaterialSymbolsDeleteOutlineRounded aria-hidden="true" />
-									</button>
-								{/if}
+								{@render knoepfe(a)}
 							</div>
 						{/each}
 					</div>
@@ -764,6 +894,9 @@
 										<a href="/editor" data-sveltekit-reload onclick={() => imEditor(a.stem)} title="{a.title} im Editor öffnen">{a.title}</a>
 									</h3>
 									{#if wo}<span class="wo">{wo}</span>{/if}
+									{#each a.tags as t (t)}
+										<button type="button" class="marke" title="Alle mit diesem Schlagwort" onclick={() => zeige('tag:' + t)}>{t}</button>
+									{/each}
 									{#if a.sidecar}
 										<span class="neben" title="Das Transkript liegt als Datei neben der Aufnahme">
 											<IconMaterialSymbolsDescriptionOutlineRounded aria-hidden="true" /><span class="sr">Transkript neben der Aufnahme</span>
@@ -807,18 +940,7 @@
 									>
 										<IconMaterialSymbolsRefreshRounded aria-hidden="true" />
 									</button>
-									{#if a.source !== 'folder'}
-										<button
-											class="weg"
-											type="button"
-											disabled={inBearbeitung(a)}
-											title={inBearbeitung(a) ? 'Wird gerade transkribiert; erst abbrechen, dann löschen' : 'Löschen'}
-											aria-label="{a.title} löschen"
-											onclick={() => fragLoeschen(a)}
-										>
-											<IconMaterialSymbolsDeleteOutlineRounded aria-hidden="true" />
-										</button>
-									{/if}
+									{@render knoepfe(a)}
 								</div>
 							</li>
 						{/each}
@@ -827,6 +949,8 @@
 			</section>
 		</div>
 	</div>
+
+	<Beschriften bind:this={beschrifter} vorhanden={alleSchlagworte} ondone={beschriftet} />
 
 	<dialog class="rueckfrage" bind:this={rueckfrage} aria-labelledby="h-loeschen" onclose={() => (loeschen = null)}>
 		{#if loeschen}
@@ -1059,6 +1183,12 @@
 		margin-top: 0.25rem;
 		color: hsl(var(--color-text-primary));
 	}
+	/* „Ausgeblendet“ abgesetzt unter allem: ein Bereich, in den man selten schaut */
+	.unten {
+		margin-top: 1.25rem;
+		padding-top: 0.75rem;
+		border-top: 1px solid hsl(var(--color-border-primary));
+	}
 	.verbinden[aria-expanded='true'] {
 		background: hsl(var(--color-bg-primary));
 	}
@@ -1109,8 +1239,18 @@
 		gap: 0.5rem 1.5rem;
 	}
 	.ordnerkopf h2 {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 		font-size: 1.5rem;
 		letter-spacing: -0.01em;
+		overflow-wrap: anywhere;
+	}
+	.ordnerkopf h2 :global(svg) {
+		flex: none;
+		width: 1.5rem;
+		height: 1.5rem;
+		color: hsl(var(--color-text-secondary));
 	}
 	.ordnerpfad {
 		font-size: 0.9375rem;
@@ -1389,7 +1529,7 @@
 	.eintrag {
 		position: relative;
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) 11rem 6.5rem 8.5rem 6.5rem calc(2 * var(--hit));
+		grid-template-columns: minmax(0, 1fr) 11rem 6.5rem 8.5rem 6.5rem calc(3 * var(--hit));
 		align-items: center;
 		gap: 0.25rem 1rem;
 		padding: 0.75rem 0.75rem 0.75rem 1.25rem;
@@ -1561,6 +1701,40 @@
 		justify-content: flex-end;
 	}
 
+	/* Schlagworte einer Aufnahme: Nebel-Marken wie die der Clips; in der Liste führt eine zu allen mit ihr */
+	.marke {
+		display: inline-flex;
+		align-items: center;
+		align-self: center;
+		min-height: 1.625rem;
+		padding: 0 0.625rem;
+		border-radius: 2rem;
+		background: hsl(var(--color-bg-secondary));
+		color: hsl(var(--color-text-secondary));
+		font-size: 0.875rem;
+		font-weight: 600;
+		white-space: nowrap;
+	}
+	button.marke {
+		position: relative;
+		z-index: 1;
+		cursor: pointer;
+		transition: background-color 0.15s, color 0.15s;
+	}
+	button.marke:hover {
+		background: hsl(var(--color-neutral-100));
+		color: hsl(var(--color-neutral-0));
+	}
+
+	.zurueck {
+		margin-left: 0.5rem;
+		font-weight: 600;
+		color: hsl(var(--color-text-primary));
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		cursor: pointer;
+	}
+
 	/* Löschen: leise, bis man darauf zeigt; in der Zeile am Ende, über ihrem Link */
 	.weg {
 		position: relative;
@@ -1706,7 +1880,7 @@
 	/* schmaler: die Spalten der Liste rücken neben den Titel */
 	@media (max-width: 1100px) {
 		.eintrag {
-			grid-template-columns: minmax(0, 1fr) auto calc(2 * var(--hit));
+			grid-template-columns: minmax(0, 1fr) auto calc(3 * var(--hit));
 		}
 		.stimmen,
 		.arbeit,

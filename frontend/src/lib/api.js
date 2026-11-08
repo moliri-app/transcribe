@@ -111,3 +111,15 @@ export function dauer(s) {
 	const ss = String(s % 60).padStart(2, '0');
 	return s >= 3600 ? `${Math.floor(s / 3600)}:${mm}:${ss}` : `${Math.floor(s / 60)}:${ss}`;
 }
+
+/**
+ * Name, Schlagworte und Ausblenden einer Aufnahme (library.json); nur was angegeben ist, ändert
+ * sich. Ein leerer Name gibt ihr den Namen ihrer Datei zurück. Gibt den gespeicherten Stand zurück.
+ * @param {string} stem
+ * @param {{ title?: string, tags?: string[], hidden?: boolean }} was
+ * @returns {Promise<{ title: string, tags: string[], hidden: boolean }>}
+ */
+export async function beschriften(stem, was) {
+	const { title, tags, hidden } = await post(`/api/recording?stem=${encodeURIComponent(stem)}`, was);
+	return { title, tags, hidden };
+}

@@ -3,12 +3,14 @@
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
 <!-- Der Editor: der aus Moliri gespiegelte Transkript-Editor als ganze Seite, mit dem Speicher für die
      API der EXE ($lib/editor/speicher.js). Oben links die Wahl der Aufnahme; solange keine offen ist,
-     steht an der Stelle des Editors, warum (wird geladen, noch keine, Fehler). -->
+     steht an der Stelle des Editors, warum (wird geladen, noch keine, Fehler). Neben der Wahl benennt
+     und verschlagwortet man die Aufnahme (Beschriften.svelte); ausgeblendete stehen nicht zur Wahl. -->
 <script>
 	import { onMount } from 'svelte';
 	import { Editor } from '$lib/moliri/components/files/transcript/editor/editor.svelte.js';
 	import TranscriptEditor from '$lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte';
 	import { loadRecording, merken, recordingName, transcribeStore } from '$lib/editor/speicher.js';
+	import Beschriften from '$lib/Beschriften.svelte';
 
 	/** @type {import('$lib/editor/speicher.js').Datei[]} */
 	let files = $state.raw([]);
@@ -18,6 +20,8 @@
 	let phase = $state('laden');
 	let error = $state('');
 	let openSeq = 0;
+	/** @type {Beschriften} */
+	let beschrifter;
 
 	const file = $derived(files.find((f) => f.stem === stem) ?? null);
 	const title = $derived(file ? `${recordingName(file)} · Editor · Transcribe by Moliri` : 'Editor · Transcribe by Moliri');
@@ -26,7 +30,8 @@
 		try {
 			/** @type {typeof files} */
 			const idx = await (await fetch('/api/index')).json();
-			files = idx.filter((f) => f.engines.some((e) => e.final));
+			// eine ausgeblendete nur, wenn sie zuletzt offen war (aus der Bibliothek geöffnet)
+			files = idx.filter((f) => f.engines.some((e) => e.final) && (!f.hidden || f.stem === merken.get('stem')));
 		} catch {
 			phase = 'fehler';
 			error = 'Die Liste der Aufnahmen ließ sich nicht laden.';
@@ -74,6 +79,7 @@
 <svelte:head><title>{title}</title></svelte:head>
 
 {#snippet wahl()}
+	<div class="wahlzeile">
 	<select
 		class="datei"
 		aria-label="Aufnahme wählen"
@@ -89,7 +95,24 @@
 	>
 		{#each files as f (f.stem)}<option value={f.stem}>{recordingName(f)}</option>{/each}
 	</select>
+	{#if file}
+		{@const f = file}
+		<button type="button" class="beschriften" title="Name und Schlagworte" aria-label="Name und Schlagworte" onclick={() => beschrifter.open(f)}>
+			<IconMaterialSymbolsSellOutline aria-hidden="true" />
+			{#if !f.tags.length}<span>Schlagworte</span>{/if}
+		</button>
+		{#each f.tags as t (t)}<button type="button" class="marke" title="Name und Schlagworte" onclick={() => beschrifter.open(f)}>{t}</button>{/each}
+	{/if}
+	</div>
 {/snippet}
+
+<Beschriften
+	bind:this={beschrifter}
+	vorhanden={[...new Set(files.flatMap((f) => f.tags))]}
+	ondone={(a, stand) => {
+		files = files.map((f) => (f.stem === a.stem ? { ...f, ...stand } : f));
+	}}
+/>
 
 <div class="seite">
 	{#if ed && phase === 'bereit'}
@@ -148,6 +171,52 @@
 	}
 	.datei:hover {
 		background-color: hsl(var(--color-bg-secondary));
+	}
+	.wahlzeile {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.25rem 0.5rem;
+		min-width: 0;
+	}
+	/* Name und Schlagworte: leise neben dem Titel, bis man darauf zeigt */
+	.beschriften {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		min-height: 2.25rem;
+		min-width: 2.25rem;
+		justify-content: center;
+		padding: 0 0.5rem;
+		border-radius: 2rem;
+		color: hsl(var(--color-text-secondary));
+		font-size: 0.9375rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.beschriften:hover {
+		background: hsl(var(--color-bg-secondary));
+		color: hsl(var(--color-text-primary));
+	}
+	.beschriften :global(svg) {
+		width: 1.25rem;
+		height: 1.25rem;
+	}
+	.marke {
+		display: inline-flex;
+		align-items: center;
+		min-height: 1.75rem;
+		padding: 0 0.75rem;
+		border-radius: 2rem;
+		background: hsl(var(--color-bg-secondary));
+		color: hsl(var(--color-text-secondary));
+		font-size: 0.875rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.marke:hover {
+		background: hsl(var(--color-neutral-100));
+		color: hsl(var(--color-neutral-0));
 	}
 	.datei option {
 		font-size: 1rem;
