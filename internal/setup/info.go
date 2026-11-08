@@ -27,6 +27,7 @@ type Component struct {
 	Total     int64  `json:"total"`
 	Error     string `json:"error,omitempty"`
 	OnDemand  bool   `json:"onDemand"` // not fetched at startup
+	Device    string `json:"device,omitempty"` // the graphics card it runs on
 }
 
 // DirSize sums the size of all files below dir.
@@ -100,7 +101,8 @@ func Info(dataDir, ffmpegPath string) []Component {
 	add(Component{Name: "embed", Path: emb, Installed: EmbedInstalled(dataDir), Size: sizeOf(emb), OnDemand: true})
 	if LLMSupported() {
 		llm := LLMDir(dataDir)
-		add(Component{Name: "llm", Path: llm, Installed: LLMInstalled(dataDir), Size: sizeOf(llm), OnDemand: true})
+		_, device := LLMDevice(dataDir)
+		add(Component{Name: "llm", Path: llm, Installed: LLMInstalled(dataDir), Size: sizeOf(llm), OnDemand: true, Device: device})
 	}
 
 	s := models.Set{Dir: filepath.Join(dataDir, "models")}

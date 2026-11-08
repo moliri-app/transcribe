@@ -21,16 +21,17 @@ import (
 
 // GPU describes an NVIDIA GPU and whether the CUDA runtime libraries it needs are installed.
 type GPU struct {
-	Present   bool     `json:"present"`
-	Name      string   `json:"name,omitempty"`
-	Driver    string   `json:"driver,omitempty"`
-	MemoryMB  int      `json:"memoryMB,omitempty"`
-	CudaMajor int      `json:"cudaMajor,omitempty"` // CUDA major version whose sherpa build would be used
-	Supported bool     `json:"supported"`           // a sherpa CUDA build exists for this OS/arch
-	Ready     bool     `json:"ready"`               // all CUDA/cuDNN libraries were found
-	Missing   []string `json:"missing,omitempty"`
-	Fetch     int64    `json:"fetch,omitempty"` // bytes the app would download from NVIDIA to fill in Missing (0: it cannot)
-	Dirs      []string `json:"-"`               // folders holding the libraries (added to the library search path)
+	Present    bool     `json:"present"`
+	Name       string   `json:"name,omitempty"`
+	Driver     string   `json:"driver,omitempty"`
+	MemoryMB   int      `json:"memoryMB,omitempty"`
+	CudaMajor  int      `json:"cudaMajor,omitempty"`  // CUDA major version whose sherpa build would be used
+	CudaDriver int      `json:"cudaDriver,omitempty"` // newest CUDA major version the driver runs
+	Supported  bool     `json:"supported"`            // a sherpa CUDA build exists for this OS/arch
+	Ready      bool     `json:"ready"`                // all CUDA/cuDNN libraries were found
+	Missing    []string `json:"missing,omitempty"`
+	Fetch      int64    `json:"fetch,omitempty"` // bytes the app would download from NVIDIA to fill in Missing (0: it cannot)
+	Dirs       []string `json:"-"`               // folders holding the libraries (added to the library search path)
 }
 
 var cudaVer = regexp.MustCompile(`CUDA Version:\s*(\d+)\.(\d+)`)
@@ -67,6 +68,7 @@ func DetectGPU(dataDir string) GPU {
 	if m := cudaVer.FindStringSubmatch(nvidiaSmi()); m != nil {
 		driverMajor, _ = strconv.Atoi(m[1])
 	}
+	g.CudaDriver = driverMajor
 	if driverMajor < 12 {
 		g.Supported = false // sherpa only ships CUDA 12 and 13 builds
 		return g

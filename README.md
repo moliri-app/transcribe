@@ -194,7 +194,11 @@ Sprachmodell auf dem Rechner (Qwen 2.5 7B auf dem Server-Programm von llama.cpp)
 den Feldkatalog des Projekts, beides verlässt den Rechner nicht. Modell und Programm (zusammen
 4,5 GB) kommen erst, wenn Moliri oder die Einstellungen danach fragen. Auf dem Prozessor eines
 Laptops dauert die erste Frage zu einem Projekt knapp zwei Minuten, jede weitere etwa eine halbe bis
-eine Minute, weil das Modell den gelesenen Feldkatalog behält, auch über einen Neustart. Die Frage
+eine Minute, weil das Modell den gelesenen Feldkatalog behält, auch über einen Neustart. Mit einer
+NVIDIA-Grafikkarte läuft das Modell auf ihr (llama.cpp für CUDA, gut 0,6 GB dazu): auf einer RTX
+A3000 im Laptop 14 s für die erste Frage, 2 bis 3 s für jede weitere. Andere Grafikkarten, auch die
+in Intel- und AMD-Prozessoren eingebauten, nutzt das Modell über Vulkan, wenn eine Messung beim
+ersten Start zeigt, dass sie schneller sind als der Prozessor. Die Frage
 läuft im Hintergrund, Moliri zeigt, wie weit sie ist. Geladen belegt das Modell rund 5,5 GB
 Arbeitsspeicher und gibt sie nach einer Viertelstunde ohne Frage wieder frei. Webseiten brauchen
 dieselbe Erlaubnis wie für die Texterkennung. Das Protokoll steht in

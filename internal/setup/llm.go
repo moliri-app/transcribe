@@ -44,7 +44,9 @@ const LLMModelName = "Qwen 2.5 7B Instruct (Q4_K_M)"
 // llama.cpp b12110 is its release v0.9.0 (2026-11-04).
 const llamaBase = "https://github.com/ggml-org/llama.cpp/releases/download/b12110/"
 
-var llamaArchives = map[string]struct{ name, sum string }{
+type llamaArchive struct{ name, sum string }
+
+var llamaArchives = map[string]llamaArchive{
 	"windows/amd64": {"llama-b12110-bin-win-cpu-x64.zip", "98901e327c252875accaf2d1bf364e10e868843b0b63468baad1aa945cdc5da2"},
 	"windows/arm64": {"llama-b12110-bin-win-cpu-arm64.zip", "f8d20fb07d0b499988ced8963afcd5ded2d2cdd9983b757fbc7e51c4abd722e8"},
 	"linux/amd64":   {"llama-b12110-bin-ubuntu-x64.tar.gz", "368227edcc229be5f9bed16a2223d79b5e41d0ac2e19bcf5825e82291c060e55"},
@@ -133,6 +135,8 @@ func FetchLLM(ctx context.Context, dataDir string) (err error) {
 		}
 		before += f.size
 	}
+	// Then the build for the graphics card, where there is one the model runs faster on.
+	chooseLLMBuild(ctx, dataDir)
 	return nil
 }
 
@@ -142,13 +146,12 @@ func fetchLlama(ctx context.Context, dataDir string) error {
 	if !ok {
 		return fmt.Errorf("no language model server for %s/%s", runtime.GOOS, runtime.GOARCH)
 	}
-	dir := LlamaDir(dataDir)
+	return fetchLlamaInto(ctx, dataDir, LlamaDir(dataDir), []llamaArchive{a})
+}
+
+// fetchLlamaInto unpacks the archives of one build into dir; the first one holds the server.
+func fetchLlamaInto(ctx context.Context, dataDir, dir string, archives []llamaArchive) error {
 	if err := os.MkdirAll(LLMDir(dataDir), 0o755); err != nil {
-		return err
-	}
-	archive := filepath.Join(LLMDir(dataDir), a.name+".tmp")
-	defer os.Remove(archive)
-	if err := download(ctx, "llm", llamaBase+a.name, a.sum, archive); err != nil {
 		return err
 	}
 	tmp := dir + ".tmp"
@@ -157,21 +160,33 @@ func fetchLlama(ctx context.Context, dataDir string) error {
 	if err := os.MkdirAll(tmp, 0o755); err != nil {
 		return err
 	}
-	if strings.HasSuffix(a.name, ".zip") {
-		if err := unzipLlama(archive, tmp); err != nil {
-			return err
+	for _, a := range archives {
+		archive := filepath.Join(LLMDir(dataDir), a.name+".tmp")
+		err := download(ctx, "llm", llamaBase+a.name, a.sum, archive)
+		if err == nil {
+			err = unpackLlama(ctx, archive, a.name, tmp)
 		}
-	} else {
-		cmd := proc.Hide(exec.CommandContext(ctx, "tar", "-xzf", archive, "-C", tmp, "--strip-components=1"))
-		if out, err := cmd.CombinedOutput(); err != nil {
-			return fmt.Errorf("tar: %w: %s", err, out)
+		os.Remove(archive)
+		if err != nil {
+			return err
 		}
 	}
 	if _, err := os.Stat(filepath.Join(tmp, filepath.Base(LlamaServer(dataDir)))); err != nil {
-		return fmt.Errorf("llama-server not found in %s", a.name)
+		return fmt.Errorf("llama-server not found in %s", archives[0].name)
 	}
 	os.RemoveAll(dir)
 	return os.Rename(tmp, dir)
+}
+
+func unpackLlama(ctx context.Context, archive, name, dir string) error {
+	if strings.HasSuffix(name, ".zip") {
+		return unzipLlama(archive, dir)
+	}
+	cmd := proc.Hide(exec.CommandContext(ctx, "tar", "-xzf", archive, "-C", dir, "--strip-components=1"))
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("tar: %w: %s", err, out)
+	}
+	return nil
 }
 
 // unzipLlama takes the server program and the libraries; the archive's other tools stay out.

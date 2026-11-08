@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -21,7 +22,9 @@ import (
 // server program) and the model's GGUF files, and TRANSCRIBE_FILTER_CATALOG a catalog text
 // (Moliri's), with TRANSCRIBE_FILTER_FIELDS the field catalog as JSON (entries with `value`).
 // It asks twice, then once more after a restart, and logs the times: the second and third
-// question should read only the sentence.
+// question should read only the sentence. TRANSCRIBE_LLM_BUILD names another build's folder
+// beside llama/ (llama-cuda13, llama-vulkan) and TRANSCRIBE_LLM_ARGS its device arguments
+// (default "-ngl 0").
 func TestWithModel(t *testing.T) {
 	dir, catalogFile := os.Getenv("TRANSCRIBE_LLM_DIR"), os.Getenv("TRANSCRIBE_FILTER_CATALOG")
 	if dir == "" || catalogFile == "" {
@@ -43,8 +46,16 @@ func TestWithModel(t *testing.T) {
 	if len(models) == 0 {
 		t.Fatal("no model in", dir)
 	}
+	build := llm.Build{Name: "test", Program: filepath.Join(dir, "llama", "llama-server.exe"), Args: []string{"-ngl", "0"}}
+	if b := os.Getenv("TRANSCRIBE_LLM_BUILD"); b != "" {
+		build.Program = filepath.Join(dir, b, "llama-server.exe")
+	}
+	if a := os.Getenv("TRANSCRIBE_LLM_ARGS"); a != "" {
+		build.Args = strings.Fields(a)
+	}
 	newServer := func() *llm.Server {
-		return &llm.Server{Program: filepath.Join(dir, "llama", "llama-server.exe"), Model: models[0], CacheDir: filepath.Join(dir, "cache")}
+		return &llm.Server{Program: build.Program, Model: models[0], CacheDir: filepath.Join(dir, "cache"),
+			Builds: func(context.Context) ([]llm.Build, error) { return []llm.Build{build}, nil }}
 	}
 	key := sha256.Sum256([]byte(Prefix(string(catalog))))
 	ask := func(s *llm.Server, text string) {

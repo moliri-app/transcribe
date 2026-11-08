@@ -73,8 +73,9 @@ func embedModel(dataDir string, pl *runner.Runner, threads int) *embed.Model {
 }
 
 // filterModel is Qwen 2.5 7B on llama.cpp's server for Moliri's filter in plain words
-// (docs/filter-api.md): program and model come when Moliri or the settings page asks for them.
-// nil where llama.cpp has no build for this system.
+// (docs/filter-api.md): program and model come when Moliri or the settings page asks for them,
+// and it runs on the graphics card where that is faster (setup.LLMBuilds). nil where llama.cpp
+// has no build for this system.
 func filterModel(dataDir string) server.Chatter {
 	if !setup.LLMSupported() {
 		return nil
@@ -84,5 +85,6 @@ func filterModel(dataDir string) server.Chatter {
 		Model:     setup.LLMModel(dataDir),
 		CacheDir:  filepath.Join(setup.LLMDir(dataDir), "cache"),
 		Installed: func() bool { return setup.LLMInstalled(dataDir) },
+		Builds:    func(ctx context.Context) ([]llm.Build, error) { return setup.LLMBuilds(ctx, dataDir) },
 	}
 }

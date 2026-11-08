@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -44,6 +45,10 @@ var ErrTooLong = errors.New("llm: the prompt is longer than the model's context"
 type Server struct {
 	// Program is llama-server, Model the model's (first) GGUF file.
 	Program, Model string
+	// Builds lists llama.cpp's builds to run the model with, best first (nil: Program on the
+	// processor). A build that fails to start, or ends during a question, is passed over for the
+	// next one until the app restarts: a graphics card that fails falls back to the processor.
+	Builds func(ctx context.Context) ([]Build, error)
 	// CacheDir keeps what the model read under the callers' keys (empty: nothing on disk).
 	CacheDir string
 	// Installed reports whether program and model are complete (nil: both files exist).
@@ -67,7 +72,22 @@ type Server struct {
 	timer   *time.Timer
 	slotKey string          // whose prompt the slot holds
 	inRAM   map[string]bool // keys asked since the start: llama.cpp keeps their prompts in memory
+	build   string          // the build running now
+	broken  map[string]bool // builds that failed since the app started
 }
+
+// Build is one of llama.cpp's builds: its server program and the arguments that put the model
+// on its device.
+type Build struct {
+	// Name says which build: "cuda13", "vulkan", "cpu".
+	Name    string
+	Program string
+	// Args choose the device, as "-ngl 0" for the processor.
+	Args []string
+}
+
+// cpuArgs keep the model on the processor.
+var cpuArgs = []string{"-ngl", "0"}
 
 // Message is one turn of the conversation.
 type Message struct {
@@ -123,6 +143,17 @@ func (s *Server) installed() bool {
 // Ready reports whether program and model are there.
 func (s *Server) Ready() bool { return s.installed() }
 
+// Device names the build the model runs on now ("cuda13", "vulkan", "cpu"), empty while it is
+// not loaded.
+func (s *Server) Device() string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.base == "" {
+		return ""
+	}
+	return s.build
+}
+
 // Loaded reports whether the model is in memory now.
 func (s *Server) Loaded() bool {
 	s.mu.Lock()
@@ -145,33 +176,99 @@ func (s *Server) Warm(ctx context.Context) error {
 
 // start returns the address of the running server, starting it first.
 func (s *Server) start(ctx context.Context) (string, error) {
-	s.mu.Lock()
-	if s.base != "" {
-		s.timer.Reset(s.idle())
-		base := s.base
+	for {
+		s.mu.Lock()
+		if s.base != "" {
+			s.timer.Reset(s.idle())
+			base := s.base
+			s.mu.Unlock()
+			return base, nil
+		}
+		if s.cmd != nil {
+			// Another caller starts it: wait for it.
+			exited := s.exited
+			s.mu.Unlock()
+			if err := s.awaitStart(ctx, exited); err != nil {
+				return "", err
+			}
+			continue
+		}
 		s.mu.Unlock()
-		return base, nil
+		if !s.installed() {
+			return "", ErrNotInstalled
+		}
+		builds, err := s.builds(ctx)
+		if err != nil {
+			return "", err
+		}
+		b := builds[0]
+		base, err := s.launch(ctx, b)
+		if errors.Is(err, errBusy) {
+			continue
+		}
+		if err != nil && ctx.Err() == nil && len(builds) > 1 {
+			// The graphics card failed: the next build takes over.
+			log.Printf("llm: %s failed, trying %s: %v", b.Name, builds[1].Name, err)
+			s.mu.Lock()
+			s.broken[b.Name] = true
+			s.mu.Unlock()
+			continue
+		}
+		return base, err
 	}
-	if s.cmd != nil {
-		// Another caller starts it: wait for it.
-		exited := s.exited
-		s.mu.Unlock()
-		for {
-			select {
-			case <-ctx.Done():
-				return "", ctx.Err()
-			case <-exited:
-				return "", s.failure()
-			case <-time.After(200 * time.Millisecond):
-			}
-			if s.Loaded() {
-				return s.start(ctx)
-			}
+}
+
+// awaitStart waits until another caller's start is through, either way.
+func (s *Server) awaitStart(ctx context.Context, exited chan struct{}) error {
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-exited:
+			return nil
+		case <-time.After(200 * time.Millisecond):
+		}
+		if s.Loaded() {
+			return nil
 		}
 	}
-	if !s.installed() {
+}
+
+// builds returns the builds still to try, best first; the last one is never passed over.
+func (s *Server) builds(ctx context.Context) ([]Build, error) {
+	all := []Build{{Name: "cpu", Program: s.Program, Args: cpuArgs}}
+	if s.Builds != nil {
+		var err error
+		if all, err = s.Builds(ctx); err != nil {
+			return nil, err
+		}
+		if len(all) == 0 {
+			return nil, ErrNotInstalled
+		}
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.broken == nil {
+		s.broken = map[string]bool{}
+	}
+	var out []Build
+	for i, b := range all {
+		if !s.broken[b.Name] || (i == len(all)-1 && len(out) == 0) {
+			out = append(out, b)
+		}
+	}
+	return out, nil
+}
+
+// errBusy: another caller started the server meanwhile.
+var errBusy = errors.New("llm: started by another caller")
+
+// launch starts build b and waits until it answers.
+func (s *Server) launch(ctx context.Context, b Build) (string, error) {
+	s.mu.Lock()
+	if s.cmd != nil || s.base != "" {
 		s.mu.Unlock()
-		return "", ErrNotInstalled
+		return "", errBusy
 	}
 	port, err := freePort()
 	if err != nil {
@@ -188,9 +285,8 @@ func (s *Server) start(ctx context.Context) (string, error) {
 		"-b", "512",
 		// llama.cpp keeps the prompts of the last questions in memory: about 0.06 MB a token
 		// for Qwen 2.5 7B, so 2 GB hold some ten field catalogs.
-		"--cache-ram", "2048",
-		// The processor only: llama.cpp's build for it has no other device.
-		"-ngl", "0"}
+		"--cache-ram", "2048"}
+	args = append(args, b.Args...)
 	if s.Threads > 0 {
 		args = append(args, "-t", strconv.Itoa(s.Threads))
 	}
@@ -199,10 +295,10 @@ func (s *Server) start(ctx context.Context) (string, error) {
 			args = append(args, "--slot-save-path", s.CacheDir)
 		}
 	}
-	cmd := proc.Hide(exec.Command(s.Program, args...))
-	cmd.Dir = filepath.Dir(s.Program)
-	log := &tail{}
-	cmd.Stdout, cmd.Stderr = log, log
+	cmd := proc.Hide(exec.Command(b.Program, args...))
+	cmd.Dir = filepath.Dir(b.Program)
+	lines := &tail{}
+	cmd.Stdout, cmd.Stderr = lines, lines
 	if err := cmd.Start(); err != nil {
 		s.mu.Unlock()
 		return "", fmt.Errorf("llm: %w", err)
@@ -210,7 +306,7 @@ func (s *Server) start(ctx context.Context) (string, error) {
 	// Ended with the app, also when it crashes (Windows: a job object).
 	bindToApp(cmd.Process)
 	exited := make(chan struct{})
-	s.cmd, s.exited, s.log, s.slotKey, s.inRAM = cmd, exited, log, "", map[string]bool{}
+	s.cmd, s.exited, s.log, s.slotKey, s.inRAM, s.build = cmd, exited, lines, "", map[string]bool{}, b.Name
 	go func() {
 		cmd.Wait()
 		close(exited)
@@ -239,7 +335,7 @@ func (s *Server) start(ctx context.Context) (string, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.cmd != cmd {
-		return "", s.failureLocked(log)
+		return "", s.failureLocked(lines)
 	}
 	s.base = base
 	if s.timer == nil {
@@ -248,6 +344,25 @@ func (s *Server) start(ctx context.Context) (string, error) {
 		s.timer.Reset(s.idle())
 	}
 	return base, nil
+}
+
+// ended reports whether the server process ended, and then passes its build over from now on.
+func (s *Server) ended() bool {
+	s.mu.Lock()
+	exited, name := s.exited, s.build
+	s.mu.Unlock()
+	if exited == nil {
+		return false
+	}
+	select {
+	case <-exited:
+	case <-time.After(time.Second):
+		return false
+	}
+	s.mu.Lock()
+	s.broken[name] = true
+	s.mu.Unlock()
+	return true
 }
 
 // failure says why the server ended, in its own last words.
@@ -330,6 +445,17 @@ func (s *Server) Chat(ctx context.Context, req Request, progress func(Progress))
 	}
 	s.restore(ctx, base, req.CacheKey)
 	ans, err := s.complete(ctx, base, req, progress)
+	if err != nil && ctx.Err() == nil && !errors.Is(err, ErrTooLong) && s.ended() {
+		// The server fell over during the question (a graphics card out of memory or lost):
+		// the next build answers it.
+		log.Printf("llm: the server ended during a question, asking again: %v", err)
+		progress(Progress{Stage: "loading"})
+		if base, err = s.start(ctx); err != nil {
+			return Answer{}, err
+		}
+		s.restore(ctx, base, req.CacheKey)
+		ans, err = s.complete(ctx, base, req, progress)
+	}
 	if err != nil {
 		return Answer{}, err
 	}
@@ -454,8 +580,75 @@ func (s *Server) complete(ctx context.Context, base string, req Request, progres
 	return ans, nil
 }
 
-// cacheFile is where the prompt under key is kept on disk.
-func cacheFile(key string) string { return "prompt-" + key + ".bin" }
+// Speed is how fast a build runs the model: tokens of prompt read and of answer written a second.
+type Speed struct {
+	Read  float64 `json:"read"`
+	Write float64 `json:"write"`
+}
+
+// Seconds estimates how long questions take at this speed: what a first question about a
+// project reads of its catalog (spread over the next ones, which read only the sentence) and
+// writes.
+func (sp Speed) Seconds() float64 {
+	if sp.Read <= 0 || sp.Write <= 0 {
+		return 0
+	}
+	return 1000/sp.Read + 120/sp.Write
+}
+
+// Measure starts build b with model, has it read a prompt of some 700 tokens and write 32, and
+// says how fast it did both.
+func Measure(ctx context.Context, b Build, model string) (Speed, error) {
+	s := &Server{Program: b.Program, Model: model, Builds: func(context.Context) ([]Build, error) { return []Build{b}, nil }}
+	defer s.Stop()
+	base, err := s.start(ctx)
+	if err != nil {
+		return Speed{}, err
+	}
+	// The first batch on a graphics card also prepares its kernels: not part of the speed.
+	if _, err := measureOnce(ctx, base, "Hallo", 1); err != nil {
+		return Speed{}, err
+	}
+	var prompt strings.Builder
+	for i := 1; prompt.Len() < 2800; i++ {
+		fmt.Fprintf(&prompt, "- `Feld %d` „Feld %d“ · Text (`text`) · Beispiel: `Wert %d`\n", i, i, i*7)
+	}
+	return measureOnce(ctx, base, prompt.String(), 32)
+}
+
+func measureOnce(ctx context.Context, base, prompt string, n int) (Speed, error) {
+	data, _ := json.Marshal(map[string]any{"prompt": prompt, "n_predict": n, "temperature": 0,
+		"cache_prompt": false, "ignore_eos": true})
+	req, _ := http.NewRequestWithContext(ctx, "POST", base+"/completion", bytes.NewReader(data))
+	req.Header.Set("Content-Type", "application/json")
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return Speed{}, fmt.Errorf("llm: %w", err)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return Speed{}, fmt.Errorf("llm: measuring: %s", res.Status)
+	}
+	var out struct {
+		Timings struct {
+			PromptPerSecond    float64 `json:"prompt_per_second"`
+			PredictedPerSecond float64 `json:"predicted_per_second"`
+		} `json:"timings"`
+	}
+	if err := json.NewDecoder(res.Body).Decode(&out); err != nil {
+		return Speed{}, fmt.Errorf("llm: measuring: %w", err)
+	}
+	return Speed{Read: out.Timings.PromptPerSecond, Write: out.Timings.PredictedPerSecond}, nil
+}
+
+// cacheFile is where the prompt under key is kept on disk: one per build, as a graphics card may
+// keep it in another form than the processor.
+func cacheFile(build, key string) string {
+	if build == "" || build == "cpu" {
+		return "prompt-" + key + ".bin"
+	}
+	return "prompt-" + key + "-" + build + ".bin"
+}
 
 // restore reads back what the model read for key, unless the server has it in memory already.
 // Failing, the model just reads the prompt again.
@@ -465,15 +658,16 @@ func (s *Server) restore(ctx context.Context, base, key string) {
 	}
 	s.mu.Lock()
 	skip := s.slotKey == key || s.inRAM[key]
+	file := cacheFile(s.build, key)
 	s.mu.Unlock()
 	if skip {
 		return
 	}
-	path := filepath.Join(s.CacheDir, cacheFile(key))
+	path := filepath.Join(s.CacheDir, file)
 	if _, err := os.Stat(path); err != nil {
 		return
 	}
-	if slotAction(ctx, base, "restore", cacheFile(key)) == nil {
+	if slotAction(ctx, base, "restore", file) == nil {
 		now := time.Now()
 		os.Chtimes(path, now, now) // kept longest when used most recently
 		s.mu.Lock()
@@ -490,8 +684,9 @@ func (s *Server) save(ctx context.Context, base, key string) {
 	s.mu.Lock()
 	s.slotKey = key
 	s.inRAM[key] = true
+	file := cacheFile(s.build, key)
 	s.mu.Unlock()
-	if s.CacheDir == "" || slotAction(ctx, base, "save", cacheFile(key)) != nil {
+	if s.CacheDir == "" || slotAction(ctx, base, "save", file) != nil {
 		return
 	}
 	keep := s.KeepCaches

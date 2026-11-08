@@ -19,6 +19,7 @@ import (
 
 	"github.com/moliri-app/transcribe/internal/llm"
 	"github.com/moliri-app/transcribe/internal/natfilter"
+	"github.com/moliri-app/transcribe/internal/setup"
 	"github.com/moliri-app/transcribe/models"
 )
 
@@ -81,6 +82,9 @@ func (s *Server) filterInfo() map[string]any {
 		"size":        s.cfg.FilterSizeMB,
 		"comparisons": natfilter.Comparisons,
 	}
+	if d := s.filterDevice(); d != nil {
+		info["device"] = d
+	}
 	items, _ := models.Snapshot()
 	for _, it := range items {
 		if it.Name == "llm" && (it.State == "downloading" || it.State == "error") {
@@ -91,6 +95,20 @@ func (s *Server) filterInfo() map[string]any {
 	info["queued"] = len(s.filters.pending)
 	s.filters.mu.Unlock()
 	return info
+}
+
+// filterDevice says what the model runs on: the build ("cuda13", "cuda12", "vulkan", "cpu") and
+// the graphics card's name. The running build, or the one picked for this computer while the
+// model is not loaded; nil before that is picked.
+func (s *Server) filterDevice() map[string]string {
+	build, name := setup.LLMDevice(s.cfg.DataDir)
+	if d, ok := s.cfg.Filter.(interface{ Device() string }); ok && d.Device() != "" && d.Device() != build {
+		build, name = d.Device(), ""
+	}
+	if build == "" {
+		return nil
+	}
+	return map[string]string{"build": build, "name": name}
 }
 
 func (s *Server) filterAPI(w http.ResponseWriter, r *http.Request) {
@@ -272,6 +290,9 @@ func (s *Server) filterState(w http.ResponseWriter, id string) {
 		out["dropped"] = job.result.Dropped
 		out["seconds"] = job.seconds
 		out["model"] = s.cfg.FilterModel
+		if d := s.filterDevice(); d != nil {
+			out["device"] = d
+		}
 	case "failed":
 		out["error"] = job.errText
 		out["error_kind"] = job.errKind
