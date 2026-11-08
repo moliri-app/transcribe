@@ -427,7 +427,7 @@ Papierband mit Haarlinie darunter. Links (höchstens 30rem) der Aufnahmetitel al
 Tintenpille (Radius 2,25rem) im Editor-Kopf, alles auf einer Zeile.
 - **Transport:** 5 Sekunden zurück und vor als 44-px-Kreise (Hover Papier 10 %), dazwischen der Abspielknopf: 3,25rem-Kreis in Signalgrün mit Tintensymbol, Hover vergrößert auf 1,05.
 - **Spur:** gespielte Zeit (600, Papier), die Stelle als gerundeter Schieberegler (6 px, Hover und Fokus 10 px, gespielt Signalgrün, der Rest Papier 16 %, Griff 14 px Signalgrün mit Tintenrand), die ganze Länge; die Spur nimmt den freien Platz.
-- **Wer spricht:** Punkt in Sprecherfarbe mit Papierring, Name als Sprecher-Label in Papier, mit festem Platz (8rem), damit die Spur beim Sprecherwechsel nicht springt.
+- **Wer spricht:** Punkt in Sprecherfarbe mit Papierring, Name als Sprecher-Label in Papier, mit festem Platz (11rem), damit die Spur beim Sprecherwechsel nicht springt.
 - **Rechts:** Tempo als Pille mit 1 px Papier-22-%-Rahmen und eingebetteter Auswahl (0,75× bis 2×), Mitlaufen als Pillen-Schalter.
 - **Tasten:** Leertaste spielt und hält an, Pfeile springen 5 s, jede Funktion hat auch einen Knopf.
 

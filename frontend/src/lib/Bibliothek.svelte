@@ -1060,7 +1060,7 @@
 		position: sticky;
 		top: 4.5rem;
 		z-index: 20;
-		justify-self: start;
+		justify-self: center;
 		max-width: 100%;
 		padding: 0.5rem 1.125rem;
 		border-radius: 1.5rem;

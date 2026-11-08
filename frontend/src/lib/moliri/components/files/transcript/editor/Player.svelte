@@ -399,7 +399,7 @@
 		opacity: 1;
 	}
 	.kopf .wer {
-		flex: 0 1 8rem;
+		flex: 0 1 11rem;
 		min-width: 0;
 	}
 	.kopf .wer.leer {
