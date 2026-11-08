@@ -30,6 +30,10 @@ func lockInstance(dataDir string) (release func(), ok bool) {
 	return func() { once.Do(func() { f.Close() }) }, true
 }
 
+// hasAppWindow would report whether a window of the app is open; there is no telling here, so the
+// page's heartbeat alone decides.
+func hasAppWindow(dataDir string) bool { return false }
+
 // focusAppWindow brings the app's open window to the front; there is no telling which it is here.
 func focusAppWindow(dataDir string) bool { return false }
 

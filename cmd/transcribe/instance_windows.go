@@ -72,6 +72,9 @@ func appWindows(dataDir string) []uintptr {
 	return out
 }
 
+// hasAppWindow reports whether a window of the app serving dataDir is open, minimized or not.
+func hasAppWindow(dataDir string) bool { return len(appWindows(dataDir)) > 0 }
+
 // focusAppWindow brings the open window of the app serving dataDir to the front; false if it
 // found none.
 func focusAppWindow(dataDir string) bool {

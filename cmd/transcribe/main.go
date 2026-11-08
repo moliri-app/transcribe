@@ -236,7 +236,9 @@ func main() {
 			told := false
 			for range time.Tick(3 * time.Second) {
 				switch {
-				case !srv.WindowGone(150*time.Second, firstWait):
+				// a minimized or covered window's page beats rarely, or not at all while the browser
+				// freezes it: a window still there counts as open
+				case !srv.WindowGone(150*time.Second, firstWait) || hasAppWindow(*data):
 				case prefs.Load(*data).Background || autostart.Enabled():
 					if !told && srv.WindowSeen() {
 						log.Println("window closed, running on in the background")
