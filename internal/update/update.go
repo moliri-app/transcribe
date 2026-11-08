@@ -22,7 +22,7 @@ import (
 )
 
 // LatestURL is the GitHub API's latest release of the app: neither drafts nor pre-releases.
-const LatestURL = "https://api.github.com/repos/moliri/transcribe/releases/latest"
+const LatestURL = "https://api.github.com/repos/moliri-app/transcribe/releases/latest"
 
 // Asset is the name of the EXE attached to every release (.github/workflows/release.yml).
 const Asset = "transcribe.exe"

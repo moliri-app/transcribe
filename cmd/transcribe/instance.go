@@ -40,14 +40,14 @@ func claimInstance(dataDir string, show bool) (release func(), ok bool) {
 	deadline := time.Now().Add(20 * time.Second)
 	for {
 		release, ok := lockInstance(dataDir)
-		url, window := runningInstance(dataDir) // even with the lock: a version without it may run
+		url := runningInstance(dataDir) // even with the lock: a version without it may run
 		if url != "" {
 			if ok {
 				release()
 			}
 			fmt.Println("Transcribe läuft schon:", url)
 			if show {
-				showAppWindow(url, dataDir, window)
+				showAppWindow(url, dataDir)
 			}
 			return nil, false
 		}
@@ -62,38 +62,37 @@ func claimInstance(dataDir string, show bool) (release func(), ok bool) {
 	}
 }
 
-// runningInstance returns the address of the app already serving dataDir, or "", and whether a
-// window of it is open.
-func runningInstance(dataDir string) (url string, window bool) {
+// runningInstance returns the address of the app already serving dataDir, or "".
+func runningInstance(dataDir string) string {
 	var inst struct{ URL string }
 	b, err := os.ReadFile(instanceFile(dataDir))
 	if err != nil || json.Unmarshal(b, &inst) != nil || inst.URL == "" {
-		return "", false
+		return ""
 	}
 	// the file may be left over from a crash, or the port may now belong to another program
 	c := http.Client{Timeout: 3 * time.Second}
 	r, err := c.Get(inst.URL + "/api/instance")
 	if err != nil {
-		return "", false
+		return ""
 	}
 	defer r.Body.Close()
-	var got struct {
-		DataDir string
-		Window  bool
-	}
+	var got struct{ DataDir string }
 	if r.StatusCode != 200 || json.NewDecoder(r.Body).Decode(&got) != nil {
-		return "", false
+		return ""
 	}
 	abs, _ := filepath.Abs(dataDir)
 	if !strings.EqualFold(got.DataDir, abs) {
-		return "", false
+		return ""
 	}
-	return inst.URL, got.Window
+	return inst.URL
 }
 
-// showAppWindow brings the app's open window to the front, or opens one when none is open.
-func showAppWindow(url, dataDir string, open bool) {
-	if !open || !focusAppWindow() {
+// showAppWindow brings the app's open window to the front, or opens one when none is open. It
+// looks for the window itself rather than asking the page's heartbeat: a minimized or covered
+// window's page beats only about once a minute (Chromium throttles its timers), so the heartbeat
+// would tell it closed and a second window would open.
+func showAppWindow(url, dataDir string) {
+	if !focusAppWindow(dataDir) {
 		openAppWindow(url, dataDir)
 	}
 }

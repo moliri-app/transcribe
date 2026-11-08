@@ -43,11 +43,19 @@ func browserCandidates() []string {
 	return out
 }
 
+// browserProfile is the browser profile the app's windows use, of their own for every data dir.
+func browserProfile(dataDir string) string {
+	if abs, err := filepath.Abs(dataDir); err == nil {
+		dataDir = abs
+	}
+	return filepath.Join(dataDir, "browser-profile")
+}
+
 // openAppWindow opens url in a chromeless Chromium window (no tabs or address
 // bar) using a profile kept in the data dir. It falls back to the default
 // browser when no Chromium-based browser is found.
 func openAppWindow(url, dataDir string) {
-	profile := filepath.Join(dataDir, "browser-profile")
+	profile := browserProfile(dataDir)
 	for _, exe := range browserCandidates() {
 		if _, err := os.Stat(exe); err != nil {
 			continue
