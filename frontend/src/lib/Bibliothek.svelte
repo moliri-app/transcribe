@@ -9,21 +9,25 @@
      korrigiert ist; ein Klick öffnet sie im Editor. Jede Aufnahme lässt sich benennen und
      verschlagworten (Beschriften.svelte); die Schlagworte stehen links als Bereiche. Ausgeblendete
      verschwinden aus allen Bereichen und stehen nur unter „Ausgeblendet“; so lässt sich auch in einem
-     verbundenen Ordner aufräumen, in dem Transcribe nichts löscht. Steht unter / und, für alte
-     Lesezeichen, unter /queue. -->
+     verbundenen Ordner aufräumen, in dem Transcribe nichts löscht. Jede Aufnahme, mit Transkript
+     oder ohne, lässt sich vorn in ihrer Zeile anhören; dann klebt unten eine Abspielleiste. Das
+     i-Symbol öffnet ihre Details (Dateiinfo.svelte). Steht unter / und, für alte Lesezeichen, unter
+     /queue. -->
 <script>
 	import { onMount, untrack } from 'svelte';
 	import Button from '$lib/moliri/components/ui/Button.svelte';
 	import AuftragsOptionen from '$lib/AuftragsOptionen.svelte';
 	import Beschriften from '$lib/Beschriften.svelte';
+	import Dateiinfo from '$lib/Dateiinfo.svelte';
+	import Abspielen from '$lib/live/Abspielen.svelte';
 	import { auftraege, geaendert } from '$lib/auftraege.svelte.js';
-	import { beschriften, dauer, einreihen, getJSON, post, upload, vorgaben } from '$lib/api.js';
+	import { beschriften, dauer, einreihen, getJSON, groesse, post, upload, vorgaben } from '$lib/api.js';
 	import { sprachname } from '$lib/live/stand.svelte.js';
 
 	/** @typedef {{ id: number, name: string }} Sprecher */
 	/** @typedef {{ duration: number, speakers: Sprecher[], preview: string, edits: number, clips: number, done: number }} Inhalt */
-	/** title: der Name in Transcribe (sonst der der Datei), file: der Name der Datei ohne Endung
-	 * @typedef {{ name: string, stem: string, title: string, file: string, tags: string[], hidden: boolean, video: boolean, added: number, summary?: Inhalt,
+	/** title: der Name in Transcribe (sonst der der Datei), file: der Name der Datei ohne Endung, size: Bytes
+	 * @typedef {{ name: string, stem: string, title: string, file: string, tags: string[], hidden: boolean, video: boolean, added: number, size: number, summary?: Inhalt,
 	 *   source: 'upload' | 'live' | 'folder', folder?: string, dir?: string, path?: string, sidecar?: boolean }} Aufnahme */
 	/** @typedef {{ id: string, audio: string, stem: string, status: string, progress: number, step: string | null,
 	 *   log: string[] | null, started: number | null, finished: number | null, error: string | null, note: string | null,
@@ -87,6 +91,13 @@
 	let beschrifter;
 	/** „Rückgängig“ neben der Meldung, solange sie steht */
 	let zurueck = $state(/** @type {{ meldung: string, tun: () => void } | null} */ (null));
+	/** die Aufnahme in der Abspielleiste, und ob sie gerade steht */
+	let spielt = $state(/** @type {Aufnahme | null} */ (null));
+	let pausiert = $state(true);
+	/** @type {Abspielen | undefined} */
+	let spieler = $state();
+	/** @type {Dateiinfo} */
+	let details;
 
 	function gemerkt() {
 		try {
@@ -418,6 +429,7 @@
 			await post(`/api/delete?name=${encodeURIComponent(a.name)}`);
 			meldung = `„${a.title}“ ist gelöscht.`;
 			gewaehlt = gewaehlt.filter((n) => n !== a.name);
+			if (spielt?.name === a.name) spielt = null;
 		} catch (e) {
 			meldung = /** @type {Error} */ (e).message;
 		} finally {
@@ -431,6 +443,20 @@
 	/** @param {Aufnahme} a */
 	function fragBeschriften(a) {
 		beschrifter.open(a);
+	}
+
+	/** Die Aufnahme anhören, oder anhalten und weiterspielen, wenn sie schon in der Leiste ist.
+	 * @param {Aufnahme} a */
+	function anhoeren(a) {
+		if (spielt?.name === a.name && spieler) spieler.umschalten();
+		else spielt = a;
+	}
+
+	/** Die Details spielen selbst ab; die Leiste geht dafür zu.
+	 * @param {Aufnahme} a */
+	function zeigeDetails(a) {
+		spielt = null;
+		details.open(a);
 	}
 
 	/** Gespeichert im Dialog: gleich zeigen, dann vom Server holen.
@@ -546,9 +572,27 @@
 	</li>
 {/snippet}
 
-<!-- je Aufnahme: Name und Schlagworte, dann Löschen oder, wo Transcribe nichts löscht (verbundene
-     Ordner), Ausblenden; unter „Ausgeblendet“ statt beidem Einblenden -->
+<!-- vorn in jeder Zeile: anhören, in Signalgrün, solange sie spielt -->
+{#snippet abspielknopf(/** @type {Aufnahme} */ a)}
+	{@const laeuft = spielt?.name === a.name && !pausiert}
+	<button
+		class="anhoeren"
+		class:laeuft
+		type="button"
+		title={laeuft ? 'Anhalten' : 'Anhören'}
+		aria-label="{a.title} {laeuft ? 'anhalten' : 'anhören'}"
+		onclick={() => anhoeren(a)}
+	>
+		{#if laeuft}<IconMaterialSymbolsPauseRounded aria-hidden="true" />{:else}<IconMaterialSymbolsPlayArrowRounded aria-hidden="true" />{/if}
+	</button>
+{/snippet}
+
+<!-- je Aufnahme: Details, Name und Schlagworte, dann Löschen oder, wo Transcribe nichts löscht
+     (verbundene Ordner), Ausblenden; unter „Ausgeblendet“ statt beidem Einblenden -->
 {#snippet knoepfe(/** @type {Aufnahme} */ a)}
+	<button class="neu-tx" type="button" title="Details zur Datei" aria-label="Details zu {a.title}" onclick={() => zeigeDetails(a)}>
+		<IconMaterialSymbolsInfoOutlineRounded aria-hidden="true" />
+	</button>
 	<button class="neu-tx" type="button" title="Name und Schlagworte" aria-label="Name und Schlagworte von {a.title}" onclick={() => fragBeschriften(a)}>
 		<IconMaterialSymbolsSellOutline aria-hidden="true" />
 	</button>
@@ -808,6 +852,7 @@
 						{#each neu as a (a.name)}
 							{@const wo = ort(a)}
 							<div class="aufnahme" class:gewaehlt={gewaehlt.includes(a.name)}>
+								{@render abspielknopf(a)}
 								<label title={a.path}>
 									<input type="checkbox" value={a.name} bind:group={gewaehlt} />
 									<span class="name">{a.title !== a.file ? a.title : a.source === 'folder' ? a.name.replace(/^~[0-9a-f]{10}~/, '') : a.name}</span>
@@ -816,7 +861,7 @@
 									{#if a.video}
 										<span class="art" title="Video"><IconMaterialSymbolsMovieOutlineRounded aria-hidden="true" /><span class="sr">Video</span></span>
 									{/if}
-									<span class="hinzu">{wann(a.added)}</span>
+									<span class="hinzu">{#if a.size}<span class="groesse">{groesse(a.size)}</span>{/if}{wann(a.added)}</span>
 								</label>
 								{@render knoepfe(a)}
 							</div>
@@ -896,6 +941,7 @@
 							{@const erster = s.speakers[0]}
 							{@const wo = ort(a)}
 							<li class="eintrag" class:arbeitet>
+								{@render abspielknopf(a)}
 								<div class="haupt">
 									<h3 class="titel">
 										<a href="/editor" data-sveltekit-reload onclick={() => imEditor(a.stem)} title="{a.title} im Editor öffnen">{a.title}</a>
@@ -957,7 +1003,21 @@
 		</div>
 	</div>
 
+	{#if spielt}
+		<div class="leiste" role="region" aria-label="Wiedergabe">
+			<div class="spielt">
+				<strong>{spielt.title}</strong>
+				{#if spielt.title !== spielt.file}<span class="leise">{spielt.file}</span>{/if}
+			</div>
+			<Abspielen bind:this={spieler} bind:pause={pausiert} datei={spielt.name} titel={spielt.title} sofort />
+			<button type="button" class="zu" aria-label="Wiedergabe schließen" title="Schließen" onclick={() => (spielt = null)}>
+				<IconMaterialSymbolsCloseRounded aria-hidden="true" />
+			</button>
+		</div>
+	{/if}
+
 	<Beschriften bind:this={beschrifter} vorhanden={alleSchlagworte} ondone={beschriftet} />
+	<Dateiinfo bind:this={details} oneditor={(a) => imEditor(a.stem)} />
 
 	<dialog class="rueckfrage" bind:this={rueckfrage} aria-labelledby="h-loeschen" onclose={() => (loeschen = null)}>
 		{#if loeschen}
@@ -1490,6 +1550,13 @@
 		color: hsl(var(--color-text-tertiary));
 		white-space: nowrap;
 	}
+	.groesse {
+		margin-right: 1rem;
+		font-variant-numeric: tabular-nums;
+	}
+	.aufnahme .anhoeren {
+		margin-left: 0.25rem;
+	}
 	.handeln {
 		display: flex;
 		flex-wrap: wrap;
@@ -1552,10 +1619,10 @@
 	.eintrag {
 		position: relative;
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) 11rem 6.5rem 8.5rem 6.5rem calc(3 * var(--hit));
+		grid-template-columns: var(--hit) minmax(0, 1fr) 11rem 6.5rem 8.5rem 6.5rem calc(4 * var(--hit));
 		align-items: center;
 		gap: 0.25rem 1rem;
-		padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+		padding: 0.75rem 0.75rem 0.75rem 0.875rem;
 		border-top: 1px solid hsl(var(--color-border-primary));
 		transition: background-color 0.15s;
 	}
@@ -1722,6 +1789,78 @@
 	.knoepfe-zeile {
 		display: flex;
 		justify-content: flex-end;
+	}
+
+	/* Anhören: ein Kreis mit Tintenrand vorn in der Zeile, über ihrem Link; spielt sie, Signalgrün
+	   wie der Abspielknopf im Editor */
+	.anhoeren {
+		position: relative;
+		z-index: 1;
+		flex: none;
+		width: var(--hit);
+		height: var(--hit);
+		display: grid;
+		place-items: center;
+		border-radius: 50%;
+		box-shadow: inset 0 0 0 1.5px hsl(var(--color-neutral-100) / 0.35);
+		color: hsl(var(--color-text-primary));
+		cursor: pointer;
+		transition: background-color 0.15s, box-shadow 0.15s, transform 0.15s;
+	}
+	.anhoeren:hover {
+		box-shadow: inset 0 0 0 1.5px hsl(var(--color-neutral-100));
+		transform: scale(1.05);
+	}
+	.anhoeren.laeuft {
+		background: hsl(var(--color-green-100));
+		box-shadow: inset 0 0 0 1px hsl(var(--color-neutral-100) / 0.25);
+		color: hsl(var(--color-neutral-100));
+	}
+	.anhoeren :global(svg) {
+		width: 1.625rem;
+		height: 1.625rem;
+	}
+
+	/* die Abspielleiste: klebt unten, ein Papierband über der Liste wie die Meldung oben */
+	.leiste {
+		position: sticky;
+		bottom: 1rem;
+		z-index: 20;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem 1.25rem;
+		width: min(56rem, 100%);
+		justify-self: center;
+		padding: 0.5rem 0.75rem 0.5rem 1.5rem;
+		border-radius: 2rem;
+		background: hsl(var(--color-bg-primary));
+		box-shadow:
+			0 1px 2px hsl(var(--color-neutral-100) / 0.08),
+			0 18px 40px -12px hsl(var(--color-neutral-100) / 0.35);
+	}
+	.spielt {
+		flex: 0 1 16rem;
+		min-width: 0;
+		display: grid;
+	}
+	.spielt > * {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+	.spielt .leise {
+		font-size: 0.875rem;
+	}
+	.leiste :global(.spieler) {
+		flex: 1;
+		max-width: none;
+	}
+	.leiste :global(.fehlt) {
+		flex: 1;
+	}
+	.leiste .zu {
+		flex: none;
+		margin: 0;
 	}
 
 	/* Schlagworte einer Aufnahme: Nebel-Marken wie die der Clips; in der Liste führt eine zu allen mit ihr */
@@ -1903,7 +2042,7 @@
 	/* schmaler: die Spalten der Liste rücken neben den Titel */
 	@media (max-width: 1100px) {
 		.eintrag {
-			grid-template-columns: minmax(0, 1fr) auto calc(3 * var(--hit));
+			grid-template-columns: var(--hit) minmax(0, 1fr) auto calc(4 * var(--hit));
 		}
 		.stimmen,
 		.arbeit,
@@ -1952,6 +2091,18 @@
 		.suche {
 			flex: 1 1 100%;
 			order: 3;
+		}
+		.leiste {
+			flex-wrap: wrap;
+			padding: 0.5rem 0.75rem 0.5rem 1.25rem;
+			border-radius: 1.25rem;
+		}
+		.spielt {
+			flex: 1 1 0;
+		}
+		.leiste :global(.spieler) {
+			order: 3;
+			flex: 1 1 100%;
 		}
 	}
 </style>

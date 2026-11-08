@@ -131,13 +131,13 @@ func cut(s string, n int) string {
 	return strings.TrimRight(s[:i], " ,;:") + " …"
 }
 
-// added is when the recording came into audio/ (unix seconds).
-func added(path string) int64 {
+// added is when the recording came into audio/ (unix seconds), and how big it is (bytes).
+func added(path string) (int64, int64) {
 	st, err := os.Stat(path)
 	if err != nil {
-		return time.Now().Unix()
+		return time.Now().Unix(), 0
 	}
-	return st.ModTime().Unix()
+	return st.ModTime().Unix(), st.Size()
 }
 
 // deleteRecording handles POST /api/delete?name=<file in audio/>: the recording goes from the
