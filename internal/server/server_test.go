@@ -165,6 +165,26 @@ func TestIndexSummary(t *testing.T) {
 	}
 }
 
+func TestFileInfo(t *testing.T) {
+	s, d := newServer(t)
+	var info struct {
+		File, Path     string
+		Size, Modified int64
+	}
+	w := do(s, "GET", "/api/fileinfo?name="+pyQuote("Über uns ä.mp3"), "", nil)
+	if err := json.Unmarshal(w.Body.Bytes(), &info); err != nil || w.Code != 200 {
+		t.Fatalf("fileinfo: %d %s", w.Code, w.Body)
+	}
+	if info.File != "Über uns ä.mp3" || info.Size != 10 || info.Modified == 0 || info.Path != filepath.Join(d, "audio", "Über uns ä.mp3") {
+		t.Errorf("fileinfo: %+v", info)
+	}
+	for _, name := range []string{"", "..%2Fsecret.mp3", "none.mp3", "talk"} {
+		if w := do(s, "GET", "/api/fileinfo?name="+name, "", nil); w.Code != 404 {
+			t.Errorf("name=%q: %d", name, w.Code)
+		}
+	}
+}
+
 func TestCut(t *testing.T) {
 	if got := cut("eins zwei drei vier", 12); got != "eins zwei …" {
 		t.Errorf("cut: %q", got)

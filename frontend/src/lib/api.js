@@ -113,6 +113,16 @@ export function dauer(s) {
 }
 
 /**
+ * Größe einer Datei: 12,4 MB.
+ * @param {number} b Bytes
+ */
+export function groesse(b) {
+	if (b < 1000) return `${b} Byte`;
+	const [n, e] = b < 1e6 ? [b / 1e3, 'KB'] : b < 1e9 ? [b / 1e6, 'MB'] : [b / 1e9, 'GB'];
+	return `${n.toLocaleString('de-DE', { maximumFractionDigits: n < 10 ? 1 : 0 })} ${e}`;
+}
+
+/**
  * Name, Schlagworte und Ausblenden einer Aufnahme (library.json); nur was angegeben ist, ändert
  * sich. Ein leerer Name gibt ihr den Namen ihrer Datei zurück. Gibt den gespeicherten Stand zurück.
  * @param {string} stem

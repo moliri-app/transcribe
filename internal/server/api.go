@@ -129,12 +129,13 @@ func (s *Server) indexItem(name, path string, shelved map[string]shelf.Entry) ma
 			"speed": rawOrNull(meta.Speed), "elapsed": rawOrNull(meta.Elapsed), "threads": rawOrNull(meta.Threads),
 		})
 	}
+	when, size := added(path)
 	item := map[string]any{
 		"name": name, "stem": stem, "title": cmp.Or(shelved[stem].Title, media.Title(stem)), "file": media.Title(stem),
 		"tags": append([]string{}, shelved[stem].Tags...), "hidden": shelved[stem].Hidden, "url": "audio/" + pyQuote(name),
 		"video":   media.HasVideo(path),
 		"engines": engines, "speakers": variants(rdir, stem, "speakers"), "events": variants(rdir, stem, "events"),
-		"added": added(path),
+		"added": when, "size": size,
 	}
 	if sum, ok := summarize(rdir); ok {
 		item["summary"] = sum

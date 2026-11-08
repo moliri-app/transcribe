@@ -133,6 +133,7 @@ func New(cfg Config) *Server {
 	m.HandleFunc("/api/folders/pick", s.folderPick)
 	m.HandleFunc("/api/delete", s.deleteRecording)
 	m.HandleFunc("/api/recording", s.shelve)
+	m.HandleFunc("/api/fileinfo", s.fileInfo)
 	m.HandleFunc("/api/annotations", s.annotations)
 	m.HandleFunc("/api/apply", s.apply)
 	m.HandleFunc("/api/live", s.liveSocket)

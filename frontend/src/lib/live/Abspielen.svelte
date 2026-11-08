@@ -4,26 +4,36 @@
 <!-- Die gespeicherte Datei einer Live-Aufnahme abspielen: Abspielknopf, Stelle als Schieberegler,
      Zeit und Länge, im Look der Player-Leiste des Editors, aber als Band im Kopf der Aufnahme.
      Die Aufnahme liest die Zeit, um den Satz zu markieren, der gerade läuft, und springt mit `ab`
-     zu einem Satz. -->
+     zu einem Satz. Die Bibliothek spielt damit jede Aufnahme an (ihre Abspielleiste und die Details
+     einer Datei). -->
 <script>
 	import { dauer } from '$lib/api.js';
 
-	/** zeit: die Stelle in Sekunden; gespielt: es lief schon einmal (dann zeigt die Aufnahme den Satz dazu)
-	 * @type {{ datei: string, zeit?: number, gespielt?: boolean }} */
-	let { datei, zeit = $bindable(0), gespielt = $bindable(false) } = $props();
+	/** datei: der Name unter /audio/; titel: wie die Seite sie nennt (sonst datei); zeit: die Stelle in
+	 * Sekunden; gespielt: es lief schon einmal (dann zeigt die Aufnahme den Satz dazu); pause: steht
+	 * gerade; sofort: beginnt gleich zu spielen
+	 * @type {{ datei: string, titel?: string, zeit?: number, gespielt?: boolean, pause?: boolean, sofort?: boolean }} */
+	let { datei, titel = datei, zeit = $bindable(0), gespielt = $bindable(false), pause = $bindable(true), sofort = false } = $props();
 
 	/** @type {HTMLAudioElement | undefined} */
 	let el = $state();
 	let laenge = $state(0);
-	let pause = $state(true);
-	let fehlt = $state(false);
+	/** warum sie sich nicht abspielen lässt: die Datei ist fort, oder ihr Format kennt der Browser nicht */
+	let fehlt = $state(/** @type {'' | 'fort' | 'format'} */ (''));
 
 	// eine andere Datei beginnt von vorn
 	$effect.pre(() => {
 		datei;
-		fehlt = gespielt = false;
+		fehlt = '';
+		gespielt = false;
 		zeit = laenge = 0;
 	});
+
+	/** Abspielen ging nicht: liegt die Datei noch da, kann der Browser ihr Format nicht lesen. */
+	async function fehler() {
+		const r = await fetch(`/audio/${encodeURIComponent(datei)}`, { method: 'HEAD' }).catch(() => null);
+		fehlt = r?.ok ? 'format' : 'fort';
+	}
 
 	$effect(() => {
 		if (!pause) gespielt = true;
@@ -39,15 +49,20 @@
 		el.play();
 	}
 
-	function umschalten() {
+	export function umschalten() {
 		if (el?.paused) el.play();
 		else el?.pause();
 	}
 </script>
 
-{#if fehlt}
+{#if fehlt === 'format'}
 	<p class="fehlt">
-		<IconMaterialSymbolsInfoOutlineRounded aria-hidden="true" />„{datei}“ lässt sich nicht abspielen. Wurde die Datei
+		<IconMaterialSymbolsInfoOutlineRounded aria-hidden="true" />„{titel}“ lässt sich hier nicht anhören: Dieses Format kann
+		das Fenster nicht abspielen. Transkribieren geht trotzdem.
+	</p>
+{:else if fehlt}
+	<p class="fehlt">
+		<IconMaterialSymbolsInfoOutlineRounded aria-hidden="true" />„{titel}“ lässt sich nicht abspielen. Wurde die Datei
 		verschoben oder gelöscht?
 	</p>
 {:else}
@@ -56,10 +71,11 @@
 			bind:this={el}
 			src="/audio/{encodeURIComponent(datei)}"
 			preload="metadata"
+			autoplay={sofort}
 			bind:currentTime={zeit}
 			bind:duration={laenge}
 			bind:paused={pause}
-			onerror={() => (fehlt = true)}
+			onerror={fehler}
 		></audio>
 		<button class="play" type="button" aria-label={pause ? 'Abspielen' : 'Anhalten'} onclick={umschalten}>
 			{#if pause}<IconMaterialSymbolsPlayArrowRounded aria-hidden="true" />{:else}<IconMaterialSymbolsPauseRounded

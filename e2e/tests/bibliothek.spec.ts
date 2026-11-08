@@ -154,6 +154,40 @@ test.describe('Bibliothek', () => {
     await expect(page.getByRole('button', { name: 'Zeitzeugen' })).toBeVisible();
   });
 
+  test('in eine Aufnahme ohne Transkript reinhören: unten erscheint die Abspielleiste', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Neue Aufnahme anhören' }).click();
+    const bar = page.getByRole('region', { name: 'Wiedergabe' });
+    await expect(bar).toContainText('Neue Aufnahme');
+    await expect(page.getByRole('button', { name: 'Neue Aufnahme anhalten' })).toBeVisible();
+    await expect.poll(() => bar.locator('audio').evaluate((a: HTMLAudioElement) => a.currentTime)).toBeGreaterThan(0);
+
+    // the same button pauses, another recording takes the bar over
+    await page.getByRole('button', { name: 'Neue Aufnahme anhalten' }).click();
+    await expect(bar.locator('audio')).toHaveJSProperty('paused', true);
+    await card(page, INTERVIEW).getByRole('button', { name: `${INTERVIEW} anhören` }).click();
+    await expect(bar).toContainText(INTERVIEW);
+    await bar.getByRole('button', { name: 'Wiedergabe schließen' }).click();
+    await expect(bar).toHaveCount(0);
+  });
+
+  test('die Details einer Aufnahme: Dateiname, Ort, Größe, Datum und Transkript', async ({ page, app }) => {
+    await page.goto('/');
+    // a recording without a transcript shows its size beside the date
+    await expect(page.getByRole('checkbox', { name: /^Neue Aufnahme\.mp3 58 KB/ })).toBeVisible();
+    await card(page, KORRIGIERT).getByRole('button', { name: `Details zu ${KORRIGIERT}` }).click();
+    const dlg = page.getByRole('dialog', { name: KORRIGIERT });
+    await expect(dlg).toContainText(`${KORRIGIERT}.mp3`);
+    await expect(dlg).toContainText(join(app.dataDir, 'audio'));
+    await expect(dlg).toContainText('211 KB');
+    await expect(dlg).toContainText('0:35');
+    await expect(dlg).toContainText('Geändert');
+    await expect(dlg).toContainText('1 Korrektur von Hand · 2 Clips');
+    await expect(dlg.getByRole('button', { name: 'Abspielen' })).toBeVisible();
+    await dlg.getByRole('button', { name: 'Schließen' }).click();
+    await expect(dlg).toBeHidden();
+  });
+
   test('eine Aufnahme ausblenden: sie steht nur noch unter „Ausgeblendet“, gelöscht ist nichts', async ({ page, app }) => {
     await page.goto('/');
     await expect(shelf(page)).toHaveCount(2);
