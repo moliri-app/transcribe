@@ -65,6 +65,7 @@ declare global {
   const IconMaterialSymbolsSaveOutlineRounded: typeof import('~icons/material-symbols/save-outline-rounded').default
   const IconMaterialSymbolsSearch: typeof import('~icons/material-symbols/search').default
   const IconMaterialSymbolsSearchRounded: typeof import('~icons/material-symbols/search-rounded').default
+  const IconMaterialSymbolsSellOutline: typeof import('~icons/material-symbols/sell-outline').default
   const IconMaterialSymbolsShareOutline: typeof import('~icons/material-symbols/share-outline').default
   const IconMaterialSymbolsSpeedRounded: typeof import('~icons/material-symbols/speed-rounded').default
   const IconMaterialSymbolsStopRounded: typeof import('~icons/material-symbols/stop-rounded').default
