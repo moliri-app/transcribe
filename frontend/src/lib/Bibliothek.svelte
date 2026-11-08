@@ -492,6 +492,13 @@
 		return dauer((j.finished || jetzt) - j.started);
 	}
 
+	// eine Meldung geht nach einer Weile von selbst, damit sie nicht über der Liste stehen bleibt
+	$effect(() => {
+		if (!meldung) return;
+		const t = setTimeout(() => (meldung = ''), 12000);
+		return () => clearTimeout(t);
+	});
+
 	// Nach dem Ablegen von Dateien im Fenster (Einrichtung.svelte) oder einer eigenen Aktion sofort neu laden
 	$effect(() => {
 		auftraege.stand;
@@ -586,7 +593,7 @@
 		</label>
 	</header>
 
-	<p class="meldung" role="status">
+	<p class="meldung" class:voll={!!meldung} role="status">
 		{meldung}
 		{#if zurueck && zurueck.meldung === meldung}
 			<button type="button" class="zurueck" onclick={() => zurueck?.tun()}>Rückgängig</button>
@@ -1046,6 +1053,22 @@
 	}
 	.meldung:empty {
 		margin-bottom: -1.5rem;
+	}
+	/* eine Meldung klebt unter der App-Leiste: wer weiter unten etwas tut (ausblenden), sieht sie
+	   samt „Rückgängig“, ohne hochzuscrollen */
+	.meldung.voll {
+		position: sticky;
+		top: 4.5rem;
+		z-index: 20;
+		justify-self: start;
+		max-width: 100%;
+		padding: 0.5rem 1.125rem;
+		border-radius: 1.5rem;
+		background: hsl(var(--color-bg-primary));
+		color: hsl(var(--color-text-primary));
+		box-shadow:
+			0 1px 2px hsl(var(--color-neutral-100) / 0.08),
+			0 14px 30px -10px hsl(var(--color-neutral-100) / 0.3);
 	}
 
 	.blatt {
