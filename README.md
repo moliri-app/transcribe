@@ -102,8 +102,9 @@ Editor. Darüber steht, was gerade transkribiert wird, und was noch kein Transkr
 sind nur die Sprecher (meist automatisch) und die Sprachen; die Zahl der Threads wählt die App selbst.
 
 Unter Windows zeigt die App ein Symbol im Infobereich der Taskleiste: Ein Klick öffnet das Fenster,
-ein Rechtsklick zeigt „Einstellungen“ und „Beenden“. Läuft die App schon, öffnet ein zweiter Start
-nur ihr Fenster.
+ein Rechtsklick zeigt „Einstellungen“ und „Beenden“, das mit der App auch ihre Fenster schließt.
+Läuft die App schon, holt ein zweiter Start ihr offenes Fenster nach vorn (auch ein minimiertes) und
+öffnet nur dann eins, wenn keins offen ist.
 
 ### Ordner verbinden
 
