@@ -33,6 +33,7 @@ Starke Automatik ohne Zutun, gekoppelt an eine Korrekturschicht, die von der Mas
 
 - Öffentlich als freie Software unter der Mozilla Public License 2.0 (Repo `github.com/moliri-app/transcribe`); Drittkomponenten und Modelle mit Lizenz und Namensnennung in `NOTICE`.
 - Oberflächensprache Deutsch.
+- Bibliothek: Aufnahmen benennen, verschlagworten und ausblenden, ohne die Datei anzufassen (`library.json` im Datenordner); so auch in verbundenen Ordnern, in denen Transcribe nichts löscht.
 - Korrekturen: Sprecher benennen, zusammenlegen, Sprache pro Sprecher oder Stelle, Text ersetzen und einfügen, automatisch gespeichert, rückgängig machbar.
 - Clips: Stellen mit Titel und Schlagworten markieren, einzeln oder nacheinander abspielen, einzeln oder als Zusammenschnitt exportieren (Audio, Video, Text). Das Transkript geht als Text, Untertitel (VTT) oder HTML hinaus.
 - Oberfläche mit Build-Schritt: SvelteKit (Svelte 5, `adapter-static`) in `frontend/`, `pnpm build` schreibt nach `web/dist`, das per `go:embed` in die Binärdatei kommt; `build.ps1` baut erst das Frontend, dann Go. Die HTTP-API ist dieselbe wie zur Zeit der statischen Seiten.

@@ -6,7 +6,9 @@ package server
 
 import (
 	"cmp"
+	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -20,6 +22,7 @@ import (
 	"github.com/moliri-app/transcribe/fileutil"
 	"github.com/moliri-app/transcribe/internal/media"
 	"github.com/moliri-app/transcribe/internal/queue"
+	"github.com/moliri-app/transcribe/internal/shelf"
 	"github.com/moliri-app/transcribe/model"
 )
 
@@ -185,5 +188,51 @@ func (s *Server) removeRecording(name string) error {
 	}
 	rdir := filepath.Join(s.resultsDir(), stem)
 	summaries.Delete(rdir)
+	_ = shelf.Forget(s.cfg.DataDir, stem)
 	return os.RemoveAll(rdir)
+}
+
+// shelve handles POST /api/recording?stem=<stem> with {"title", "tags", "hidden"}, each optional:
+// what people say about a recording in the library. An empty title gives the file's name back.
+// Nothing happens to the recording itself, so this works in connected folders too.
+func (s *Server) shelve(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.NotFound(w, r)
+		return
+	}
+	if !allowedPost(r) {
+		http.Error(w, "forbidden", 403)
+		return
+	}
+	stem := r.URL.Query().Get("stem")
+	if !validStem(stem) || media.FindMedia(s.cfg.DataDir, stem) == "" {
+		fail(w, 404, "unknown recording")
+		return
+	}
+	var in struct {
+		Title  *string   `json:"title"`
+		Tags   *[]string `json:"tags"`
+		Hidden *bool     `json:"hidden"`
+	}
+	if err := json.NewDecoder(io.LimitReader(r.Body, 64<<10)).Decode(&in); err != nil {
+		fail(w, 400, "bad request")
+		return
+	}
+	e, err := shelf.Update(s.cfg.DataDir, stem, func(e *shelf.Entry) {
+		if in.Title != nil {
+			e.Title = *in.Title
+		}
+		if in.Tags != nil {
+			e.Tags = *in.Tags
+		}
+		if in.Hidden != nil {
+			e.Hidden = *in.Hidden
+		}
+	})
+	if err != nil {
+		fail(w, 500, err.Error())
+		return
+	}
+	writeJSON(w, 200, map[string]any{"ok": true, "title": cmp.Or(e.Title, media.Title(stem)),
+		"tags": append([]string{}, e.Tags...), "hidden": e.Hidden})
 }

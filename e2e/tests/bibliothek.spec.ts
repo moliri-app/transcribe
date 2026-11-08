@@ -125,4 +125,55 @@ test.describe('Bibliothek', () => {
     // its finished job went from the queue with it
     expect(app.json('results/_queue.json').jobs.map((j: { audio: string }) => j.audio)).not.toContain(`${KORRIGIERT}.mp3`);
   });
+
+  test('eine Aufnahme benennen und verschlagworten; die Schlagworte stehen links als Bereiche', async ({ page, app }) => {
+    await page.goto('/');
+    await card(page, KORRIGIERT).getByRole('button', { name: `Name und Schlagworte von ${KORRIGIERT}` }).click();
+    const dlg = page.getByRole('dialog', { name: 'Name und Schlagworte' });
+    await expect(dlg).toContainText(`Die Datei heißt weiter „${KORRIGIERT}“`);
+    await dlg.getByRole('textbox', { name: 'Name' }).fill('Herr Berger erzählt');
+    await dlg.getByRole('textbox', { name: 'Schlagworte' }).fill('Zeitzeugen, Papierfabrik');
+    await dlg.getByRole('button', { name: 'Speichern' }).click();
+    await expect(dlg).toBeHidden();
+
+    const berger = card(page, 'Herr Berger erzählt');
+    await expect(berger).toHaveCount(1);
+    await expect(berger.getByRole('button', { name: 'Zeitzeugen' })).toBeVisible();
+    expect(app.json('library.json').recordings[KORRIGIERT]).toEqual({ title: 'Herr Berger erzählt', tags: ['Zeitzeugen', 'Papierfabrik'] });
+
+    // a tag is an area of the library, with only its recordings
+    const areas = page.getByRole('navigation', { name: 'Bereiche der Bibliothek' });
+    await areas.getByRole('button', { name: /^Zeitzeugen/ }).click();
+    await expect(page.getByRole('heading', { level: 2, name: 'Zeitzeugen' })).toBeVisible();
+    await expect(shelf(page)).toHaveCount(1);
+
+    // the editor names it so, with its tags beside the title
+    await berger.getByRole('link').click();
+    await expect(page.getByRole('combobox', { name: 'Aufnahme wählen' }).getByRole('option', { name: 'Herr Berger erzählt', exact: true }))
+      .toHaveJSProperty('selected', true);
+    await expect(page.getByRole('button', { name: 'Zeitzeugen' })).toBeVisible();
+  });
+
+  test('eine Aufnahme ausblenden: sie steht nur noch unter „Ausgeblendet“, gelöscht ist nichts', async ({ page, app }) => {
+    await page.goto('/');
+    await expect(shelf(page)).toHaveCount(2);
+    await card(page, KORRIGIERT).getByRole('button', { name: `Name und Schlagworte von ${KORRIGIERT}` }).click();
+    await page.getByRole('dialog', { name: 'Name und Schlagworte' }).getByRole('button', { name: 'Ausblenden' }).click();
+    await expect(page.getByRole('status')).toContainText(`„${KORRIGIERT}“ ist ausgeblendet.`);
+    await expect(shelf(page)).toHaveCount(1);
+    expect(existsSync(join(app.dataDir, 'results', KORRIGIERT, '_final.json'))).toBe(true);
+
+    // undo right away
+    await page.getByRole('status').getByRole('button', { name: 'Rückgängig' }).click();
+    await expect(shelf(page)).toHaveCount(2);
+
+    await card(page, KORRIGIERT).getByRole('button', { name: `Name und Schlagworte von ${KORRIGIERT}` }).click();
+    await page.getByRole('dialog', { name: 'Name und Schlagworte' }).getByRole('button', { name: 'Ausblenden' }).click();
+    await page.getByRole('navigation', { name: 'Bereiche der Bibliothek' }).getByRole('button', { name: /^Ausgeblendet/ }).click();
+    await expect(shelf(page)).toHaveCount(1);
+    await card(page, KORRIGIERT).getByRole('button', { name: `${KORRIGIERT} wieder einblenden` }).click();
+    // nothing hidden any more: back to all recordings
+    await expect(page.getByRole('navigation', { name: 'Bereiche der Bibliothek' }).getByRole('button', { name: /^Ausgeblendet/ })).toHaveCount(0);
+    await expect(shelf(page)).toHaveCount(2);
+  });
 });

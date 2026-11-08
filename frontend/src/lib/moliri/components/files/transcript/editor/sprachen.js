@@ -12,7 +12,7 @@
 // Ported from transcribe-go (frontend/src/lib/editor/sprachen.js); the names follow the UI language.
 // Languages for speakers and passages: code, name and other names one searches by („Platt“ finds
 // Plattdeutsch). The machine recognises again only what Whisper knows; the same list is in the
-// transcribe service (server/transcribe/internal/annotate/languages.go). Everything else, dialects
+// transcribe service (annotate/languages.go of its engine module). Everything else, dialects
 // above all, is noted and otherwise stays as the machine heard it.
 
 import { getLocale } from '$lib/moliri/texte.js';

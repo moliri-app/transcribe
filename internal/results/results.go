@@ -20,6 +20,7 @@ import (
 	"github.com/moliri-app/transcribe/export"
 	"github.com/moliri-app/transcribe/fileutil"
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/shelf"
 	"github.com/moliri-app/transcribe/model"
 )
 
@@ -147,5 +148,5 @@ func Export(dataDir, stem, format string) ([]byte, string, string, error) {
 		return nil, "", "", err
 	}
 	body, ctype, err := export.Render(format, final, ann, "")
-	return body, ctype, media.Title(stem) + "." + format, err
+	return body, ctype, shelf.FileName(dataDir, stem) + "." + format, err
 }

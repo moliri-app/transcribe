@@ -12,7 +12,7 @@
 // Ported from transcribe-go (frontend/src/lib/editor/model.js); UI texts through paraglide.
 // Das Datenmodell des Editors ohne Oberfläche: aus _final.json (Maschine) und _annotations.json
 // (Menschen) entstehen die Wörter, wie sie im Text stehen. Die Regeln für Korrekturen und Zeitanker
-// sind dieselben wie in server/transcribe/internal/annotate.
+// sind dieselben wie im Paket annotate des Engine-Moduls (server/transcribe/vendor).
 
 import * as m from '$lib/moliri/texte.js';
 import { getLocale } from '$lib/moliri/texte.js';
