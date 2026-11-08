@@ -436,9 +436,9 @@
 	/** Gespeichert im Dialog: gleich zeigen, dann vom Server holen.
 	 * @param {{ stem: string }} a @param {{ title: string, tags: string[], hidden: boolean }} stand */
 	function beschriftet(a, stand) {
-		const vorher = aufnahmen?.find((x) => x.stem === a.stem);
+		const warVersteckt = aufnahmen?.find((x) => x.stem === a.stem)?.hidden;
 		for (const x of aufnahmen ?? []) if (x.stem === a.stem) Object.assign(x, stand);
-		if (vorher && stand.hidden !== vorher.hidden) sichtbarGemacht(a.stem, stand.title, stand.hidden);
+		if (warVersteckt !== undefined && stand.hidden !== warVersteckt) sichtbarGemacht(a.stem, stand.title, stand.hidden);
 		else meldung = `„${stand.title}“ ist gespeichert.`;
 		ladeAufnahmen();
 	}

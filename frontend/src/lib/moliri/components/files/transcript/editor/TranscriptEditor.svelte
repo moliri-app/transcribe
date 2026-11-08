@@ -13,7 +13,10 @@
      Zusammenlegen) und Clips (Titel, Schlagworte, Abspielen, einzeln oder als Zusammenschnitt
      exportieren). Gespeichert wird von selbst; in Moliri wendet der Server Zusammenlegen gleich an und
      erkennt eine festgelegte Sprache von selbst neu. Kann der Speicher das nicht (transcribe-go, das
-     diesen Editor spiegelt), steht oben „Neu berechnen“. -->
+     diesen Editor spiegelt), steht oben „Neu berechnen“. Mit playerInHead (transcribe-go, wo der
+     Editor die ganze Seite ist) steht das Abspielen als Tintenpult im Kopf, über der Zeitleiste, die
+     es bewegt, und Suche, Rückgängig, Neu berechnen, Export, Vollbild und Bedienung als Werkzeugleiste
+     unten. -->
 <script>
 	import * as m from '$lib/moliri/texte.js';
 	import { fmt, presetName, searchItems } from './model.js';
@@ -30,8 +33,10 @@
 	 *  compact: little room (Moliri's file window), so a one-line head and a smaller timeline until
 	 *  fullscreen; false where the editor is the whole page (transcribe-go).
 	 *  title: shown above the figures in the head (transcribe-go: the choice of recording).
-	 *  @type {{ ed: import('./editor.svelte.js').Editor, onrerun?: () => void, rerunOpen?: boolean, start?: { time: number | null, query: string } | null, compact?: boolean, title?: import('svelte').Snippet }} */
-	let { ed, onrerun, rerunOpen = false, start = null, compact = true, title } = $props();
+	 *  playerInHead: the player in the head, the tools in a bar at the bottom (transcribe-go); else
+	 *  the tools in the head and the player as the bar at the bottom.
+	 *  @type {{ ed: import('./editor.svelte.js').Editor, onrerun?: () => void, rerunOpen?: boolean, start?: { time: number | null, query: string } | null, compact?: boolean, title?: import('svelte').Snippet, playerInHead?: boolean }} */
+	let { ed, onrerun, rerunOpen = false, start = null, compact = true, title, playerInHead = false } = $props();
 
 	let help = $state(false);
 	/** @type {HTMLButtonElement | undefined} */ let helpBtn = $state();
@@ -161,7 +166,87 @@
 	}}
 />
 
-<div class="editor" class:vollbild={fullscreen} class:eng bind:this={root}>
+{#snippet tools()}
+	<label class="suche">
+		<IconMaterialSymbolsSearch aria-hidden="true" />
+		<input type="search" placeholder={m.transcript_search()} aria-label={m.transcript_search()} bind:value={query} oninput={() => (hitIndex = 0)} onkeydown={searchKey} />
+		{#if query.trim()}
+			<span class="treffer" aria-live="polite">{hits.length ? m.transcript_search_hits({ current: hitIndex + 1, total: hits.length }) : m.transcript_search_none()}</span>
+			<button type="button" class="pfeil" title={m.transcript_search_prev()} aria-label={m.transcript_search_prev()} disabled={!hits.length} onclick={() => moveHit(-1)}
+				><IconMaterialSymbolsKeyboardArrowUpRounded /></button
+			>
+			<button type="button" class="pfeil" title={m.transcript_search_next()} aria-label={m.transcript_search_next()} disabled={!hits.length} onclick={() => moveHit(1)}
+				><IconMaterialSymbolsKeyboardArrowDownRounded /></button
+			>
+		{/if}
+	</label>
+	{#if ed.canEdit}
+		<button
+			class="hilfe-btn"
+			title={m.te_undo_hint()}
+			disabled={!ed.canUndo && !ed.editing}
+			onpointerdown={(e) => e.preventDefault()}
+			onclick={() => ed.undo()}
+		>
+			<IconMaterialSymbolsUndoRounded /><span class="lbl">{m.te_undo()}</span>
+		</button>
+		{#if ed.recomputes}
+			<!-- Sprache neu erkennen und Zusammenlegen rechnet der Server; alles andere wirkt sofort -->
+			<button
+				class="hilfe-btn rechnen"
+				class:vorgemerkt={ed.pending}
+				title={ed.pending ? m.te_recompute_due_hint() : m.te_recompute_hint()}
+				disabled={!ed.pending || ed.computing}
+				aria-busy={ed.computing}
+				onclick={() => ed.recompute()}
+			>
+				{#if ed.computing}<IconEosIconsLoading /><span class="lbl">{m.te_recompute_busy()}</span>{:else}<IconMaterialSymbolsAutorenewRounded /><span class="lbl"
+						>{m.te_recompute()}</span
+					>{/if}
+			</button>
+		{/if}
+		{#if onrerun}
+			<button class="hilfe-btn" title={m.te_rerun_hint()} aria-expanded={rerunOpen} onclick={() => onrerun()}>
+				<IconMaterialSymbolsAutorenewRounded /><span class="lbl">{m.te_rerun()}</span>
+			</button>
+		{/if}
+	{/if}
+	<div class="export" bind:this={exportBox}>
+		<button
+			class="hilfe-btn"
+			aria-label={m.te_export_hint()}
+			title={m.te_export_hint()}
+			aria-expanded={exportOpen}
+			aria-controls="export-formate"
+			onclick={() => (exportOpen = !exportOpen)}
+		>
+			<IconMaterialSymbolsDownloadRounded /><span class="lbl">{m.transcript_export()}</span>
+		</button>
+		{#if exportOpen}
+			<ul class="formate" id="export-formate" aria-label={m.te_formats()}>
+				{#each FORMATS as [f, label, note] (f)}
+					<li>
+						<button
+							type="button"
+							onclick={() => {
+								exportOpen = false;
+								ed.exportTranscript(f);
+							}}><b>{label}</b><span>{note}</span></button
+						>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</div>
+	<button class="hilfe-btn rund" title={fullscreen ? m.te_fullscreen_exit() : m.te_fullscreen()} aria-label={fullscreen ? m.te_fullscreen_exit() : m.te_fullscreen()} aria-pressed={fullscreen} onclick={toggleFullscreen}>
+		{#if fullscreen}<IconMaterialSymbolsCloseFullscreenRounded />{:else}<IconMaterialSymbolsOpenInFullRounded />{/if}
+	</button>
+	<button class="hilfe-btn rund" bind:this={helpBtn} title={m.te_help()} aria-label={m.te_help()} aria-expanded={help} aria-controls="hilfe" onclick={() => (help = !help)}>
+		<IconMaterialSymbolsHelpOutlineRounded />
+	</button>
+{/snippet}
+
+<div class="editor" class:vollbild={fullscreen} class:eng class:player-oben={playerInHead} bind:this={root}>
 	<header class="kopf">
 		<div class="titel">
 			{@render title?.()}
@@ -177,83 +262,11 @@
 				{/if}
 			</div>
 		</div>
-		<label class="suche">
-			<IconMaterialSymbolsSearch aria-hidden="true" />
-			<input type="search" placeholder={m.transcript_search()} aria-label={m.transcript_search()} bind:value={query} oninput={() => (hitIndex = 0)} onkeydown={searchKey} />
-			{#if query.trim()}
-				<span class="treffer" aria-live="polite">{hits.length ? m.transcript_search_hits({ current: hitIndex + 1, total: hits.length }) : m.transcript_search_none()}</span>
-				<button type="button" class="pfeil" title={m.transcript_search_prev()} aria-label={m.transcript_search_prev()} disabled={!hits.length} onclick={() => moveHit(-1)}
-					><IconMaterialSymbolsKeyboardArrowUpRounded /></button
-				>
-				<button type="button" class="pfeil" title={m.transcript_search_next()} aria-label={m.transcript_search_next()} disabled={!hits.length} onclick={() => moveHit(1)}
-					><IconMaterialSymbolsKeyboardArrowDownRounded /></button
-				>
-			{/if}
-		</label>
-		{#if ed.canEdit}
-			<button
-				class="hilfe-btn"
-				title={m.te_undo_hint()}
-				disabled={!ed.canUndo && !ed.editing}
-				onpointerdown={(e) => e.preventDefault()}
-				onclick={() => ed.undo()}
-			>
-				<IconMaterialSymbolsUndoRounded /><span class="lbl">{m.te_undo()}</span>
-			</button>
-			{#if ed.recomputes}
-				<!-- Sprache neu erkennen und Zusammenlegen rechnet der Server; alles andere wirkt sofort -->
-				<button
-					class="hilfe-btn rechnen"
-					class:vorgemerkt={ed.pending}
-					title={ed.pending ? m.te_recompute_due_hint() : m.te_recompute_hint()}
-					disabled={!ed.pending || ed.computing}
-					aria-busy={ed.computing}
-					onclick={() => ed.recompute()}
-				>
-					{#if ed.computing}<IconEosIconsLoading /><span class="lbl">{m.te_recompute_busy()}</span>{:else}<IconMaterialSymbolsAutorenewRounded /><span class="lbl"
-							>{m.te_recompute()}</span
-						>{/if}
-				</button>
-			{/if}
-			{#if onrerun}
-				<button class="hilfe-btn" title={m.te_rerun_hint()} aria-expanded={rerunOpen} onclick={() => onrerun()}>
-					<IconMaterialSymbolsAutorenewRounded /><span class="lbl">{m.te_rerun()}</span>
-				</button>
-			{/if}
+		{#if playerInHead}
+			<Player {ed} inHead />
+		{:else}
+			{@render tools()}
 		{/if}
-		<div class="export" bind:this={exportBox}>
-			<button
-				class="hilfe-btn"
-				aria-label={m.te_export_hint()}
-				title={m.te_export_hint()}
-				aria-expanded={exportOpen}
-				aria-controls="export-formate"
-				onclick={() => (exportOpen = !exportOpen)}
-			>
-				<IconMaterialSymbolsDownloadRounded /><span class="lbl">{m.transcript_export()}</span>
-			</button>
-			{#if exportOpen}
-				<ul class="formate" id="export-formate" aria-label={m.te_formats()}>
-					{#each FORMATS as [f, label, note] (f)}
-						<li>
-							<button
-								type="button"
-								onclick={() => {
-									exportOpen = false;
-									ed.exportTranscript(f);
-								}}><b>{label}</b><span>{note}</span></button
-							>
-						</li>
-					{/each}
-				</ul>
-			{/if}
-		</div>
-		<button class="hilfe-btn rund" title={fullscreen ? m.te_fullscreen_exit() : m.te_fullscreen()} aria-label={fullscreen ? m.te_fullscreen_exit() : m.te_fullscreen()} aria-pressed={fullscreen} onclick={toggleFullscreen}>
-			{#if fullscreen}<IconMaterialSymbolsCloseFullscreenRounded />{:else}<IconMaterialSymbolsOpenInFullRounded />{/if}
-		</button>
-		<button class="hilfe-btn rund" bind:this={helpBtn} title={m.te_help()} aria-label={m.te_help()} aria-expanded={help} aria-controls="hilfe" onclick={() => (help = !help)}>
-			<IconMaterialSymbolsHelpOutlineRounded />
-		</button>
 	</header>
 
 	<Zeitleiste {ed} />
@@ -263,7 +276,11 @@
 		<Seitenspalte {ed} />
 	</main>
 
-	<Player {ed} />
+	{#if playerInHead}
+		<footer class="werkzeug">{@render tools()}</footer>
+	{:else}
+		<Player {ed} />
+	{/if}
 	<!-- schwebend, aber im Editor: sie brauchen dessen Farben (und erscheinen im Vollbild) -->
 	<SprecherMenue {ed} />
 	<Bereich {ed} />
@@ -642,6 +659,41 @@
 		color: var(--ink-3);
 	}
 
+	/* Player im Kopf: links Titel und Stand, rechts das Tintenpult, das bei wenig Breite darunter rückt */
+	.player-oben .kopf {
+		flex-wrap: wrap;
+		gap: 0.5rem 1.5rem;
+	}
+	.player-oben .titel {
+		flex: 0 1 30rem;
+	}
+	/* die Werkzeuge unten: Papier mit Haarlinie, die Suche vorn und breit, Export und Bedienung rechts */
+	.werkzeug {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.5rem 1rem 0.5rem 1.25rem;
+		background: var(--paper);
+		border-top: 1px solid var(--rule);
+		position: relative;
+		z-index: 5;
+	}
+	.werkzeug .suche {
+		flex: 0 1 26rem;
+	}
+	.werkzeug .export {
+		margin-left: auto;
+	}
+	/* die Formate gehen nach oben auf, über der Leiste */
+	.werkzeug .formate {
+		top: auto;
+		bottom: calc(100% + 0.5rem);
+	}
+	.player-oben .hilfe {
+		top: auto;
+		bottom: 4.5rem;
+	}
+
 	.arbeit {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) 21.25rem;
@@ -720,12 +772,13 @@
 			grid-template-columns: 1fr;
 			grid-template-rows: minmax(0, 1fr) auto;
 		}
-		.hilfe-btn:not(.rund) {
+		/* im Kopf wird es eng; die Leiste unten hat Platz für die Namen bis 720px */
+		.kopf .hilfe-btn:not(.rund) {
 			width: var(--hit);
 			padding: 0;
 			justify-content: center;
 		}
-		.hilfe-btn .lbl {
+		.kopf .hilfe-btn .lbl {
 			position: absolute;
 			width: 1px;
 			height: 1px;
@@ -734,9 +787,25 @@
 		}
 	}
 	@media (max-width: 720px) {
-		.kopf {
+		.kopf,
+		.werkzeug {
 			flex-wrap: wrap;
 			padding: 0.5rem 0.75rem;
+		}
+		.werkzeug .suche {
+			flex: 1 1 100%;
+		}
+		.werkzeug .hilfe-btn:not(.rund) {
+			width: var(--hit);
+			padding: 0;
+			justify-content: center;
+		}
+		.werkzeug .hilfe-btn .lbl {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip: rect(0 0 0 0);
 		}
 		.meta {
 			font-size: 0.875rem;

@@ -9,15 +9,17 @@
 <!-- Ported from transcribe-go (frontend/src/lib/editor/Player.svelte). -->
 <!-- Der Player als feste Leiste am unteren Rand, wie bei einem Musikspieler: oben die Stelle in der
      Aufnahme als Schieberegler, darunter Springen, Abspielen, Zeit, wer gerade spricht, der
-     Sprecherfilter und rechts Geschwindigkeit und Mitlaufen. -->
+     Sprecherfilter und rechts Geschwindigkeit und Mitlaufen. Mit inHead steht er als Tintenpult im
+     Kopf des Editors, alles auf einer Zeile: Springen und Abspielen, die Zeit, die Stelle als Spur
+     zwischen gespielter und ganzer Länge, wer spricht, Tempo und Mitlaufen. -->
 <script>
 	import * as m from '$lib/moliri/texte.js';
 	import { getLocale } from '$lib/moliri/texte.js';
 	import { fmt, itemAt } from './model.js';
 	import { spkColor } from './editor.svelte.js';
 
-	/** @type {{ ed: import('./editor.svelte.js').Editor }} */
-	let { ed } = $props();
+	/** @type {{ ed: import('./editor.svelte.js').Editor, inHead?: boolean }} */
+	let { ed, inHead = false } = $props();
 
 	const RATES = [0.75, 1, 1.25, 1.5, 2].map((v) => [v, `${v.toLocaleString(getLocale())}×`]);
 
@@ -34,7 +36,7 @@
 	const pct = $derived(Math.min(100, (ed.time / d) * 100));
 </script>
 
-<div class="player" role="group" aria-label={m.te_player()}>
+{#snippet stelle()}
 	<input
 		class="stelle"
 		type="range"
@@ -47,6 +49,10 @@
 		aria-valuetext={m.te_player_of({ time: fmt(ed.time), total: fmt(d) })}
 		oninput={(e) => ed.seek(+e.currentTarget.value, false)}
 	/>
+{/snippet}
+
+<div class="player" class:kopf={inHead} role="group" aria-label={m.te_player()}>
+	{#if !inHead}{@render stelle()}{/if}
 	<div class="reihe">
 		<div class="transport">
 			<button class="rund" aria-label={m.te_player_back()} title="{m.te_player_back()} (←)" onclick={() => ed.skip(-5)}>
@@ -59,12 +65,23 @@
 				<IconMaterialSymbolsForward5Rounded />
 			</button>
 		</div>
-		<div class="jetzt">
-			<span class="zeit"><b>{fmt(ed.time)}</b> / {fmt(d)}</span>
-			{#if now != null}
-				<span class="wer" style:--c={spkColor(now)}><span class="pkt" aria-hidden="true"></span>{ed.spkName(now)}</span>
-			{/if}
-		</div>
+		{#if inHead}
+			<div class="spur">
+				<span class="zeit"><b>{fmt(ed.time)}</b></span>
+				{@render stelle()}
+				<span class="zeit">{fmt(d)}</span>
+			</div>
+			<span class="wer" class:leer={now == null} style:--c={now == null ? 'transparent' : spkColor(now)}
+				><span class="pkt" aria-hidden="true"></span>{now == null ? '' : ed.spkName(now)}</span
+			>
+		{:else}
+			<div class="jetzt">
+				<span class="zeit"><b>{fmt(ed.time)}</b> / {fmt(d)}</span>
+				{#if now != null}
+					<span class="wer" style:--c={spkColor(now)}><span class="pkt" aria-hidden="true"></span>{ed.spkName(now)}</span>
+				{/if}
+			</div>
+		{/if}
 		{#if ed.loop}
 			<span class="filter">
 				<IconMaterialSymbolsRepeatRounded />
@@ -348,6 +365,45 @@
 		width: 1.25rem;
 		height: 1.25rem;
 		margin: 0;
+	}
+
+	/* im Kopf: ein Pult aus Tinte, eine Zeile; die Stelle ist eine gerundete Spur zwischen den Zeiten */
+	.player.kopf {
+		flex: 1 1 36rem;
+		min-width: 0;
+		border-radius: 2.25rem;
+		z-index: 6;
+	}
+	.kopf .reihe {
+		gap: 0.5rem 1rem;
+		min-height: 0;
+		padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+	}
+	.kopf .transport {
+		gap: 0.125rem;
+	}
+	.spur {
+		flex: 1 1 10rem;
+		min-width: 8rem;
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+	}
+	.kopf .stelle {
+		flex: 1;
+		min-width: 0;
+		width: auto;
+		border-radius: 3px;
+	}
+	.kopf .stelle::-webkit-slider-thumb {
+		opacity: 1;
+	}
+	.kopf .wer {
+		flex: 0 1 8rem;
+		min-width: 0;
+	}
+	.kopf .wer.leer {
+		visibility: hidden;
 	}
 
 	@media (max-width: 720px) {
