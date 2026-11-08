@@ -206,9 +206,12 @@ func main() {
 
 	if !*noBrowser || *background {
 		tr = startTray(trayActions{
-			open:     func() { showAppWindow(url, *data, srv.WindowOpen()) },
+			open:     func() { showAppWindow(url, *data) },
 			settings: func() { openAppWindow(url+"/settings", *data) },
-			quit:     stop,
+			quit: func() {
+				closeAppWindows(*data) // a window left open would only show that the app is gone
+				stop()
+			},
 
 			dictate:       dict.toggle,
 			cancelDictate: dict.cancel,

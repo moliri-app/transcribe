@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -292,4 +293,26 @@ func read(t *testing.T, path string) string {
 		t.Fatal(err)
 	}
 	return string(b)
+}
+
+// TestLatestURLIsTheModulesRepo keeps the update looking where the releases are: the repository
+// the module is named after (an earlier name of it found nothing, and the app said it was current).
+func TestLatestURLIsTheModulesRepo(t *testing.T) {
+	b, err := os.ReadFile(filepath.Join("..", "..", "go.mod"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var module string
+	for _, line := range strings.Split(string(b), "\n") {
+		if m, ok := strings.CutPrefix(strings.TrimSpace(line), "module "); ok {
+			module = strings.TrimSpace(m)
+		}
+	}
+	repo, ok := strings.CutPrefix(module, "github.com/")
+	if !ok {
+		t.Fatalf("module %q is not on GitHub", module)
+	}
+	if want := "https://api.github.com/repos/" + repo + "/releases/latest"; LatestURL != want {
+		t.Errorf("LatestURL = %q, want %q", LatestURL, want)
+	}
 }

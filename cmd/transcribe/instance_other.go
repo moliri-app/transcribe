@@ -31,4 +31,7 @@ func lockInstance(dataDir string) (release func(), ok bool) {
 }
 
 // focusAppWindow brings the app's open window to the front; there is no telling which it is here.
-func focusAppWindow() bool { return false }
+func focusAppWindow(dataDir string) bool { return false }
+
+// closeAppWindows would close the app's open windows; there is no telling which they are here.
+func closeAppWindows(dataDir string) {}
