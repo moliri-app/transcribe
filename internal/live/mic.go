@@ -191,37 +191,69 @@ func recordSystem(ctx context.Context, piece func([]float32)) error {
 
 // Mixing: the microphone sets the pace. The system sound waits in a buffer of mixDelay before it
 // is added, so pieces that come a little early or late on either side leave no gaps. When the
-// microphone stalls (a busy computer), the system sound piles up to mixMax and is all added once
-// the microphone catches up; only beyond that is the oldest dropped. When the system sound stalls,
-// silence stands in for it until the buffer has filled again.
+// system sound stalls, silence stands in for it until the buffer has filled again. When the
+// microphone stalls (a Bluetooth headset that delivers nothing for a while, sound lost on a busy
+// computer), the system sound piles
+// up; once it is mixLag ahead, it sets the pace itself, with silence for the microphone, until the
+// microphone gives sound again. So nothing of what the others in a meeting say is lost.
 const (
-	mixDelay = SR / 5  // 200 ms
-	mixMax   = SR * 10 // 10 s
+	mixDelay = SR / 5 // 200 ms
+	mixLag   = SR     // 1 s
 )
 
 func mixed(ctx context.Context, device string, piece func(pcm, mic, system []float32)) error {
+	mic := func(ctx context.Context, piece func([]float32)) error { return recordMic(ctx, device, piece) }
+	return mix(ctx, mic, recordSystem, piece)
+}
+
+// mix mixes what mic records (in 100 ms pieces) and what system records (in pieces of any size).
+func mix(ctx context.Context, mic, system func(context.Context, func([]float32)) error, piece func(pcm, mic, system []float32)) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	var mu sync.Mutex
+	var out sync.Mutex // one piece handed out at a time, in order
+	var mu sync.Mutex  // guards what follows
 	var buf []float32
 	filling := true
+	alone := 0 // samples of the system sound handed out without the microphone since it last gave sound
 	sysErr := make(chan error, 1)
 	go func() {
-		err := recordSystem(ctx, func(pcm []float32) {
+		err := system(ctx, func(pcm []float32) {
 			mu.Lock()
 			buf = append(buf, pcm...)
-			if len(buf) > mixMax {
-				log.Printf("live: the microphone fell behind the system audio; %.1f s of it dropped", float64(len(buf)-mixDelay)/SR)
-				buf = append(buf[:0], buf[len(buf)-mixDelay:]...)
-			}
 			mu.Unlock()
+			if !out.TryLock() {
+				return // the microphone hands out a piece just now
+			}
+			defer out.Unlock()
+			for {
+				mu.Lock()
+				if len(buf) < mixDelay+SR/10 || alone == 0 && len(buf) <= mixDelay+mixLag {
+					mu.Unlock()
+					return
+				}
+				if alone == 0 {
+					log.Printf("live: the microphone fell %d s behind the system audio (it gave no sound); the system audio goes on with silence for it", mixLag/SR)
+				}
+				sys := slices.Clone(buf[:SR/10])
+				buf = buf[SR/10:]
+				alone += len(sys)
+				filling = false
+				mu.Unlock()
+				piece(sys, make([]float32, len(sys)), sys)
+			}
 		})
 		sysErr <- err
 		cancel() // without the system sound the recording ends
 	}()
-	err := recordMic(ctx, device, func(mic []float32) {
+	err := mic(ctx, func(mic []float32) {
+		out.Lock()
+		defer out.Unlock()
 		sys := make([]float32, len(mic))
 		mu.Lock()
+		if alone > 0 {
+			log.Printf("live: the microphone gives sound again; %.1f s of the system audio went on without it", float64(alone)/SR)
+			alone = 0
+		}
 		if filling && len(buf) >= mixDelay {
 			filling = false
 		}
@@ -238,7 +270,11 @@ func mixed(ctx context.Context, device string, piece func(pcm, mic, system []flo
 		piece(pcm, mic, sys)
 	})
 	cancel()
-	return cmp.Or(err, <-sysErr)
+	err = cmp.Or(err, <-sysErr)
+	if alone > 0 {
+		log.Printf("live: the microphone gave no sound up to the end; %.1f s of the system audio went on without it", float64(alone)/SR)
+	}
+	return err
 }
 
 // chunks gathers pieces of any size into 100 ms ones.

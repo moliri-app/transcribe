@@ -71,7 +71,8 @@ const (
 	vtLPWSTR          = 31
 	streamLoopback    = 0x00020000
 	bufferSilent      = 0x2
-	bufferDuration    = 2_000_000 // 200 ms in 100 ns
+	captureBuffer     = 20_000_000 // 2 s in 100 ns; see recordDevice
+	renderBuffer      = 2_000_000  // 200 ms
 	rpcEChangedMode   = 0x80010106
 	errNotFound       = 0x80070490
 	deviceInvalidated = 0x88890004
@@ -343,7 +344,7 @@ func deviceState() (stamp, def string, ok bool) {
 }
 
 // audioClient opens an audio client on dev in shared mode, in the device's own format.
-func audioClient(dev *comObj, flags uintptr) (client *comObj, format []byte, err error) {
+func audioClient(dev *comObj, flags, duration uintptr) (client *comObj, format []byte, err error) {
 	if err := check(syscall.SyscallN(dev.fn(mActivate), uintptr(unsafe.Pointer(dev)), uintptr(unsafe.Pointer(&iidIAudioClient)),
 		clsctxAll, 0, uintptr(unsafe.Pointer(&client)))); err != nil {
 		return nil, nil, err
@@ -356,7 +357,7 @@ func audioClient(dev *comObj, flags uintptr) (client *comObj, format []byte, err
 	defer coTaskMemFree.Call(uintptr(unsafe.Pointer(wf)))
 	extra := binary.LittleEndian.Uint16(unsafe.Slice(wf, 18)[16:]) // cbSize
 	format = append([]byte{}, unsafe.Slice(wf, 18+int(extra))...)
-	if err := check(syscall.SyscallN(client.fn(mInitialize), uintptr(unsafe.Pointer(client)), 0, flags, bufferDuration, 0,
+	if err := check(syscall.SyscallN(client.fn(mInitialize), uintptr(unsafe.Pointer(client)), 0, flags, duration, 0,
 		uintptr(unsafe.Pointer(wf)), 0)); err != nil {
 		client.release()
 		return nil, nil, err
@@ -400,7 +401,10 @@ func sampleFormat(f []byte) (channels, rate int, kind sampleKind, err error) {
 	return channels, rate, kind, nil
 }
 
-// recordDevice records the device pick gives (of flow) until ctx ends or pick gives another.
+// recordDevice records the device pick gives (of flow) until ctx ends or pick gives another. The
+// device's buffer holds 2 s: sound the app has not read by then is lost. With 200 ms, a computer
+// busy with recognizing speech on its processor read a Bluetooth headset too late for a fifth of
+// its sound, so that the microphone fell further and further behind the system sound.
 func recordDevice(ctx context.Context, enum *comObj, flow uintptr, pick func() (*comObj, string, error), piece func([]float32)) error {
 	dev, id, err := pick()
 	if err != nil {
@@ -411,7 +415,7 @@ func recordDevice(ctx context.Context, enum *comObj, flow uintptr, pick func() (
 	if flow == eRender {
 		flags = streamLoopback
 	}
-	client, format, err := audioClient(dev, flags)
+	client, format, err := audioClient(dev, flags, captureBuffer)
 	if err != nil {
 		return err
 	}
@@ -442,6 +446,7 @@ func recordDevice(ctx context.Context, enum *comObj, flow uintptr, pick func() (
 	defer syscall.SyscallN(client.fn(mStop), uintptr(unsafe.Pointer(client)))
 
 	rs := newResampler(rate, SR)
+	gaps := gapLog{name: friendlyName(dev), read: time.Now(), last: time.Now()}
 	tick := time.NewTicker(10 * time.Millisecond)
 	defer tick.Stop()
 	for ticks := 1; ; ticks++ {
@@ -453,6 +458,7 @@ func recordDevice(ctx context.Context, enum *comObj, flow uintptr, pick func() (
 		if quiet != nil {
 			quiet.fill()
 		}
+		gaps.tick()
 		for {
 			var n uint32
 			if err := check(syscall.SyscallN(capt.fn(mGetNextPacketSize), uintptr(unsafe.Pointer(capt)), uintptr(unsafe.Pointer(&n)))); err != nil {
@@ -467,6 +473,7 @@ func recordDevice(ctx context.Context, enum *comObj, flow uintptr, pick func() (
 				uintptr(unsafe.Pointer(&frames)), uintptr(unsafe.Pointer(&flags)), 0, 0)); err != nil {
 				return err
 			}
+			gaps.packet()
 			var mono []float32
 			if flags&bufferSilent != 0 || data == nil {
 				mono = make([]float32, frames)
@@ -491,6 +498,35 @@ func recordDevice(ctx context.Context, enum *comObj, flow uintptr, pick func() (
 	}
 }
 
+// gapLog writes to the log when a device stops delivering sound and when it goes on, and when the
+// app read it so late (a busy computer) that its sound may be lost: what the log should tell when
+// parts of a recording are missing.
+type gapLog struct {
+	name       string
+	read, last time.Time // when the device was last read, and when sound last came
+	quiet      bool      // logged that none came for a while
+}
+
+func (g *gapLog) tick() {
+	now := time.Now()
+	if late := now.Sub(g.read); late > time.Second {
+		log.Printf("live: %q was not read for %.1f s (a busy computer); beyond %d s its sound is lost", g.name, late.Seconds(), captureBuffer/10_000_000)
+	}
+	g.read = now
+	if !g.quiet && now.Sub(g.last) > time.Second {
+		g.quiet = true
+		log.Printf("live: %q has delivered no sound for 1 s", g.name)
+	}
+}
+
+func (g *gapLog) packet() {
+	if g.quiet {
+		g.quiet = false
+		log.Printf("live: %q delivers sound again, after %.1f s without", g.name, time.Since(g.last).Seconds())
+	}
+	g.last = time.Now()
+}
+
 // silence plays silence on an output device, so that its loopback keeps running.
 type silence struct {
 	client, render *comObj
@@ -498,7 +534,7 @@ type silence struct {
 }
 
 func playSilence(dev *comObj) (*silence, error) {
-	client, _, err := audioClient(dev, 0)
+	client, _, err := audioClient(dev, 0, renderBuffer)
 	if err != nil {
 		return nil, err
 	}
