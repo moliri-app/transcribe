@@ -76,20 +76,70 @@ type scan struct {
 }
 
 var (
-	scanMu sync.Mutex
+	scanMu sync.Mutex // guards scans, rescans and forgets
 	scans  = map[string]scan{}
+	// rescans are the data dirs whose listing is being renewed in the background
+	rescans = map[string]bool{}
+	// forgets counts the calls of Forget per data dir, so that a listing begun before one is not kept
+	forgets = map[string]int{}
+	// walkMu lets one walk of the folders run at a time: who waits for a listing takes the one
+	// another just made
+	walkMu sync.Mutex
 )
 
-// LinkedIn lists the recordings in the connected folders, also in their subfolders. A listing is
-// kept for two seconds: the library and the queue ask often.
+// fresh is how long a listing is given as it is. An older one is still given at once (a walk of a
+// large folder, such as Downloads, can take seconds while a transcription keeps the computer
+// busy, and the library, the queue and every file the pages load ask for it), and renewed in the
+// background for the next one to ask.
+const fresh = 2 * time.Second
+
+// LinkedIn lists the recordings in the connected folders, also in their subfolders. Only the first
+// listing, or the first after the folders changed or Forget, waits for the folders to be walked.
 func LinkedIn(dataDir string) []Linked {
 	folders := prefs.Load(dataDir).Folders
 	key := strings.Join(folders, "\x00")
 	scanMu.Lock()
-	defer scanMu.Unlock()
-	if s, ok := scans[dataDir]; ok && s.key == key && time.Since(s.at) < 2*time.Second {
+	if s, ok := scans[dataDir]; ok && s.key == key {
+		if time.Since(s.at) >= fresh && !rescans[dataDir] {
+			rescans[dataDir] = true
+			go func() {
+				defer func() {
+					scanMu.Lock()
+					delete(rescans, dataDir)
+					scanMu.Unlock()
+				}()
+				rescan(dataDir, folders, key, time.Time{})
+			}()
+		}
+		scanMu.Unlock()
 		return s.items
 	}
+	scanMu.Unlock()
+	return rescan(dataDir, folders, key, time.Now())
+}
+
+// rescan walks folders and keeps the listing, unless Forget was called meanwhile. With since, it
+// first takes a listing made by another walk that ended after since.
+func rescan(dataDir string, folders []string, key string, since time.Time) []Linked {
+	walkMu.Lock()
+	defer walkMu.Unlock()
+	scanMu.Lock()
+	s, ok := scans[dataDir]
+	gen := forgets[dataDir]
+	scanMu.Unlock()
+	if ok && s.key == key && !since.IsZero() && !s.at.Before(since) {
+		return s.items
+	}
+	items := walkFolders(dataDir, folders)
+	scanMu.Lock()
+	if forgets[dataDir] == gen {
+		scans[dataDir] = scan{time.Now(), key, items}
+	}
+	scanMu.Unlock()
+	return items
+}
+
+func walkFolders(dataDir string, folders []string) []Linked {
 	abs, _ := filepath.Abs(dataDir)
 	var items []Linked
 	seen := map[string]bool{}
@@ -123,14 +173,15 @@ func LinkedIn(dataDir string) []Linked {
 			return nil
 		})
 	}
-	scans[dataDir] = scan{time.Now(), key, items}
 	return items
 }
 
-// Forget drops the kept listing of the connected folders, after they changed.
+// Forget drops the kept listing of the connected folders, after they changed: the next one walks
+// them again.
 func Forget(dataDir string) {
 	scanMu.Lock()
 	delete(scans, dataDir)
+	forgets[dataDir]++
 	scanMu.Unlock()
 }
 

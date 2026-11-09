@@ -21,7 +21,7 @@
 	import Dateiinfo from '$lib/Dateiinfo.svelte';
 	import Abspielen from '$lib/live/Abspielen.svelte';
 	import { auftraege, geaendert } from '$lib/auftraege.svelte.js';
-	import { beschriften, dauer, einreihen, getJSON, groesse, post, upload, vorgaben } from '$lib/api.js';
+	import { beschriften, dauer, einreihen, einzeln, getJSON, groesse, post, upload, verbindung, vorgaben } from '$lib/api.js';
 	import { sprachname } from '$lib/live/stand.svelte.js';
 
 	/** @typedef {{ id: number, name: string }} Sprecher */
@@ -258,8 +258,7 @@
 		if (!['alle', 'upload', 'live'].includes(bereich) && !ordner.folders.some((o) => o.path === bereich)) zeige('alle');
 	}
 
-	/** Abfragen der Warteschlange hintereinander ohne Antwort */
-	let fehlschlaege = 0;
+	const server = verbindung();
 	let fragt = false;
 
 	async function ladeAuftraege() {
@@ -269,11 +268,10 @@
 		const vorher = laufend.length;
 		try {
 			jobs = (await getJSON('/api/queue', { signal: AbortSignal.timeout(8000) })).jobs;
-			fehlschlaege = 0;
+			server.ok();
 			offline = false;
-		} catch {
-			// eine einzelne verlorene Antwort ist noch kein Ausfall; erst die zweite in Folge zählt
-			offline = ++fehlschlaege >= 2;
+		} catch (e) {
+			offline = server.fehler(e);
 			return;
 		} finally {
 			fragt = false;
@@ -548,8 +546,9 @@
 			jetzt = Date.now() / 1000;
 		}, 2000);
 		// neue Aufnahmen in den Ordnern, und was andere dort transkribiert oder korrigiert haben
+		const nachsehen = einzeln(ladeAufnahmen);
 		const o = setInterval(() => {
-			if (ordner.folders.length && !document.hidden) ladeAufnahmen();
+			if (ordner.folders.length && !document.hidden) nachsehen();
 		}, 10000);
 		return () => {
 			clearInterval(t);

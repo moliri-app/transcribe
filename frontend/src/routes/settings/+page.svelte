@@ -14,7 +14,7 @@
 	import Toggle from '$lib/moliri/components/ui/Toggle.svelte';
 	import AuftragsOptionen from '$lib/AuftragsOptionen.svelte';
 	import { einrichtung } from '$lib/Einrichtung.svelte';
-	import { ENGINES, getJSON, post, sprecherAus } from '$lib/api.js';
+	import { ENGINES, einzeln, getJSON, post, sprecherAus, verbindung } from '$lib/api.js';
 	import { ladeUpdate, update, updateAktion, versionText, vorherigeVersion } from '$lib/update.svelte.js';
 
 	/** @typedef {{ key: string, path: string, size: number }} Ordner */
@@ -196,19 +196,18 @@
 	/** pending: wartet in „GPU einrichten“ auf die NVIDIA-Bibliotheken */
 	const imGang = (/** @type {Komponente | null} */ c) => c?.state === 'downloading' || c?.state === 'pending';
 
-	/** Abfragen hintereinander ohne Antwort: eine einzelne verlorene ist noch kein Ausfall */
-	let fehlschlaege = 0;
+	const server = verbindung();
 
 	async function ladeStand() {
 		const vorher = nvidia?.state;
 		try {
 			stand = await getJSON('/api/settings', { signal: AbortSignal.timeout(8000) });
-			fehlschlaege = 0;
+			server.ok();
 			offline = false;
 			// sind die Bibliotheken fertig, gleich neu prüfen statt mit der gemerkten Antwort
 			if (vorher === 'downloading' && nvidia?.state !== 'downloading') ladeGpu(true);
-		} catch {
-			offline = ++fehlschlaege >= 2;
+		} catch (e) {
+			offline = server.fehler(e);
 		}
 	}
 
@@ -695,8 +694,8 @@
 				aktuell = angeklickt = ziel;
 				el.scrollIntoView();
 			});
-		const s = setInterval(ladeStand, 2000);
-		const g = setInterval(ladeGpu, 4000);
+		const s = setInterval(einzeln(ladeStand), 2000);
+		const g = setInterval(einzeln(() => ladeGpu()), 4000);
 		return () => {
 			clearInterval(s);
 			clearInterval(g);
