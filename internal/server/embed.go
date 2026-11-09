@@ -8,12 +8,15 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"sync/atomic"
 	"unicode/utf8"
 
 	"github.com/moliri-app/transcribe/embed"
+	"github.com/moliri-app/transcribe/internal/live"
 	"github.com/moliri-app/transcribe/models"
 )
 
@@ -105,18 +108,32 @@ func (s *Server) embedTexts(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	loaded := s.cfg.Embed.Loaded()
+	chars := 0
+	for _, t := range body.Texts {
+		chars += utf8.RuneCountInString(t)
+	}
+	call := s.Live.Call(live.KindEmbed, clientName(r), embed.ModelID+" ("+string(embed.Dtype)+")", embedRequest(body.Texts, body.Kind),
+		live.Fact{Label: "Texte", Value: fmt.Sprintf("%d, zusammen %d Zeichen", len(body.Texts), chars)})
+	if !loaded && s.cfg.Embed.Installed() {
+		call.Status("Lädt das Modell …")
+	}
 	vectors, err := s.cfg.Embed.Embed(r.Context(), body.Texts, body.Kind)
 	switch {
 	case errors.Is(err, embed.ErrNotInstalled):
+		call.End("", errors.New("Das Modell ist noch nicht heruntergeladen"))
 		fail(w, http.StatusServiceUnavailable, "Das Modell für die Suche nach Bedeutung ist in Transcribe noch nicht geladen")
 		return
 	case err != nil:
 		if r.Context().Err() != nil {
+			call.End("", errGone)
 			return // the caller went away
 		}
+		call.End("", err)
 		fail(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	call.End(embedResponse(vectors), nil, live.Fact{Label: "Modell", Value: map[bool]string{true: "war schon geladen", false: "wurde erst geladen"}[loaded]})
 	writeJSON(w, 200, map[string]any{"ok": true, "model": embed.ModelID, "dtype": embed.Dtype, "dim": embed.Dim, "vectors": vectors})
 }
 
@@ -143,4 +160,38 @@ func (s *Server) embedDownload(w http.ResponseWriter, r *http.Request) {
 		}()
 	}
 	writeJSON(w, 200, s.embedInfo())
+}
+
+// embedRequest is what the Live page shows of a request: the kind and the texts, one a line.
+func embedRequest(texts []string, kind embed.Kind) string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "Art: %s\n", kind)
+	for i, t := range texts {
+		fmt.Fprintf(&b, "\n%d. %s", i+1, strings.ReplaceAll(t, "\n", " "))
+	}
+	return b.String()
+}
+
+// embedResponse is what the Live page shows of the vectors: how many, and how each begins.
+func embedResponse(vectors [][]float32) string {
+	var b strings.Builder
+	dim := 0
+	if len(vectors) > 0 {
+		dim = len(vectors[0])
+	}
+	fmt.Fprintf(&b, "%d Vektoren mit je %d Zahlen\n", len(vectors), dim)
+	for i, v := range vectors {
+		fmt.Fprintf(&b, "\n%d. [", i+1)
+		for k, x := range v[:min(len(v), 6)] {
+			if k > 0 {
+				b.WriteString(", ")
+			}
+			fmt.Fprintf(&b, "%.4f", x)
+		}
+		if len(v) > 6 {
+			b.WriteString(", …")
+		}
+		b.WriteString("]")
+	}
+	return b.String()
 }

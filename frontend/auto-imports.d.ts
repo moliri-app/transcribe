@@ -12,6 +12,7 @@ declare global {
   const IconMaterialSymbolsAddRounded: typeof import('~icons/material-symbols/add-rounded').default
   const IconMaterialSymbolsArrowBackRounded: typeof import('~icons/material-symbols/arrow-back-rounded').default
   const IconMaterialSymbolsArrowForwardRounded: typeof import('~icons/material-symbols/arrow-forward-rounded').default
+  const IconMaterialSymbolsAutoAwesomeOutlineRounded: typeof import('~icons/material-symbols/auto-awesome-outline-rounded').default
   const IconMaterialSymbolsAutorenewRounded: typeof import('~icons/material-symbols/autorenew-rounded').default
   const IconMaterialSymbolsBackHandOutlineRounded: typeof import('~icons/material-symbols/back-hand-outline-rounded').default
   const IconMaterialSymbolsCableRounded: typeof import('~icons/material-symbols/cable-rounded').default
@@ -48,6 +49,7 @@ declare global {
   const IconMaterialSymbolsLibraryMusicOutlineRounded: typeof import('~icons/material-symbols/library-music-outline-rounded').default
   const IconMaterialSymbolsLinkOffRounded: typeof import('~icons/material-symbols/link-off-rounded').default
   const IconMaterialSymbolsMailOutlineRounded: typeof import('~icons/material-symbols/mail-outline-rounded').default
+  const IconMaterialSymbolsManageSearchRounded: typeof import('~icons/material-symbols/manage-search-rounded').default
   const IconMaterialSymbolsMemoryOutlineRounded: typeof import('~icons/material-symbols/memory-outline-rounded').default
   const IconMaterialSymbolsMicOutlineRounded: typeof import('~icons/material-symbols/mic-outline-rounded').default
   const IconMaterialSymbolsMicRounded: typeof import('~icons/material-symbols/mic-rounded').default

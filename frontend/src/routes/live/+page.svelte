@@ -2,7 +2,8 @@
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
 <!-- Live: Sprache sofort als Text. Links alle Aufnahmen (von Hand auf dieser Seite gestartet oder per
-     API von einem Programm), durchsuchbar, gefiltert und sortiert; rechts die gewählte groß; unten die
+     API von einem Programm) und die Anfragen von Programmen an Texterkennung und Sprachmodelle,
+     durchsuchbar, gefiltert und sortiert; rechts die gewählte groß; unten die
      Aufnahmeleiste mit Aufnehmen, Pegeln und „Einrichten“. „Programme verbinden“ hat eine eigene
      Ansicht. Den Stand schickt der Server über /api/live/events (internal/live). -->
 <script>
@@ -10,11 +11,12 @@
 	import { MediaQuery } from 'svelte/reactivity';
 	import { afterNavigate, replaceState } from '$app/navigation';
 	import { page } from '$app/state';
+	import Anfrage from '$lib/live/Anfrage.svelte';
 	import Aufnahme from '$lib/live/Aufnahme.svelte';
 	import Aufnahmeleiste from '$lib/live/Aufnahmeleiste.svelte';
 	import Liste from '$lib/live/Liste.svelte';
 	import Verbinden from '$lib/live/Verbinden.svelte';
-	import { live } from '$lib/live/stand.svelte.js';
+	import { anfrage, live } from '$lib/live/stand.svelte.js';
 
 	/** @type {string | null} */
 	let gewaehlt = $state(page.url.searchParams.get('aufnahme'));
@@ -92,6 +94,8 @@
 
 		{#if verbinden}
 			<Verbinden onzurueck={schmal.current ? () => (liste = true) : undefined} />
+		{:else if notiz && anfrage(notiz)}
+			<Anfrage n={notiz} onzurueck={schmal.current ? () => (liste = true) : undefined} />
 		{:else if notiz}
 			<Aufnahme n={notiz} {q} onzurueck={schmal.current ? () => (liste = true) : undefined} />
 		{:else if live.notizen}

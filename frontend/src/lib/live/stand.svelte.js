@@ -9,10 +9,14 @@ import { langName } from '$lib/moliri/components/files/transcript/editor/sprache
 
 /** source: woher der Satz kam, wenn die Aufnahme Mikrofon und Systemaudio mischt
  * @typedef {{ text: string, start: number, end: number, source?: 'mic' | 'system' }} Zeile */
-/** source: was die App aufgenommen hat; fehlt, wenn ein Programm den Ton geschickt hat
- * @typedef {{ id: string, kind: 'audio' | 'mic' | 'dauer' | 'diktat', client?: string, started: string, ended?: string,
+/** source: was die App aufgenommen hat; fehlt, wenn ein Programm den Ton geschickt hat. Eine Anfrage an
+ * einen Dienst (ocr, filter, embed; internal/live/calls.go) hat statt Sätzen model, request, response und
+ * facts; partial sagt, was sie gerade tut.
+ * @typedef {{ id: string, kind: 'audio' | 'mic' | 'dauer' | 'diktat' | Dienst, client?: string, started: string, ended?: string,
  *   lines: Zeile[], partial?: string, partialSource?: 'mic' | 'system', audio?: string, language?: string,
- *   source?: Quelle, error?: string, loading?: boolean, waiting?: boolean, transient?: boolean }} Notiz */
+ *   source?: Quelle, error?: string, loading?: boolean, waiting?: boolean, transient?: boolean,
+ *   model?: string, request?: string, response?: string, facts?: { label: string, value: string }[] }} Notiz */
+/** @typedef {keyof typeof DIENSTE} Dienst */
 /** @typedef {'mic' | 'system' | 'both'} Quelle */
 /** input: was mit dem Mikrofon nicht stimmt, solange die Aufnahme läuft (internal/live/input.go)
  * @typedef {{ running: boolean, source?: Quelle, dauer?: string, listeners: number, input?: 'narrow' | 'quiet' }} Mikrofon */
@@ -59,6 +63,17 @@ export const LOESCHEN = /** @type {const} */ ([
 /** so heißen die Quellen über den Sätzen einer gemischten Aufnahme */
 export const LINIE = { mic: 'Mikrofon', system: 'Systemaudio' };
 
+/** die Dienste, die Programme außer der Live-Transkription nutzen */
+export const DIENSTE = /** @type {const} */ ({
+	ocr: 'Texterkennung',
+	filter: 'Filter in eigenen Worten',
+	embed: 'Suche nach Bedeutung'
+});
+
+/** Eine Anfrage an einen Dienst (Texterkennung, Sprachmodell, …), keine Aufnahme.
+ * @param {Notiz} n */
+export const anfrage = (n) => n.kind in DIENSTE;
+
 /** Von Hand: auf dieser Seite gestartet oder mit dem Tastenkürzel diktiert. Sonst kam die Anfrage über die
  * API von einem Programm.
  * @param {Notiz} n */
@@ -77,7 +92,33 @@ export function wer(n) {
 /** was das Programm getan hat
  * @param {Notiz} n */
 export function art(n) {
-	return { audio: 'hat Audio geschickt', mic: 'hat mithören lassen', dauer: 'auf dieser Seite aufgenommen', diktat: 'per Tastenkürzel diktiert' }[n.kind];
+	return {
+		audio: 'hat Audio geschickt',
+		mic: 'hat mithören lassen',
+		dauer: 'auf dieser Seite aufgenommen',
+		diktat: 'per Tastenkürzel diktiert',
+		ocr: 'hat Text in einem Bild lesen lassen',
+		filter: 'hat das Sprachmodell gefragt',
+		embed: 'hat Texte für die Suche nach Bedeutung umwandeln lassen'
+	}[n.kind];
+}
+
+/** Worum es bei einer Anfrage ging, in einer Zeile: die Frage, der erste Text, oder was gelesen wurde.
+ * @param {Notiz} n */
+export function worum(n) {
+	const zeilen = (n.request ?? '').split('\n');
+	const nach = (/** @type {RegExp} */ muster) => zeilen.find((z) => muster.test(z))?.replace(muster, '') ?? '';
+	if (n.kind === 'filter') return nach(/^Frage: /);
+	if (n.kind === 'embed') return nach(/^1\. /);
+	return (n.response ?? '').replace(/\s+/g, ' ').trim();
+}
+
+/** wie lange eine Anfrage dauerte, genauer als die Länge einer Aufnahme: „0,42 s“, „12 s“, „2:05 min“
+ * @param {number} s */
+export function sekunden(s) {
+	if (s < 10) return `${s.toLocaleString('de-DE', { minimumFractionDigits: s < 1 ? 2 : 1, maximumFractionDigits: s < 1 ? 2 : 1 })} s`;
+	if (s < 60) return `${Math.round(s)} s`;
+	return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')} min`;
 }
 
 /** wie lange die Aufnahme lief, in Sekunden

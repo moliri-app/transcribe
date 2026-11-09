@@ -313,13 +313,7 @@ func (h *Hub) newNote(kind, client string) *Note {
 	h.seq++
 	now := time.Now()
 	n := &Note{ID: fmt.Sprintf("%s-%d", now.Format(idTime), h.seq), Kind: kind, Client: client, Started: now, Lines: []Line{}, Loading: true, Transient: transient}
-	h.notes = append(h.notes, n)
-	h.byID[n.ID] = n
-	if len(h.notes) > keepNotes {
-		old := h.notes[0]
-		h.notes = h.notes[1:]
-		delete(h.byID, old.ID)
-	}
+	h.add(n)
 	h.active++
 	h.sendNote(n)
 	return n

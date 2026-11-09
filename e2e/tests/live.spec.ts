@@ -178,4 +178,32 @@ test.describe('Live', () => {
     await ansagen.click();
     await stimme.getByRole('button', { name: 'Obeya entfernen' }).click();
   });
+  test('what programs ask of the language model and search by meaning is listed with request, answer and model', async ({ page }) => {
+    // the test data has neither model: both requests are refused, and listed with why
+    const frage = await page.request.post('/api/filter?name=Moliri', {
+      data: { text: 'Gemälde aus dem 19. Jahrhundert', catalog: 'titel: Titel (Text)\njahr: Datierung (Zahl)', fields: ['titel', 'jahr'] },
+    });
+    expect(frage.status()).toBe(503);
+    const suche = await page.request.post('/api/embed?name=Moliri', { data: { texts: ['Zinnteller', 'Gravur'], kind: 'document' } });
+    expect(suche.status()).toBe(503);
+
+    await page.goto('/live');
+    await page.getByRole('radio', { name: /^KI & OCR/ }).check({ force: true });
+    await expect(recordings(page)).toHaveCount(2);
+    await expect(page.getByRole('status').filter({ hasText: '2 Anfragen' })).toBeVisible();
+    await recordings(page).filter({ hasText: 'Gemälde aus dem 19. Jahrhundert' }).getByRole('button').click();
+
+    const anfrage = page.getByRole('region', { name: 'Anfrage und Antwort' });
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Filter in eigenen Worten');
+    await expect(page.getByText('Qwen 2.5 7B Instruct').first()).toBeVisible();
+    await expect(anfrage.getByRole('alert')).toHaveText('Das Sprachmodell ist noch nicht heruntergeladen');
+    // the request holds the question and the prompt the model would have read
+    await expect(anfrage).toContainText('Frage: Gemälde aus dem 19. Jahrhundert');
+    await expect(anfrage).toContainText('jahr: Datierung (Zahl)');
+
+    await recordings(page).filter({ hasText: 'Zinnteller' }).getByRole('button').click();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Suche nach Bedeutung');
+    await expect(anfrage).toContainText('2. Gravur');
+    await expect(anfrage.getByText('2, zusammen 16 Zeichen')).toBeVisible();
+  });
 });

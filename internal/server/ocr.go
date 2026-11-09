@@ -5,11 +5,14 @@
 package server
 
 import (
+	"cmp"
 	"errors"
+	"fmt"
 	"io"
 	"mime"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/moliri-app/transcribe/internal/live"
 	"github.com/moliri-app/transcribe/internal/prefs"
@@ -124,25 +127,30 @@ func (s *Server) ocrRead(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, maxOCRImage)
 	var body io.Reader = r.Body
 	field := r.URL.Query().Get
+	image := r.Header.Get("Content-Type")
 	if mt, _, _ := mime.ParseMediaType(r.Header.Get("Content-Type")); mt == "multipart/form-data" {
 		if err := r.ParseMultipartForm(8 << 20); err != nil {
 			fail(w, http.StatusBadRequest, "Formular: "+err.Error())
 			return
 		}
 		defer r.MultipartForm.RemoveAll()
-		f, _, err := r.FormFile("image")
+		f, hdr, err := r.FormFile("image")
 		if err != nil {
 			fail(w, http.StatusBadRequest, "image fehlt")
 			return
 		}
 		defer f.Close()
 		body, field = f, r.FormValue
+		image = strings.TrimSpace(hdr.Filename + ", " + hdr.Header.Get("Content-Type"))
 	}
-	engine, o, err := s.cfg.OCR.Prepare(field("engine"), ocr.Options{Languages: field("languages"), Layout: field("layout")})
+	asked := ocr.Options{Languages: field("languages"), Layout: field("layout")}
+	engine, o, err := s.cfg.OCR.Prepare(field("engine"), asked)
 	if err != nil {
+		s.Live.Logged(live.KindOCR, clientName(r), field("engine"), ocrRequest(image, 0, asked), err)
 		fail(w, ocrStatus(err), err.Error())
 		return
 	}
+	info := engine.Info()
 	tmp, err := os.CreateTemp("", "transcribe-ocr-*")
 	if err != nil {
 		fail(w, 500, err.Error())
@@ -154,6 +162,7 @@ func (s *Server) ocrRead(w http.ResponseWriter, r *http.Request) {
 	var tooBig *http.MaxBytesError
 	switch {
 	case errors.As(err, &tooBig):
+		s.Live.Logged(live.KindOCR, clientName(r), engineName(info), ocrRequest(image, 0, o), errors.New("Bild größer als 64 MB"))
 		fail(w, http.StatusRequestEntityTooLarge, "Bild größer als 64 MB")
 		return
 	case err != nil:
@@ -163,15 +172,73 @@ func (s *Server) ocrRead(w http.ResponseWriter, r *http.Request) {
 		fail(w, http.StatusBadRequest, "Bild fehlt")
 		return
 	}
+	var facts []live.Fact
+	if info.GPU {
+		facts = append(facts, live.Fact{Label: "Grafikkarte", Value: "ja"})
+	}
+	call := s.Live.Call(live.KindOCR, clientName(r), engineName(info), ocrRequest(image, n, o), facts...)
 	res, err := s.cfg.OCR.Read(r.Context(), engine, tmp.Name(), o, s.cfg.Threads)
 	if err != nil {
 		if r.Context().Err() != nil {
+			call.End("", errGone)
 			return // the caller went away
 		}
+		call.End("", err)
 		fail(w, ocrStatus(err), err.Error())
 		return
 	}
+	call.End(res.Text(), nil, ocrFacts(res)...)
 	writeJSON(w, 200, res)
+}
+
+// errGone ends a call whose program went away before the answer came.
+var errGone = errors.New("Das Programm hat nicht mehr auf die Antwort gewartet")
+
+// engineName names an OCR engine for the Live page: its name and version.
+func engineName(info ocr.Info) string {
+	if info.Version == "" || strings.Contains(info.Name, info.Version) {
+		return info.Name
+	}
+	return info.Name + " " + info.Version
+}
+
+// ocrRequest is what the Live page shows of a request: the image (its name and type, size) and the
+// options.
+func ocrRequest(image string, size int64, o ocr.Options) string {
+	var b strings.Builder
+	b.WriteString("Bild: " + cmp.Or(strings.Trim(image, ", "), "ohne Angabe"))
+	if size > 0 {
+		fmt.Fprintf(&b, ", %s", byteSize(size))
+	}
+	b.WriteString("\nSprachen: " + cmp.Or(o.Languages, "Standard"))
+	b.WriteString("\nLayout: " + cmp.Or(o.Layout, "Standard"))
+	return b.String()
+}
+
+func ocrFacts(res *ocr.Result) []live.Fact {
+	lines := 0
+	for _, p := range res.Pages {
+		lines += len(p.Lines)
+	}
+	facts := []live.Fact{
+		{Label: "Erkannt", Value: fmt.Sprintf("%d Zeilen, %d Wörter", lines, res.Words())},
+		{Label: "Engine", Value: res.Engine},
+	}
+	if len(res.Pages) > 0 {
+		facts = append(facts, live.Fact{Label: "Bildgröße", Value: fmt.Sprintf("%d × %d Pixel", res.Pages[0].Width, res.Pages[0].Height)})
+	}
+	if res.Language != "" {
+		facts = append(facts, live.Fact{Label: "Modelle", Value: res.Language})
+	}
+	return facts
+}
+
+// byteSize says a size for people: "812 KB", "2,4 MB".
+func byteSize(n int64) string {
+	if n < 1<<20 {
+		return fmt.Sprintf("%d KB", max(1, (n+512)>>10))
+	}
+	return strings.Replace(fmt.Sprintf("%.1f MB", float64(n)/(1<<20)), ".", ",", 1)
 }
 
 func ocrStatus(err error) int {

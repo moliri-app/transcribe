@@ -11,12 +11,15 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"github.com/moliri-app/transcribe/internal/live"
 	"github.com/moliri-app/transcribe/internal/llm"
 	"github.com/moliri-app/transcribe/internal/natfilter"
 	"github.com/moliri-app/transcribe/internal/setup"
@@ -63,6 +66,8 @@ type filterJob struct {
 	seconds  float64
 	errText  string
 	errKind  string
+	call     *live.Call // on the Live page
+	stage    string     // of progress, as the Live page was told
 }
 
 // filterQueue holds the questions: one is asked at a time, in the order they came.
@@ -155,7 +160,9 @@ func (s *Server) filterAsk(w http.ResponseWriter, r *http.Request) {
 		fail(w, http.StatusBadRequest, "text, catalog und fields werden gebraucht")
 		return
 	}
+	request := filterRequest(in)
 	if !s.cfg.Filter.Ready() {
+		s.Live.Logged(live.KindFilter, clientName(r), s.cfg.FilterModel, request, errors.New("Das Sprachmodell ist noch nicht heruntergeladen"))
 		fail(w, http.StatusServiceUnavailable, "Das Sprachmodell für den Filter in eigenen Worten ist in Transcribe noch nicht geladen")
 		return
 	}
@@ -164,11 +171,16 @@ func (s *Server) filterAsk(w http.ResponseWriter, r *http.Request) {
 	q.sweep()
 	if len(q.pending) >= maxFilterQueue {
 		q.mu.Unlock()
+		s.Live.Logged(live.KindFilter, clientName(r), s.cfg.FilterModel, request, errors.New("Zu viele Fragen warten schon"))
 		fail(w, http.StatusTooManyRequests, "Zu viele Fragen warten schon")
 		return
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	job := &filterJob{ID: newJobID(), in: in, ctx: ctx, cancel: cancel, created: time.Now(), status: "pending"}
+	job := &filterJob{ID: newJobID(), in: in, ctx: ctx, cancel: cancel, created: time.Now(), status: "pending",
+		call: s.Live.Call(live.KindFilter, clientName(r), s.cfg.FilterModel, request)}
+	if q.running || len(q.pending) > 0 {
+		job.call.Status("Wartet, bis die Fragen davor beantwortet sind …")
+	}
 	if q.jobs == nil {
 		q.jobs = map[string]*filterJob{}
 	}
@@ -200,6 +212,7 @@ func (s *Server) filterWork() {
 		q.pending = q.pending[1:]
 		job.status, job.started = "processing", time.Now()
 		q.mu.Unlock()
+		job.call.Status("Rechnet …")
 
 		key := sha256.Sum256([]byte(natfilter.Prefix(job.in.Catalog)))
 		msgs := natfilter.Messages(job.in.Text, job.in.Catalog)
@@ -210,7 +223,12 @@ func (s *Server) filterWork() {
 		ans, err := s.cfg.Filter.Chat(job.ctx, req, func(p llm.Progress) {
 			q.mu.Lock()
 			job.progress = p
+			tell := p.Stage != job.stage
+			job.stage = p.Stage
 			q.mu.Unlock()
+			if tell {
+				job.call.Status(filterStages[p.Stage])
+			}
 		})
 
 		q.mu.Lock()
@@ -237,7 +255,16 @@ func (s *Server) filterWork() {
 			}
 		}
 		job.cancel()
+		var failed error
+		if job.status == "failed" {
+			failed = errors.New(job.errText)
+			if job.errKind == "no_json" {
+				failed = errors.New("Die Antwort des Sprachmodells enthält kein JSON")
+			}
+		}
+		facts := s.filterFacts(job, ans)
 		q.mu.Unlock()
+		job.call.End(ans.Content, failed, facts...)
 		if err != nil && job.ctx.Err() == nil {
 			log.Println("filter:", err)
 		}
@@ -325,6 +352,7 @@ func (s *Server) filterCancel(w http.ResponseWriter, r *http.Request) {
 			if p == job {
 				q.pending = append(q.pending[:i], q.pending[i+1:]...)
 				job.status, job.errKind, job.errText, job.finished = "failed", "cancelled", "Abgebrochen", time.Now()
+				job.call.End("", errors.New("Abgebrochen, bevor sie gestellt wurde"))
 				break
 			}
 		}
@@ -362,4 +390,45 @@ func newJobID() string {
 	b := make([]byte, 9)
 	rand.Read(b)
 	return hex.EncodeToString(b)
+}
+
+// filterStages say on the Live page what the model is doing.
+var filterStages = map[string]string{"loading": "Lädt das Sprachmodell …", "reading": "Liest die Frage …", "writing": "Schreibt die Antwort …"}
+
+// filterRequest is what the Live page shows of a question: the words, then what the model is
+// given, its prompt with the catalog of fields.
+func filterRequest(in natfilter.Input) string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "Frage: %s\nFelder: %d\n", in.Text, len(in.Fields))
+	for _, m := range natfilter.Messages(in.Text, in.Catalog) {
+		fmt.Fprintf(&b, "\n[%s]\n%s\n", m.Role, m.Content)
+	}
+	return b.String()
+}
+
+// filterFacts are what helps to see how a question went: the wait, the model's work, the result.
+// Called with the queue's mu held.
+func (s *Server) filterFacts(job *filterJob, ans llm.Answer) []live.Fact {
+	var facts []live.Fact
+	add := func(label, value string) { facts = append(facts, live.Fact{Label: label, Value: value}) }
+	if !job.started.IsZero() {
+		add("Gewartet", live.Seconds(job.started.Sub(job.created)))
+	}
+	if ans.Seconds > 0 {
+		add("Rechenzeit", live.Seconds(time.Duration(ans.Seconds*float64(time.Second))))
+	}
+	if ans.PromptTokens > 0 {
+		add("Tokens gelesen", fmt.Sprintf("%d, davon %d schon zwischengespeichert", ans.PromptTokens, ans.CachedTokens))
+	}
+	if ans.Tokens > 0 {
+		add("Tokens geschrieben", fmt.Sprint(ans.Tokens))
+	}
+	if d := s.filterDevice(); d != nil {
+		add("Gerät", strings.TrimSpace(d["build"]+" "+d["name"]))
+	}
+	if job.status == "done" {
+		add("Ergebnis", fmt.Sprintf("%d Bedingungen, %d nicht verstanden, %d verworfen",
+			len(job.result.Conditions), len(job.result.NotUnderstood), len(job.result.Dropped)))
+	}
+	return facts
 }

@@ -41,6 +41,12 @@ type Note struct {
 	Transient     bool       `json:"transient,omitempty"` // kept only for a while in memory, never saved (apinotes.go)
 	Loading       bool       `json:"loading,omitempty"`   // recognition is still being loaded
 	Waiting       bool       `json:"waiting,omitempty"`   // recognition is ready, the recording has not given sound yet
+	// A call (calls.go): what answered, what was asked and came back, and what else is worth
+	// knowing. Partial says what it is doing while it runs.
+	Model    string `json:"model,omitempty"`
+	Request  string `json:"request,omitempty"`
+	Response string `json:"response,omitempty"`
+	Facts    []Fact `json:"facts,omitempty"`
 }
 
 // Line is one utterance; its times count seconds since the note started.
@@ -77,13 +83,14 @@ func (n *Note) Text() string {
 func (n *Note) clone() *Note {
 	c := *n
 	c.Lines = append([]Line{}, n.Lines...)
+	c.Facts = append([]Fact(nil), n.Facts...)
 	return &c
 }
 
-// byProgram reports whether notes of kind come from a program over the live API.
-func byProgram(kind string) bool { return kind == KindAudio || kind == KindMic }
+// byProgram reports whether notes of kind come from a program: over the live API, or calls.
+func byProgram(kind string) bool { return kind == KindAudio || kind == KindMic || isCall(kind) }
 
-// keepNotes is how many notes the Live page gets; older ones stay on disk.
+// keepNotes is how many notes the Live page gets, and as many calls; older ones stay on disk.
 const keepNotes = 200
 
 func notesDir(dataDir string) string { return filepath.Join(dataDir, "live") }
@@ -109,10 +116,15 @@ func removeNote(dataDir, id string) error {
 
 // loadNotes reads the newest notes, oldest first.
 func loadNotes(dataDir string) []*Note {
-	names := noteFiles(dataDir)
-	if len(names) > keepNotes {
-		names = names[len(names)-keepNotes:]
+	var notes, calls []string
+	for _, name := range noteFiles(dataDir) {
+		if callID(name) {
+			calls = append(calls, name)
+		} else {
+			notes = append(notes, name)
+		}
 	}
+	names := append(notes[max(0, len(notes)-keepNotes):], calls[max(0, len(calls)-keepNotes):]...)
 	var out []*Note
 	for _, name := range names {
 		if n := readNote(dataDir, name); n != nil {
