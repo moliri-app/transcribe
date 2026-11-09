@@ -5,12 +5,15 @@
 package live
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -82,6 +85,114 @@ func TestBothSourcesAreMixed(t *testing.T) {
 	_, mic, sys = recordFor(t, SourceSystem, 2*time.Second)
 	if mic != nil || len(sys) < SR/2 || rms(sys[SR/10:]) < 0.3 {
 		t.Errorf("system sound alone: %d samples of the microphone, %d of the system (RMS %.3f)", len(mic), len(sys), rms(sys))
+	}
+}
+
+// stepper is a recorder for mix that hands out a piece each time the test says so.
+type stepper struct {
+	step chan []float32
+	done chan struct{}
+}
+
+func newStepper() *stepper { return &stepper{make(chan []float32), make(chan struct{})} }
+
+func (s *stepper) record(ctx context.Context, piece func([]float32)) error {
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case p := <-s.step:
+			piece(p)
+			s.done <- struct{}{}
+		}
+	}
+}
+
+func (s *stepper) give(p []float32) {
+	s.step <- p
+	<-s.done
+}
+
+// A microphone that gives no sound for longer than the mix used to wait (a Bluetooth headset that
+// stalls) loses nothing of the system sound: it goes on with silence for the microphone, in order,
+// and the log tells.
+func TestMixKeepsTheSystemSoundWhileTheMicrophoneStalls(t *testing.T) {
+	var logged bytes.Buffer
+	log.SetOutput(&logged)
+	defer log.SetOutput(os.Stderr)
+
+	mic, sys := newStepper(), newStepper()
+	ctx, cancel := context.WithCancel(context.Background())
+	var pcm, micOut, sysOut []float32
+	done := make(chan error)
+	go func() {
+		done <- mix(ctx, mic.record, sys.record, func(p, m, s []float32) {
+			pcm, micOut, sysOut = append(pcm, p...), append(micOut, m...), append(sysOut, s...)
+		})
+	}()
+
+	// the system sound counts its samples, in pieces of 10 ms; the microphone gives -1
+	next := float32(0)
+	system := func(pieces int) {
+		for range pieces {
+			p := make([]float32, SR/100)
+			for i := range p {
+				next++
+				p[i] = next
+			}
+			sys.give(p)
+		}
+	}
+	speak := func(seconds int) {
+		for range seconds * 10 {
+			system(10)
+			p := make([]float32, SR/10)
+			for i := range p {
+				p[i] = -1
+			}
+			mic.give(p)
+		}
+	}
+	speak(3)
+	system(1500) // the microphone stalls for 15 s, for longer than the mix used to keep the system sound
+	speak(3)
+	cancel()
+	if err := <-done; err != nil {
+		t.Fatal(err)
+	}
+
+	var got []float32
+	for _, v := range sysOut {
+		if v != 0 {
+			got = append(got, v)
+		}
+	}
+	for i, v := range got {
+		if v != float32(i+1) {
+			t.Fatalf("system sample %d is %v: the system sound lost some of itself", i+1, v)
+		}
+	}
+	if left := int(next) - len(got); left > mixDelay+SR/10 {
+		t.Errorf("%.1f s of the system sound not handed out", float64(left)/SR)
+	}
+	for i := range pcm {
+		if pcm[i] != micOut[i]+sysOut[i] {
+			t.Fatalf("sample %d: %v is not %v + %v", i, pcm[i], micOut[i], sysOut[i])
+		}
+	}
+	spoken := 0
+	for _, v := range micOut {
+		if v == -1 {
+			spoken++
+		}
+	}
+	if spoken != 6*SR {
+		t.Errorf("%.1f s of the microphone handed out, want 6 s", float64(spoken)/SR)
+	}
+	for _, want := range []string{"the system audio goes on with silence for it", "the microphone gives sound again"} {
+		if !strings.Contains(logged.String(), want) {
+			t.Errorf("the log does not say %q:\n%s", want, logged.String())
+		}
 	}
 }
 
