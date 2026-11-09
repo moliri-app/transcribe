@@ -154,6 +154,37 @@ test.describe('Bibliothek', () => {
     await expect(page.getByRole('button', { name: 'Zeitzeugen' })).toBeVisible();
   });
 
+  test('ein langer Name mit Schlagworten bleibt in jedem Fenster lesbar, nie Buchstabe für Buchstabe', async ({ page }) => {
+    await page.goto('/');
+    await card(page, KORRIGIERT).getByRole('button', { name: `Name und Schlagworte von ${KORRIGIERT}` }).click();
+    const dlg = page.getByRole('dialog', { name: 'Name und Schlagworte' });
+    await dlg.getByRole('textbox', { name: 'Name' }).fill('Zeitzeuge Berger, Papierfabrik');
+    await dlg.getByRole('textbox', { name: 'Schlagworte' }).fill('Zeitzeugen, Papierfabrik');
+    await dlg.getByRole('button', { name: 'Speichern' }).click();
+    await expect(dlg).toBeHidden();
+
+    const title = card(page, 'Zeitzeuge Berger, Papierfabrik').getByRole('heading');
+    // the name of a recording not transcribed yet, beside its size and date
+    const tick = page.getByRole('checkbox', { name: /Neue Aufnahme/ });
+    const fresh = tick.locator('xpath=following-sibling::span[1]');
+    const measure = (e: HTMLElement | SVGElement) => {
+      const r = e.getBoundingClientRect();
+      return { width: r.width, lines: Math.round(r.height / parseFloat(getComputedStyle(e).lineHeight)) };
+    };
+    // 1200 is where the title once shrank to one letter; 360 is a phone-narrow window
+    for (const width of [1440, 1300, 1200, 1100, 1000, 900, 800, 640, 480, 360]) {
+      await page.setViewportSize({ width, height: 800 });
+      const box = await title.evaluate(measure);
+      expect(box.width, `title width at ${width} px`).toBeGreaterThan(150);
+      expect(box.lines, `title lines at ${width} px`).toBeLessThanOrEqual(3);
+      expect((await fresh.evaluate(measure)).lines, `new recording's name at ${width} px`).toBeLessThanOrEqual(2);
+      // its checkbox stays in front of it, not on a line above
+      expect((await fresh.boundingBox())!.y, `new recording's checkbox at ${width} px`).toBeLessThan((await tick.boundingBox())!.y + 20);
+    }
+    // and the page never needs scrolling sideways
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  });
+
   test('in eine Aufnahme ohne Transkript reinhören: unten erscheint die Abspielleiste', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Neue Aufnahme anhören' }).click();

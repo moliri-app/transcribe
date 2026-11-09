@@ -1511,12 +1511,14 @@
 		border-radius: 0.375rem;
 		transition: background-color 0.15s;
 	}
+	/* in a narrow window size and date go to a line of their own, rather than squeezing the name */
 	.aufnahme label {
 		flex: 1;
 		min-width: 0;
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
-		gap: 0.75rem;
+		gap: 0.25rem 0.75rem;
 		min-height: var(--hit);
 		padding: 0.25rem 0.75rem;
 		cursor: pointer;
@@ -1534,6 +1536,8 @@
 		cursor: pointer;
 	}
 	.aufnahme .name {
+		flex: 1 1 5rem;
+		min-width: 0;
 		overflow-wrap: anywhere;
 	}
 	.aufnahme .wo {
@@ -1615,6 +1619,9 @@
 		border-radius: 0.75rem;
 		background: hsl(var(--color-bg-primary));
 		box-shadow: 0 1px 2px hsl(var(--color-shadow)), 0 12px 32px -20px hsl(var(--color-neutral-100) / 0.25);
+		/* the columns follow the list's own width, not the window's: beside the areas on the left
+		   the list is far narrower than the window */
+		container: regal / inline-size;
 	}
 	.eintrag {
 		position: relative;
@@ -2039,18 +2046,45 @@
 		outline-offset: 2px;
 	}
 
-	/* schmaler: die Spalten der Liste rücken neben den Titel */
-	@media (max-width: 1100px) {
+	/* narrower: first the speakers go, then the remaining columns move beside the title, and in a
+	   very narrow list below it; the title always keeps room for a few words per line */
+	@container regal (width < 64rem) {
+		.eintrag {
+			grid-template-columns: var(--hit) minmax(0, 1fr) 6.5rem 8.5rem 6.5rem calc(4 * var(--hit));
+		}
+		.stimmen {
+			display: none;
+		}
+	}
+	@container regal (width < 52rem) {
 		.eintrag {
 			grid-template-columns: var(--hit) minmax(0, 1fr) auto calc(4 * var(--hit));
 		}
-		.stimmen,
 		.arbeit,
 		.wann {
 			display: none;
 		}
 		.stand {
 			text-align: right;
+		}
+	}
+	@container regal (width < 36rem) {
+		.eintrag {
+			grid-template-columns: var(--hit) minmax(0, 1fr) auto;
+			align-items: start;
+		}
+		.haupt {
+			grid-column: 2 / -1;
+			align-self: center;
+		}
+		.stand {
+			grid-column: 2;
+			align-self: center;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			text-align: left;
+			white-space: nowrap;
 		}
 	}
 
