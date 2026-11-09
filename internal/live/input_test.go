@@ -51,6 +51,19 @@ func TestInputCheck(t *testing.T) {
 	if v := feed(&inputCheck{}, tones(2, 0.2, 300, 1100, 2500)); v != "" {
 		t.Errorf("after 2 s of speech it does not judge yet: %q", v)
 	}
+	// a headset that sends the full band but sounds dark: a tenth of a percent of it lies above
+	// 4.5 kHz, which once counted as telephone quality
+	dark := make([]float32, len(wide))
+	lp := lowpass(600, math.Sqrt2/2)
+	for i, v := range wide {
+		dark[i] = float32(lp.step(float64(v)))
+	}
+	if v := feed(&inputCheck{}, dark); v != "" {
+		t.Errorf("full band, dark: %q", v)
+	}
+	if v := feed(&inputCheck{}, telephone(wide)); v != InputNarrow {
+		t.Errorf("8 kHz upsampled: %q", v)
+	}
 	quiet := wide[:]
 	for i := range quiet {
 		quiet[i] *= 0.03
@@ -66,6 +79,26 @@ func TestInputCheck(t *testing.T) {
 	if v := c.verdict(); v != "" {
 		t.Errorf("silence: %q", v)
 	}
+}
+
+// telephone is pcm as it comes from a device that records at 8 kHz: band-limited, and upsampled
+// as the app does it.
+func telephone(pcm []float32) []float32 {
+	var lp []biquad
+	for _, q := range []float64{0.5098, 0.6013, 0.9000, 2.5629} {
+		lp = append(lp, lowpass(3600, q))
+	}
+	var half []float32
+	for i, v := range pcm {
+		x := float64(v)
+		for k := range lp {
+			x = lp[k].step(x)
+		}
+		if i%2 == 0 {
+			half = append(half, float32(x))
+		}
+	}
+	return newResampler(8000, SR).process(half)
 }
 
 // With the live bench (see TestLiveBench in pipeline): the clean recording passes, the
