@@ -1615,6 +1615,9 @@
 		border-radius: 0.75rem;
 		background: hsl(var(--color-bg-primary));
 		box-shadow: 0 1px 2px hsl(var(--color-shadow)), 0 12px 32px -20px hsl(var(--color-neutral-100) / 0.25);
+		/* the columns follow the list's own width, not the window's: beside the areas on the left
+		   the list is far narrower than the window */
+		container: regal / inline-size;
 	}
 	.eintrag {
 		position: relative;
@@ -2039,18 +2042,45 @@
 		outline-offset: 2px;
 	}
 
-	/* schmaler: die Spalten der Liste rücken neben den Titel */
-	@media (max-width: 1100px) {
+	/* schmaler: erst gehen die Sprecher, dann rücken die übrigen Spalten neben den Titel, ganz
+	   schmal unter ihn; der Titel behält so immer Platz für ein paar Wörter je Zeile */
+	@container regal (width < 64rem) {
+		.eintrag {
+			grid-template-columns: var(--hit) minmax(0, 1fr) 6.5rem 8.5rem 6.5rem calc(4 * var(--hit));
+		}
+		.stimmen {
+			display: none;
+		}
+	}
+	@container regal (width < 52rem) {
 		.eintrag {
 			grid-template-columns: var(--hit) minmax(0, 1fr) auto calc(4 * var(--hit));
 		}
-		.stimmen,
 		.arbeit,
 		.wann {
 			display: none;
 		}
 		.stand {
 			text-align: right;
+		}
+	}
+	@container regal (width < 36rem) {
+		.eintrag {
+			grid-template-columns: var(--hit) minmax(0, 1fr) auto;
+			align-items: start;
+		}
+		.haupt {
+			grid-column: 2 / -1;
+			align-self: center;
+		}
+		.stand {
+			grid-column: 2;
+			align-self: center;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			text-align: left;
+			white-space: nowrap;
 		}
 	}
 
