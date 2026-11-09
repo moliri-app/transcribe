@@ -273,7 +273,11 @@ func DiarizeAHC2(ctx context.Context, pcm []float32, segModel, embModel string, 
 	if err != nil {
 		return nil, err
 	}
-	labels := cut(len(X), merges, numSpeakers, threshold)
+	k, scraps := numSpeakers, true
+	if k > 0 {
+		k, scraps = clustersFor(spans, merges, k, minSpeaker)
+	}
+	labels := cut(len(X), merges, k, threshold)
 
 	// ahc2 smoothing: only an isolated window between two agreeing, touching neighbours
 	sm := append([]int(nil), labels...)
@@ -284,8 +288,8 @@ func DiarizeAHC2(ctx context.Context, pcm []float32, segModel, embModel string, 
 	}
 	labels = sm
 
-	if numSpeakers <= 0 {
-		mergeSmallClusters(X, spans, labels, 8.0)
+	if scraps {
+		mergeSmallClusters(X, spans, labels, minSpeaker)
 	}
 
 	var segs []SpeakerSeg
@@ -305,6 +309,64 @@ func DiarizeAHC2(ctx context.Context, pcm []float32, segModel, embModel string, 
 		}
 	}
 	return renumber(segs), nil
+}
+
+// minSpeaker is the least speech, in seconds, a cluster needs to count as a speaker; smaller ones
+// (a jingle, a cough, a laugh) go to the speaker whose voice is nearest.
+const minSpeaker = 8.0
+
+// clustersFor returns how many clusters to cut the tree into so that k of them hold at least
+// minTotal seconds of speech each. Cut into exactly k, the tree often splits off a few seconds of
+// intro music or noise and leaves all voices in one cluster; cut deeper, the voices part, and
+// mergeSmallClusters then gives the scraps to them. When no cut has k such clusters (a short
+// recording), it returns k and false: then the clusters stay as they are, small or not.
+func clustersFor(spans []span, merges []merge, k int, minTotal float64) (int, bool) {
+	n := len(spans)
+	parent := make([]int, n)
+	tot := make([]float64, n)
+	big := 0
+	for i, sp := range spans {
+		parent[i] = i
+		tot[i] = (sp.e - sp.s) / 2 // windows overlap by half
+		if tot[i] >= minTotal {
+			big++
+		}
+	}
+	find := func(i int) int {
+		for parent[i] != i {
+			parent[i] = parent[parent[i]]
+			i = parent[i]
+		}
+		return i
+	}
+	isBig := func(r int) int {
+		if tot[r] >= minTotal {
+			return 1
+		}
+		return 0
+	}
+	// bigAt[c] is the number of big clusters when the tree is cut into c clusters
+	bigAt := make([]int, n+1)
+	clusters := n
+	bigAt[n] = big
+	for _, m := range merges {
+		ra, rb := find(m.a), find(m.b)
+		if ra == rb {
+			continue
+		}
+		big -= isBig(ra) + isBig(rb)
+		parent[ra] = rb
+		tot[rb] += tot[ra]
+		big += isBig(rb)
+		clusters--
+		bigAt[clusters] = big
+	}
+	for c := k; c <= n; c++ {
+		if bigAt[c] >= k {
+			return c, true
+		}
+	}
+	return k, false
 }
 
 func mergeSmallClusters(X [][]float32, spans []span, labels []int, minTotal float64) {
