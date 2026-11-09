@@ -246,12 +246,15 @@
 
 <style>
 	/* Tinte wie die Player-Leiste des Editors */
+	/* eine Zeile: Aufnehmen, Meldung, Pegel, Schalter, Einrichten; die Spalte der Meldung nimmt, was
+	   übrig ist */
 	.leiste {
 		position: relative;
 		z-index: 5;
-		display: flex;
+		display: grid;
+		grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(8rem, 15rem) auto auto;
 		align-items: center;
-		gap: 1rem 1.5rem;
+		gap: 0 1.5rem;
 		min-height: 4.5rem;
 		padding: 0.625rem 1rem 0.625rem 1.25rem;
 		background: hsl(var(--color-neutral-100));
@@ -261,6 +264,7 @@
 		outline-color: hsl(var(--color-green-100));
 	}
 	.links {
+		grid-column: 1;
 		display: flex;
 		align-items: center;
 		gap: 1rem;
@@ -372,10 +376,27 @@
 	}
 
 	.meldung {
-		flex: 1;
-		min-width: 0;
+		grid-area: 1 / 2;
 		font-size: 0.9375rem;
 		color: hsl(var(--color-neutral-10));
+	}
+	.meldung:empty {
+		display: none;
+	}
+	/* Wo Aufnahme, Pegel und Schalter die Mitte schon fast füllen, stünde eine Meldung dort in einer
+	   schmalen Spalte, Wort für Wort: dann bekommt sie eine eigene Zeile über ihnen, und ihre Spalte
+	   bleibt leer. */
+	@media (max-width: 1600px) {
+		.meldung {
+			grid-area: 1 / 1 / 2 / -1;
+			padding: 0.25rem 0 0.75rem;
+		}
+		.links,
+		.pegel,
+		.modus,
+		.einrichten {
+			grid-row: 2;
+		}
 	}
 
 	/* was mit dem Mikrofon nicht stimmt: ruhig, ohne Alarmfarbe */
@@ -405,7 +426,7 @@
 
 	/* Pegel: wie laut Mikrofon und Systemaudio gerade sind, in Signalgrün */
 	.pegel {
-		flex: 0 1 15rem;
+		grid-column: 3;
 		display: grid;
 		gap: 0.375rem;
 		opacity: 0.4;
@@ -416,7 +437,7 @@
 	}
 	/* Im Hintergrund bereit: Schalter mit Signalgrün, darunter ob die Erkennung bereitsteht */
 	.modus {
-		flex: none;
+		grid-column: 4;
 		display: inline-flex;
 		align-items: center;
 		gap: 0.625rem;
@@ -496,7 +517,7 @@
 
 	/* Einrichten: wie die Tempo-Pille der Player-Leiste */
 	.einrichten {
-		flex: none;
+		grid-column: 5;
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -678,29 +699,12 @@
 		}
 	}
 
+	/* schmaler gibt die Leiste nach und nach ab, damit Beenden und die Laufzeit Platz behalten: erst
+	   die Beschriftung von Einrichten, dann die des Schalters, zuletzt Pegel und Stand */
 	@media (max-width: 900px) {
-		.meldung {
-			display: none;
-		}
-		.pegel {
-			flex: 1 1 6rem;
-		}
-	}
-	@media (max-width: 560px) {
 		.leiste {
-			gap: 0.75rem;
-			padding-inline: 0.5rem 0.75rem;
-		}
-		.unter,
-		.pegel,
-		.mtext {
-			display: none;
-		}
-		.starten {
-			margin-right: auto;
-		}
-		.links {
-			flex: 1;
+			grid-template-columns: minmax(0, auto) 0 minmax(6rem, 10rem) auto auto;
+			column-gap: 1rem;
 		}
 		.einrichten .lbl {
 			position: absolute;
@@ -713,6 +717,22 @@
 			padding: 0;
 			width: var(--hit);
 			justify-content: center;
+		}
+	}
+	@media (max-width: 760px) {
+		.mtext {
+			display: none;
+		}
+	}
+	@media (max-width: 560px) {
+		.leiste {
+			grid-template-columns: minmax(0, 1fr) 0 0 auto auto;
+			column-gap: 0.75rem;
+			padding-inline: 0.5rem 0.75rem;
+		}
+		.unter,
+		.pegel {
+			display: none;
 		}
 	}
 </style>
