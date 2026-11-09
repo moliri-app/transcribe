@@ -7,13 +7,14 @@
 // fast jede Buchstabenfolge irgendwo verstreut, und echte Tippfehler („Absperung“) wären davon nicht
 // zu unterscheiden. Mehrere Suchwörter müssen alle in derselben Aufnahme vorkommen.
 import fuzzysort from 'fuzzysort';
-import { art, laenge, sprachname, vonHand, wer } from './stand.svelte.js';
+import { anfrage, art, DIENSTE, laenge, sprachname, vonHand, wer, worum } from './stand.svelte.js';
 
 /** @typedef {import('./stand.svelte.js').Notiz} Notiz */
 /** zeile: der Satz, der die Suchwörter am besten trifft (-1: Treffer nur im Namen)
  * @typedef {{ score: number, zeile: number }} Treffer */
 
-export const HERKUNFT = /** @type {const} */ ({ alle: 'Alle', hand: 'Von Hand', api: 'Per API' });
+/** api: Sprache, die Programme schicken oder mithören lassen; ki: ihre Anfragen an Texterkennung und Sprachmodelle */
+export const HERKUNFT = /** @type {const} */ ({ alle: 'Alle', hand: 'Von Hand', api: 'Per API', ki: 'KI & OCR' });
 /** @typedef {keyof typeof HERKUNFT} Herkunft */
 
 export const SORTIERUNG = /** @type {const} */ ({
@@ -38,7 +39,10 @@ const reicht = (begriff, score) => score >= (begriff.length < 3 ? 0.8 : SCHWELLE
 
 /** @param {Notiz} n @param {Herkunft} h */
 export function passt(n, h) {
-	return h === 'alle' || (h === 'hand') === vonHand(n);
+	if (h === 'alle') return true;
+	if (h === 'hand') return vonHand(n);
+	if (h === 'ki') return anfrage(n);
+	return !vonHand(n) && !anfrage(n);
 }
 
 /** @param {Notiz[]} liste @param {Sortierung} s @param {number} jetzt */
@@ -70,6 +74,13 @@ export function suchen(notizen, q) {
 		}
 	};
 	for (const n of notizen) {
+		if (anfrage(n)) {
+			// beim Sprachmodell nur die Frage, nicht der ganze Prompt mit dem Feldkatalog
+			const gefragt = n.kind === 'filter' ? worum(n) : (n.request ?? '');
+			const dienst = DIENSTE[/** @type {import('./stand.svelte.js').Dienst} */ (n.kind)];
+			merken(`${wer(n)} ${art(n)} ${dienst} ${n.model ?? ''} ${gefragt} ${n.response ?? ''} ${n.error ?? ''}`, n.id, -1);
+			continue;
+		}
 		merken(`${wer(n)} ${n.client ?? ''} ${art(n)} ${sprachname(n.language)} ${n.audio ?? ''}`, n.id, -1);
 		n.lines.forEach((l, i) => merken(l.text, n.id, i));
 	}

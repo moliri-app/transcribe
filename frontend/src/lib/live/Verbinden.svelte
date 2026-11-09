@@ -83,7 +83,8 @@
 			</dl>
 			<p class="meta">
 				Jede Anfrage erscheint links als Aufnahme „Per API“. Das Programm Transcribe muss dafür laufen; solange es Text
-				liefert, beendet es sich nicht.
+				liefert, beendet es sich nicht. Was Programme lesen lassen, das Sprachmodell fragen oder für die Suche nach
+				Bedeutung umwandeln, steht links unter „KI & OCR“: mit Anfrage, Antwort, der KI, die antwortete, und der Dauer.
 			</p>
 		</section>
 

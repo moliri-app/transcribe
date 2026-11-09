@@ -356,6 +356,15 @@ func (s *Server) liveAPI(w http.ResponseWriter, r *http.Request) {
 			}
 			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 			_, _ = w.Write([]byte(n.Text()))
+		case "image":
+			// the image a program had read (text recognition), for the Live page
+			path := s.Live.ImagePath(r.URL.Query().Get("id"))
+			if path == "" {
+				http.NotFound(w, r)
+				return
+			}
+			w.Header().Set("X-Content-Type-Options", "nosniff")
+			http.ServeFile(w, r, path)
 		default:
 			http.NotFound(w, r)
 		}

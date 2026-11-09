@@ -1,11 +1,12 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Seitenleiste der Live-Seite: alle Aufnahmen, durchsuchbar (unscharf, im ganzen Text), nach
-     Herkunft gefiltert (von Hand oder per API) und sortiert; unten „Programme verbinden“. -->
+<!-- Seitenleiste der Live-Seite: alle Aufnahmen und die Anfragen von Programmen an Texterkennung und
+     Sprachmodelle, durchsuchbar (unscharf, im ganzen Text), nach Herkunft gefiltert (von Hand, per
+     API, KI & OCR) und sortiert; unten „Programme verbinden“. -->
 <script>
 	import { dauer } from '$lib/api.js';
-	import { live, laenge, QUELLEN, tag, uhrzeit, vonHand, WARTET, wer } from './stand.svelte.js';
+	import { anfrage, DIENSTE, live, laenge, QUELLEN, sekunden, tag, uhrzeit, vonHand, WARTET, wer, worum } from './stand.svelte.js';
 	import { ausschnitt, HERKUNFT, passt, SORTIERUNG, sortieren, stellenIn, stuecke, suchen } from './suche.js';
 
 	/** @typedef {import('./stand.svelte.js').Notiz} Notiz */
@@ -24,7 +25,8 @@
 	const zahl = $derived({
 		alle: alle.length,
 		hand: alle.filter(vonHand).length,
-		api: alle.filter((n) => !vonHand(n)).length
+		api: alle.filter((n) => !vonHand(n) && !anfrage(n)).length,
+		ki: alle.filter(anfrage).length
 	});
 	const treffer = $derived(suchen(alle, q));
 	const sucht = $derived(!!q.trim());
@@ -63,7 +65,7 @@
 			const a = ausschnitt(satz, stellenIn(q, satz) ?? []);
 			return stuecke(a.satz, a.stellen);
 		}
-		const anfang = n.lines.map((l) => l.text).join(' ') || n.partial || '';
+		const anfang = anfrage(n) ? worum(n) : n.lines.map((l) => l.text).join(' ') || n.partial || '';
 		return anfang ? [{ t: anfang, an: false }] : [];
 	}
 
@@ -125,8 +127,6 @@
 			{#each Object.entries(HERKUNFT) as [k, name] (k)}
 				<label class="pille" class:an={herkunft === k}>
 					<input class="sr" type="radio" name="herkunft" value={k} bind:group={herkunft} />
-					{#if k === 'hand'}<IconMaterialSymbolsBackHandOutlineRounded aria-hidden="true" />{/if}
-					{#if k === 'api'}<IconMaterialSymbolsCableRounded aria-hidden="true" />{/if}
 					{name}
 					<span class="zahl">{zahl[/** @type {keyof typeof zahl} */ (k)]}</span>
 				</label>
@@ -140,7 +140,11 @@
 				{:else if sucht}
 					{sichtbar.length === 1 ? 'ein Treffer' : `${sichtbar.length || 'keine'} Treffer`}
 				{:else}
-					{sichtbar.length === 1 ? 'eine Aufnahme' : `${sichtbar.length} Aufnahmen`}
+					{#if herkunft === 'ki'}
+						{sichtbar.length === 1 ? 'eine Anfrage' : `${sichtbar.length} Anfragen`}
+					{:else}
+						{sichtbar.length === 1 ? 'eine Aufnahme' : `${sichtbar.length} Aufnahmen`}
+					{/if}
 				{/if}
 			</span>
 			<label class="sortieren">
@@ -165,7 +169,7 @@
 				{#if sucht}
 					Nichts gefunden für „{q}“{herkunft !== 'alle' ? ` unter „${HERKUNFT[herkunft]}“` : ''}.
 				{:else}
-					Keine Aufnahmen {herkunft === 'hand' ? 'von Hand' : 'per API'}.
+					{herkunft === 'ki' ? 'Noch keine Anfragen an KI oder Texterkennung.' : `Keine Aufnahmen ${herkunft === 'hand' ? 'von Hand' : 'per API'}.`}
 				{/if}
 				{#if herkunft !== 'alle'}
 					<button class="link" type="button" onclick={() => (herkunft = 'alle')}>Alle zeigen</button>
@@ -177,6 +181,7 @@
 			{#if g.titel}<h3 class="tag">{g.titel}</h3>{/if}
 			{#each g.notizen as n (n.id)}
 				{@const hand = vonHand(n)}
+				{@const dienst = anfrage(n)}
 				{@const v = vorschau(n)}
 				<div role="listitem">
 					<button
@@ -189,16 +194,21 @@
 					>
 						<span class="kopf">
 							<span class="herkunft" class:hand>
-								{#if hand}<IconMaterialSymbolsBackHandOutlineRounded aria-hidden="true" />{:else}<IconMaterialSymbolsCableRounded
+								{#if hand}<IconMaterialSymbolsBackHandOutlineRounded aria-hidden="true" />{:else if n.kind === 'ocr'}<IconMaterialSymbolsDocumentScannerOutlineRounded
+										aria-hidden="true"
+									/>{:else if n.kind === 'filter'}<IconMaterialSymbolsAutoAwesomeOutlineRounded
+										aria-hidden="true"
+									/>{:else if n.kind === 'embed'}<IconMaterialSymbolsManageSearchRounded aria-hidden="true" />{:else}<IconMaterialSymbolsCableRounded
 										aria-hidden="true"
 									/>{/if}
 								<span class="wer">{wer(n)}</span>
-								{#if !hand}<span class="sr">, per API</span>{/if}
+								{#if dienst}<span class="sr">, {DIENSTE[/** @type {import('./stand.svelte.js').Dienst} */ (n.kind)]}</span
+									>{:else if !hand}<span class="sr">, per API</span>{/if}
 							</span>
 							{#if !n.ended}
 								<span class="laeuft"><span class="punkt" aria-hidden="true"></span>läuft</span>
 							{:else if n.error}
-								<span class="abbruch">abgebrochen</span>
+								<span class="abbruch">{dienst ? 'Fehler' : 'abgebrochen'}</span>
 							{:else if n.transient}
 								<span class="fluechtig">nicht gespeichert</span>
 							{/if}
@@ -208,11 +218,19 @@
 							{#if v.length}
 								{#each v as s, i (i)}{#if s.an}<mark>{s.t}</mark>{:else}{s.t}{/if}{/each}
 							{:else}
-								{n.error ? 'Kein Text' : n.loading ? 'Lädt die Erkennung …' : n.waiting ? WARTET[n.source ?? 'mic'] : !n.ended ? 'Hört zu …' : 'Es wurde nichts erkannt.'}
+								{dienst
+									? n.error || (n.ended ? 'Leere Antwort' : n.partial || 'Läuft …')
+									: n.error ? 'Kein Text' : n.loading ? 'Lädt die Erkennung …' : n.waiting ? WARTET[n.source ?? 'mic'] : !n.ended ? 'Hört zu …' : 'Es wurde nichts erkannt.'}
 							{/if}
 						</span>
 						<span class="fuss">
-							<span class="dauer">{dauer(laenge(n, live.jetzt))}</span>
+							{#if dienst}
+								<span class="dauer">{n.ended ? sekunden(laenge(n, live.jetzt)) : dauer(laenge(n, live.jetzt))}</span>
+								<span>{DIENSTE[/** @type {import('./stand.svelte.js').Dienst} */ (n.kind)]}</span>
+								{#if n.model}<span class="modell" title={n.model}>{n.model}</span>{/if}
+							{:else}
+								<span class="dauer">{dauer(laenge(n, live.jetzt))}</span>
+							{/if}
 							{#if n.source}<span>{QUELLEN[n.source]}</span>{/if}
 							{#if n.audio}<span class="gespeichert" title="Aufnahme gespeichert"
 									><IconMaterialSymbolsSaveOutlineRounded aria-hidden="true" /><span class="sr">gespeichert</span></span
@@ -302,7 +320,8 @@
 	/* Herkunft als Umschalter in einer Pille: gewählt in Tinte */
 	.filter {
 		display: grid;
-		grid-template-columns: auto auto auto;
+		grid-template-columns: repeat(4, auto);
+		min-width: 0;
 		gap: 2px;
 		padding: 3px;
 		border-radius: 2rem;
@@ -314,9 +333,9 @@
 		justify-content: center;
 		gap: 0.3125rem;
 		min-height: 2.5rem;
-		padding: 0 0.625rem;
+		padding: 0 0.4375rem;
 		border-radius: 2rem;
-		font-size: 0.9375rem;
+		font-size: 0.875rem;
 		font-weight: 600;
 		white-space: nowrap;
 		cursor: pointer;
@@ -335,11 +354,6 @@
 	.pille:has(:focus-visible) {
 		outline: 2px solid hsl(var(--color-border-focus));
 		outline-offset: 2px;
-	}
-	.pille :global(svg) {
-		flex: none;
-		width: 1.125rem;
-		height: 1.125rem;
 	}
 	.zahl {
 		font-weight: 500;
@@ -518,12 +532,23 @@
 	.fuss {
 		display: flex;
 		align-items: center;
+		min-width: 0;
 		gap: 0.25rem 0.875rem;
 		font-size: 0.875rem;
 		color: hsl(var(--color-text-tertiary));
 	}
 	.dauer {
 		font-variant-numeric: tabular-nums;
+	}
+	.fuss > :not(.modell) {
+		flex: none;
+		white-space: nowrap;
+	}
+	.modell {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	.gespeichert {
 		display: inline-flex;

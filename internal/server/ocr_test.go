@@ -82,6 +82,17 @@ func TestOCRReadMultipart(t *testing.T) {
 	if w.Code != 200 || string(f.image) != "png bytes" || f.options.Languages != "eng" || f.options.Layout != "auto" {
 		t.Errorf("%d %s, engine got %q %+v", w.Code, w.Body, f.image, f.options)
 	}
+
+	// the Live page lists the request, with what came back
+	notes := s.Live.Notes()
+	if len(notes) != 1 {
+		t.Fatalf("%d notes on the Live page", len(notes))
+	}
+	n := notes[0]
+	if n.Kind != live.KindOCR || n.Model != "Tesseract" || !strings.HasPrefix(n.Request, "Bild: seite.png") ||
+		!strings.Contains(n.Request, "Sprachen: eng") || n.Response != "Zinnteller\n" || n.Ended == nil || len(n.Facts) == 0 {
+		t.Errorf("logged: %+v", n)
+	}
 }
 
 func TestOCRErrors(t *testing.T) {
