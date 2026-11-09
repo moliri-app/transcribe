@@ -165,7 +165,8 @@ test.describe('Bibliothek', () => {
 
     const title = card(page, 'Zeitzeuge Berger, Papierfabrik').getByRole('heading');
     // the name of a recording not transcribed yet, beside its size and date
-    const fresh = page.getByRole('checkbox', { name: /Neue Aufnahme/ }).locator('xpath=following-sibling::span[1]');
+    const tick = page.getByRole('checkbox', { name: /Neue Aufnahme/ });
+    const fresh = tick.locator('xpath=following-sibling::span[1]');
     const measure = (e: HTMLElement | SVGElement) => {
       const r = e.getBoundingClientRect();
       return { width: r.width, lines: Math.round(r.height / parseFloat(getComputedStyle(e).lineHeight)) };
@@ -177,6 +178,8 @@ test.describe('Bibliothek', () => {
       expect(box.width, `title width at ${width} px`).toBeGreaterThan(150);
       expect(box.lines, `title lines at ${width} px`).toBeLessThanOrEqual(3);
       expect((await fresh.evaluate(measure)).lines, `new recording's name at ${width} px`).toBeLessThanOrEqual(2);
+      // its checkbox stays in front of it, not on a line above
+      expect((await fresh.boundingBox())!.y, `new recording's checkbox at ${width} px`).toBeLessThan((await tick.boundingBox())!.y + 20);
     }
     // and the page never needs scrolling sideways
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);

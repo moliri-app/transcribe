@@ -1536,6 +1536,8 @@
 		cursor: pointer;
 	}
 	.aufnahme .name {
+		flex: 1 1 5rem;
+		min-width: 0;
 		overflow-wrap: anywhere;
 	}
 	.aufnahme .wo {
