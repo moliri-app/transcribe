@@ -1511,12 +1511,14 @@
 		border-radius: 0.375rem;
 		transition: background-color 0.15s;
 	}
+	/* in a narrow window size and date go to a line of their own, rather than squeezing the name */
 	.aufnahme label {
 		flex: 1;
 		min-width: 0;
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
-		gap: 0.75rem;
+		gap: 0.25rem 0.75rem;
 		min-height: var(--hit);
 		padding: 0.25rem 0.75rem;
 		cursor: pointer;
@@ -2042,8 +2044,8 @@
 		outline-offset: 2px;
 	}
 
-	/* schmaler: erst gehen die Sprecher, dann rücken die übrigen Spalten neben den Titel, ganz
-	   schmal unter ihn; der Titel behält so immer Platz für ein paar Wörter je Zeile */
+	/* narrower: first the speakers go, then the remaining columns move beside the title, and in a
+	   very narrow list below it; the title always keeps room for a few words per line */
 	@container regal (width < 64rem) {
 		.eintrag {
 			grid-template-columns: var(--hit) minmax(0, 1fr) 6.5rem 8.5rem 6.5rem calc(4 * var(--hit));
