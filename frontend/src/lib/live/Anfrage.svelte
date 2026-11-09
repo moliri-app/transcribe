@@ -111,6 +111,12 @@
 						</button>
 					{/if}
 				</div>
+				{#if n.image}
+					{@const bild = `/api/live/image?id=${encodeURIComponent(n.id)}`}
+					<a class="bild" href={bild} target="_blank" rel="noopener" title="Bild in voller Größe öffnen">
+						<img src={bild} alt="Das Bild, das gelesen wurde" />
+					</a>
+				{/if}
 				<pre>{n.request || '–'}</pre>
 			</section>
 
@@ -344,6 +350,24 @@
 	}
 	.klein:hover {
 		color: hsl(var(--color-text-primary));
+	}
+	.bild {
+		justify-self: start;
+		display: block;
+		max-width: 100%;
+		border: 1px solid hsl(var(--color-border-primary));
+		border-radius: 0.5rem;
+		overflow: hidden;
+		cursor: zoom-in;
+	}
+	.bild img {
+		display: block;
+		max-width: 100%;
+		max-height: 24rem;
+		object-fit: contain;
+	}
+	.bild:focus-visible {
+		outline-offset: 2px;
 	}
 	pre {
 		max-height: 28rem;

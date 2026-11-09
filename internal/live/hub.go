@@ -75,6 +75,7 @@ func NewHub(dataDir string, open Opener) *Hub {
 	for _, n := range h.notes {
 		h.byID[n.ID] = n
 	}
+	sweepImages(dataDir)
 	go h.pruneLoop()
 	return h
 }

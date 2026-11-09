@@ -11,11 +11,11 @@ import { langName } from '$lib/moliri/components/files/transcript/editor/sprache
  * @typedef {{ text: string, start: number, end: number, source?: 'mic' | 'system' }} Zeile */
 /** source: was die App aufgenommen hat; fehlt, wenn ein Programm den Ton geschickt hat. Eine Anfrage an
  * einen Dienst (ocr, filter, embed; internal/live/calls.go) hat statt Sätzen model, request, response und
- * facts; partial sagt, was sie gerade tut.
+ * facts (bei der Texterkennung auch das Bild, image); partial sagt, was sie gerade tut.
  * @typedef {{ id: string, kind: 'audio' | 'mic' | 'dauer' | 'diktat' | Dienst, client?: string, started: string, ended?: string,
  *   lines: Zeile[], partial?: string, partialSource?: 'mic' | 'system', audio?: string, language?: string,
  *   source?: Quelle, error?: string, loading?: boolean, waiting?: boolean, transient?: boolean,
- *   model?: string, request?: string, response?: string, facts?: { label: string, value: string }[] }} Notiz */
+ *   model?: string, request?: string, response?: string, facts?: { label: string, value: string }[], image?: string }} Notiz */
 /** @typedef {keyof typeof DIENSTE} Dienst */
 /** @typedef {'mic' | 'system' | 'both'} Quelle */
 /** input: was mit dem Mikrofon nicht stimmt, solange die Aufnahme läuft (internal/live/input.go)

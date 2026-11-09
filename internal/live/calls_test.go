@@ -7,6 +7,8 @@ package live
 import (
 	"context"
 	"errors"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -71,4 +73,55 @@ func TestNilCall(t *testing.T) {
 	c.Status("x")
 	c.End("", nil)
 	h.Logged(KindFilter, "", "", "", nil)
+}
+
+func TestCallImageKeptAndDeleted(t *testing.T) {
+	dir := t.TempDir()
+	open := func(context.Context, string) (Stream, error) { return &fakeStream{}, nil }
+	h := NewHub(dir, open)
+	src := filepath.Join(t.TempDir(), "upload")
+	if err := os.WriteFile(src, append([]byte("\x89PNG\r\n\x1a\n"), make([]byte, 64)...), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	c := h.Call(KindOCR, "Moliri", "Tesseract", "Bild")
+	c.Image(src)
+	c.End("Text", nil)
+	n := h.Notes()[0]
+	path := h.ImagePath(n.ID)
+	if n.Image != n.ID+".png" || path == "" {
+		t.Fatalf("image %q at %q", n.Image, path)
+	}
+	if _, err := os.Stat(path); err != nil {
+		t.Fatal(err)
+	}
+
+	// an image without its note (one not saved, when the app ended) goes at the next start
+	orphan := filepath.Join(imagesDir(dir), "20260101-000000-1-ocr.png")
+	if err := os.WriteFile(orphan, []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	h = NewHub(dir, open)
+	if _, err := os.Stat(orphan); !os.IsNotExist(err) {
+		t.Error("orphan image stays")
+	}
+	if h.ImagePath(n.ID) != path {
+		t.Error("image lost after a restart")
+	}
+
+	if err := h.Delete(n.ID); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		t.Error("image stays after its note was deleted")
+	}
+
+	// what is not an image is not kept
+	if err := os.WriteFile(src, []byte("%PDF-1.7"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	c = h.Call(KindOCR, "Moliri", "Tesseract", "Bild")
+	c.Image(src)
+	if n := h.Notes()[len(h.Notes())-1]; n.Image != "" {
+		t.Errorf("kept %q", n.Image)
+	}
 }

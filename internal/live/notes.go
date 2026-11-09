@@ -47,6 +47,7 @@ type Note struct {
 	Request  string `json:"request,omitempty"`
 	Response string `json:"response,omitempty"`
 	Facts    []Fact `json:"facts,omitempty"`
+	Image    string `json:"image,omitempty"` // the image text recognition read, in images/ (calls.go)
 }
 
 // Line is one utterance; its times count seconds since the note started.
@@ -107,6 +108,7 @@ func saveNote(dataDir string, n *Note) error {
 }
 
 func removeNote(dataDir, id string) error {
+	removeImage(dataDir, id)
 	err := os.Remove(filepath.Join(notesDir(dataDir), id+".json"))
 	if os.IsNotExist(err) {
 		return nil

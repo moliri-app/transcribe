@@ -177,6 +177,7 @@ func (s *Server) ocrRead(w http.ResponseWriter, r *http.Request) {
 		facts = append(facts, live.Fact{Label: "Grafikkarte", Value: "ja"})
 	}
 	call := s.Live.Call(live.KindOCR, clientName(r), engineName(info), ocrRequest(image, n, o), facts...)
+	call.Image(tmp.Name())
 	res, err := s.cfg.OCR.Read(r.Context(), engine, tmp.Name(), o, s.cfg.Threads)
 	if err != nil {
 		if r.Context().Err() != nil {

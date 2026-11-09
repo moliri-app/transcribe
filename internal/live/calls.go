@@ -6,6 +6,11 @@ package live
 
 import (
 	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -110,6 +115,87 @@ func (c *Call) Model(model string) {
 	defer c.h.mu.Unlock()
 	c.n.Model = model
 	c.h.sendNote(c.n)
+}
+
+// imageTypes are the images a call keeps, by their type, with the extension of their file. Others
+// (a PDF, say) are not kept: a page cannot show them.
+var imageTypes = map[string]string{
+	"image/jpeg": ".jpg", "image/png": ".png", "image/gif": ".gif", "image/webp": ".webp", "image/bmp": ".bmp",
+}
+
+func imagesDir(dataDir string) string { return filepath.Join(notesDir(dataDir), "images") }
+
+// Image keeps a copy of the image at path that the call reads, so that the Live page shows it.
+// Its type comes from its content.
+func (c *Call) Image(path string) {
+	if c == nil {
+		return
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	head := make([]byte, 512)
+	k, _ := io.ReadFull(f, head)
+	ext, ok := imageTypes[http.DetectContentType(head[:k])]
+	if !ok {
+		return
+	}
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
+		return
+	}
+	name := c.n.ID + ext
+	if err := os.MkdirAll(imagesDir(c.h.dataDir), 0o755); err != nil {
+		log.Println("live: keeping the image:", err)
+		return
+	}
+	out, err := os.Create(filepath.Join(imagesDir(c.h.dataDir), name))
+	if err == nil {
+		_, err = io.Copy(out, f)
+		if cerr := out.Close(); err == nil {
+			err = cerr
+		}
+	}
+	if err != nil {
+		log.Println("live: keeping the image:", err)
+		removeImage(c.h.dataDir, c.n.ID)
+		return
+	}
+	c.h.mu.Lock()
+	defer c.h.mu.Unlock()
+	c.n.Image = name
+	c.h.sendNote(c.n)
+	c.h.save(c.n)
+}
+
+// ImagePath is the file of the image of the note with this id, "" when it has none.
+func (h *Hub) ImagePath(id string) string {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if n := h.byID[id]; n != nil && n.Image != "" {
+		return filepath.Join(imagesDir(h.dataDir), n.Image)
+	}
+	return ""
+}
+
+// removeImage deletes the image of the note with this id, if it has one.
+func removeImage(dataDir, id string) {
+	for _, ext := range imageTypes {
+		_ = os.Remove(filepath.Join(imagesDir(dataDir), id+ext))
+	}
+}
+
+// sweepImages deletes the images whose notes are gone: those not saved, when the app ended
+// before it forgot them.
+func sweepImages(dataDir string) {
+	entries, _ := os.ReadDir(imagesDir(dataDir))
+	for _, e := range entries {
+		id := strings.TrimSuffix(e.Name(), filepath.Ext(e.Name()))
+		if _, err := os.Stat(filepath.Join(notesDir(dataDir), id+".json")); os.IsNotExist(err) {
+			_ = os.Remove(filepath.Join(imagesDir(dataDir), e.Name()))
+		}
+	}
 }
 
 // End finishes the call with the response, or err; facts come after those given when it began.

@@ -48,6 +48,7 @@ func (h *Hub) forgetLater(n *Note) {
 		h.mu.Lock()
 		defer h.mu.Unlock()
 		h.drop(n)
+		removeImage(h.dataDir, n.ID)
 	})
 }
 
