@@ -222,7 +222,10 @@
 </article>
 
 <style>
+	/* Kopf und Blatt richten sich nach der Breite der Aufnahme, nicht des Fensters: daneben steht
+	   die Liste */
 	.aufnahme {
+		container-type: inline-size;
 		display: grid;
 		grid-template-rows: auto minmax(0, 1fr);
 		min-height: 0;
@@ -562,7 +565,8 @@
 		}
 	}
 
-	@media (max-width: 1100px) {
+	/* die Pillen neben Titel und Stand nur, solange der Stand dort Platz hat; sonst darunter */
+	@container (max-width: 70rem) {
 		.kopf {
 			grid-template-columns: minmax(0, 1fr);
 		}
@@ -573,7 +577,7 @@
 			margin-top: 0.5rem;
 		}
 	}
-	@media (max-width: 720px) {
+	@container (max-width: 45rem) {
 		.kopf {
 			padding: 0.75rem 1rem;
 		}

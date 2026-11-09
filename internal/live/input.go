@@ -8,46 +8,58 @@ import "math"
 
 // What the microphone sends can be too poor for recognition: the Live page says so (MicState.Input).
 const (
-	InputNarrow = "narrow" // telephone quality: practically nothing above 4.5 kHz, as a Bluetooth headset in hands-free mode sends it
+	InputNarrow = "narrow" // telephone quality: practically nothing above 4 kHz, as a Bluetooth headset in hands-free mode sends it
 	InputQuiet  = "quiet"  // speech stays very quiet
 )
 
 const (
 	inputPieces  = 50   // the last 5 s of speech decide
 	inputEnough  = 30   // and 3 s of speech at least
-	inputNarrow  = 1e-3 // share of the energy above 4.5 kHz below which the input is narrow (-30 dB)
+	inputEdge    = 5000 // above it, telephone quality has nothing; at 4.5 kHz upsampling 8 kHz still leaves a trace
+	inputNarrow  = 1e-4 // energy above inputEdge, relative to 1.5 to 3.4 kHz, below which the input is narrow (-40 dB)
 	inputQuietMS = 3e-5 // mean square of speech below which it is very quiet (-45 dBFS)
 )
 
-// inputCheck watches the microphone while someone speaks. Not safe for concurrent use.
+// inputCheck watches the microphone while someone speaks. Telephone quality is told by its edge:
+// speech up to 3.4 kHz and next to nothing above. The share of all the energy that lies high up
+// does not tell it: a headset that sends the full band but sounds dark has little up there too
+// (a tenth of a percent above 4.5 kHz), against the speech band it is still -30 dB rather than
+// -60 dB. Not safe for concurrent use.
 type inputCheck struct {
-	hp          []biquad  // above 4.5 kHz
-	total, high []float64 // per piece of speech: energy, and the part of it above 4.5 kHz
-	n           []int     // samples per piece
+	hp, band         []biquad  // above inputEdge; 1.5 to 3.4 kHz
+	total, mid, high []float64 // per piece of speech: energy, the part of it in band, and above inputEdge
+	n                []int     // samples per piece
 }
 
 // add takes the next piece of the microphone, speech or not, and says what is wrong with it,
 // if anything.
 func (c *inputCheck) add(pcm []float32, speech bool) string {
-	if c.hp == nil { // eighth-order Butterworth
+	if c.hp == nil { // eighth-order Butterworth; fourth-order on either side of the band
 		for _, q := range []float64{0.5098, 0.6013, 0.9000, 2.5629} {
-			c.hp = append(c.hp, highpass(4500, q))
+			c.hp = append(c.hp, highpass(inputEdge, q))
+		}
+		for _, q := range []float64{0.5412, 1.3066} {
+			c.band = append(c.band, highpass(1500, q), lowpass(3400, q))
 		}
 	}
-	var total, high float64
+	var total, mid, high float64
 	for _, v := range pcm {
 		x := float64(v)
-		h := x
+		h, m := x, x
 		for i := range c.hp {
 			h = c.hp[i].step(h)
 		}
+		for i := range c.band {
+			m = c.band[i].step(m)
+		}
 		total += x * x
+		mid += m * m
 		high += h * h
 	}
 	if speech && len(pcm) > 0 {
-		c.total, c.high, c.n = append(c.total, total), append(c.high, high), append(c.n, len(pcm))
+		c.total, c.mid, c.high, c.n = append(c.total, total), append(c.mid, mid), append(c.high, high), append(c.n, len(pcm))
 		if len(c.total) > inputPieces {
-			c.total, c.high, c.n = c.total[1:], c.high[1:], c.n[1:]
+			c.total, c.mid, c.high, c.n = c.total[1:], c.mid[1:], c.high[1:], c.n[1:]
 		}
 	}
 	return c.verdict()
@@ -57,15 +69,15 @@ func (c *inputCheck) verdict() string {
 	if len(c.total) < inputEnough {
 		return ""
 	}
-	var total, high float64
+	var total, mid, high float64
 	n := 0
 	for i := range c.total {
-		total, high, n = total+c.total[i], high+c.high[i], n+c.n[i]
+		total, mid, high, n = total+c.total[i], mid+c.mid[i], high+c.high[i], n+c.n[i]
 	}
 	switch {
 	case total/float64(n) < inputQuietMS:
 		return InputQuiet
-	case high < inputNarrow*total:
+	case high < inputNarrow*mid:
 		return InputNarrow
 	}
 	return ""
@@ -85,6 +97,15 @@ func highpass(f, q float64) biquad {
 	cw := math.Cos(w)
 	a0 := 1 + alpha
 	return biquad{b0: (1 + cw) / 2 / a0, b1: -(1 + cw) / a0, b2: (1 + cw) / 2 / a0, a1: -2 * cw / a0, a2: (1 - alpha) / a0}
+}
+
+// lowpass is highpass's counterpart.
+func lowpass(f, q float64) biquad {
+	w := 2 * math.Pi * f / SR
+	alpha := math.Sin(w) / (2 * q)
+	cw := math.Cos(w)
+	a0 := 1 + alpha
+	return biquad{b0: (1 - cw) / 2 / a0, b1: (1 - cw) / a0, b2: (1 - cw) / 2 / a0, a1: -2 * cw / a0, a2: (1 - alpha) / a0}
 }
 
 func (b *biquad) step(x float64) float64 {
