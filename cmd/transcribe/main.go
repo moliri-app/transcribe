@@ -143,6 +143,7 @@ func main() {
 		}
 	}
 	media.SetDataDir(*data)
+	go media.LinkedIn(*data) // the first walk of the connected folders, before the library asks for it
 	pl := runner.New(*data)
 	upd := newUpdater(exe)
 	srv := server.New(server.Config{DataDir: *data, Runner: pl.Run, Retranscriber: pl, Threads: *threads, Live: pl.OpenLive, Warmer: pl,

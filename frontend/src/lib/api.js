@@ -12,6 +12,47 @@ export async function getJSON(url, init) {
 }
 
 /**
+ * Für eine Abfrage, die eine Seite regelmäßig stellt: nie zweimal zugleich. Solange eine offen ist,
+ * bekommt, wer sie wieder stellt, die offene. Sonst stauen sich bei einem beschäftigten Server die
+ * Fragen, bis der Browser keine Verbindung mehr frei hat (er öffnet je Adresse nur sechs) und selbst
+ * die kleinste nicht mehr durchkommt. Nach einer Änderung fragt die Seite f selbst, damit die Antwort
+ * sie schon kennt.
+ * @template {unknown[]} A @template R
+ * @param {(...a: A) => Promise<R>} f
+ * @returns {(...a: A) => Promise<R>}
+ */
+export function einzeln(f) {
+	/** @type {Promise<R> | null} */
+	let offen = null;
+	return (...a) => (offen ??= f(...a).finally(() => (offen = null)));
+}
+
+/**
+ * Ob Transcribe noch läuft, nach den Abfragen einer Seite. Nur was den Server gar nicht erreicht
+ * (er läuft nicht mehr: der Browser bekommt keine Verbindung), zählt, und erst zweimal in Folge.
+ * Eine Antwort, die nur lange braucht, zählt nicht: Ein Server, der gerade viel zu tun hat, läuft
+ * noch. Erst wenn eine Minute lang gar keine kam, gilt er als fort.
+ */
+export function verbindung() {
+	let fehlschlaege = 0;
+	let antwort = Date.now();
+	return {
+		/** eine Antwort kam */
+		ok() {
+			fehlschlaege = 0;
+			antwort = Date.now();
+		},
+		/** eine Abfrage ging schief; gibt zurück, ob die Seite „Keine Verbindung“ zeigen soll
+		 * @param {unknown} e */
+		fehler(e) {
+			if (e instanceof TypeError) fehlschlaege++; // fetch: keine Verbindung zum Server
+			else if (!(e instanceof DOMException)) this.ok(); // er antwortete, nur mit einem Fehler (nicht: abgebrochen)
+			return fehlschlaege >= 2 || Date.now() - antwort > 60_000;
+		}
+	};
+}
+
+/**
  * POST mit JSON; wirft mit der Meldung des Servers, wenn er ablehnt.
  * @param {string} url
  * @param {unknown} [body]

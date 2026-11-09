@@ -8,6 +8,7 @@
 	import { page } from '$app/state';
 	import { onMount, tick } from 'svelte';
 	import { auftraege } from '$lib/auftraege.svelte.js';
+	import { einzeln } from '$lib/api.js';
 	import { beobachteUpdate, update, versionText } from '$lib/update.svelte.js';
 	import Dropdown from '$lib/moliri/components/ui/Dropdown.svelte';
 	import DropdownItem from '$lib/moliri/components/ui/DropdownItem.svelte';
@@ -80,7 +81,7 @@
 	});
 
 	onMount(() => {
-		const t = setInterval(refresh, 4000);
+		const t = setInterval(einzeln(refresh), 4000);
 		const u = beobachteUpdate();
 		return () => {
 			clearInterval(t);
