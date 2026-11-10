@@ -164,6 +164,7 @@ type speechSegment struct {
 var (
 	loadErr        error
 	createRecF     func(unsafe.Pointer) uintptr
+	setConfigF     func(uintptr, unsafe.Pointer)
 	createStreamF  func(uintptr) uintptr
 	acceptWaveF    func(uintptr, int32, unsafe.Pointer, int32)
 	decodeF        func(uintptr, uintptr)
@@ -261,6 +262,7 @@ func load(dir string) error {
 	}
 	reg := func(f any, name string) { purego.RegisterLibFunc(f, h, name) }
 	reg(&createRecF, "SherpaOnnxCreateOfflineRecognizer")
+	reg(&setConfigF, "SherpaOnnxOfflineRecognizerSetConfig")
 	reg(&createStreamF, "SherpaOnnxCreateOfflineStream")
 	reg(&acceptWaveF, "SherpaOnnxAcceptWaveformOffline")
 	reg(&decodeF, "SherpaOnnxDecodeOfflineStream")
@@ -312,6 +314,7 @@ type RecognizerConfig struct {
 type Recognizer struct {
 	h  uintptr
 	mu sync.Mutex
+	c  RecognizerConfig // as created, Language as last set
 }
 
 func NewRecognizer(c RecognizerConfig) (*Recognizer, error) {
@@ -319,7 +322,23 @@ func NewRecognizer(c RecognizerConfig) (*Recognizer, error) {
 		return nil, err
 	}
 	var k keeper
-	cfg := offlineRecognizerConfig{}
+	cfg, cleanup, err := c.native(&k)
+	if err != nil {
+		return nil, err
+	}
+	defer cleanup()
+	h := createRecF(unsafe.Pointer(&cfg))
+	runtime.KeepAlive(&k)
+	runtime.KeepAlive(&cfg)
+	if h == 0 {
+		return nil, fmt.Errorf("sherpa: cannot create recognizer (%s)", c.Kind)
+	}
+	return &Recognizer{h: h, c: c}, nil
+}
+
+// native is c as the C API takes it, its strings held by k; cleanup removes the files it wrote.
+func (c RecognizerConfig) native(k *keeper) (cfg offlineRecognizerConfig, cleanup func(), err error) {
+	cleanup = func() {}
 	cfg.Feat = featureConfig{16000, 80}
 	cfg.Model.Tokens = k.s(c.Tokens)
 	cfg.Model.NumThreads = int32(c.Threads)
@@ -335,10 +354,9 @@ func NewRecognizer(c RecognizerConfig) (*Recognizer, error) {
 		if len(c.Hotwords) > 0 {
 			vocab, words, err := hotwordFiles(c.Tokens, c.Hotwords)
 			if err != nil {
-				return nil, err
+				return cfg, cleanup, err
 			}
-			defer os.Remove(vocab)
-			defer os.Remove(words)
+			cleanup = func() { os.Remove(vocab); os.Remove(words) }
 			cfg.DecodingMethod = k.s("modified_beam_search")
 			cfg.MaxActivePaths = 4
 			cfg.Model.ModelingUnit = k.s("bpe")
@@ -352,23 +370,44 @@ func NewRecognizer(c RecognizerConfig) (*Recognizer, error) {
 			cfg.Model.Whisper.TokenTS = 1
 		}
 	default:
-		return nil, fmt.Errorf("unknown recognizer kind %q", c.Kind)
+		return cfg, cleanup, fmt.Errorf("unknown recognizer kind %q", c.Kind)
 	}
-	h := createRecF(unsafe.Pointer(&cfg))
-	runtime.KeepAlive(&k)
-	runtime.KeepAlive(&cfg)
-	if h == 0 {
-		return nil, fmt.Errorf("sherpa: cannot create recognizer (%s)", c.Kind)
-	}
-	return &Recognizer{h: h}, nil
+	return cfg, cleanup, nil
 }
 
 func (r *Recognizer) Close() { destroyRecF(r.h) }
+
+// DecodeIn is Decode with a Whisper recognizer set to lang first ("": the language it detects),
+// which stays set for the decodes after it. One model so serves every language, where a
+// recognizer per language would hold a copy of it each.
+func (r *Recognizer) DecodeIn(lang string, samples []float32) Result {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.c.Kind == "whisper" && lang != r.c.Language {
+		c := r.c
+		c.Language = lang
+		var k keeper
+		cfg, cleanup, err := c.native(&k)
+		cleanup()
+		if err == nil {
+			// the whisper recognizer takes over only the whisper part, read at each decode
+			setConfigF(r.h, unsafe.Pointer(&cfg))
+			runtime.KeepAlive(&k)
+			runtime.KeepAlive(&cfg)
+			r.c = c
+		}
+	}
+	return r.decode(samples)
+}
 
 // Decode runs one utterance (16 kHz mono float32).
 func (r *Recognizer) Decode(samples []float32) Result {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+	return r.decode(samples)
+}
+
+func (r *Recognizer) decode(samples []float32) Result {
 	s := createStreamF(r.h)
 	defer destroyStreamF(s)
 	if len(samples) > 0 {
