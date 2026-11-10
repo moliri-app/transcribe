@@ -320,7 +320,9 @@ func clipFileName(title string) string {
 }
 
 func (s *Server) queueList(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, 200, map[string]any{"jobs": s.Queue.List()})
+	// paused: by the user until they go on; live: while a live transcription runs
+	paused, live := s.Queue.Paused()
+	writeJSON(w, 200, map[string]any{"jobs": s.Queue.List(), "paused": paused, "live": live})
 }
 
 func readBody(r *http.Request) ([]byte, error) {
@@ -365,6 +367,10 @@ func (s *Server) queueAction(w http.ResponseWriter, r *http.Request) {
 		}
 	case len(parts) == 1 && parts[0] == "cancel-all":
 		s.Queue.CancelAll()
+	case len(parts) == 1 && parts[0] == "pause":
+		s.Queue.Pause()
+	case len(parts) == 1 && parts[0] == "resume":
+		s.Queue.Resume()
 	case len(parts) == 2 && parts[1] == "cancel":
 		err = s.Queue.Cancel(parts[0])
 	case len(parts) == 2 && parts[1] == "retry":

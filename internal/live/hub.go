@@ -35,6 +35,9 @@ type Hub struct {
 	// Warmer keeps live recognition loaded while the live mode is on (mode.go); nil for none. Set
 	// it before serving.
 	Warmer Warmer
+	// Hold pauses the transcription of whole recordings while a live transcription runs, so it has
+	// the computer first (queue.Queue.Hold); nil for none. Set it before serving.
+	Hold func() (release func())
 
 	mu       sync.Mutex
 	notes    []*Note // oldest first
@@ -42,7 +45,8 @@ type Hub struct {
 	subs     map[chan []byte]struct{}
 	watching bool // watchDevices runs
 	blocked  []Refusal
-	active   int // notes still running
+	active   int    // notes still running
+	release  func() // ends the Hold while notes run
 	seq      int
 	warm     string // WarmLoading, WarmReady or ""
 
@@ -315,6 +319,9 @@ func (h *Hub) newNote(kind, client string) *Note {
 	now := time.Now()
 	n := &Note{ID: fmt.Sprintf("%s-%d", now.Format(idTime), h.seq), Kind: kind, Client: client, Started: now, Lines: []Line{}, Loading: true, Transient: transient}
 	h.add(n)
+	if h.active == 0 && h.Hold != nil {
+		h.release = h.Hold()
+	}
 	h.active++
 	h.sendNote(n)
 	return n
@@ -415,6 +422,10 @@ func (h *Hub) finish(t *tap, err error) {
 		n.Error = err.Error()
 	}
 	h.active--
+	if h.active == 0 && h.release != nil {
+		h.release()
+		h.release = nil
+	}
 	h.sendNote(n)
 	h.save(n)
 	h.forgetLater(n)

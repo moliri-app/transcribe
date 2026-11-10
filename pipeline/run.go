@@ -298,6 +298,9 @@ func (e *Engine) TranscribeWhisper(ctx context.Context, pcm []float32, langs []s
 	var segs []tseg
 	for _, sp0 := range speech {
 		for _, sp := range splitLong(sp0, 25) {
+			if err := jobs.Hold(ctx); err != nil {
+				return nil, err
+			}
 			a := float64(sp.Start) / audio.SR
 			b := a + float64(len(sp.Samples))/audio.SR
 			lang := langs[0]

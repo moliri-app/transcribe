@@ -9,6 +9,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -201,4 +202,120 @@ func TestShutdownRequeues(t *testing.T) {
 	if s := New(d, nil, 0).List()[0].Status; s != Queued {
 		t.Errorf("after restart: %s", s)
 	}
+}
+
+// A paused queue holds its running job where it is and starts no other, also after a restart;
+// a live transcription holds it the same way until it ends.
+func TestPause(t *testing.T) {
+	d := newData(t, "a.mp3", "b.mp3")
+	var steps atomic.Int32
+	finish := make(chan struct{})
+	run := func(ctx context.Context, _, audio string, o jobs.Options, p jobs.Progress) error {
+		if audio == "b.mp3" {
+			return nil
+		}
+		for {
+			if err := jobs.Hold(ctx); err != nil {
+				return err
+			}
+			steps.Add(1)
+			select {
+			case <-finish:
+				return nil
+			case <-time.After(time.Millisecond):
+			}
+		}
+	}
+	q := New(d, run, 0)
+	ctx, stop := context.WithCancel(context.Background())
+	q.Start(ctx)
+	if _, err := q.Add([]string{"a.mp3", "b.mp3"}, nil); err != nil {
+		t.Fatal(err)
+	}
+	ids := map[string]string{}
+	for _, j := range q.List() {
+		ids[j.Audio] = j.ID
+	}
+	waitFor(t, q, ids["a.mp3"], Running)
+
+	q.Pause()
+	waitFor(t, q, ids["a.mp3"], Paused)
+	time.Sleep(20 * time.Millisecond)
+	n := steps.Load()
+	time.Sleep(50 * time.Millisecond)
+	if steps.Load() != n {
+		t.Error("the paused job went on working")
+	}
+	if user, live := q.Paused(); !user || live {
+		t.Errorf("paused: user %v, live %v", user, live)
+	}
+
+	release := q.Hold()
+	q.Resume()
+	time.Sleep(50 * time.Millisecond)
+	if status(q, ids["a.mp3"]) != Paused || steps.Load() != n {
+		t.Error("the job went on while a live transcription held the queue")
+	}
+	release()
+	release() // a second release changes nothing
+	waitFor(t, q, ids["a.mp3"], Running)
+	if steps.Load() == n {
+		time.Sleep(50 * time.Millisecond)
+		if steps.Load() == n {
+			t.Error("the job did not go on")
+		}
+	}
+
+	// shut down while paused: the job waits again after the restart, the queue still paused
+	q.Pause()
+	waitFor(t, q, ids["a.mp3"], Paused)
+	stop()
+	q.Wait()
+	if got := status(q, ids["a.mp3"]); got != Queued {
+		t.Fatalf("after shutdown: %q", got)
+	}
+	q2 := New(d, run, 0)
+	ctx2, stop2 := context.WithCancel(context.Background())
+	defer stop2()
+	q2.Start(ctx2)
+	time.Sleep(50 * time.Millisecond)
+	if got := status(q2, ids["a.mp3"]); got != Queued {
+		t.Errorf("after the restart the paused queue started its job: %q", got)
+	}
+	q2.Resume()
+	waitFor(t, q2, ids["a.mp3"], Running)
+	close(finish)
+	waitFor(t, q2, ids["a.mp3"], Done)
+	waitFor(t, q2, ids["b.mp3"], Done)
+}
+
+func TestCancelPaused(t *testing.T) {
+	d := newData(t, "a.mp3")
+	run := func(ctx context.Context, _, audio string, o jobs.Options, p jobs.Progress) error {
+		for {
+			if err := jobs.Hold(ctx); err != nil {
+				return err
+			}
+			time.Sleep(time.Millisecond)
+		}
+	}
+	q := New(d, run, 0)
+	ctx, stop := context.WithCancel(context.Background())
+	defer stop()
+	q.Start(ctx)
+	if _, err := q.Add([]string{"a.mp3"}, nil); err != nil {
+		t.Fatal(err)
+	}
+	id := q.List()[0].ID
+	waitFor(t, q, id, Running)
+	release := q.Hold()
+	defer release()
+	waitFor(t, q, id, Paused)
+	if err := q.Remove(id); err == nil {
+		t.Error("a paused job was removed")
+	}
+	if err := q.Cancel(id); err != nil {
+		t.Fatal(err)
+	}
+	waitFor(t, q, id, Canceled)
 }

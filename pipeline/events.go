@@ -9,6 +9,7 @@ import (
 	"sort"
 
 	"github.com/moliri-app/transcribe/audio"
+	"github.com/moliri-app/transcribe/jobs"
 	"github.com/moliri-app/transcribe/model"
 	"github.com/moliri-app/transcribe/sherpa"
 )
@@ -55,7 +56,7 @@ func TagEvents(ctx context.Context, pcm []float32, t *sherpa.Tagger, win, hop, g
 	var hits []hit
 	limit := max(1, len(pcm)-W+H)
 	for start := 0; start < limit; start += H {
-		if err := ctx.Err(); err != nil {
+		if err := jobs.Hold(ctx); err != nil {
 			return nil, err
 		}
 		end := min(start+W, len(pcm))

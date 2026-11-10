@@ -68,7 +68,7 @@
 	async function refresh() {
 		try {
 			const { jobs } = await (await fetch('/api/queue')).json();
-			active = jobs.filter((/** @type {{status: string}} */ j) => ['queued', 'running', 'canceling'].includes(j.status)).length;
+			active = jobs.filter((/** @type {{status: string}} */ j) => ['queued', 'running', 'paused', 'canceling'].includes(j.status)).length;
 		} catch {
 			// Server gerade nicht erreichbar: Zahl bleibt stehen
 		}

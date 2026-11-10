@@ -11,7 +11,10 @@ the address in use). Live transcription is a WebSocket:
 ws://localhost:31765/api/live
 ```
 
-Recognition runs on this computer (Parakeet with Silero VAD); nothing leaves it. The background mode
+Recognition runs on this computer (Parakeet with Silero VAD); nothing leaves it. While a live
+transcription runs (a request here, a recording on the Live page or dictation), the transcription
+of whole recordings in the library pauses where it is and goes on once the last one has ended, so
+the live text comes first. The background mode
 („Im Hintergrund bereit“), switched on and off on the Live page and in the settings under „Andere
 Programme“, keeps the model loaded while it is on (the default), so a request starts at once; only
 when the model has not been downloaded yet, the first request downloads and loads it, which takes a

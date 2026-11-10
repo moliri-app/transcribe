@@ -24,6 +24,7 @@ import (
 const (
 	Queued    = "queued"
 	Running   = "running"
+	Paused    = "paused" // running, but held where it stopped (Pause, Hold)
 	Canceling = "canceling"
 	Canceled  = "canceled"
 	Done      = "done"
@@ -58,19 +59,28 @@ type Job struct {
 }
 
 func (j *Job) active() bool {
-	return j.Status == Queued || j.Status == Running || j.Status == Canceling
+	return j.Status == Queued || j.Status == Running || j.Status == Paused || j.Status == Canceling
+}
+
+// started reports whether the job's work has begun and not yet ended.
+func (j *Job) started() bool {
+	return j.Status == Running || j.Status == Paused || j.Status == Canceling
 }
 
 type Queue struct {
 	DataDir        string
 	DefaultThreads int
 
-	run    Runner
-	mu     sync.Mutex
-	jobs   []*Job
-	cancel context.CancelFunc // of the running job
-	wake   chan struct{}
-	done   chan struct{}
+	run     Runner
+	mu      sync.Mutex
+	jobs    []*Job
+	current *Job               // the running job
+	cancel  context.CancelFunc // of the running job
+	paused  bool               // by the user (Pause); kept in _queue.json until Resume
+	holds   int                // live transcriptions holding the queue (Hold)
+	gate    jobs.Gate          // shut while paused or held: the running job waits at its next step
+	wake    chan struct{}
+	done    chan struct{}
 }
 
 func New(dataDir string, run Runner, defaultThreads int) *Queue {
@@ -90,14 +100,17 @@ func (q *Queue) path() string { return filepath.Join(q.DataDir, "results", "_que
 
 func (q *Queue) load() {
 	var f struct {
-		Jobs []*Job `json:"jobs"`
+		Jobs   []*Job `json:"jobs"`
+		Paused bool   `json:"paused"`
 	}
 	if fileutil.ReadJSON(q.path(), &f) != nil {
 		return
 	}
+	q.paused = f.Paused
+	q.hold()
 	for _, j := range f.Jobs {
 		switch j.Status {
-		case Running:
+		case Running, Paused:
 			// a shutdown puts its job back in the queue (runNext), so this one was running when the
 			// app crashed or was killed; running it again at once could crash it again, at every start
 			j.Status, j.Finished = Failed, ptr(now())
@@ -120,7 +133,75 @@ func (q *Queue) save() {
 	if jobs == nil {
 		jobs = []*Job{}
 	}
-	_ = fileutil.WriteJSON(q.path(), map[string]any{"jobs": jobs})
+	_ = fileutil.WriteJSON(q.path(), map[string]any{"jobs": jobs, "paused": q.paused})
+}
+
+// hold shuts the gate while the queue is paused or held and opens it otherwise, and shows on the
+// running job whether it waits; it must be called with mu held, after paused or holds changed.
+func (q *Queue) hold() {
+	shut := q.paused || q.holds > 0
+	if shut {
+		q.gate.Shut()
+	} else {
+		q.gate.Open()
+	}
+	if j := q.current; j != nil {
+		switch {
+		case shut && j.Status == Running:
+			j.Status = Paused
+		case !shut && j.Status == Paused:
+			j.Status = Running
+		}
+	}
+}
+
+// Pause stops the transcriptions until Resume, also across a restart: the running one waits where
+// it is (on its next piece of audio), the waiting ones do not start.
+func (q *Queue) Pause() {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	q.paused = true
+	q.hold()
+	q.save()
+}
+
+// Resume lets the transcriptions go on after Pause (unless a live transcription holds them).
+func (q *Queue) Resume() {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	q.paused = false
+	q.hold()
+	q.save()
+	q.poke()
+}
+
+// Hold pauses the transcriptions like Pause until release is called, for a live transcription
+// to have the computer first. Holds add up; release may be called more than once.
+func (q *Queue) Hold() (release func()) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	q.holds++
+	q.hold()
+	q.save()
+	var once sync.Once
+	return func() {
+		once.Do(func() {
+			q.mu.Lock()
+			defer q.mu.Unlock()
+			q.holds--
+			q.hold()
+			q.save()
+			q.poke()
+		})
+	}
+}
+
+// Paused reports whether the user paused the transcriptions and whether a live transcription
+// holds them.
+func (q *Queue) Paused() (byUser, byLive bool) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	return q.paused, q.holds > 0
 }
 
 func (q *Queue) poke() {
@@ -208,7 +289,7 @@ func (q *Queue) cancelLocked(j *Job) {
 	switch j.Status {
 	case Queued:
 		j.Status, j.Finished = Canceled, ptr(now())
-	case Running:
+	case Running, Paused:
 		j.Status = Canceling
 		if q.cancel != nil {
 			q.cancel()
@@ -261,7 +342,7 @@ func (q *Queue) Remove(id string) error {
 	if j == nil {
 		return ErrUnknownJob
 	}
-	if j.Status == Running || j.Status == Canceling {
+	if j.started() {
 		return jobs.JobError("cancel the running job first")
 	}
 	for i, x := range q.jobs {
@@ -286,7 +367,7 @@ func (q *Queue) Forget(audio string) error {
 	for _, j := range q.jobs {
 		if j.Audio != audio {
 			keep = append(keep, j)
-		} else if j.Status == Running || j.Status == Canceling {
+		} else if j.started() {
 			return ErrBusy
 		}
 	}
@@ -345,6 +426,10 @@ func (q *Queue) loop(ctx context.Context) {
 
 func (q *Queue) runNext(parent context.Context) bool {
 	q.mu.Lock()
+	if q.paused || q.holds > 0 {
+		q.mu.Unlock()
+		return false
+	}
 	var j *Job
 	for _, x := range q.jobs {
 		if x.Status == Queued {
@@ -357,7 +442,7 @@ func (q *Queue) runNext(parent context.Context) bool {
 		return false
 	}
 	ctx, cancel := context.WithCancel(parent)
-	q.cancel = cancel
+	q.cancel, q.current = cancel, j
 	j.Status, j.Started, j.Progress, j.Step = Running, ptr(now()), 0, ptr("Start")
 	j.Log, j.Error = []string{}, nil
 	q.save()
@@ -366,6 +451,7 @@ func (q *Queue) runNext(parent context.Context) bool {
 	defer cancel()
 
 	ctx = context.WithValue(ctx, logKey{}, func(s string) { q.appendLog(j, s) })
+	ctx = jobs.WithGate(ctx, &q.gate)
 	prog := func(step, total int, label string) {
 		q.mu.Lock()
 		defer q.mu.Unlock()
@@ -379,8 +465,8 @@ func (q *Queue) runNext(parent context.Context) bool {
 
 	q.mu.Lock()
 	defer q.mu.Unlock()
-	q.cancel = nil
-	if parent.Err() != nil && j.Status == Running {
+	q.cancel, q.current = nil, nil
+	if parent.Err() != nil && (j.Status == Running || j.Status == Paused) {
 		// shutting down: the job runs again on the next start
 		j.Status, j.Progress, j.Step, j.Started = Queued, 0, nil, nil
 		j.Note = ptr("nach Neustart erneut eingereiht")

@@ -14,6 +14,7 @@ import (
 	"sync"
 
 	"github.com/moliri-app/transcribe/audio"
+	"github.com/moliri-app/transcribe/jobs"
 	"github.com/moliri-app/transcribe/model"
 	"github.com/moliri-app/transcribe/models"
 	"github.com/moliri-app/transcribe/sherpa"
@@ -291,7 +292,7 @@ func meanP(ws []model.Word) (float64, bool) {
 func (e *Engine) deFallback(ctx context.Context, segs []tseg, pcm []float32, lang string) ([]tseg, error) {
 	var out []tseg
 	for _, sg := range segs {
-		if err := ctx.Err(); err != nil {
+		if err := jobs.Hold(ctx); err != nil {
 			return nil, err
 		}
 		n := len(strings.Fields(sg.Text))
@@ -448,7 +449,7 @@ func (e *Engine) fillGaps(ctx context.Context, segs []tseg, pcm []float32, o Tex
 	}
 	added := []tseg{}
 	for _, g := range gaps {
-		if err := ctx.Err(); err != nil {
+		if err := jobs.Hold(ctx); err != nil {
 			return nil, err
 		}
 		if speechActivity(pcm, g.a, g.b, ref) < 0.25 {
