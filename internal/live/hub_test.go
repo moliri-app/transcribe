@@ -293,8 +293,9 @@ func TestLivePageHearsWhatWaits(t *testing.T) {
 	}}
 	r.do(func() { r.taps[tp] = struct{}{} })
 	narrow := make([]float32, SR/10)
-	for i := range narrow {
-		narrow[i] = float32(0.1 * math.Sin(2*math.Pi*500*float64(i)/SR))
+	for i := range narrow { // tones in the telephone band, which the check compares the top with
+		x := 2 * math.Pi * float64(i) / SR
+		narrow[i] = float32(0.05*math.Sin(500*x) + 0.05*math.Sin(2000*x))
 	}
 	for range 40 { // 4 s of speech that has nothing above 4.5 kHz
 		r.audio <- chunk{pcm: narrow, micPCM: narrow}
