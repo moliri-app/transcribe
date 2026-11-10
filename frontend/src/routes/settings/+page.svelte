@@ -1139,9 +1139,6 @@
 						</Button>
 					</div>
 					{#if kopierFehler}<p class="warnung" role="status">{kopierFehler}</p>{/if}
-					<p class="meta">
-						Die Spracheingabe in Moliri will bisher die Adresse der Live-Transkription: <code>{adresse}</code>
-					</p>
 					<dl class="modi">
 						<dt>Audio schicken</dt>
 						<dd>Das Programm nimmt selbst auf und schickt den Ton; der Text kommt sofort zurück.</dd>
