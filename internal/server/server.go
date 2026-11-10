@@ -100,6 +100,7 @@ func New(cfg Config) *Server {
 	if cfg.Live != nil {
 		s.Live = live.NewHub(cfg.DataDir, cfg.Live)
 		s.Live.Warmer = cfg.Warmer
+		s.Live.Hold = s.Queue.Hold
 	}
 	m := http.NewServeMux()
 	m.HandleFunc("/api/ping", s.ping)

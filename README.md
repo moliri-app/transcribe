@@ -101,6 +101,13 @@ mit dem Anfang seines Transkripts, den Sprechern und den Korrekturen von Hand; e
 Editor. Darüber steht, was gerade transkribiert wird, und was noch kein Transkript hat. Zu wählen
 sind nur die Sprecher (meist automatisch) und die Sprachen; die Zahl der Threads wählt die App selbst.
 
+**Pausieren** hält die Transkriptionen an, damit der Rechner frei für anderes ist: Die laufende bleibt
+an ihrer Stelle stehen, mit ihren Modellen im Arbeitsspeicher, die wartenden beginnen nicht.
+**Fortsetzen** macht dort weiter. Die Pause hält auch über einen Neustart, die unterbrochene
+Transkription beginnt dann von vorn. Während einer Live-Transkription (Live-Seite, Diktieren oder ein
+anderes Programm über die Live-API) pausieren die Transkriptionen von selbst und gehen danach weiter,
+damit die Live-Anfrage den Rechner zuerst hat.
+
 Unter Windows zeigt die App ein Symbol im Infobereich der Taskleiste: Ein Klick öffnet das Fenster,
 ein Rechtsklick zeigt „Einstellungen“ und „Beenden“, das mit der App auch ihre Fenster schließt.
 Läuft die App schon, holt ein zweiter Start ihr offenes Fenster nach vorn (auch ein minimiertes) und

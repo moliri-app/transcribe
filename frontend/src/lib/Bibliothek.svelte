@@ -38,10 +38,11 @@
 	const STATUS = /** @type {Record<string, string>} */ ({
 		queued: 'wartet',
 		running: 'läuft',
+		paused: 'pausiert',
 		canceling: 'bricht ab',
 		error: 'Fehler'
 	});
-	const LAUFEND = ['queued', 'running', 'canceling'];
+	const LAUFEND = ['queued', 'running', 'paused', 'canceling'];
 
 	const SORTEN = /** @type {const} */ ([
 		['zuletzt', 'Zuletzt bearbeitet'],
@@ -63,6 +64,10 @@
 	/** @type {Ordnerstand} */
 	let ordner = $state({ folders: [], sidecar: true, pick: false });
 	let offline = $state(false);
+	/** die Transkriptionen ruhen: von Hand pausiert (bis „Fortsetzen“), oder solange live transkribiert wird */
+	let angehalten = $state(false);
+	let liveHaelt = $state(false);
+	let schaltet = $state(false);
 	/** Namen der angekreuzten Aufnahmen */
 	let gewaehlt = $state(/** @type {string[]} */ ([]));
 	/** @type {import('$lib/api.js').Optionen} */
@@ -267,7 +272,10 @@
 		fragt = true;
 		const vorher = laufend.length;
 		try {
-			jobs = (await getJSON('/api/queue', { signal: AbortSignal.timeout(8000) })).jobs;
+			const q = await getJSON('/api/queue', { signal: AbortSignal.timeout(8000) });
+			jobs = q.jobs;
+			angehalten = !!q.paused;
+			liveHaelt = !!q.live;
 			server.ok();
 			offline = false;
 		} catch (e) {
@@ -366,6 +374,20 @@
 			await post(`/api/queue/${j.id}/${was}`);
 		} catch (e) {
 			meldung = /** @type {Error} */ (e).message;
+		}
+		geaendert();
+	}
+
+	/** Von Hand pausieren oder fortsetzen; die laufende Transkription bleibt dabei an ihrer Stelle. */
+	async function pause() {
+		schaltet = true;
+		try {
+			await post(angehalten ? '/api/queue/resume' : '/api/queue/pause');
+			angehalten = !angehalten;
+		} catch (e) {
+			meldung = /** @type {Error} */ (e).message;
+		} finally {
+			schaltet = false;
 		}
 		geaendert();
 	}
@@ -790,10 +812,26 @@
 						<h2 id="h-arbeit">In Arbeit</h2>
 						{#if laufend.length}<span class="zaehler">{laufend.length}</span>{/if}
 						<span class="platz"></span>
+						{#if laufend.length && !offline}
+							<Button type="secondary" size="large" disabled={schaltet} onclick={pause}>
+								{#snippet iconLeft()}{#if angehalten}<IconMaterialSymbolsPlayArrowRounded />{:else}<IconMaterialSymbolsPauseRounded />{/if}{/snippet}
+								{angehalten ? 'Fortsetzen' : 'Pausieren'}
+							</Button>
+						{/if}
 						{#if laufend.length > 1}
 							<Button type="secondary" size="large" onclick={alleAbbrechen}>Alle abbrechen</Button>
 						{/if}
 					</div>
+					{#if laufend.length && !offline && (angehalten || liveHaelt)}
+						<p class="pausenhinweis" role="status">
+							<IconMaterialSymbolsPauseCircleOutlineRounded aria-hidden="true" />
+							{#if angehalten}
+								Pausiert, bis du fortsetzt, auch über einen Neustart. Die laufende Transkription bleibt an ihrer Stelle stehen{liveHaelt ? '; gerade läuft auch eine Live-Transkription' : ''}.
+							{:else}
+								Pausiert, solange eine Live-Transkription läuft. Danach geht es von selbst an derselben Stelle weiter.
+							{/if}
+						</p>
+					{/if}
 					<ul class="auftraege" aria-label="Aufträge">
 						{#each inArbeit as j (j.id)}
 							{@const pct = Math.round((j.progress || 0) * 100)}
@@ -821,8 +859,8 @@
 										{/if}
 									</div>
 								</div>
-								{#if j.status === 'running' && !offline}
-									<div class="balken" role="progressbar" aria-label="Fortschritt {titel(j.audio)}" aria-valuenow={pct} aria-valuemin="0" aria-valuemax="100">
+								{#if (j.status === 'running' || j.status === 'paused') && !offline}
+									<div class="balken" class:ruht={j.status === 'paused'} role="progressbar" aria-label="Fortschritt {titel(j.audio)}" aria-valuenow={pct} aria-valuemin="0" aria-valuemax="100">
 										<i style:width="{pct}%"></i>
 									</div>
 									<p class="schritt">{j.step || 'startet …'} ({pct} %)</p>
@@ -1457,6 +1495,10 @@
 		background: hsl(var(--color-red-10));
 		color: hsl(var(--color-text-error));
 	}
+	.status.paused {
+		background: hsl(var(--color-orange-10));
+		color: hsl(var(--color-text-warning));
+	}
 	.status.canceling {
 		background: hsl(var(--color-orange-10));
 		color: hsl(var(--color-text-warning));
@@ -1474,6 +1516,21 @@
 		border-radius: inherit;
 		background: hsl(var(--color-green-100));
 		transition: width 0.4s ease-out;
+	}
+	/* pausiert: der Balken steht in Moliris Pausen-Orange */
+	.balken.ruht i {
+		background: hsl(var(--color-orange-100));
+	}
+	.pausenhinweis {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin: 0;
+		color: hsl(var(--color-text-warning));
+	}
+	.pausenhinweis :global(svg) {
+		flex: none;
+		font-size: 1.25rem;
 	}
 	details summary {
 		display: inline-flex;

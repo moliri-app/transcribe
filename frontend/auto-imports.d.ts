@@ -55,6 +55,7 @@ declare global {
   const IconMaterialSymbolsMicRounded: typeof import('~icons/material-symbols/mic-rounded').default
   const IconMaterialSymbolsMovieOutlineRounded: typeof import('~icons/material-symbols/movie-outline-rounded').default
   const IconMaterialSymbolsOpenInFullRounded: typeof import('~icons/material-symbols/open-in-full-rounded').default
+  const IconMaterialSymbolsPauseCircleOutlineRounded: typeof import('~icons/material-symbols/pause-circle-outline-rounded').default
   const IconMaterialSymbolsPauseRounded: typeof import('~icons/material-symbols/pause-rounded').default
   const IconMaterialSymbolsPlayArrowRounded: typeof import('~icons/material-symbols/play-arrow-rounded').default
   const IconMaterialSymbolsPlaylistAddRounded: typeof import('~icons/material-symbols/playlist-add-rounded').default

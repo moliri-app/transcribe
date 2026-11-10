@@ -10,6 +10,7 @@ import (
 	"sort"
 
 	"github.com/moliri-app/transcribe/audio"
+	"github.com/moliri-app/transcribe/jobs"
 	"github.com/moliri-app/transcribe/sherpa"
 )
 
@@ -34,7 +35,7 @@ func averageLinkage(ctx context.Context, x [][]float32) ([]merge, error) {
 	}
 	d := make([]float32, n*n)
 	for i := 0; i < n; i++ {
-		if err := ctx.Err(); err != nil {
+		if err := jobs.Hold(ctx); err != nil {
 			return nil, err
 		}
 		for j := i + 1; j < n; j++ {
@@ -53,7 +54,7 @@ func averageLinkage(ctx context.Context, x [][]float32) ([]merge, error) {
 	var chain []int
 	var out []merge
 	for len(out) < n-1 {
-		if err := ctx.Err(); err != nil {
+		if err := jobs.Hold(ctx); err != nil {
 			return nil, err
 		}
 		if len(chain) == 0 {
@@ -174,7 +175,7 @@ func embedWindows(ctx context.Context, ex *sherpa.Embedder, pcm []float32, regio
 			starts = []float64{a}
 		}
 		for _, s := range starts {
-			if err := ctx.Err(); err != nil {
+			if err := jobs.Hold(ctx); err != nil {
 				return nil, nil, err
 			}
 			e := math.Min(b, s+win)
@@ -224,7 +225,7 @@ func diarizePieces(ctx context.Context, pcm []float32, segModel, embModel string
 	defer dz.Close()
 	var rough []sherpa.DiarSegment
 	for a := 0; a < len(pcm); {
-		if err := ctx.Err(); err != nil {
+		if err := jobs.Hold(ctx); err != nil {
 			return nil, err
 		}
 		b := a + diarPiece

@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/moliri-app/transcribe/jobs"
 	"github.com/moliri-app/transcribe/model"
 	"github.com/moliri-app/transcribe/sherpa"
 	"github.com/moliri-app/transcribe/stream"
@@ -293,7 +294,7 @@ func decodeStream(ctx context.Context, rec, de *sherpa.Recognizer, vadModel stri
 	i := 0
 	for _, stop := range append(slices.Clone(cuts), float64(len(pcm))/stream.SR) {
 		for end := min(len(pcm), int(stop*stream.SR)); i < end; {
-			if err := ctx.Err(); err != nil {
+			if err := jobs.Hold(ctx); err != nil {
 				return nil, err
 			}
 			j := min(end, i+piece)

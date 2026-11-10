@@ -133,6 +133,9 @@ func apiPieces(ctx context.Context, c sttapi.Config, path string, req sttapi.Req
 	cuts = append(cuts, dur)
 	all := &sttapi.Result{Duration: dur}
 	for i := 0; i+1 < len(cuts); i++ {
+		if err := jobs.Hold(ctx); err != nil {
+			return nil, err
+		}
 		a, b := cuts[i], cuts[i+1]
 		req.Length = b - a
 		res, err := sttapi.Transcribe(ctx, c, bytes.NewReader(sttapi.WAV(audio.Slice(pcm, a, b))), fmt.Sprintf("teil-%d.wav", i+1), req)

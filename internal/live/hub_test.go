@@ -99,6 +99,35 @@ func TestAudioSessionKeepsANote(t *testing.T) {
 	}
 }
 
+// While live transcriptions run, the transcription of whole recordings is held, once for all of them.
+func TestSessionsHoldTheQueue(t *testing.T) {
+	h := NewHub(t.TempDir(), func(context.Context, string) (Stream, error) { return &fakeStream{}, nil })
+	holds, releases := 0, 0
+	h.Hold = func() func() {
+		holds++
+		return func() { releases++ }
+	}
+	a, err := h.Audio(context.Background(), "Moliri", func(Event) {})
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := h.Audio(context.Background(), "Skript", func(Event) {})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if holds != 1 || releases != 0 {
+		t.Errorf("two sessions: %d holds, %d releases", holds, releases)
+	}
+	a.End(nil)
+	if releases != 0 {
+		t.Error("released while a session still runs")
+	}
+	b.End(nil)
+	if holds != 1 || releases != 1 {
+		t.Errorf("after both: %d holds, %d releases", holds, releases)
+	}
+}
+
 func TestAllowedOrigins(t *testing.T) {
 	h := NewHub(t.TempDir(), nil)
 	for origin, want := range map[string]bool{
