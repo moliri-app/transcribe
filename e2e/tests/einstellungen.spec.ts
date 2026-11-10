@@ -32,13 +32,26 @@ test.describe('Einstellungen', () => {
     await expect(page.getByRole('combobox', { name: 'Sprecher' })).toHaveValue('2');
   });
 
-  test('das Menü führt zu den Abschnitten und zeigt, wo man ist', async ({ page }) => {
+  test('das Menü zeigt eine Kategorie mit ihren Abschnitten und, wo man ist', async ({ page }) => {
     await page.goto('/settings');
-    const menu = page.getByRole('navigation', { name: 'Abschnitte der Einstellungen' });
+    const menu = page.getByRole('navigation', { name: 'Kategorien der Einstellungen' });
+    await expect(menu.getByRole('link', { name: 'Transkribieren' })).toHaveAttribute('aria-current', 'page');
+    await expect(page.getByRole('heading', { name: 'Erkennung', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Grafikkarte' })).toHaveCount(0);
+
+    await menu.getByRole('link', { name: 'System' }).click();
+    await expect(page).toHaveURL(/#system$/);
+    await expect(menu.getByRole('link', { name: 'System' })).toHaveAttribute('aria-current', 'page');
+    await expect(page.getByRole('heading', { name: 'Erkennung', exact: true })).toHaveCount(0);
     await menu.getByRole('link', { name: 'Speicher und Modelle' }).click();
     await expect(page).toHaveURL(/#speicher$/);
     await expect(page.getByRole('heading', { name: 'Speicher und Modelle' })).toBeInViewport();
     await expect(menu.getByRole('link', { name: 'Speicher und Modelle' })).toHaveAttribute('aria-current', 'location');
+
+    // a section in the address opens its category
+    await page.goto('/settings#stimme');
+    await expect(menu.getByRole('link', { name: 'Live und Diktieren' })).toHaveAttribute('aria-current', 'page');
+    await expect(page.getByRole('region', { name: 'Meine Stimme' })).toBeInViewport();
   });
 
   test('„Im Hintergrund bereit“ schaltet die Mikrofon-Aufnahme für Programme', async ({ page, app }) => {
@@ -73,7 +86,7 @@ test.describe('Einstellungen', () => {
 
   test('Diktieren: Tastenkürzel und Ziel des Textes werden gespeichert', async ({ page, app }) => {
     test.skip(process.platform !== 'win32', 'das Tastenkürzel gibt es nur unter Windows');
-    await page.goto('/settings');
+    await page.goto('/settings#diktieren');
     const bereich = page.getByRole('region', { name: 'Diktieren in jedem Programm' });
     // the tests start the app without its tray icon, which receives the shortcut
     await expect(bereich).toContainText('nur, solange Transcribe mit seinem Symbol im Infobereich läuft');
@@ -105,7 +118,7 @@ test.describe('Einstellungen', () => {
   });
 
   test('zeigt Datenordner, Modelle und Programm', async ({ page, app }) => {
-    await page.goto('/settings');
+    await page.goto('/settings#system');
     await expect(page.getByRole('heading', { name: 'Speicherorte' })).toBeVisible();
     await expect(page.getByRole('list', { name: 'Speicherorte' }).getByText(app.dataDir, { exact: true })).toBeVisible();
     // started with --data: the place is fixed, and cannot move here

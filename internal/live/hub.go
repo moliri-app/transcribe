@@ -38,6 +38,9 @@ type Hub struct {
 	// Hold pauses the transcription of whole recordings while a live transcription runs, so it has
 	// the computer first (queue.Queue.Hold); nil for none. Set it before serving.
 	Hold func() (release func())
+	// Asked is called, on a goroutine of its own, when a page that is not allowed asks for the
+	// app, at most once a minute for the same page; nil for nothing.
+	Asked func(origin, client string)
 
 	mu       sync.Mutex
 	notes    []*Note // oldest first
@@ -49,6 +52,7 @@ type Hub struct {
 	release  func() // ends the Hold while notes run
 	seq      int
 	warm     string // WarmLoading, WarmReady or ""
+	program  string // the program that used the API last since the start, "" none
 
 	warmMu      sync.Mutex
 	warmWant    string  // the language Warm asked for last, "" for nothing
@@ -318,6 +322,9 @@ func (h *Hub) newNote(kind, client string) *Note {
 	h.seq++
 	now := time.Now()
 	n := &Note{ID: fmt.Sprintf("%s-%d", now.Format(idTime), h.seq), Kind: kind, Client: client, Started: now, Lines: []Line{}, Loading: true, Transient: transient}
+	if byProgram(kind) {
+		h.used(client)
+	}
 	h.add(n)
 	if h.active == 0 && h.Hold != nil {
 		h.release = h.Hold()
@@ -842,6 +849,7 @@ func (h *Hub) Allowed(origin string) bool {
 func (h *Hub) Refused(origin, client string) {
 	origin = Origin(origin)
 	h.mu.Lock()
+	again := slices.ContainsFunc(h.blocked, func(r Refusal) bool { return r.Origin == origin && time.Since(r.At) < time.Minute })
 	h.blocked = slices.DeleteFunc(h.blocked, func(r Refusal) bool { return r.Origin == origin })
 	h.blocked = append([]Refusal{{Origin: origin, Client: client, At: time.Now()}}, h.blocked...)
 	if len(h.blocked) > 10 {
@@ -849,6 +857,29 @@ func (h *Hub) Refused(origin, client string) {
 	}
 	h.mu.Unlock()
 	h.sendAccess()
+	if h.Asked != nil && !again {
+		go h.Asked(origin, client)
+	}
+}
+
+// Blocked lists the pages turned away that are still waiting to be allowed, newest first.
+func (h *Hub) Blocked() []Refusal {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return append([]Refusal{}, h.blocked...)
+}
+
+// Program names the program that used the API last since the app started ("Ein Programm" when
+// it gave no name), "" when none did.
+func (h *Hub) Program() string {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.program
+}
+
+// used notes that client, a program, uses the API; h.mu is held.
+func (h *Hub) used(client string) {
+	h.program = cmp.Or(strings.TrimPrefix(strings.TrimPrefix(client, "https://"), "http://"), "Ein Programm")
 }
 
 // Allow lets origin use live transcription from now on (allow) or no longer (!allow).

@@ -4,8 +4,8 @@
 <!-- Live: Sprache sofort als Text. Links alle Aufnahmen (von Hand auf dieser Seite gestartet oder per
      API von einem Programm) und die Anfragen von Programmen an Texterkennung und Sprachmodelle,
      durchsuchbar, gefiltert und sortiert; rechts die gewählte groß; unten die
-     Aufnahmeleiste mit Aufnehmen, Pegeln und „Einrichten“. „Programme verbinden“ hat eine eigene
-     Ansicht. Den Stand schickt der Server über /api/live/events (internal/live). -->
+     Aufnahmeleiste mit Aufnehmen, Pegeln und „Einrichten“. „Programme verbinden“ führt in die
+     Einstellungen, Kategorie „Programme“. Den Stand schickt der Server über /api/live/events (internal/live). -->
 <script>
 	import { onMount } from 'svelte';
 	import { MediaQuery } from 'svelte/reactivity';
@@ -15,30 +15,27 @@
 	import Aufnahme from '$lib/live/Aufnahme.svelte';
 	import Aufnahmeleiste from '$lib/live/Aufnahmeleiste.svelte';
 	import Liste from '$lib/live/Liste.svelte';
-	import Verbinden from '$lib/live/Verbinden.svelte';
 	import { anfrage, live } from '$lib/live/stand.svelte.js';
 
 	/** @type {string | null} */
 	let gewaehlt = $state(page.url.searchParams.get('aufnahme'));
-	let verbinden = $state(page.url.searchParams.has('verbinden'));
 	let q = $state('');
 
 	/** schmal: nur eine Spalte, entweder die Liste oder eine Aufnahme */
 	const schmal = new MediaQuery('max-width: 900px');
-	let liste = $state(!page.url.searchParams.has('aufnahme') && !page.url.searchParams.has('verbinden'));
+	let liste = $state(!page.url.searchParams.has('aufnahme'));
 
 	const notiz = $derived(live.notizen?.find((n) => n.id === gewaehlt) ?? null);
 
 	/** @param {string} id @param {boolean} [bleiben] in der schmalen Ansicht bleibt die Liste stehen */
 	function waehlen(id, bleiben = false) {
 		gewaehlt = id;
-		verbinden = false;
 		if (!bleiben) liste = false;
 	}
 
 	// Keine oder eine verschwundene Aufnahme gewählt: die laufende, sonst die neueste
 	$effect(() => {
-		if (!live.notizen || verbinden || notiz) return;
+		if (!live.notizen || notiz) return;
 		const neueste = live.notizen.toSorted((a, b) => b.started.localeCompare(a.started))[0];
 		gewaehlt = (live.laufend ?? neueste)?.id ?? null;
 	});
@@ -64,26 +61,24 @@
 		const andere = location.search
 			.slice(1)
 			.split('&')
-			.filter((teil) => teil && !/^(aufnahme|verbinden)(=|$)/.test(teil));
-		const eigene = verbinden ? ['verbinden'] : gewaehlt ? [`aufnahme=${encodeURIComponent(gewaehlt)}`] : [];
+			.filter((teil) => teil && !/^aufnahme(=|$)/.test(teil));
+		const eigene = gewaehlt ? [`aufnahme=${encodeURIComponent(gewaehlt)}`] : [];
 		const teile = [...andere, ...eigene];
 		const neu = teile.length ? `?${teile.join('&')}` : '';
 		if (bereit && neu !== location.search) replaceState(location.pathname + neu, {});
 	});
 
-	onMount(() => live.verbinden());
+	onMount(() => {
+		// „Programme verbinden“ war hier eine eigene Ansicht; alte Verweise führen in die Einstellungen
+		if (page.url.searchParams.has('verbinden')) location.replace('/settings#programme');
+		return live.verbinden();
+	});
 </script>
 
 <svelte:head><title>Live · Transcribe by Moliri</title></svelte:head>
 
 <main class="live" class:schmal={schmal.current} class:zeigt-liste={schmal.current && liste}>
-	<Liste
-		{gewaehlt}
-		{verbinden}
-		bind:q
-		onwaehlen={waehlen}
-		onverbinden={() => ((verbinden = true), (liste = false))}
-	/>
+	<Liste {gewaehlt} bind:q onwaehlen={waehlen} />
 
 	<div class="haupt">
 		{#if !live.verbunden}
@@ -92,9 +87,7 @@
 			</p>
 		{/if}
 
-		{#if verbinden}
-			<Verbinden onzurueck={schmal.current ? () => (liste = true) : undefined} />
-		{:else if notiz && anfrage(notiz)}
+		{#if notiz && anfrage(notiz)}
 			<Anfrage n={notiz} onzurueck={schmal.current ? () => (liste = true) : undefined} />
 		{:else if notiz}
 			<Aufnahme n={notiz} {q} onzurueck={schmal.current ? () => (liste = true) : undefined} />
@@ -107,7 +100,7 @@
 				</p>
 				<p>
 					Oder lass Programme wie Moliri Sprache schicken, über die
-					<button class="link" type="button" onclick={() => (verbinden = true)}>Live-API</button>. Jede Anfrage
+					<a class="link" href="/settings#programme" data-sveltekit-reload>Live-API</a>. Jede Anfrage
 					{live.apiSpeichern ? 'bleibt links als Aufnahme stehen.' : 'steht links, solange sie läuft.'}
 				</p>
 			</div>

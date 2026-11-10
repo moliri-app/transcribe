@@ -3,7 +3,7 @@
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
 <!-- Seitenleiste der Live-Seite: alle Aufnahmen und die Anfragen von Programmen an Texterkennung und
      Sprachmodelle, durchsuchbar (unscharf, im ganzen Text), nach Herkunft gefiltert (von Hand, per
-     API, KI & OCR) und sortiert; unten „Programme verbinden“. -->
+     API, KI & OCR) und sortiert; unten der Weg zu „Programme“ in den Einstellungen. -->
 <script>
 	import { dauer } from '$lib/api.js';
 	import { anfrage, DIENSTE, live, laenge, QUELLEN, sekunden, tag, uhrzeit, vonHand, WARTET, wer, worum } from './stand.svelte.js';
@@ -12,9 +12,8 @@
 	/** @typedef {import('./stand.svelte.js').Notiz} Notiz */
 
 	/** bleiben: nur zeigen, in der schmalen Ansicht bleibt die Liste stehen
-	 * @type {{ gewaehlt: string | null, verbinden: boolean, q: string, onwaehlen: (id: string, bleiben?: boolean) => void,
-	 *   onverbinden: () => void }} */
-	let { gewaehlt, verbinden, q = $bindable(), onwaehlen, onverbinden } = $props();
+	 * @type {{ gewaehlt: string | null, q: string, onwaehlen: (id: string, bleiben?: boolean) => void }} */
+	let { gewaehlt, q = $bindable(), onwaehlen } = $props();
 
 	/** @type {import('./suche.js').Herkunft} */
 	let herkunft = $state('alle');
@@ -40,7 +39,7 @@
 
 	// Beim Suchen steht der beste Treffer groß da, wenn die gezeigte Aufnahme nicht mehr dazugehört
 	$effect(() => {
-		if (sucht && !verbinden && sichtbar.length && !sichtbar.some((n) => n.id === gewaehlt)) onwaehlen(sichtbar[0].id, true);
+		if (sucht && sichtbar.length && !sichtbar.some((n) => n.id === gewaehlt)) onwaehlen(sichtbar[0].id, true);
 	});
 
 	/** nach Tagen gruppiert, solange nach Zeit sortiert wird und nicht gesucht */
@@ -187,9 +186,9 @@
 					<button
 						type="button"
 						class="eintrag"
-						class:gewaehlt={n.id === gewaehlt && !verbinden}
+						class:gewaehlt={n.id === gewaehlt}
 						data-id={n.id}
-						aria-current={n.id === gewaehlt && !verbinden ? 'true' : undefined}
+						aria-current={n.id === gewaehlt ? 'true' : undefined}
 						onclick={() => onwaehlen(n.id)}
 					>
 						<span class="kopf">
@@ -242,7 +241,7 @@
 		{/each}
 	</div>
 
-	<button class="verbinden" class:gewaehlt={verbinden} type="button" aria-current={verbinden ? 'true' : undefined} onclick={onverbinden}>
+	<a class="verbinden" href="/settings#programme" data-sveltekit-reload>
 		<IconMaterialSymbolsCableRounded aria-hidden="true" />
 		<span>Programme verbinden</span>
 		{#if live.abgelehnt.length}
@@ -250,7 +249,8 @@
 				>{live.abgelehnt.length}<span class="sr"> Seiten wollten sich verbinden</span></span
 			>
 		{/if}
-	</button>
+		<IconMaterialSymbolsArrowForwardRounded class="pfeil" aria-hidden="true" />
+	</a>
 </aside>
 
 <style>
@@ -600,14 +600,20 @@
 		padding: 0 1.25rem;
 		border-top: 1px solid hsl(var(--color-border-primary));
 		font-weight: 600;
+		color: inherit;
+		text-decoration: none;
 		cursor: pointer;
 		text-align: left;
 	}
+	.verbinden :global(.pfeil) {
+		margin-left: auto;
+		color: hsl(var(--color-text-secondary));
+	}
+	.verbinden .badge + :global(.pfeil) {
+		margin-left: 0;
+	}
 	.verbinden:hover {
 		background: hsl(var(--color-bg-secondary));
-	}
-	.verbinden.gewaehlt {
-		background: hsl(var(--color-green-10));
 	}
 	.verbinden :global(svg) {
 		width: 1.375rem;

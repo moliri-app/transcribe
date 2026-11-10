@@ -57,7 +57,7 @@ func (s *Server) pageAccess(w http.ResponseWriter, r *http.Request, what string)
 		return false
 	}
 	if !s.originAllowed(origin, clientName(r)) {
-		fail(w, http.StatusForbidden, "Diese Seite darf "+what+" nicht nutzen. In Transcribe auf der Seite „Live“ erlauben: "+live.Origin(origin))
+		fail(w, http.StatusForbidden, "Diese Seite darf "+what+" nicht nutzen. Erlaube sie in Transcribe, es fragt gerade danach: "+live.Origin(origin))
 		return false
 	}
 	return true

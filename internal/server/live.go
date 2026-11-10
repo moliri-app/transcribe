@@ -151,7 +151,7 @@ func (s *Server) liveSocket(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case !s.Live.Allowed(origin):
 		s.Live.Refused(origin, client)
-		refuse("Diese Seite darf die Live-Transkription nicht nutzen. In Transcribe auf der Seite „Live“ erlauben: " + live.Origin(origin))
+		refuse("Diese Seite darf die Live-Transkription nicht nutzen. Erlaube sie in Transcribe, es fragt gerade danach: " + live.Origin(origin))
 		return
 	case mode != "audio" && mode != "mic":
 		refuse("mode: audio oder mic")

@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"github.com/moliri-app/transcribe/internal/autostart"
+	"github.com/moliri-app/transcribe/internal/live"
 	"github.com/moliri-app/transcribe/internal/prefs"
 )
 
@@ -75,4 +76,40 @@ func (s *Server) background(w http.ResponseWriter, r *http.Request) {
 		out["ready"] = s.Live.Enabled()
 	}
 	writeJSON(w, 200, out)
+}
+
+// access tells every page of the app (frontend/src/lib/Zugriff.svelte) which pages ask to use the
+// app and whether to suggest starting with Windows and running in the background: once a program
+// asked for the app (allowed or not) while that is off and the user did not decline it. POST
+// {"hint": false} declines the hint for good.
+func (s *Server) access(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		if !allowedPost(r) {
+			http.Error(w, "forbidden", 403)
+			return
+		}
+		var in struct {
+			Hint *bool `json:"hint"`
+		}
+		if json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<16)).Decode(&in) != nil {
+			http.Error(w, "bad request", 400)
+			return
+		}
+		if in.Hint != nil {
+			if _, err := prefs.Update(s.cfg.DataDir, func(p *prefs.Prefs) { p.NoBackgroundHint = !*in.Hint }); err != nil {
+				fail(w, 500, err.Error())
+				return
+			}
+		}
+	} else if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", 405)
+		return
+	}
+	blocked, program := []live.Refusal{}, ""
+	if s.Live != nil {
+		blocked, program = s.Live.Blocked(), s.Live.Program()
+	}
+	hint := autostart.Supported() && !autostart.Enabled() && !prefs.Load(s.cfg.DataDir).NoBackgroundHint &&
+		(len(blocked) > 0 || program != "")
+	writeJSON(w, 200, map[string]any{"blocked": blocked, "program": program, "hint": hint})
 }
