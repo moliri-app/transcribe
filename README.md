@@ -152,9 +152,9 @@ der Taskleiste, ohne Fenster und ohne Zugriff aufs Mikrofon.
 Die Seite **Live** macht aus Sprache sofort Text: selbst aufnehmen, übers Mikrofon, den Systemton
 (was der Rechner abspielt, etwa die anderen in einem Online-Meeting) oder beides gemischt (auf
 Wunsch mit gespeicherter Aufnahme, die sich danach vollständig mit Sprechern transkribieren lässt),
-oder andere Programme wie Moliri verbinden. Die tragen `ws://localhost:31765/api/live` als Adresse
-ein und schicken entweder selbst Ton, oder lassen Transcribe mithören und bekommen den Text laufend
-zurück. Jede Anfrage bleibt als Notiz stehen. Adresse, Erlaubnisse und was von Anfragen bleibt,
+oder andere Programme verbinden. Die öffnen `ws://localhost:31765/api/live` (Moliri trägt dafür nur
+`http://localhost:31765` ein) und schicken entweder selbst Ton, oder lassen Transcribe mithören und
+bekommen den Text laufend zurück. Jede Anfrage bleibt als Notiz stehen. Adresse, Erlaubnisse und was von Anfragen bleibt,
 stehen in den **Einstellungen** unter „Programme“. Das Protokoll steht in
 [docs/live-api.md](docs/live-api.md).
 
