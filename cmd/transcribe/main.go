@@ -100,7 +100,7 @@ func setupLog(dataDir string) {
 
 func main() {
 	data := flag.String("data", "", "data directory (audio/, results/, models/); default: the one chosen in the settings, else "+datadir.Default())
-	port := flag.Int("port", 8765, "HTTP port")
+	port := flag.Int("port", 31765, "HTTP port")
 	noBrowser := flag.Bool("no-browser", false, "do not open the browser")
 	background := flag.Bool("background", false, "start without a window, in the notification area (as at sign-in)")
 	threads := flag.Int("threads", prefs.DefaultThreads(), "default thread count for new jobs")

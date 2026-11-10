@@ -11,7 +11,7 @@
 	/** @type {{ onzurueck?: () => void }} */
 	let { onzurueck } = $props();
 
-	const adresse = `ws://${typeof location === 'undefined' ? 'localhost:8765' : location.host}/api/live`;
+	const adresse = `ws://${typeof location === 'undefined' ? 'localhost:31765' : location.host}/api/live`;
 
 	let kopiert = $state(false);
 	let meldung = $state('');

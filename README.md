@@ -85,13 +85,13 @@ Schnittstellen in `internal/sttapi/sttapitest` (`pnpm start --api` in `e2e/`).
 .\transcribe.exe
 ```
 
-Die App startet einen lokalen Server auf `http://localhost:8765` (ist der Port belegt, auf einem
+Die App startet einen lokalen Server auf `http://localhost:31765` (ist der Port belegt, auf einem
 freien) und öffnet die Oberfläche in einem eigenen Fenster (Edge, Chrome oder Brave im App-Modus, sonst der Standardbrowser).
 
 | Option | Bedeutung |
 | --- | --- |
 | `--data <ordner>` | Datenordner statt des in den Einstellungen gewählten (auch über `TRANSCRIBE_DATA`); er lässt sich dann nicht in der App umziehen |
-| `--port <zahl>` | anderer Port als 8765 |
+| `--port <zahl>` | anderer Port als 31765 |
 | `--no-browser` | kein Fenster öffnen, nur den Server starten |
 | `--background` | ohne Fenster starten, nur mit dem Symbol im Infobereich (so startet der Autostart) |
 | `--threads <zahl>` | Threads für Aufträge ohne eigene Zahl (sonst etwa einer je Prozessorkern) |
@@ -145,7 +145,7 @@ der Taskleiste, ohne Fenster und ohne Zugriff aufs Mikrofon.
 Die Seite **Live** macht aus Sprache sofort Text: selbst aufnehmen, übers Mikrofon, den Systemton
 (was der Rechner abspielt, etwa die anderen in einem Online-Meeting) oder beides gemischt (auf
 Wunsch mit gespeicherter Aufnahme, die sich danach vollständig mit Sprechern transkribieren lässt),
-oder andere Programme wie Moliri verbinden. Die tragen `ws://localhost:8765/api/live` als Adresse
+oder andere Programme wie Moliri verbinden. Die tragen `ws://localhost:31765/api/live` als Adresse
 ein und schicken entweder selbst Ton, oder lassen Transcribe mithören und bekommen den Text laufend
 zurück. Jede Anfrage bleibt als Notiz stehen. Das Protokoll steht in
 [docs/live-api.md](docs/live-api.md).
@@ -161,7 +161,7 @@ Satzes spielt ab dort.
 ### Texterkennung für andere Programme
 
 Programme wie Moliri lassen Transcribe auch den Text von Bildern lesen (OCR): `POST
-http://localhost:8765/api/ocr` mit dem Bild, zurück kommen Zeilen und Wörter mit ihrer Lage im Bild.
+http://localhost:31765/api/ocr` mit dem Bild, zurück kommen Zeilen und Wörter mit ihrer Lage im Bild.
 Webseiten brauchen dieselbe Erlaubnis wie für die Live-Transkription (Seite **Live**, „Wer sich
 verbinden darf“). Tesseract wird nicht mitgeliefert: Unter Windows lädt die App es beim ersten Lesen
 herunter (etwa 6 MB, dazu je Sprache 2–11 MB), unter Linux und macOS liest das installierte
@@ -180,7 +180,7 @@ einrichten lässt sich alles unter **Einstellungen → Texterkennung**. Das Prot
 
 Moliris Feldauswahl findet Felder auch nach ihrer Bedeutung („Künstler“ findet *Urheber*), mit dem
 Sprachmodell EmbeddingGemma. Statt es in jeden Browser zu laden, kann Moliri Transcribe rechnen
-lassen: `POST http://localhost:8765/api/embed` mit Texten, zurück kommen ihre Vektoren, dieselben
+lassen: `POST http://localhost:31765/api/embed` mit Texten, zurück kommen ihre Vektoren, dieselben
 wie im Browser. Das Modell (295 MB) kommt erst, wenn Moliri oder die Einstellungen danach fragen,
 und rechnet auf dem Prozessor, etwa eine Zehntelsekunde je Suchwort; geladen belegt es rund 1,4 GB
 Arbeitsspeicher und gibt sie nach einer Viertelstunde ohne Anfrage wieder frei. Webseiten brauchen
@@ -282,7 +282,7 @@ Frontend-Build geht).
 - **Seiten:** Welche Adressen die App ausliefert, steht in `internal/server/pages.go`; die Adressen
   der früheren statischen Seiten (`/editor.html` …) leiten dorthin weiter.
 - **Entwickeln:** die EXE oder `go run ./cmd/transcribe` starten, dann in `frontend/` `pnpm dev`;
-  Vite reicht `/api`, `/audio` und `/results` an `http://localhost:8765` weiter (anderer Port:
+  Vite reicht `/api`, `/audio` und `/results` an `http://localhost:31765` weiter (anderer Port:
   `TRANSCRIBE_URL`).
 - **Moliri-Komponenten** (Knöpfe, Schalter, Reiter, Dialoge, Stile und der Transkript-Editor) liegen
   gespiegelt unter `frontend/src/lib/moliri/` und werden nur in Moliri geändert. `pnpm sync:moliri`

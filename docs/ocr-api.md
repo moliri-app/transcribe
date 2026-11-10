@@ -5,7 +5,7 @@ Recognition runs on this computer and the image does not leave it, except with t
 (an AI service with the user's own key, below), which reads only when a request names it or the
 user made it the default in the settings.
 
-The app listens on `http://localhost:8765` (or the port given with `--port`; the Live page shows the
+The app listens on `http://localhost:31765` (or the port given with `--port`; the Live page shows the
 address in use).
 
 | Request | Answer |
@@ -39,7 +39,7 @@ const form = new FormData();
 form.append('image', blob, 'seite.jpg');
 form.append('languages', 'deu+frak2021');
 form.append('layout', 'lines');
-const res = await fetch('http://localhost:8765/api/ocr', { method: 'POST', body: form });
+const res = await fetch('http://localhost:31765/api/ocr', { method: 'POST', body: form });
 ```
 
 or with the image as the body and the options in the query:

@@ -4,11 +4,11 @@ Transcribe can turn speech into text while it is spoken, for other programs: Mol
 extension, a script. Every request is kept as a note on the app's **Live** page, where its text
 scrolls by as well.
 
-The app listens on `http://localhost:8765` (or the port given with `--port`; the Live page shows
+The app listens on `http://localhost:31765` (or the port given with `--port`; the Live page shows
 the address in use). Live transcription is a WebSocket:
 
 ```
-ws://localhost:8765/api/live
+ws://localhost:31765/api/live
 ```
 
 Recognition runs on this computer (Parakeet with Silero VAD); nothing leaves it. The background mode
@@ -109,7 +109,7 @@ addresses are kept in `settings.json` (`liveOrigins`).
 ## Example
 
 ```js
-const ws = new WebSocket('ws://localhost:8765/api/live?mode=mic&name=Moliri');
+const ws = new WebSocket('ws://localhost:31765/api/live?mode=mic&name=Moliri');
 ws.onmessage = (e) => {
   const m = JSON.parse(e.data);
   if (m.type === 'partial') field.placeholder = m.text;
@@ -125,7 +125,7 @@ Sending audio from the browser's microphone instead (audio mode):
 ```js
 const ctx = new AudioContext({ sampleRate: 16000 });
 const mic = ctx.createMediaStreamSource(await navigator.mediaDevices.getUserMedia({ audio: true }));
-const ws = new WebSocket('ws://localhost:8765/api/live?name=Moliri&encoding=f32le');
+const ws = new WebSocket('ws://localhost:31765/api/live?name=Moliri&encoding=f32le');
 ws.binaryType = 'arraybuffer';
 const proc = ctx.createScriptProcessor(2048, 1, 1); // or an AudioWorklet
 proc.onaudioprocess = (e) => ws.readyState === 1 && ws.send(e.inputBuffer.getChannelData(0).slice().buffer);

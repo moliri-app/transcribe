@@ -8,8 +8,8 @@ import Icons from 'unplugin-icons/vite';
 import IconsResolver from 'unplugin-icons/resolver';
 import AutoImport from 'unplugin-auto-import/vite';
 
-// Wohin `pnpm dev` die API weiterreicht: die laufende EXE (Standard-Port 8765).
-const backend = process.env.TRANSCRIBE_URL || 'http://localhost:8765';
+// Wohin `pnpm dev` die API weiterreicht: die laufende EXE (Standard-Port 31765).
+const backend = process.env.TRANSCRIBE_URL || 'http://localhost:31765';
 
 export default defineConfig({
 	plugins: [
