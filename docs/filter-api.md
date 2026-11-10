@@ -12,7 +12,7 @@ of its own. The prompt and the check of the answer are those of Moliri's server
 (`static/api/_func/natural_filter.php`), so the answer is the one the instance's AI account would
 give with the same model.
 
-The app listens on `http://localhost:8765` (or the port given with `--port`; the Live page shows the
+The app listens on `http://localhost:31765` (or the port given with `--port`; the Live page shows the
 address in use).
 
 | Request | Answer |
@@ -73,7 +73,7 @@ llama.cpp's build for it follows the model (below).
 ## A question
 
 ```js
-const res = await fetch('http://localhost:8765/api/filter', {
+const res = await fetch('http://localhost:31765/api/filter', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({

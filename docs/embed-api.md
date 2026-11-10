@@ -7,7 +7,7 @@ transformers.js, computed the same way (mean of the last hidden state over the t
 to length 1). Vectors from Transcribe and from the browser can therefore be compared with each
 other: on 23 field names and queries their cosine was at least 0.9999995.
 
-The app listens on `http://localhost:8765` (or the port given with `--port`; the Live page shows the
+The app listens on `http://localhost:31765` (or the port given with `--port`; the Live page shows the
 address in use). Texts do not leave the computer.
 
 | Request | Answer |
@@ -59,7 +59,7 @@ checksum and land in `<data>/embeddinggemma`.
 ## Vectors
 
 ```js
-const res = await fetch('http://localhost:8765/api/embed', {
+const res = await fetch('http://localhost:31765/api/embed', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ texts: ['Künstler'], kind: 'query' })
