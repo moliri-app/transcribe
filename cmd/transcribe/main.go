@@ -167,29 +167,31 @@ func main() {
 	defer stop()
 	srv.Start(ctx)
 
-	ln, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", *port))
-	if err != nil {
-		log.Printf("port %d is busy, picking a free one", *port)
-		ln, err = net.Listen("tcp", "127.0.0.1:0")
-	}
+	lns, err := listenLoopback(*port)
 	if err != nil {
 		fail(err)
 	}
-	url := fmt.Sprintf("http://localhost:%d", ln.Addr().(*net.TCPAddr).Port)
+	listenPort := lns[0].Addr().(*net.TCPAddr).Port
+	if listenPort != *port {
+		log.Printf("port %d is busy, picked %d", *port, listenPort)
+	}
+	url := fmt.Sprintf("http://localhost:%d", listenPort)
 	fmt.Println(url, "(data:", *data+")")
 	restart := func() {
-		restartArgs = relaunchArgs(os.Args[1:], ln.Addr().(*net.TCPAddr).Port, *noBrowser && !*background)
+		restartArgs = relaunchArgs(os.Args[1:], listenPort, *noBrowser && !*background)
 		stop()
 	}
 	if !fixed {
 		srv.Restart = restart // once the data moved to another folder
 	}
 	hs := &http.Server{Handler: srv.Handler()}
-	go func() {
-		if err := hs.Serve(ln); !errors.Is(err, http.ErrServerClosed) {
-			fail(err)
-		}
-	}()
+	for _, ln := range lns {
+		go func() {
+			if err := hs.Serve(ln); !errors.Is(err, http.ErrServerClosed) {
+				fail(err)
+			}
+		}()
+	}
 	writeInstance(*data, url)
 	defer removeInstance(*data)
 	var tr *tray
