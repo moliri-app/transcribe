@@ -20,8 +20,9 @@ address in use). Texts do not leave the computer.
 
 The same approval as for text recognition ([ocr-api.md](ocr-api.md)) and live transcription:
 programs that are no web page (no `Origin` header) and pages on this computer (`localhost`,
-`127.0.0.1`) always; pages from other addresses only once the user allowed them on the Live page
-under „Wer sich verbinden darf“. A page that tries is listed there, and gets `403` with
+`127.0.0.1`) always; pages from other addresses only once the user allowed them. A page that
+tries is asked about on whatever page of the app is open (and with a notification at the tray icon
+while no window is in sight), is listed under Einstellungen › Programme › Zugriff, and gets `403` with
 `{"ok": false, "error": "Diese Seite darf die Suche nach Bedeutung nicht nutzen. … erlauben: <origin>"}`.
 The answers carry CORS headers for the calling page, and the preflight `OPTIONS` is answered.
 

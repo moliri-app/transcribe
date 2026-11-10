@@ -125,12 +125,12 @@ verbinden. Trennen nimmt einen Ordner nur aus der Bibliothek; Transcribe löscht
 Das Transkript einer Aufnahme aus einem verbundenen Ordner legt die App außerdem als Datei daneben
 (`Interview.mp3.transcribe.json`, mit Korrekturen und Clips), und liest beim Laden, was dort liegt.
 So arbeiten mehrere Menschen über einen geteilten Ordner (etwa Nextcloud) an denselben Transkripten.
-Abschalten lässt sich das in den **Einstellungen** unter „Ordner“. Das Format steht in
+Abschalten lässt sich das in den **Einstellungen** unter „Transkribieren › Verbundene Ordner“. Das Format steht in
 [docs/sidecar.md](docs/sidecar.md).
 
 ### Mit Windows starten, im Hintergrund weiterlaufen
 
-In den **Einstellungen** unter „Andere Programme“:
+In den **Einstellungen** unter „Programme › Im Hintergrund“:
 
 - **Im Hintergrund bereit** (anfangs an): Andere Programme dürfen die Live-API nutzen, und die
   Erkennung bleibt geladen, damit alles sofort startet (etwa 1 GB Arbeitsspeicher). Aus werden
@@ -154,8 +154,15 @@ Die Seite **Live** macht aus Sprache sofort Text: selbst aufnehmen, übers Mikro
 Wunsch mit gespeicherter Aufnahme, die sich danach vollständig mit Sprechern transkribieren lässt),
 oder andere Programme wie Moliri verbinden. Die tragen `ws://localhost:31765/api/live` als Adresse
 ein und schicken entweder selbst Ton, oder lassen Transcribe mithören und bekommen den Text laufend
-zurück. Jede Anfrage bleibt als Notiz stehen. Das Protokoll steht in
+zurück. Jede Anfrage bleibt als Notiz stehen. Adresse, Erlaubnisse und was von Anfragen bleibt,
+stehen in den **Einstellungen** unter „Programme“. Das Protokoll steht in
 [docs/live-api.md](docs/live-api.md).
+
+Programme auf diesem Rechner dürfen Transcribe immer nutzen, Webseiten von anderen Adressen erst,
+wenn man sie erlaubt. Versucht es eine, fragt Transcribe auf der Seite, die gerade offen ist; ist
+kein Fenster zu sehen, meldet es sich mit einer Benachrichtigung am Symbol im Infobereich, ein Klick
+darauf zeigt die Anfrage. Startet Transcribe nicht mit Windows, schlägt es dabei vor, das und das
+Weiterlaufen im Hintergrund einzuschalten, damit Programme es immer erreichen.
 
 Der Schalter **Im Hintergrund bereit** unten auf der Seite (derselbe wie in den Einstellungen) hält
 die Erkennung geladen und lässt Programme zu, solange er an ist (so ist es anfangs): Eine Aufnahme
@@ -169,8 +176,7 @@ Satzes spielt ab dort.
 
 Programme wie Moliri lassen Transcribe auch den Text von Bildern lesen (OCR): `POST
 http://localhost:31765/api/ocr` mit dem Bild, zurück kommen Zeilen und Wörter mit ihrer Lage im Bild.
-Webseiten brauchen dieselbe Erlaubnis wie für die Live-Transkription (Seite **Live**, „Wer sich
-verbinden darf“). Tesseract wird nicht mitgeliefert: Unter Windows lädt die App es beim ersten Lesen
+Webseiten brauchen dieselbe Erlaubnis wie für die Live-Transkription. Tesseract wird nicht mitgeliefert: Unter Windows lädt die App es beim ersten Lesen
 herunter (etwa 6 MB, dazu je Sprache 2–11 MB), unter Linux und macOS liest das installierte
 `tesseract`. Als zweite Erkennung liest PP-OCRv5 gedruckte lateinische Schrift genauer, auch auf der
 Grafikkarte; seine Modelle (13 MB) kommen ebenfalls erst beim ersten Lesen. Unter Windows liest auf
