@@ -590,14 +590,16 @@
 		speichertOcrSchluessel = false;
 	}
 
-	// ---- Programme: die Adresse der Live-API ----
-	const adresse = `ws://${typeof location === 'undefined' ? 'localhost:31765' : location.host}/api/live`;
+	// ---- Programme: die Adresse, unter der Programme Transcribe erreichen, und die der Live-API ----
+	const rechner = typeof location === 'undefined' ? 'localhost:31765' : location.host;
+	const grundadresse = `http://${rechner}`;
+	const adresse = `ws://${rechner}/api/live`;
 	let kopiert = $state(false);
 	let kopierFehler = $state('');
 	async function kopieren() {
 		kopierFehler = '';
 		try {
-			await navigator.clipboard.writeText(adresse);
+			await navigator.clipboard.writeText(grundadresse);
 			kopiert = true;
 			setTimeout(() => (kopiert = false), 2000);
 		} catch {
@@ -1128,15 +1130,18 @@
 
 				<section id="adresse" class="blatt" aria-labelledby="h-adresse">
 					<h2 id="h-adresse">Adresse</h2>
-					<p class="hinweis">Diese Adresse in das Programm eintragen, in Moliri beim Feld „API“:</p>
+					<p class="hinweis">Unter dieser Adresse erreichen Programme Transcribe. In Moliri trägst du sie im Profil ein:</p>
 					<div class="apiadresse">
-						<code>{adresse}</code>
+						<code>{grundadresse}</code>
 						<Button type="secondary" size="large" onclick={kopieren}>
 							{#snippet iconLeft()}<IconMaterialSymbolsContentCopyOutlineRounded />{/snippet}
 							{kopiert ? 'Kopiert' : 'Adresse kopieren'}
 						</Button>
 					</div>
 					{#if kopierFehler}<p class="warnung" role="status">{kopierFehler}</p>{/if}
+					<p class="meta">
+						Die Spracheingabe in Moliri will bisher die Adresse der Live-Transkription: <code>{adresse}</code>
+					</p>
 					<dl class="modi">
 						<dt>Audio schicken</dt>
 						<dd>Das Programm nimmt selbst auf und schickt den Ton; der Text kommt sofort zurück.</dd>

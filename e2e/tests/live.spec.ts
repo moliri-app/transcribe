@@ -148,7 +148,7 @@ test.describe('Live', () => {
     await page.getByRole('link', { name: 'Programme verbinden' }).click();
     await expect(page).toHaveURL(/\/settings#programme$/);
     await expect(page.getByRole('heading', { name: 'Zugriff' })).toBeVisible();
-    await expect(page.getByText(/^ws:\/\/.+\/api\/live$/).first()).toBeVisible();
+    await expect(page.getByText(/^http:\/\/localhost:\d+$/).first()).toBeVisible();
     // the view it had before: old links lead there too
     await page.goto('/live?verbinden');
     await expect(page).toHaveURL(/\/settings#programme$/);
