@@ -22,13 +22,14 @@ func main() {
 	speakers := flag.Int("speakers", 0, "number of speakers (0 = auto)")
 	lang := flag.String("language", "auto", "auto, a language code, or several like de,en")
 	threads := flag.Int("threads", 4, "threads")
+	quality := flag.String("quality", "", "fast|best (default: what the preset says)")
 	flag.Parse()
 	if *data == "" || flag.NArg() != 1 {
 		log.Fatal("usage: tx -data DIR audiofile (a name inside DIR/audio)")
 	}
 	r := runner.New(*data)
 	t0 := time.Now()
-	err := r.Run(context.Background(), *data, flag.Arg(0), jobs.Options{Preset: *preset, Speakers: *speakers, Language: *lang, Threads: *threads},
+	err := r.Run(context.Background(), *data, flag.Arg(0), jobs.Options{Preset: *preset, Speakers: *speakers, Language: *lang, Threads: *threads, Quality: *quality},
 		func(step, total int, label string) {
 			fmt.Printf("[%d/%d] %s (%.0fs)\n", step, total, label, time.Since(t0).Seconds())
 		})

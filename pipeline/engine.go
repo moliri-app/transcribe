@@ -101,11 +101,13 @@ func (e *Engine) say(s string) {
 	}
 }
 
-func (e *Engine) recognizer(ctx context.Context, key, lang string) (*sherpa.Recognizer, error) {
+// recognizer gives the recognizer of key, loading it the first time. There is one per key: Whisper
+// turbo serves every language, set per decode (sherpa.Recognizer.DecodeIn), as a copy of it per
+// language would take another 1.6 GB each.
+func (e *Engine) recognizer(ctx context.Context, key string) (*sherpa.Recognizer, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	id := key + ":" + lang
-	if r := e.rec[id]; r != nil {
+	if r := e.rec[key]; r != nil {
 		return r, nil
 	}
 	var cfg sherpa.RecognizerConfig
@@ -127,16 +129,19 @@ func (e *Engine) recognizer(ctx context.Context, key, lang string) (*sherpa.Reco
 			return nil, err
 		}
 		w := e.M.Whisper("turbo")
-		cfg = sherpa.RecognizerConfig{Kind: "whisper", Encoder: w.Encoder, Decoder: w.Decoder, Tokens: w.Tokens, Language: lang, UseGPU: true}
+		cfg = sherpa.RecognizerConfig{Kind: "whisper", Encoder: w.Encoder, Decoder: w.Decoder, Tokens: w.Tokens, UseGPU: true}
 	default:
 		return nil, fmt.Errorf("unknown recognizer %q", key)
 	}
 	cfg.Threads = e.Threads
+	if os.Getenv("TRANSCRIBE_DEBUG") != "" {
+		fmt.Fprintf(os.Stderr, "load recognizer %s\n", key)
+	}
 	r, err := sherpa.NewRecognizer(cfg)
 	if err != nil {
 		return nil, err
 	}
-	e.rec[id] = r
+	e.rec[key] = r
 	return r, nil
 }
 
@@ -210,7 +215,7 @@ func (e *Engine) transcribe(ctx context.Context, pcm []float32, o TextOptions, t
 			cuts = append(cuts, c[1])
 		}
 	}
-	rec, err := e.recognizer(ctx, "parakeet", "")
+	rec, err := e.recognizer(ctx, "parakeet")
 	if err != nil {
 		return nil, err
 	}
@@ -299,7 +304,7 @@ func (e *Engine) deFallback(ctx context.Context, segs []tseg, pcm []float32, lan
 			}
 		}
 		if suspicious {
-			de, err := e.recognizer(ctx, "german", "")
+			de, err := e.recognizer(ctx, "german")
 			if err != nil {
 				return nil, err
 			}
@@ -344,7 +349,7 @@ func germanCheck(text string, words, de []model.Word) (out []model.Word, drop bo
 // whisperSnippet transcribes pcm[a:b] with Whisper turbo forced to lang. sherpa's Whisper gives no
 // word times or confidences, so words are spread over the detected speech by length (p fixed).
 func (e *Engine) whisperSnippet(ctx context.Context, pcm []float32, a, b float64, lang string) ([]model.Word, error) {
-	r, err := e.recognizer(ctx, "turbo", lang)
+	r, err := e.recognizer(ctx, "turbo")
 	if err != nil {
 		return nil, err
 	}
@@ -354,7 +359,7 @@ func (e *Engine) whisperSnippet(ctx context.Context, pcm []float32, a, b float64
 	piece = append(piece, make([]float32, int(pad*audio.SR))...)
 	piece = append(piece, x...)
 	piece = append(piece, make([]float32, int(pad*audio.SR))...)
-	text := strings.TrimSpace(r.Decode(piece).Text)
+	text := strings.TrimSpace(r.DecodeIn(lang, piece).Text)
 	low := strings.ToLower(text)
 	for _, h := range hallucinations {
 		if strings.Contains(low, h) {
