@@ -229,6 +229,20 @@ func main() {
 		})
 		defer tr.close()
 		dict.attach(tr)
+		// a page asks for the app while no window is in sight: the window would show the request,
+		// the notification brings it there
+		srv.Live.Asked = func(origin, client string) {
+			if srv.WindowInSight() {
+				return
+			}
+			who := strings.TrimPrefix(strings.TrimPrefix(origin, "https://"), "http://")
+			if origin == "null" {
+				who = "Eine Datei oder eingebettete Seite"
+			}
+			tr.notifyThen("Darf "+who+" Transcribe nutzen?",
+				"Die Seite möchte Sprache als Text holen oder Text aus Bildern lesen lassen. Ein Klick hier zeigt die Anfrage.",
+				func() { showAppWindow(url, *data) })
+		}
 		firstWait := 90 * time.Second
 		if *background {
 			firstWait = math.MaxInt64 // started without a window: wait until one was opened and closed again

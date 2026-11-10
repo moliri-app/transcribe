@@ -18,8 +18,9 @@ address in use).
 
 The same approval as for live transcription ([live-api.md](live-api.md)): programs that are no web
 page (no `Origin` header) and pages on this computer (`localhost`, `127.0.0.1`) always; pages from
-other addresses only once the user allowed them on the Live page under „Wer sich verbinden darf“. A
-page that tries is listed there, and gets `403` with `{"ok": false, "error": "… erlauben: <origin>"}`
+other addresses only once the user allowed them. A page that tries is asked about on whatever page
+of the app is open (and with a notification at the tray icon while no window is in sight), is listed
+under Einstellungen › Programme › Zugriff, and gets `403` with `{"ok": false, "error": "… erlauben: <origin>"}`
 it can read and show.
 
 The switch „Im Hintergrund bereit“ does not matter here: it only decides whether programs may have

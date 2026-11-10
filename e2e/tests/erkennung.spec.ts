@@ -68,8 +68,11 @@ test.describe('Erkennung', () => {
   test('nur über die API: mit ElevenLabs, ohne Schlüssel geht nichts, mit Schlüssel gehen die Aufträge dorthin', async ({ page, app }) => {
     await page.goto('/settings');
     await page.getByRole('radio', { name: /Nur über eine API/ }).check();
-    await expect(page.getByText(/deshalb lädt die App keine Modelle/)).toBeVisible();
     await expect(page.getByRole('combobox', { name: 'Ganze Aufnahmen' })).toHaveCount(0);
+    // the models are in the category System
+    await page.getByRole('link', { name: 'System' }).click();
+    await expect(page.getByText(/deshalb lädt die App keine Modelle/)).toBeVisible();
+    await page.getByRole('link', { name: 'Transkribieren' }).click();
     await erkennung(page).getByRole('combobox', { name: 'Dienst' }).selectOption({ label: 'ElevenLabs' });
     const adresse = erkennung(page).getByRole('textbox', { name: 'Adresse' });
     await expect(adresse).toHaveValue('https://api.elevenlabs.io');

@@ -59,6 +59,7 @@ type Server struct {
 	mux       *http.ServeMux
 	started   time.Time
 	lastPing  atomic.Int64 // unix nanos of the last UI heartbeat
+	hidden    atomic.Bool  // the last heartbeat came from a page out of sight (minimized, covered)
 	lastBye   atomic.Int64
 	move      moving
 	filters   filterQueue
@@ -90,7 +91,12 @@ func (s *Server) bye(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// WindowInSight reports whether a window of the app is open and in sight, not minimized or covered:
+// what it shows, the user sees.
+func (s *Server) WindowInSight() bool { return s.WindowOpen() && !s.hidden.Load() }
+
 func (s *Server) ping(w http.ResponseWriter, r *http.Request) {
+	s.hidden.Store(r.URL.Query().Has("hidden"))
 	s.lastPing.Store(time.Now().UnixNano())
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -107,6 +113,7 @@ func New(cfg Config) *Server {
 	m.HandleFunc("/api/bye", s.bye)
 	m.HandleFunc("/api/instance", s.instance)
 	m.HandleFunc("/api/background", s.background)
+	m.HandleFunc("/api/access", s.access)
 	m.HandleFunc("/api/dictate", s.dictate)
 	m.HandleFunc("/api/update", s.updateAPI)
 	m.HandleFunc("/", s.root)

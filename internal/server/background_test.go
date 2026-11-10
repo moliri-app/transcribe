@@ -5,9 +5,14 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"path/filepath"
 	"testing"
+
+	"github.com/moliri-app/transcribe/internal/live"
+	"github.com/moliri-app/transcribe/jobs"
 )
 
 func TestInstance(t *testing.T) {
@@ -37,5 +42,32 @@ func TestBackgroundPref(t *testing.T) {
 	}
 	if !get().Background {
 		t.Error("the background preference was not stored")
+	}
+}
+
+func TestAccessListsRequestsAndDeclinesTheHint(t *testing.T) {
+	run := func(context.Context, string, string, jobs.Options, jobs.Progress) error { return nil }
+	noLive := func(context.Context, string) (live.Stream, error) { return nil, errors.New("no live in tests") }
+	s := New(Config{DataDir: t.TempDir(), Runner: run, Live: noLive})
+	s.Live.Refused("https://moliri.example", "Moliri")
+	type state struct {
+		Blocked []struct{ Origin, Client string }
+		Hint    bool
+	}
+	get := func() (st state) {
+		_ = json.Unmarshal(do(s, "GET", "/api/access", "", nil).Body.Bytes(), &st)
+		return st
+	}
+	if b := get().Blocked; len(b) != 1 || b[0].Origin != "https://moliri.example" || b[0].Client != "Moliri" {
+		t.Errorf("blocked: %+v", b)
+	}
+	if w := do(s, "POST", "/api/access", `{"hint":false}`, map[string]string{"Origin": "https://evil.example"}); w.Code != 403 {
+		t.Errorf("foreign page: got %d, want 403", w.Code)
+	}
+	if w := do(s, "POST", "/api/access", `{"hint":false}`, nil); w.Code != 200 {
+		t.Fatalf("got %d: %s", w.Code, w.Body)
+	}
+	if get().Hint {
+		t.Error("the hint stays after it was declined")
 	}
 }

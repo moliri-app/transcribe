@@ -54,6 +54,9 @@ type Prefs struct {
 	LiveAPIKeepHours int  `json:"liveApiKeepHours,omitempty"`
 
 	Background bool `json:"background,omitempty"` // keep running in the notification area when the window is closed
+	// NoBackgroundHint: the user declined the hint, shown once a program asks for the app, to start
+	// it with Windows and keep it running in the background.
+	NoBackgroundHint bool `json:"noBackgroundHint,omitempty"`
 
 	// Text recognition (OCR) for programs: OCREngine is the engine a request that names none reads
 	// with ("" = the first usable one, never the AI service); OCRAPI is the AI service of the

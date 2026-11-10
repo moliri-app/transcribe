@@ -134,7 +134,7 @@ test.describe('Live', () => {
     await expect(options).toHaveCount(2);
   });
 
-  test('recording settings sit in their own window; connecting programs has its own view', async ({ page }) => {
+  test('recording settings sit in their own window; connecting programs leads to the settings', async ({ page }) => {
     await page.goto('/live');
     await page.getByRole('button', { name: 'Einrichten' }).click();
     const settings = page.getByRole('dialog', { name: 'Aufnahme einrichten' });
@@ -145,17 +145,44 @@ test.describe('Live', () => {
     await page.keyboard.press('Escape');
     await expect(settings).toHaveCount(0);
 
-    await page.getByRole('button', { name: 'Programme verbinden' }).click();
-    await expect(page.getByRole('heading', { name: 'Programme verbinden', level: 1 })).toBeVisible();
-    await expect(page.getByText(/^ws:\/\/.+\/api\/live$/).first()).toBeVisible();
-    await expect(page).toHaveURL(/verbinden/);
+    await page.getByRole('link', { name: 'Programme verbinden' }).click();
+    await expect(page).toHaveURL(/\/settings#programme$/);
+    await expect(page.getByRole('heading', { name: 'Zugriff' })).toBeVisible();
+    await expect(page.getByText(/^http:\/\/localhost:\d+$/).first()).toBeVisible();
+    // the view it had before: old links lead there too
+    await page.goto('/live?verbinden');
+    await expect(page).toHaveURL(/\/settings#programme$/);
+  });
+
+  test('a page that may not use Transcribe is asked about wherever one is; allowed, it may', async ({ page, app }) => {
+    await page.goto('/');
+    const refused = await page.request.get('/api/ocr/engines', { headers: { Origin: 'https://moliri.example.org' } });
+    expect(refused.status()).toBe(403);
+    const frage = page.getByRole('region', { name: 'Darf moliri.example.org Transcribe nutzen?' });
+    await expect(frage).toBeVisible();
+    await frage.getByRole('button', { name: 'Erlauben' }).click();
+    await expect(page.getByRole('heading', { name: 'moliri.example.org darf Transcribe nutzen' })).toBeVisible();
+    await expect.poll(() => app.json('settings.json').liveOrigins).toEqual(['https://moliri.example.org']);
+    expect((await page.request.get('/api/ocr/engines', { headers: { Origin: 'https://moliri.example.org' } })).status()).toBe(200);
+
+    // turned down, it is asked about again the next time, and stays out
+    await page.request.get('/api/ocr/engines', { headers: { Origin: 'https://other.example.org' } });
+    await page.goto('/settings#zugriff');
+    const andere = page.getByRole('region', { name: 'Darf other.example.org Transcribe nutzen?' });
+    await expect(page.getByRole('list', { name: 'Möchten Transcribe nutzen' })).toContainText('https://other.example.org');
+    await andere.getByRole('button', { name: 'Ablehnen' }).click();
+    await expect(andere).toHaveCount(0);
+    await expect(page.getByRole('list', { name: 'Möchten Transcribe nutzen' })).toHaveCount(0);
+    await expect(page.getByRole('list', { name: 'Erlaubte Webseiten' })).toContainText('https://moliri.example.org');
   });
 
   test('my voice: own words as chips and spoken punctuation, kept in the settings', async ({ page }) => {
     await page.goto('/live');
     await page.getByRole('button', { name: 'Einrichten' }).click();
     const settings = page.getByRole('dialog', { name: 'Aufnahme einrichten' });
-    const stimme = settings.getByRole('region', { name: 'Meine Stimme' });
+    await expect(settings.getByRole('combobox', { name: 'Sprachen' })).toBeVisible();
+    await settings.getByRole('link', { name: /alle Einstellungen für Live/ }).click();
+    const stimme = page.getByRole('region', { name: 'Meine Stimme' });
     await expect(stimme.getByRole('combobox', { name: 'Sprachen' })).toBeVisible();
     const feld = stimme.getByRole('textbox', { name: 'Meine Wörter' });
     await feld.fill('Moliri');
@@ -171,7 +198,6 @@ test.describe('Live', () => {
     await ansagen.click();
 
     await page.reload();
-    await page.getByRole('button', { name: 'Einrichten' }).click();
     await expect(stimme.getByRole('button', { name: /entfernen$/ })).toHaveCount(1);
     await expect(stimme.getByRole('button', { name: 'Obeya entfernen' })).toBeVisible();
     await expect(ansagen).toHaveAttribute('aria-checked', 'false');

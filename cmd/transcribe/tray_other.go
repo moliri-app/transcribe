@@ -13,6 +13,7 @@ type tray struct{}
 
 func startTray(trayActions) *tray       { return nil }
 func (*tray) notify(title, text string) {}
+func (*tray) notifyThen(string, string, func()) {}
 func (*tray) close()                    {}
 
 // dictating (dictate.go) is only implemented on Windows as well

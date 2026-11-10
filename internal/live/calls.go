@@ -81,6 +81,7 @@ func (h *Hub) Call(kind, client, model, request string, facts ...Fact) *Call {
 	now := time.Now()
 	n := &Note{ID: fmt.Sprintf("%s-%d-%s", now.Format(idTime), h.seq, kind), Kind: kind, Client: client, Started: now,
 		Lines: []Line{}, Model: model, Request: clip(request), Facts: facts, Transient: transient}
+	h.used(client)
 	h.add(n)
 	h.sendNote(n)
 	h.save(n)

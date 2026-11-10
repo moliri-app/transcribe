@@ -13,6 +13,7 @@ import (
 	"slices"
 	"sync"
 	"testing"
+	"time"
 )
 
 // fakeStream "recognises" one utterance per second of audio and previews the second going on.
@@ -377,5 +378,32 @@ func TestOffTurnsAwayOnlyTheMicrophone(t *testing.T) {
 	s.End(nil)
 	if len(got) != 1 || got[0] != "Satz" {
 		t.Errorf("finals sent: %v", got)
+	}
+}
+
+func TestAskedOnceAMinuteAndProgramNamed(t *testing.T) {
+	h := NewHub(t.TempDir(), nil)
+	asked := make(chan string, 4)
+	h.Asked = func(origin, client string) { asked <- origin }
+	h.Refused("https://Moliri.example/", "Moliri")
+	h.Refused("https://moliri.example", "Moliri") // the page tries again at once
+	if got := <-asked; got != "https://moliri.example" {
+		t.Errorf("asked for %q", got)
+	}
+	select {
+	case o := <-asked:
+		t.Errorf("asked again within the minute for %q", o)
+	case <-time.After(50 * time.Millisecond):
+	}
+	if b := h.Blocked(); len(b) != 1 || b[0].Client != "Moliri" {
+		t.Errorf("blocked: %+v", b)
+	}
+
+	if p := h.Program(); p != "" {
+		t.Errorf("a program used the API before any did: %q", p)
+	}
+	h.Logged(KindOCR, "https://moliri.example", "", "", nil)
+	if p := h.Program(); p != "moliri.example" {
+		t.Errorf("program: %q", p)
 	}
 }

@@ -146,7 +146,7 @@ messages of this API stay as they are.
 Each request is saved as `<data>/live/<id>.json`: who asked, when, and every utterance with its
 times. The Live page shows the newest 200, copies their text and deletes them.
 
-Under "Programme verbinden" on the Live page, saving requests can be switched off
+Under Einstellungen › Programme › Gespeicherte Anfragen, saving requests can be switched off
 (`liveApiNoSave` in `settings.json`): a request's note is then only held in memory, shown on the
 Live page (marked "nicht gespeichert") while it runs and for five minutes after it ended, readable from `GET /api/live/note` for as long, and never written to disk.
 Saved requests can instead be deleted automatically some time after they ended

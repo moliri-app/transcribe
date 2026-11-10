@@ -4,15 +4,15 @@
 <!-- Aufnahmeleiste der Live-Seite: Tintenleiste am unteren Rand wie die Player-Leiste des Editors.
      Links Aufnehmen und Beenden mit der Laufzeit, in der Mitte die Pegel, rechts der Schalter
      „Im Hintergrund bereit“ (Programme dürfen das Mikrofon aufnehmen lassen, die Erkennung bleibt
-     geladen; geschickte Audiodaten und Bilder und von Hand aufnehmen gehen immer) und „Einrichten“: Quelle, Mikrofon und Speichern, daneben „Meine Stimme“
-     mit Sprache, eigenen Wörtern und angesagten Satzzeichen, stehen in einem eigenen Fenster über der
-     Leiste, nicht im Weg. -->
+     geladen; geschickte Audiodaten und Bilder und von Hand aufnehmen gehen immer) und „Einrichten“:
+     Quelle, Mikrofon, Speichern und Sprachen in einem eigenen Fenster über der Leiste, nicht im Weg.
+     Eigene Wörter, Satzzeichen und Diktieren stehen in den Einstellungen unter „Live und Diktieren“,
+     zusammen mit allem hier. -->
 <script>
 	import { tick } from 'svelte';
 	import { dauer } from '$lib/api.js';
-	import Sprachenwahl from '$lib/Sprachenwahl.svelte';
-	import Toggle from '$lib/moliri/components/ui/Toggle.svelte';
-	import MeineWoerter from './MeineWoerter.svelte';
+	import AufnahmeWahl from './AufnahmeWahl.svelte';
+	import StimmeWahl from './StimmeWahl.svelte';
 	import { EINGANG, laenge, live, QUELLEN, sprachname } from './stand.svelte.js';
 
 	let offen = $state(false);
@@ -20,9 +20,6 @@
 	let fenster = $state();
 	/** @type {HTMLButtonElement | undefined} */
 	let knopf = $state();
-
-	/** das gewählte Mikrofon ist gerade nicht angeschlossen */
-	const fehlt = $derived(!!live.geraet && !!live.geraete && !live.geraete.includes(live.geraet));
 
 	const quelle = $derived((live.mic.running && live.mic.source) || live.quelle);
 	/** die Pegel, die zur laufenden Aufnahme gehören, sonst zur gewählten Quelle */
@@ -164,82 +161,12 @@
 			</div>
 			{#if live.mic.running}<p class="hinweis">Änderungen gelten ab der nächsten Aufnahme.</p>{/if}
 
-			<section class="teil" aria-labelledby="h-aufnahme">
-				<h3 id="h-aufnahme">Aufnahme</h3>
-				<fieldset class="quellen">
-					<legend class="feldname">Was aufgenommen wird</legend>
-					{#each /** @type {const} */ ([['mic', 'Mikrofon', 'Was am Mikrofon gesagt wird.'], ['system', 'Systemaudio', 'Was der Rechner abspielt, etwa die anderen in einem Online-Meeting.'], ['both', 'Beides gemischt', 'Am besten mit Kopfhörern, sonst sind die anderen doppelt zu hören.']]) as [wert, name, satz] (wert)}
-						{@const aus = wert !== 'mic' && !live.systemMoeglich}
-						<label class="quelle" class:an={live.quelle === wert} class:aus>
-							<input type="radio" name="quelle" value={wert} disabled={aus} bind:group={live.quelle} onchange={live.quelleWaehlen} />
-							<span>
-								<b>{name}</b>
-								<span class="satz">{aus ? 'Auf diesem Rechner nicht möglich.' : satz}</span>
-							</span>
-						</label>
-					{/each}
-				</fieldset>
-
-				{#if live.quelle !== 'system'}
-					<label class="feldname">
-						Mikrofon
-						<select class="feld" bind:value={live.geraet} onchange={live.geraetWaehlen} disabled={live.geraete === null}>
-							<option value="">
-								{live.geraete === null ? 'wird gesucht …' : live.standard ? `Systemstandard: ${live.standard}` : 'Systemstandard'}
-							</option>
-							{#if fehlt}
-								<option value={live.geraet}>{live.geraet} (nicht angeschlossen)</option>
-							{/if}
-							{#each live.geraete ?? [] as g (g)}<option value={g}>{g}</option>{/each}
-						</select>
-						<span class="satz">
-							{#if fehlt}
-								Dieses Mikrofon ist gerade nicht angeschlossen.
-							{:else if live.geraet}
-								Bleibt bei diesem Mikrofon, auch wenn ein anderes angeschlossen wird.
-							{:else if live.standard}
-								Nimmt das Mikrofon, das in Windows als Standard eingestellt ist. Wird ein anderes zum Standard, etwa ein
-								angeschlossenes Headset, wechselt die Aufnahme mit.
-							{:else}
-								Nimmt das Mikrofon, das im System als Standard eingestellt ist.
-							{/if}
-						</span>
-					</label>
-				{/if}
-
-				<Toggle
-					bind:checked={() => live.speichern, (v) => live.speichernSetzen(v)}
-					disabled={!!live.laufend}
-					title="Aufnahme speichern"
-					description={live.speichern
-						? 'Sie kommt zu deinen Aufnahmen und lässt sich danach vollständig transkribieren, mit Sprechern.'
-						: 'Aus: Es bleibt nur der Text.'}
-				/>
-			</section>
-
-			<section class="teil stimme" aria-labelledby="h-stimme">
-				<h3 id="h-stimme">Meine Stimme</h3>
-				<div class="sprache">
-					<Sprachenwahl bind:value={live.sprache} label="Sprachen" onchange={live.spracheWaehlen} />
-					<span class="satz">
-						{live.sprache === 'de'
-							? 'Beim Sprechen zeigt das schnelle deutsche Modell Kroko den Text; jeden Satz schreibt danach das genauere Parakeet.'
-							: live.sprache === 'auto'
-								? 'Der Live-Text erkennt die Sprache selbst.'
-								: live.sprache.includes(',')
-									? 'Der Live-Text erkennt die Sprache selbst. Vollständig transkribiert bekommt jeder Abschnitt eine dieser Sprachen.'
-									: 'Der Live-Text erkennt die Sprache selbst; die Wahl gilt fürs vollständige Transkribieren.'}
-					</span>
-				</div>
-				<MeineWoerter />
-				<Toggle
-					bind:checked={() => live.ansagen, (v) => live.ansagenSetzen(v)}
-					title="Satzzeichen ansagen"
-					description={live.ansagen
-						? 'Sag „Komma“, „Punkt“, „Fragezeichen“ oder „neuer Absatz“, und das Zeichen steht da. Sonst setzt die App sie selbst.'
-						: 'Aus: Die App setzt alle Satzzeichen selbst, „Komma“ bleibt ein Wort.'}
-				/>
-			</section>
+			<AufnahmeWahl />
+			<StimmeWahl kurz />
+			<a class="mehr" href="/settings#live" data-sveltekit-reload>
+				Eigene Wörter, Satzzeichen und Diktieren: alle Einstellungen für Live
+				<IconMaterialSymbolsArrowForwardRounded aria-hidden="true" />
+			</a>
 		</div>
 	{/if}
 </div>
@@ -594,103 +521,32 @@
 		width: 1.5rem;
 		height: 1.5rem;
 	}
-	/* Aufnahme und Meine Stimme: untereinander, auf breitem Schirm nebeneinander */
-	.teil {
-		display: grid;
-		align-content: start;
-		gap: 1.125rem;
-	}
-	h3 {
-		font-size: 0.875rem;
-		font-weight: 700;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: hsl(var(--color-text-secondary));
-		margin-bottom: -0.375rem;
-	}
-	.stimme {
-		padding-top: 1.125rem;
-		border-top: 1px solid hsl(var(--color-border-primary));
-	}
-	@media (min-width: 1000px) {
-		.fenster {
-			width: 54rem;
-			grid-template-columns: 1fr 1fr;
-			column-gap: 2rem;
-		}
-		.fkopf,
-		.hinweis {
-			grid-column: 1 / -1;
-		}
-		.stimme {
-			padding-top: 0;
-			padding-left: 2rem;
-			border-top: 0;
-			border-left: 1px solid hsl(var(--color-border-primary));
-		}
-	}
 	.hinweis {
 		padding: 0.5rem 0.75rem;
 		border-radius: 0.5rem;
 		background: hsl(var(--color-green-10));
 		font-size: 0.9375rem;
 	}
-
-	.quellen {
-		display: grid;
-		gap: 0.375rem;
-		border: 0;
-		margin: 0;
-		padding: 0;
-	}
-	.quellen legend {
-		margin-bottom: 0.375rem;
-	}
-	.quelle {
-		display: flex;
-		align-items: flex-start;
-		gap: 0.75rem;
-		padding: 0.625rem 0.75rem;
-		border: 1px solid hsl(var(--color-border-primary));
-		border-radius: 0.75rem;
-		cursor: pointer;
-		transition:
-			background-color 0.15s,
-			border-color 0.15s;
-	}
-	.quelle:hover:not(.aus) {
-		border-color: hsl(var(--color-text-secondary));
-	}
-	.quelle.an {
-		border-color: hsl(var(--color-neutral-100));
-		box-shadow: inset 0 0 0 1px hsl(var(--color-neutral-100));
-	}
-	.quelle.aus {
-		cursor: default;
-		opacity: 0.55;
-	}
-	.quelle input {
-		margin-top: 0.1875rem;
-	}
-	.quelle > span {
-		display: grid;
-	}
-	.sprache {
-		display: grid;
+	.mehr {
+		display: inline-flex;
+		align-items: center;
 		gap: 0.3rem;
+		min-height: var(--hit);
+		padding-top: 0.75rem;
+		border-top: 1px solid hsl(var(--color-border-primary));
+		font-weight: 700;
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		text-decoration-thickness: 2px;
+		text-decoration-color: hsl(var(--color-green-100));
 	}
-	.sprache :global(.sprachen) {
-		width: 100%;
+	.mehr:hover {
+		text-decoration-color: currentColor;
 	}
-	.satz {
-		font-size: 0.9375rem;
-		font-weight: 400;
-		color: hsl(var(--color-text-secondary));
-	}
-	.feldname select {
-		width: 100%;
-		color: hsl(var(--color-text-primary));
-		font-weight: 400;
+	.mehr :global(svg) {
+		flex: none;
+		width: 1.25rem;
+		height: 1.25rem;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

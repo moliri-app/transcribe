@@ -1,13 +1,16 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Einstellungen, links ein Menü zu den Abschnitten (schmal eine Leiste oben): wo die Sprache
+<!-- Einstellungen in Kategorien, links ein Menü (schmal eine Leiste oben) mit den Kategorien und unter
+     der offenen ihren Abschnitten; zu sehen ist immer eine Kategorie. Transkribieren: wo die Sprache
      erkannt wird (auf diesem Rechner, über eine API oder beides; welche API), Vorgaben für neue
-     Aufnahmen (Sprecher und Sprachen, sofort gespeichert), andere Programme („Im Hintergrund bereit“,
-     Start mit Windows, Weiterlaufen im Hintergrund), Texterkennung (OCR: die Vorgabe für Programme, der
-     KI-Dienst mit eigenem Schlüssel, ein Bild zum Ausprobieren), Diktieren
-     per Tastenkürzel, GPU-Beschleunigung, Speicherorte, Modelle und Komponenten samt Download, Angaben
-     zum Programm samt Version und Update (internal/update). -->
+     Aufnahmen (Sprecher und Sprachen, sofort gespeichert), verbundene Ordner. Live und Diktieren: was
+     Live aufnimmt, „Meine Stimme“, Diktieren per Tastenkürzel. Programme: wer Transcribe nutzen darf,
+     Start mit Windows und Weiterlaufen im Hintergrund, die Adresse der API und was von Anfragen bleibt.
+     Texterkennung (OCR): die Erkennungen samt Vorgabe für Programme, der KI-Dienst mit eigenem
+     Schlüssel, ein Bild zum Ausprobieren. System: GPU-Beschleunigung, Speicherorte, Modelle und
+     Komponenten samt Download, Angaben zum Programm samt Version und Update (internal/update).
+     Die Adresse trägt die Kategorie oder einen Abschnitt als #anker, etwa /settings#programme. -->
 <script>
 	import { onMount, tick } from 'svelte';
 	import Button from '$lib/moliri/components/ui/Button.svelte';
@@ -16,6 +19,9 @@
 	import { einrichtung } from '$lib/Einrichtung.svelte';
 	import { ENGINES, einzeln, getJSON, post, sprecherAus, verbindung } from '$lib/api.js';
 	import { ladeUpdate, update, updateAktion, versionText, vorherigeVersion } from '$lib/update.svelte.js';
+	import AufnahmeWahl from '$lib/live/AufnahmeWahl.svelte';
+	import StimmeWahl from '$lib/live/StimmeWahl.svelte';
+	import { live, LOESCHEN, uhrzeit } from '$lib/live/stand.svelte.js';
 
 	/** @typedef {{ key: string, path: string, size: number }} Ordner */
 	/** @typedef {{ name: string, label: string, path: string, installed: boolean, size: number, state: string,
@@ -584,30 +590,108 @@
 		speichertOcrSchluessel = false;
 	}
 
-	// ---- Menü: welcher Abschnitt gerade zu sehen ist ----
-	const ABSCHNITTE = /** @type {const} */ ([
-		['erkennung', 'Erkennung'],
-		['neu', 'Neue Aufnahmen'],
-		['ordner', 'Ordner'],
-		['programme', 'Andere Programme'],
-		['ocr', 'Texterkennung'],
-		['diktieren', 'Diktieren'],
-		['gpu', 'Grafikkarte'],
-		['speicher', 'Speicher und Modelle'],
-		['programm', 'Über Transcribe']
+	// ---- Programme: die Adresse, unter der Programme Transcribe erreichen, und die der Live-API ----
+	const rechner = typeof location === 'undefined' ? 'localhost:31765' : location.host;
+	const grundadresse = `http://${rechner}`;
+	const adresse = `ws://${rechner}/api/live`;
+	let kopiert = $state(false);
+	let kopierFehler = $state('');
+	async function kopieren() {
+		kopierFehler = '';
+		try {
+			await navigator.clipboard.writeText(grundadresse);
+			kopiert = true;
+			setTimeout(() => (kopiert = false), 2000);
+		} catch {
+			kopierFehler = 'Kopieren ging nicht.';
+		}
+	}
+
+	// ---- Menü: Kategorien und ihre Abschnitte ----
+	const KATEGORIEN = /** @type {const} */ ([
+		{
+			id: 'transkribieren',
+			name: 'Transkribieren',
+			abschnitte: [
+				['erkennung', 'Erkennung'],
+				['neu', 'Neue Aufnahmen'],
+				['ordner', 'Verbundene Ordner']
+			]
+		},
+		{
+			id: 'live',
+			name: 'Live und Diktieren',
+			abschnitte: [
+				['aufnahme', 'Aufnahme'],
+				['stimme', 'Meine Stimme'],
+				['diktieren', 'Diktieren']
+			]
+		},
+		{
+			id: 'programme',
+			name: 'Programme',
+			abschnitte: [
+				['zugriff', 'Zugriff'],
+				['bereit', 'Im Hintergrund'],
+				['adresse', 'Adresse'],
+				['anfragen', 'Gespeicherte Anfragen']
+			]
+		},
+		{
+			id: 'ocr',
+			name: 'Texterkennung',
+			abschnitte: [
+				['ocr-leser', 'Erkennungen'],
+				['ocr-ki', 'KI-Dienst'],
+				['ocr-probe', 'Ausprobieren']
+			]
+		},
+		{
+			id: 'system',
+			name: 'System',
+			abschnitte: [
+				['gpu', 'Grafikkarte'],
+				['speicher', 'Speicher und Modelle'],
+				['programm', 'Über Transcribe']
+			]
+		}
 	]);
+	/** was diese App zeigt: ohne Texterkennung keine Kategorie dafür, ohne Tastenkürzel kein Diktieren */
 	const menue = $derived(
-		ABSCHNITTE.filter(([id]) => (id === 'ocr' ? ocr !== false : id === 'diktieren' ? !!diktat?.supported : true))
+		KATEGORIEN.filter((k) => k.id !== 'ocr' || ocr !== false).map((k) => ({
+			...k,
+			abschnitte: k.abschnitte.filter(([id]) => id !== 'diktieren' || !!diktat?.supported)
+		}))
 	);
+	/** die Kategorie, die gerade zu sehen ist */
+	let kategorie = $state('transkribieren');
+	const offen = $derived(menue.find((k) => k.id === kategorie) ?? menue[0]);
 	let aktuell = $state('erkennung');
 	/** im Menü angeklickt: bleibt markiert, bis man selbst scrollt, auch wenn der Sprung ganz unten endet */
 	let angeklickt = '';
 	/** @type {HTMLElement | undefined} */
 	let menueLeiste = $state();
 
-	// schmal scrollt die Leiste seitlich: der aktuelle Abschnitt bleibt darin zu sehen
+	/** die Kategorie, zu der ein #anker gehört: sie selbst oder einer ihrer Abschnitte
+	 * @param {string} anker ohne # */
+	const kategorieVon = (anker) => KATEGORIEN.find((k) => k.id === anker || k.abschnitte.some(([id]) => id === anker));
+
+	/** Öffnet, was der #anker nennt: eine Kategorie (von oben) oder einen Abschnitt (in seiner Kategorie).
+	 * @param {string} anker ohne # */
+	async function zeigen(anker) {
+		const k = kategorieVon(anker);
+		if (!k) return;
+		const abschnitt = k.id === anker ? '' : anker;
+		kategorie = k.id;
+		aktuell = angeklickt = abschnitt || k.abschnitte[0][0];
+		await tick();
+		if (abschnitt) document.getElementById(abschnitt)?.scrollIntoView();
+		else scrollTo({ top: 0 });
+	}
+
+	// schmal scrollt die Leiste seitlich: die offene Kategorie bleibt darin zu sehen
 	$effect(() => {
-		const a = menueLeiste?.querySelector(`a[href="#${aktuell}"]`);
+		const a = menueLeiste?.querySelector(`a[href="#${offen.id}"]`);
 		if (!menueLeiste || !(a instanceof HTMLElement) || menueLeiste.scrollWidth <= menueLeiste.clientWidth) return;
 		const leiste = menueLeiste.getBoundingClientRect();
 		const r = a.getBoundingClientRect();
@@ -625,7 +709,7 @@
 				if (angeklickt) return;
 				// ganz unten zählt der letzte Abschnitt, auch wenn er kurz ist
 				const unten = innerHeight + scrollY >= document.documentElement.scrollHeight - 4;
-				const ids = menue.map(([id]) => id);
+				const ids = offen.abschnitte.map(([id]) => id);
 				aktuell = unten ? ids[ids.length - 1] : (ids.find((id) => sichtbar.get(id)) ?? aktuell);
 			},
 			{ rootMargin: '-140px 0px -50% 0px' }
@@ -684,22 +768,25 @@
 			ladeStand(),
 			ladeGpu()
 		]);
-		// mit #abschnitt geöffnet (das Update in der App-Leiste, das Menü im Infobereich): der Sprung
-		// des Browsers kam, bevor die Abschnitte darüber geladen waren, und landet zu weit oben
-		const ziel = decodeURIComponent(location.hash.slice(1));
-		if (ziel)
-			geladen.then(tick).then(() => {
-				const el = document.getElementById(ziel);
-				if (!el) return;
-				aktuell = angeklickt = ziel;
-				el.scrollIntoView();
-			});
+		// mit #kategorie oder #abschnitt geöffnet (das Update in der App-Leiste, das Menü im Infobereich,
+		// „Programme verbinden“ auf der Seite Live): die Kategorie gleich, den Sprung zum Abschnitt erst,
+		// wenn die Abschnitte darüber geladen sind, sonst landet er zu weit oben
+		const anker = () => decodeURIComponent(location.hash.slice(1));
+		if (anker()) {
+			kategorie = kategorieVon(anker())?.id ?? kategorie;
+			geladen.then(() => zeigen(anker()));
+		}
+		const wechsel = () => zeigen(anker());
+		addEventListener('hashchange', wechsel);
+		const liveWeg = live.verbinden();
 		const s = setInterval(einzeln(ladeStand), 2000);
 		const g = setInterval(einzeln(() => ladeGpu()), 4000);
 		return () => {
 			clearInterval(s);
 			clearInterval(g);
 			clearTimeout(gespeichertUhr);
+			removeEventListener('hashchange', wechsel);
+			liveWeg();
 		};
 	});
 </script>
@@ -713,17 +800,27 @@
 	</header>
 
 	<div class="rahmen">
-		<nav class="menue" aria-label="Abschnitte der Einstellungen" bind:this={menueLeiste}>
+		<nav class="menue" aria-label="Kategorien der Einstellungen" bind:this={menueLeiste}>
 			<ul>
-				{#each menue as [id, name] (id)}
+				{#each menue as k (k.id)}
 					<li>
-						<a href="#{id}" aria-current={aktuell === id ? 'location' : undefined} onclick={() => (aktuell = angeklickt = id)}>{name}</a>
+						<a class="kategorie" href="#{k.id}" aria-current={offen.id === k.id ? 'page' : undefined}>{k.name}</a>
+						{#if offen.id === k.id}
+							<ul class="unter" aria-label="Abschnitte">
+								{#each k.abschnitte as [id, name] (id)}
+									<li>
+										<a href="#{id}" aria-current={aktuell === id ? 'location' : undefined} onclick={() => (aktuell = angeklickt = id)}>{name}</a>
+									</li>
+								{/each}
+							</ul>
+						{/if}
 					</li>
 				{/each}
 			</ul>
 		</nav>
 
 		<div class="abschnitte" {@attach beobachten}>
+			{#if offen.id === 'transkribieren'}
 			<section id="erkennung" class="blatt" aria-labelledby="h-erkennung">
 				<h2 id="h-erkennung">Erkennung</h2>
 				<p class="hinweis">
@@ -934,62 +1031,192 @@
 					/>
 				</div>
 			</section>
+			{/if}
 
-			<section id="programme" class="blatt" aria-labelledby="h-programme">
-				<h2 id="h-programme">Andere Programme</h2>
-				<p class="hinweis">
-					Programme wie Moliri können Transcribe nutzen: Sprache live als Text, Text aus Bildern lesen. Dafür muss
-					Transcribe laufen, auf Wunsch auch ohne offenes Fenster als Symbol im Infobereich der Taskleiste.
-				</p>
-				{#if hintergrund}
-					{@const h = hintergrund}
+
+			{#if offen.id === 'programme'}
+				<section id="zugriff" class="blatt" aria-labelledby="h-zugriff">
+					<h2 id="h-zugriff">Zugriff</h2>
+					<p class="hinweis">
+						Programme wie Moliri holen sich bei Transcribe Sprache als Text und lassen Text aus Bildern lesen. Programme
+						auf diesem Rechner dürfen das immer, Webseiten von anderen Adressen erst, wenn du sie erlaubst. Versucht es
+						eine, fragt Transcribe nach, wo du gerade bist, und ist das Fenster zu, mit einer Benachrichtigung.
+					</p>
+					{#if live.abgelehnt.length}
+						<div class="fragen">
+							<h3 class="teil">Möchten Transcribe nutzen</h3>
+							<ul class="liste" aria-label="Möchten Transcribe nutzen">
+								{#each live.abgelehnt as z (z.origin)}
+									<li class="eintrag">
+										<div class="was">
+											<span class="name">{z.origin === 'null' ? 'Eine Datei oder eingebettete Seite' : z.origin}</span>
+											<span class="pfad">
+												{z.client && !z.origin.endsWith(`//${z.client}`) && z.client !== z.origin ? `${z.client}, ` : ''}fragte um {uhrzeit(z.at)}
+											</span>
+										</div>
+										<span></span>
+										<div class="tun">
+											<Button type="primary" size="large" onclick={() => live.freigeben(z.origin, true)}>Erlauben</Button>
+											<Button type="secondary" size="large" onclick={() => live.freigeben(z.origin, false)}>Ablehnen</Button>
+										</div>
+									</li>
+								{/each}
+							</ul>
+						</div>
+					{/if}
+					<h3 class="teil">Erlaubte Webseiten</h3>
+					{#if live.erlaubt.length}
+						<ul class="liste" aria-label="Erlaubte Webseiten">
+							{#each live.erlaubt as o (o)}
+								<li class="eintrag">
+									<div class="was"><span class="name">{o}</span></div>
+									<span></span>
+									<div class="tun">
+										<Button type="tertiary" size="large" onclick={() => live.freigeben(o, false)}>Nicht mehr erlauben</Button>
+									</div>
+								</li>
+							{/each}
+						</ul>
+					{:else}
+						<p class="leer">Noch keine Webseite erlaubt.</p>
+					{/if}
+					<p class="meta">Die Erlaubnis gilt für Live-Transkription und Texterkennung.</p>
+				</section>
+
+				<section id="bereit" class="blatt" aria-labelledby="h-bereit">
+					<h2 id="h-bereit">Im Hintergrund</h2>
+					<p class="hinweis">
+						Programme erreichen Transcribe nur, solange es läuft, auf Wunsch auch ohne offenes Fenster als Symbol im
+						Infobereich der Taskleiste.
+					</p>
+					{#if hintergrund}
+						{@const h = hintergrund}
+						<div class="schalter">
+							{#if h.ready !== undefined}
+								<Toggle
+									checked={h.ready}
+									title="Im Hintergrund bereit"
+									description={h.ready
+										? 'Programme dürfen über Transcribe das Mikrofon aufnehmen lassen, und die Erkennung bleibt geladen, damit alles sofort startet. Das belegt etwa 1 GB Arbeitsspeicher. Audiodaten und Bilder, die ein Programm schickt, verarbeitet Transcribe immer.'
+										: 'Aus: Programme dürfen das Mikrofon nicht über Transcribe aufnehmen lassen, und nichts bleibt geladen. Audiodaten und Bilder, die ein Programm schickt, verarbeitet Transcribe trotzdem. Von Hand aufnehmen und diktieren geht auch, es startet nur etwas langsamer.'}
+									onclick={() => hintergrundSetzen({ ready: !h.ready })}
+								/>
+							{/if}
+							{#if h.supported}
+								<Toggle
+									checked={h.autostart}
+									title="Mit Windows starten"
+									description={h.autostart
+										? 'Transcribe startet beim Anmelden ohne Fenster und wartet im Infobereich.'
+										: 'Aus: Transcribe startet erst, wenn du es öffnest.'}
+									onclick={() => hintergrundSetzen({ autostart: !h.autostart })}
+								/>
+								<Toggle
+									checked={h.background || h.autostart}
+									disabled={h.autostart}
+									title="Nach dem Schließen weiterlaufen"
+									description={h.autostart
+										? 'Gilt immer, solange Transcribe mit Windows startet.'
+										: h.background
+											? 'Schließt du das Fenster, bleibt Transcribe im Infobereich: ein Klick darauf öffnet es, mit Rechtsklick beendest du es.'
+											: 'Aus: Schließt du das Fenster, beendet sich Transcribe, sobald nichts mehr zu tun ist.'}
+									onclick={() => hintergrundSetzen({ background: !h.background })}
+								/>
+							{/if}
+						</div>
+						{#if hintergrundFehler}<p class="warnung">{hintergrundFehler}</p>{/if}
+					{/if}
+				</section>
+
+				<section id="adresse" class="blatt" aria-labelledby="h-adresse">
+					<h2 id="h-adresse">Adresse</h2>
+					<p class="hinweis">Unter dieser Adresse erreichen Programme Transcribe. In Moliri trägst du sie im Profil ein:</p>
+					<div class="apiadresse">
+						<code>{grundadresse}</code>
+						<Button type="secondary" size="large" onclick={kopieren}>
+							{#snippet iconLeft()}<IconMaterialSymbolsContentCopyOutlineRounded />{/snippet}
+							{kopiert ? 'Kopiert' : 'Adresse kopieren'}
+						</Button>
+					</div>
+					{#if kopierFehler}<p class="warnung" role="status">{kopierFehler}</p>{/if}
+					<p class="meta">
+						Die Spracheingabe in Moliri will bisher die Adresse der Live-Transkription: <code>{adresse}</code>
+					</p>
+					<dl class="modi">
+						<dt>Audio schicken</dt>
+						<dd>Das Programm nimmt selbst auf und schickt den Ton; der Text kommt sofort zurück.</dd>
+						<dt>Mithören lassen <code>?mode=mic</code></dt>
+						<dd>
+							Das Programm sagt nur „ab jetzt“ und „bis jetzt“. Dazwischen nimmt Transcribe auf, was unter
+							<a href="#aufnahme">Live und Diktieren › Aufnahme</a> gewählt ist, und schickt den Text laufend an das Programm.
+							{#if !live.an}<strong>Das geht nur, solange „Im Hintergrund bereit“ an ist.</strong>{/if}
+						</dd>
+					</dl>
+					<p class="meta">
+						Jede Anfrage steht auf der Seite <a href="/live">Live</a> als Aufnahme „Per API“; was Programme lesen lassen, das
+						Sprachmodell fragen oder für die Suche nach Bedeutung umwandeln, steht dort unter „KI & OCR“. Solange
+						Transcribe einem Programm Text liefert, beendet es sich nicht.
+					</p>
+					<details class="protokoll">
+						<summary>Für Entwickler: so spricht man mit Transcribe</summary>
+						<p>
+							WebSocket auf <code>{adresse}</code>. Parameter: <code>mode=audio</code> (Standard) oder <code>mic</code>,
+							<code>name=</code> wie die Aufnahme heißen soll, bei Audio <code>sample_rate=16000</code> und
+							<code>encoding=s16le</code> oder <code>f32le</code> (Mono).
+						</p>
+						<p>
+							Audio geht als binäre Nachrichten hin. Zurück kommen JSON-Nachrichten: <code>ready</code>, laufend
+							<code>partial</code> (der Satz, der gerade gesprochen wird), <code>final</code> (fertiger Satz, mit
+							<code>start</code> und <code>end</code> in Sekunden), am Ende <code>done</code>, bei Problemen
+							<code>error</code>. <code>{'{"type":"stop"}'}</code> beendet: Transcribe schickt noch, was bis jetzt gesagt
+							wurde, dann <code>done</code>.
+						</p>
+						<pre>{`const ws = new WebSocket('${adresse}?mode=mic&name=Moliri');
+ws.onmessage = (e) => {
+  const m = JSON.parse(e.data);
+  if (m.type === 'partial') feld.placeholder = m.text;
+  if (m.type === 'final') feld.value += m.text + ' ';
+};
+// später: ws.send(JSON.stringify({ type: 'stop' }));`}</pre>
+					</details>
+				</section>
+
+				<section id="anfragen" class="blatt" aria-labelledby="h-anfragen">
+					<h2 id="h-anfragen">Gespeicherte Anfragen</h2>
 					<div class="schalter">
-						{#if h.ready !== undefined}
-							<Toggle
-								checked={h.ready}
-								title="Im Hintergrund bereit"
-								description={h.ready
-									? 'Programme dürfen über Transcribe das Mikrofon aufnehmen lassen, und die Erkennung bleibt geladen, damit alles sofort startet. Das belegt etwa 1 GB Arbeitsspeicher. Audiodaten und Bilder, die ein Programm schickt, verarbeitet Transcribe immer.'
-									: 'Aus: Programme dürfen das Mikrofon nicht über Transcribe aufnehmen lassen, und nichts bleibt geladen. Audiodaten und Bilder, die ein Programm schickt, verarbeitet Transcribe trotzdem. Von Hand aufnehmen und diktieren geht auch, es startet nur etwas langsamer.'}
-								onclick={() => hintergrundSetzen({ ready: !h.ready })}
-							/>
-						{/if}
-						{#if h.supported}
-							<Toggle
-								checked={h.autostart}
-								title="Mit Windows starten"
-								description={h.autostart
-									? 'Transcribe startet beim Anmelden ohne Fenster und wartet im Infobereich.'
-									: 'Aus: Transcribe startet erst, wenn du es öffnest.'}
-								onclick={() => hintergrundSetzen({ autostart: !h.autostart })}
-							/>
-							<Toggle
-								checked={h.background || h.autostart}
-								disabled={h.autostart}
-								title="Nach dem Schließen weiterlaufen"
-								description={h.autostart
-									? 'Gilt immer, solange Transcribe mit Windows startet.'
-									: h.background
-										? 'Schließt du das Fenster, bleibt Transcribe im Infobereich: ein Klick darauf öffnet es, mit Rechtsklick beendest du es.'
-										: 'Aus: Schließt du das Fenster, beendet sich Transcribe, sobald nichts mehr zu tun ist.'}
-								onclick={() => hintergrundSetzen({ background: !h.background })}
-							/>
+						<Toggle
+							bind:checked={() => live.apiSpeichern, (v) => live.apiSpeichernSetzen(v)}
+							title="Anfragen als Aufnahme speichern"
+							description={live.apiSpeichern
+								? 'Jede Anfrage bleibt auf der Seite Live stehen, mit ihrem Text, auch nach einem Neustart.'
+								: 'Aus: Eine Anfrage steht auf der Seite Live nur, solange sie läuft, und ein paar Minuten danach. Auf dem Rechner bleibt nichts davon.'}
+						/>
+						{#if live.apiSpeichern}
+							<label class="feldname">
+								Automatisch löschen
+								<select class="feld" value={live.apiLoeschen} onchange={(e) => live.apiLoeschenSetzen(Number(e.currentTarget.value))}>
+									{#each LOESCHEN as [stunden, name] (stunden)}<option value={stunden}>{name}</option>{/each}
+									{#if !LOESCHEN.some(([stunden]) => stunden === live.apiLoeschen)}
+										<option value={live.apiLoeschen}>Nach {live.apiLoeschen} Stunden</option>
+									{/if}
+								</select>
+							</label>
+							<p class="meta">
+								Gezählt ab dem Ende einer Anfrage; das gilt auch für die, die schon gespeichert sind. Aufnahmen, die du auf
+								der Seite Live startest, und Diktate bleiben.
+							</p>
 						{/if}
 					</div>
-					{#if hintergrundFehler}<p class="warnung">{hintergrundFehler}</p>{/if}
-				{/if}
-				<a class="weiter" href="/live?verbinden" data-sveltekit-reload>
-					Adresse und wer sich verbinden darf <IconMaterialSymbolsArrowForwardRounded aria-hidden="true" />
-				</a>
-			</section>
+					{#if live.meldung}<p class="warnung" role="status">{live.meldung}</p>{/if}
+				</section>
+			{/if}
 
-			{#if ocr !== false}
-				<section id="ocr" class="blatt" aria-labelledby="h-ocr">
+			{#if offen.id === 'ocr' && ocr !== false}
+				<section id="ocr-leser" class="blatt" aria-labelledby="h-ocr">
 					<h2 id="h-ocr">Texterkennung</h2>
 					<p class="hinweis">
 						Transcribe liest auch Text aus Bildern, etwa Karteikarten, Etiketten oder Frakturdruck, für Programme wie
-						Moliri. Das Bild verlässt den Rechner nicht, außer du lässt einen KI-Dienst lesen. Hier kannst du es mit einem
-						eigenen Bild ausprobieren.
+						Moliri. Das Bild verlässt den Rechner nicht, außer du lässt einen KI-Dienst lesen.
 					</p>
 					{#if !ocr}
 						<p class="leer">Lade …</p>
@@ -1027,8 +1254,6 @@
 
 						{#if ocrDienst}
 							{@const od = ocrDienst}
-							{@const a = od.ocrApi}
-							{@const dienst = od.ocrApiProviders.find((d) => d.id === a.provider) ?? od.ocrApiProviders[0]}
 							{@const vorgabe = ocr.engines.find((l) => l.id === od.ocrEngine)}
 							<div class="schalter">
 								<label class="feldname">
@@ -1047,79 +1272,96 @@
 								<p class="warnung">{vorgabe.name} liest noch nicht, bis dahin wählt Transcribe automatisch.</p>
 							{/if}
 
-							<h3 class="teil">KI-Dienst</h3>
-							<p class="hinweis">
-								Mit deinem eigenen Schlüssel liest ein KI-Modell im Internet oder im eigenen Netz. Das ist ein anderer Dienst
-								als der für die Sprache unter „Erkennung“, mit eigenem Modell und Schlüssel.
-							</p>
-							<div class="api">
-								<div class="apifelder">
-									<label class="feldname">
-										Dienst
-										<select class="feld" value={a.provider} onchange={(ev) => ocrApiSetzen({ provider: ev.currentTarget.value })}>
-											{#each od.ocrApiProviders as d (d.id)}<option value={d.id}>{d.label}</option>{/each}
-										</select>
-									</label>
-									<label class="feldname adresse">
-										Adresse
-										<input class="feld" spellcheck="false" value={a.url} onchange={(ev) => ocrApiSetzen({ url: ev.currentTarget.value })} />
-									</label>
-									<label class="feldname">
-										Modell
-										<input class="feld" spellcheck="false" value={a.model} onchange={(ev) => ocrApiSetzen({ model: ev.currentTarget.value })} />
-									</label>
-								</div>
-								{#if dienst.kind === 'openai'}
-									<p class="hinweis">
-										Spricht die OpenAI-kompatible Schnittstelle, wie OpenAI, Mistral oder ein eigener Server (etwa Ollama). Das
-										Modell muss Bilder lesen können, etwa qwen2.5vl.
-									</p>
-								{/if}
-
-								<label class="feldname" for="ocr-schluessel">API-Schlüssel{dienst.noKey ? ' (falls der Server einen verlangt)' : ''}</label>
-								<form
-									class="schluesselzeile"
-									onsubmit={(ev) => {
-										ev.preventDefault();
-										if (ocrSchluessel.trim()) ocrSchluesselSpeichern(ocrSchluessel.trim());
-									}}
-								>
-									<input
-										id="ocr-schluessel"
-										class="feld"
-										type="password"
-										autocomplete="off"
-										spellcheck="false"
-										placeholder={a.keySet ? `hinterlegt${a.keyHint ? ` (endet auf ${a.keyHint})` : ''}` : 'Schlüssel'}
-										bind:value={ocrSchluessel}
-									/>
-									<Button type="primary" size="large" nativeType="submit" disabled={!ocrSchluessel.trim()} loading={speichertOcrSchluessel}>
-										{a.keySet ? 'Ersetzen' : 'Speichern'}
-									</Button>
-									{#if a.keySet}
-										<Button type="secondary" size="large" onclick={() => ocrSchluesselSpeichern('')}>Entfernen</Button>
-									{/if}
-								</form>
-								{#if ocrSchluesselStand}
-									<p class="gespeichert" role="status">{ocrSchluesselStand}</p>
-								{:else if !a.keySet && !dienst.noKey}
-									<p class="warnung">Ohne Schlüssel kann die App {dienst.label} nicht nutzen.</p>
-								{/if}
-								<p class="hinweis">
-									{#if dienst.keys}
-										Den Schlüssel legst du in deinem Konto bei
-										<a href={dienst.keys} target="_blank" rel="noreferrer">{dienst.label}</a> an. Abgerechnet wird nach
-										Tokens, für jedes Bild und den Text, den das Modell schreibt.
-									{/if}
-									Der Schlüssel bleibt in den Einstellungen auf diesem Rechner; Moliri bekommt ihn nicht.
-								</p>
-							</div>
 							{#if ocrDienstFehler}<p class="warnung">{ocrDienstFehler}</p>{/if}
 						{/if}
+					{/if}
+				</section>
 
-						{@const lesbar = ocrLesbar()}
-						{@const leser = lesbar.find((l) => l.id === ocrLeser) ?? lesbar[0]}
-						{#if leser}
+				{#if ocr && ocrDienst}
+					{@const od = ocrDienst}
+					{@const a = od.ocrApi}
+					{@const dienst = od.ocrApiProviders.find((d) => d.id === a.provider) ?? od.ocrApiProviders[0]}
+					<section id="ocr-ki" class="blatt" aria-labelledby="h-ocr-ki">
+						<h2 id="h-ocr-ki">KI-Dienst</h2>
+						<p class="hinweis">
+							Mit deinem eigenen Schlüssel liest ein KI-Modell im Internet oder im eigenen Netz. Das ist ein anderer Dienst
+							als der für die Sprache unter <a href="#erkennung">Transkribieren › Erkennung</a>, mit eigenem Modell und Schlüssel.
+						</p>
+						<div class="api">
+							<div class="apifelder">
+								<label class="feldname">
+									Dienst
+									<select class="feld" value={a.provider} onchange={(ev) => ocrApiSetzen({ provider: ev.currentTarget.value })}>
+										{#each od.ocrApiProviders as d (d.id)}<option value={d.id}>{d.label}</option>{/each}
+									</select>
+								</label>
+								<label class="feldname adresse">
+									Adresse
+									<input class="feld" spellcheck="false" value={a.url} onchange={(ev) => ocrApiSetzen({ url: ev.currentTarget.value })} />
+								</label>
+								<label class="feldname">
+									Modell
+									<input class="feld" spellcheck="false" value={a.model} onchange={(ev) => ocrApiSetzen({ model: ev.currentTarget.value })} />
+								</label>
+							</div>
+							{#if dienst.kind === 'openai'}
+								<p class="hinweis">
+									Spricht die OpenAI-kompatible Schnittstelle, wie OpenAI, Mistral oder ein eigener Server (etwa Ollama). Das
+									Modell muss Bilder lesen können, etwa qwen2.5vl.
+								</p>
+							{/if}
+
+							<label class="feldname" for="ocr-schluessel">API-Schlüssel{dienst.noKey ? ' (falls der Server einen verlangt)' : ''}</label>
+							<form
+								class="schluesselzeile"
+								onsubmit={(ev) => {
+									ev.preventDefault();
+									if (ocrSchluessel.trim()) ocrSchluesselSpeichern(ocrSchluessel.trim());
+								}}
+							>
+								<input
+									id="ocr-schluessel"
+									class="feld"
+									type="password"
+									autocomplete="off"
+									spellcheck="false"
+									placeholder={a.keySet ? `hinterlegt${a.keyHint ? ` (endet auf ${a.keyHint})` : ''}` : 'Schlüssel'}
+									bind:value={ocrSchluessel}
+								/>
+								<Button type="primary" size="large" nativeType="submit" disabled={!ocrSchluessel.trim()} loading={speichertOcrSchluessel}>
+									{a.keySet ? 'Ersetzen' : 'Speichern'}
+								</Button>
+								{#if a.keySet}
+									<Button type="secondary" size="large" onclick={() => ocrSchluesselSpeichern('')}>Entfernen</Button>
+								{/if}
+							</form>
+							{#if ocrSchluesselStand}
+								<p class="gespeichert" role="status">{ocrSchluesselStand}</p>
+							{:else if !a.keySet && !dienst.noKey}
+								<p class="warnung">Ohne Schlüssel kann die App {dienst.label} nicht nutzen.</p>
+							{/if}
+							<p class="hinweis">
+								{#if dienst.keys}
+									Den Schlüssel legst du in deinem Konto bei
+									<a href={dienst.keys} target="_blank" rel="noreferrer">{dienst.label}</a> an. Abgerechnet wird nach
+									Tokens, für jedes Bild und den Text, den das Modell schreibt.
+								{/if}
+								Der Schlüssel bleibt in den Einstellungen auf diesem Rechner; Moliri bekommt ihn nicht.
+							</p>
+						</div>
+						{#if ocrDienstFehler}<p class="warnung">{ocrDienstFehler}</p>{/if}
+					</section>
+				{/if}
+
+				{#if ocr}
+					{@const lesbar = ocrLesbar()}
+					{@const leser = lesbar.find((l) => l.id === ocrLeser) ?? lesbar[0]}
+					<section id="ocr-probe" class="blatt" aria-labelledby="h-ocr-probe">
+						<h2 id="h-ocr-probe">Ausprobieren</h2>
+						<p class="hinweis">Lies ein eigenes Bild, mit der Erkennung, der Sprache und der Art von Text, die du wählst.</p>
+						{#if !leser}
+							<p class="leer">Noch kann keine Erkennung lesen.</p>
+						{:else}
 							{@const sprachen = ocrReihe([...leser.languages, ...leser.download])}
 							<div class="probe">
 								<div class="apifelder">
@@ -1201,9 +1443,26 @@
 								{/if}
 							</div>
 						{/if}
-					{/if}
-				</section>
+					</section>
+				{/if}
 			{/if}
+
+			{#if offen.id === 'live'}
+				<section id="aufnahme" class="blatt" aria-labelledby="h-aufnahme">
+					<h2 id="h-aufnahme">Aufnahme</h2>
+					<p class="hinweis">
+						So nimmt Transcribe auf der Seite <a href="/live">Live</a> auf, beim Diktieren und für Programme, die mithören
+						lassen. Quelle, Mikrofon und Sprachen erreichst du auch dort unter „Einrichten“.
+					</p>
+					<div class="schalter"><AufnahmeWahl /></div>
+					{#if live.meldung}<p class="hinweis" role="status">{live.meldung}</p>{/if}
+				</section>
+
+				<section id="stimme" class="blatt" aria-labelledby="h-stimme">
+					<h2 id="h-stimme">Meine Stimme</h2>
+					<p class="hinweis">Was gesprochen wird und wie der Live-Text es schreibt, auch beim Diktieren.</p>
+					<div class="schalter"><StimmeWahl /></div>
+				</section>
 
 			{#if diktat?.supported}
 				{@const dk = diktat}
@@ -1258,7 +1517,9 @@
 					{#if diktatFehler}<p class="warnung">{diktatFehler}</p>{/if}
 				</section>
 			{/if}
+			{/if}
 
+			{#if offen.id === 'system'}
 			<section id="gpu" class="blatt" aria-labelledby="h-gpu">
 				<h2 id="h-gpu">Grafikkarte</h2>
 				{#if !gpu}
@@ -1624,6 +1885,7 @@
 					Lizenzen und Drittkomponenten <IconMaterialSymbolsArrowForwardRounded aria-hidden="true" />
 				</a>
 			</section>
+			{/if}
 		</div>
 	</div>
 </main>
@@ -1671,10 +1933,29 @@
 		background: hsl(var(--color-bg-primary));
 		color: hsl(var(--color-text-primary));
 	}
-	/* wo man ist: Tintenpille wie der aktive Tab der App-Leiste, umgekehrt */
-	.menue a[aria-current='location'] {
+	/* die offene Kategorie: Tintenpille wie der aktive Tab der App-Leiste, umgekehrt */
+	.menue a[aria-current='page'] {
 		background: hsl(var(--color-neutral-100));
 		color: hsl(var(--color-neutral-0));
+	}
+	/* ihre Abschnitte darunter, eingerückt an einer Linie; der, wo man ist, kräftig mit grüner Marke */
+	.menue .unter {
+		margin: 0.25rem 0 0.5rem 1.25rem;
+		padding-left: 0.5rem;
+		border-left: 2px solid hsl(var(--color-border-primary));
+		gap: 0;
+	}
+	.menue .unter a {
+		min-height: 2.25rem;
+		padding: 0 0.75rem;
+		font-weight: 500;
+	}
+	.menue .unter a[aria-current='location'] {
+		background: none;
+		color: hsl(var(--color-text-primary));
+		font-weight: 700;
+		box-shadow: inset 3px 0 0 hsl(var(--color-green-100));
+		border-radius: 0 2rem 2rem 0;
 	}
 	.abschnitte {
 		display: grid;
@@ -2068,6 +2349,78 @@
 		text-decoration-color: currentColor;
 	}
 
+	/* Programme: wer fragt, auf einen Blick abgesetzt */
+	.fragen {
+		display: grid;
+		gap: 0.5rem;
+		padding: 0.75rem 1.25rem 0.5rem;
+		border-radius: 0.75rem;
+		background: hsl(var(--color-green-10));
+	}
+	.fragen h3.teil {
+		margin-top: 0.25rem;
+	}
+	.apiadresse {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem 1rem;
+	}
+	.apiadresse code,
+	.modi code,
+	.protokoll code,
+	.protokoll pre {
+		font-family: var(--font-mono);
+		font-size: 0.9375em;
+	}
+	.apiadresse code {
+		padding: 0.55rem 0.9rem;
+		border-radius: 0.5rem;
+		background: hsl(var(--color-bg-secondary));
+		font-size: 1.0625rem;
+		overflow-wrap: anywhere;
+	}
+	.modi {
+		display: grid;
+		grid-template-columns: 12rem minmax(0, 1fr);
+		gap: 0.75rem 1.5rem;
+		margin: 0;
+		padding: 1rem 0;
+		border-block: 1px solid hsl(var(--color-border-primary));
+	}
+	.modi dt {
+		font-weight: 700;
+	}
+	.modi dt code {
+		display: block;
+		font-weight: 400;
+		color: hsl(var(--color-text-secondary));
+	}
+	.modi dd {
+		margin: 0;
+		max-width: 62ch;
+	}
+	.modi a,
+	.meta a {
+		color: hsl(var(--color-text-primary));
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+	.protokoll {
+		display: grid;
+		gap: 0.75rem;
+		max-width: 70ch;
+	}
+	.protokoll pre {
+		margin: 0;
+		padding: 0.75rem 1rem;
+		border-radius: 0.5rem;
+		background: hsl(var(--color-bg-secondary));
+		font-size: 0.875rem;
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
+	}
+
 	/* Texterkennung: was installiert ist, dann ein Bild zum Ausprobieren */
 	.leser {
 		display: grid;
@@ -2170,6 +2523,9 @@
 			display: flex;
 			gap: 0.25rem;
 		}
+		.menue .unter {
+			display: none;
+		}
 		.abschnitte > section {
 			scroll-margin-top: calc(60px + 4.5rem);
 		}
@@ -2185,6 +2541,13 @@
 		}
 		.ergebnis {
 			grid-template-columns: minmax(0, 1fr);
+		}
+		.modi {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 0.25rem;
+		}
+		.modi dd {
+			margin-bottom: 0.75rem;
 		}
 		.erklaerung {
 			grid-template-columns: minmax(0, 1fr);

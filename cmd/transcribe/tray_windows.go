@@ -135,6 +135,7 @@ type tray struct {
 
 	mu      sync.Mutex
 	balloon [2]string // title and text for wmNotify
+	click   func()    // what a click on the notification does; nil opens the app
 	key     string    // the shortcut for dictating, "" none (dictate_windows.go)
 	keyErr  error     // why it could not be registered
 	ov      overlay   // what the small window shows while dictating
@@ -210,13 +211,18 @@ func (t *tray) add() bool {
 	return r != 0
 }
 
-// notify shows a notification at the icon (on Windows 10 and 11 as a toast).
-func (t *tray) notify(title, text string) {
+// notify shows a notification at the icon (on Windows 10 and 11 as a toast); a click on it opens
+// the app.
+func (t *tray) notify(title, text string) { t.notifyThen(title, text, nil) }
+
+// notifyThen shows a notification at the icon, and a click on it does click (nil: opens the app).
+func (t *tray) notifyThen(title, text string, click func()) {
 	if t == nil {
 		return
 	}
 	t.mu.Lock()
 	t.balloon = [2]string{title, text}
+	t.click = click
 	t.mu.Unlock()
 	procPostMessage.Call(t.wnd, wmNotify, 0, 0)
 }
@@ -243,8 +249,16 @@ func wndProc(wnd, message, wParam, lParam uintptr) uintptr {
 		return 0
 	case message == wmTray:
 		switch lParam & 0xffff {
-		case wmLButtonUp, ninBalloonClick:
+		case wmLButtonUp:
 			go t.actions.open()
+		case ninBalloonClick:
+			t.mu.Lock()
+			click := t.click
+			t.mu.Unlock()
+			if click == nil {
+				click = t.actions.open
+			}
+			go click()
 		case wmRButtonUp:
 			t.menu()
 		}
