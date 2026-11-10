@@ -117,9 +117,13 @@ func Default() Prefs {
 }
 
 // DefaultThreads is how many threads recognition on this computer uses unless set otherwise:
-// about one per core (half the logical processors), at least 4 and at most 16. The settings no
-// longer show the number.
-func DefaultThreads() int { return max(4, min(16, runtime.NumCPU()/2)) }
+// about one per core (half the logical processors), but a quarter of the cores (at least one) kept
+// for the rest of the computer, so it stays responsive while a recording is transcribed; at least
+// 2 and at most 16. The settings no longer show the number.
+func DefaultThreads() int {
+	cores := max(1, runtime.NumCPU()/2)
+	return max(2, min(16, cores-max(1, cores/4)))
+}
 
 // Where speech is recognised.
 const (
@@ -157,7 +161,9 @@ func (p *Prefs) normalize() {
 	if p.Speakers < 0 || p.Speakers > 20 {
 		p.Speakers = 0
 	}
-	if p.Threads < 1 || p.Threads > 64 {
+	// the settings no longer show the number: one saved before (all the cores) gives way to the
+	// default, which keeps some for the rest of the computer
+	if p.Threads < 1 || p.Threads > d.Threads {
 		p.Threads = d.Threads
 	}
 	if p.DropMode != "auto" {

@@ -18,6 +18,7 @@ import (
 
 	"github.com/moliri-app/transcribe/fileutil"
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/prio"
 	"github.com/moliri-app/transcribe/jobs"
 )
 
@@ -79,6 +80,11 @@ type Queue struct {
 	paused  bool               // by the user (Pause); kept in _queue.json until Resume
 	holds   int                // live transcriptions holding the queue (Hold)
 	gate    jobs.Gate          // shut while paused or held: the running job waits at its next step
+	low     bool               // Background was last called with true
+
+	// Background is told whether a job is working (running, not waiting at the gate), to lower
+	// the app's priority meanwhile (prio.Background unless set otherwise).
+	Background func(on bool)
 	wake    chan struct{}
 	done    chan struct{}
 }
@@ -87,7 +93,8 @@ func New(dataDir string, run Runner, defaultThreads int) *Queue {
 	if defaultThreads <= 0 {
 		defaultThreads = 4
 	}
-	q := &Queue{DataDir: dataDir, DefaultThreads: defaultThreads, run: run, wake: make(chan struct{}, 1)}
+	q := &Queue{DataDir: dataDir, DefaultThreads: defaultThreads, run: run, wake: make(chan struct{}, 1),
+		Background: prio.Background}
 	q.load()
 	return q
 }
@@ -152,6 +159,18 @@ func (q *Queue) hold() {
 		case !shut && j.Status == Paused:
 			j.Status = Running
 		}
+	}
+	q.priority()
+}
+
+// priority lowers the app's priority while a job works and gives it back as soon as none does
+// (waiting at the gate for a live transcription, which then has the computer first); it must be
+// called with mu held.
+func (q *Queue) priority() {
+	low := q.current != nil && !q.paused && q.holds == 0
+	if low != q.low && q.Background != nil {
+		q.low = low
+		q.Background(low)
 	}
 }
 
@@ -445,6 +464,7 @@ func (q *Queue) runNext(parent context.Context) bool {
 	q.cancel, q.current = cancel, j
 	j.Status, j.Started, j.Progress, j.Step = Running, ptr(now()), 0, ptr("Start")
 	j.Log, j.Error = []string{}, nil
+	q.priority()
 	q.save()
 	audio, o := j.Audio, j.Options
 	q.mu.Unlock()
@@ -466,6 +486,7 @@ func (q *Queue) runNext(parent context.Context) bool {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	q.cancel, q.current = nil, nil
+	q.priority()
 	if parent.Err() != nil && (j.Status == Running || j.Status == Paused) {
 		// shutting down: the job runs again on the next start
 		j.Status, j.Progress, j.Step, j.Started = Queued, 0, nil, nil
