@@ -15,7 +15,7 @@
 // sind dieselben wie im Paket annotate des Engine-Moduls (server/transcribe/vendor).
 
 import * as m from '$lib/moliri/texte.js';
-import { getLocale } from '$lib/moliri/texte.js';
+import { getLocale } from '$lib/moliri/locale.js';
 
 /** @typedef {{ w: string, start: number, end: number, p?: number, speaker?: number | null, edited?: boolean, fill?: boolean, redone?: boolean, pin?: boolean, nopin?: boolean, lang?: string, lid?: string }} Wort */
 /** @typedef {{ start: number, end: number, text?: string, mode?: string, drop?: number }} Edit */

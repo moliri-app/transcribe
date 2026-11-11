@@ -6,23 +6,36 @@
 <script>
     import { lockscroll } from '@svelte-put/lockscroll';
     import * as m from "$lib/moliri/texte.js";
-    export let open = true;
-    export let padding = '1rem';
-    export let display = 'block';
-    export let full = false;
-    export let showCloseButton = true;
-
     import Portal from "svelte-portal";
 
-    import { createEventDispatcher } from "svelte";
-    const dispatch = createEventDispatcher()
+    /**
+     * @typedef {Object} Props
+     * @property {boolean} [open]
+     * @property {string} [padding]
+     * @property {string} [display]
+     * @property {boolean} [full]
+     * @property {boolean} [showCloseButton]
+     * @property {() => void} [onclosed]
+     * @property {import('svelte').Snippet} [children]
+     */
+
+    /** @type {Props} */
+    let {
+        open = $bindable(true),
+        padding = '1rem',
+        display = 'block',
+        full = false,
+        showCloseButton = true,
+        onclosed,
+        children
+    } = $props();
 
     import { scale } from 'svelte/transition';
 	import { quintInOut } from 'svelte/easing';
 
     function close() {
         open=false;
-        dispatch("closed");
+        onclosed?.();
 		}
   
     </script>
@@ -35,16 +48,16 @@
         <div class="modal-outer" class:full>
           <div class="modal-inner" class:full style="padding: {padding}; display: {display};">
               
-              <slot />
+              {@render children?.()}
 
               {#if showCloseButton}
-                <button type="button" class="close" aria-label={m.close()} on:click={close}>
+                <button type="button" class="close" aria-label={m.close()} onclick={close}>
                   <IconMaterialSymbolsClose />
                 </button>
               {/if}
           </div>
         </div>
-        <button type="button" class="bg" aria-label={m.close_modal()} on:click={close}></button>
+        <button type="button" class="bg" aria-label={m.close_modal()} onclick={close}></button>
     </div>
   </Portal>
   {/if}
