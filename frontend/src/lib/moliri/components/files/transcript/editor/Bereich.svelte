@@ -15,7 +15,7 @@
      oder nach dem Übernehmen. -->
 <script>
 	import * as m from '$lib/moliri/texte.js';
-	import { getLocale } from '$lib/moliri/texte.js';
+	import { getLocale } from '$lib/moliri/locale.js';
 	import { fmt, rangeText } from './model.js';
 	import Sprachwahl from './Sprachwahl.svelte';
 	import { langName, recognizable } from './sprachen.js';

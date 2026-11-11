@@ -5,9 +5,6 @@
 // Erzeugt von frontend/scripts/sync-moliri.mjs aus Moliris messages/de.json: die Texte, die die
 // gespiegelten Komponenten über `m.<name>()` aufrufen. Ersetzt Paraglide; nicht von Hand ändern.
 
-/** Sprache der Oberfläche (Paraglides getLocale): Transcribe ist nur deutsch. */
-export const getLocale = () => 'de';
-
 export const close = () => "Schließen";
 export const close_modal = () => "Modal schließen";
 export const delete_btn = () => "Löschen";

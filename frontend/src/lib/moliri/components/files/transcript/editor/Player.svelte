@@ -13,7 +13,7 @@
      Spur für die Stelle gibt es nicht: die Zeitleiste darunter ist sie. -->
 <script>
 	import * as m from '$lib/moliri/texte.js';
-	import { getLocale } from '$lib/moliri/texte.js';
+	import { getLocale } from '$lib/moliri/locale.js';
 	import { fmt, itemAt } from './model.js';
 	import { spkColor } from './editor.svelte.js';
 

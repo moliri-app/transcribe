@@ -15,7 +15,7 @@
 // transcribe service (annotate/languages.go of its engine module). Everything else, dialects
 // above all, is noted and otherwise stays as the machine heard it.
 
-import { getLocale } from '$lib/moliri/texte.js';
+import { getLocale } from '$lib/moliri/locale.js';
 
 /** @typedef {{ code: string, name: string, also: string[], neu: boolean }} Sprache */
 

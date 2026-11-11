@@ -23,7 +23,7 @@
 // diesem Ordner importieren nur einander und Paraglide, nichts sonst aus Moliri.
 
 import * as m from '$lib/moliri/texte.js';
-import { getLocale } from '$lib/moliri/texte.js';
+import { getLocale } from '$lib/moliri/locale.js';
 import { buildBlocks, buildItems, buildWords, defaultTitle, playRanges, r3, rangeText, speakerIds } from './model.js';
 import { recognizable } from './sprachen.js';
 
