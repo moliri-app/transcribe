@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -24,6 +25,7 @@ import (
 	"github.com/moliri-app/transcribe/export"
 	"github.com/moliri-app/transcribe/fileutil"
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/memo"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/queue"
 	"github.com/moliri-app/transcribe/internal/results"
@@ -99,10 +101,12 @@ func (s *Server) buildIndex() []map[string]any {
 }
 
 // indexItem is what the pages know of the recording called name, which is at path; shelved is what
-// people said about the recordings (a name of their own, tags, hidden).
+// people said about the recordings (a name of their own, tags, hidden). Nothing in it waits for
+// ffprobe: what it says (length, format, when recorded) comes once it was asked in the background.
 func (s *Server) indexItem(name, path string, shelved map[string]shelf.Entry) map[string]any {
 	stem := media.Stem(name)
 	rdir := filepath.Join(s.resultsDir(), stem)
+	kept := s.kept()
 	engines := []map[string]any{}
 	if _, err := os.Stat(filepath.Join(rdir, "_final.json")); err == nil {
 		engines = append(engines, map[string]any{
@@ -115,13 +119,21 @@ func (s *Server) indexItem(name, path string, shelved map[string]shelf.Entry) ma
 		if strings.HasPrefix(base, "_") {
 			continue
 		}
+		// what a run of an engine says of itself, read once from its (long) result
 		var meta struct {
 			Engine  json.RawMessage `json:"engine"`
 			Speed   json.RawMessage `json:"speed"`
 			Elapsed json.RawMessage `json:"elapsed"`
 			Threads json.RawMessage `json:"threads"`
 		}
-		if fileutil.ReadJSON(f, &meta) != nil || len(meta.Engine) == 0 {
+		key, stamp := "engine:"+stem+"/"+base, memo.FileStamp(f)
+		if !kept.Get(key, stamp, &meta) {
+			if fileutil.ReadJSON(f, &meta) != nil {
+				continue
+			}
+			kept.Put(key, stamp, meta)
+		}
+		if len(meta.Engine) == 0 {
 			continue
 		}
 		engines = append(engines, map[string]any{
@@ -129,19 +141,33 @@ func (s *Server) indexItem(name, path string, shelved map[string]shelf.Entry) ma
 			"speed": rawOrNull(meta.Speed), "elapsed": rawOrNull(meta.Elapsed), "threads": rawOrNull(meta.Threads),
 		})
 	}
-	when, size := added(path)
 	item := map[string]any{
 		"name": name, "stem": stem, "title": cmp.Or(shelved[stem].Title, media.Title(stem)), "file": media.Title(stem),
 		"tags": append([]string{}, shelved[stem].Tags...), "hidden": shelved[stem].Hidden, "url": "audio/" + pyQuote(name),
-		"video":   media.HasVideo(path),
+		"video":   media.LooksLikeVideo(name),
 		"engines": engines, "speakers": variants(rdir, stem, "speakers"), "events": variants(rdir, stem, "events"),
-		"added": when, "size": size,
+		"added": time.Now().Unix(), "size": 0,
 	}
-	if sum, ok := summarize(rdir); ok {
+	if st, err := os.Stat(path); err == nil {
+		item["added"], item["size"] = st.ModTime().Unix(), st.Size()
+		if b := birth(st); !b.IsZero() {
+			item["created"] = b.Unix()
+		}
+		if info, pending := media.Known(path, st); info != nil {
+			item["video"] = info.Video != nil
+			item["media"] = map[string]any{"duration": info.Duration, "format": info.Format, "codec": info.Codec, "recorded": info.Recorded}
+		} else if pending {
+			item["probing"] = true
+		}
+	}
+	if sum, ok := summarize(kept, rdir); ok {
 		item["summary"] = sum
 	}
 	return item
 }
+
+// kept is where the library keeps what took long to read, for the next start too.
+func (s *Server) kept() *memo.Store { return memo.In(s.cfg.DataDir, "library") }
 
 func rawOrNull(r json.RawMessage) json.RawMessage {
 	if len(r) == 0 {
@@ -150,8 +176,19 @@ func rawOrNull(r json.RawMessage) json.RawMessage {
 	return r
 }
 
+// index handles GET /api/index. X-Probing says how many of the recordings ffprobe still looks at
+// in the background: asked again a moment later, the list knows more of them.
 func (s *Server) index(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, 200, s.buildIndex())
+	items := s.buildIndex()
+	n := 0
+	for _, it := range items {
+		if it["probing"] == true {
+			n++
+			delete(it, "probing")
+		}
+	}
+	w.Header().Set("X-Probing", strconv.Itoa(n))
+	writeJSON(w, 200, items)
 }
 
 func (s *Server) peaks(w http.ResponseWriter, r *http.Request) {

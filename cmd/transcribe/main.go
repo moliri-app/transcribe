@@ -27,6 +27,7 @@ import (
 	"github.com/moliri-app/transcribe/internal/autostart"
 	"github.com/moliri-app/transcribe/internal/datadir"
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/memo"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/runner"
 	"github.com/moliri-app/transcribe/internal/server"
@@ -283,4 +284,5 @@ func main() {
 	_ = hs.Shutdown(sctx)
 	srv.Queue.Wait()
 	sidecar.Flush()
+	memo.Flush()
 }

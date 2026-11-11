@@ -7,8 +7,6 @@ package media
 
 import (
 	"bytes"
-	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -16,9 +14,9 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/moliri-app/transcribe/audio"
+	"github.com/moliri-app/transcribe/internal/memo"
 	"github.com/moliri-app/transcribe/proc"
 )
 
@@ -28,8 +26,13 @@ var (
 	videoExt = map[string]bool{".mp4": true, ".m4v": true, ".mov": true, ".webm": true, ".mkv": true, ".avi": true}
 )
 
-// SetDataDir makes <dir>/bin a place where ffmpeg and ffprobe are looked up (after PATH and the executable's folder).
-func SetDataDir(dir string) { audio.SetToolDir(filepath.Join(dir, "bin")) }
+// SetDataDir makes <dir>/bin a place where ffmpeg and ffprobe are looked up (after PATH and the
+// executable's folder), and <dir>/cache where what ffprobe said and the listing of the connected
+// folders are kept for the next start.
+func SetDataDir(dir string) {
+	audio.SetToolDir(filepath.Join(dir, "bin"))
+	probes.Store(memo.In(dir, "media"))
+}
 
 // IsMedia reports whether the file name has an extension we accept as input.
 func IsMedia(name string) bool {
@@ -67,63 +70,13 @@ func Tool(name string) string { return audio.Tool(name) }
 
 func tool(name string) string { return audio.Tool(name) }
 
-type hasVideoKey struct {
-	path  string
-	mtime time.Time
-}
-
-var (
-	videoMu    sync.Mutex
-	videoCache = map[hasVideoKey]bool{}
-)
-
 // HasVideo reports whether the file has a real video stream (cover art in an mp3 does not count).
 func HasVideo(path string) bool {
 	if !videoExt[strings.ToLower(filepath.Ext(path))] {
 		return false
 	}
-	st, err := os.Stat(path)
-	if err != nil {
-		return false
-	}
-	key := hasVideoKey{path, st.ModTime()}
-	videoMu.Lock()
-	v, ok := videoCache[key]
-	videoMu.Unlock()
-	if ok {
-		return v
-	}
-	v = probeVideo(path)
-	videoMu.Lock()
-	videoCache[key] = v
-	videoMu.Unlock()
-	return v
-}
-
-func probeVideo(path string) bool {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-	out, err := proc.Hide(exec.CommandContext(ctx, tool("ffprobe"), "-v", "error", "-select_streams", "v", "-show_entries",
-		"stream=index:stream_disposition=attached_pic", "-of", "json", path)).Output()
-	if err != nil {
-		return false
-	}
-	var res struct {
-		Streams []struct {
-			Disposition struct {
-				AttachedPic int `json:"attached_pic"`
-			} `json:"disposition"`
-		} `json:"streams"`
-	}
-	if json.Unmarshal(out, &res) != nil {
-		return false
-	}
-	for _, s := range res.Streams {
-		if s.Disposition.AttachedPic == 0 {
-			return true
-		}
-	}
-	return false
+	info, err := Probe(path)
+	return err == nil && info.Video != nil
 }
 
 // Duration of the file in seconds.
