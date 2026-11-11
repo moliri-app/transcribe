@@ -23,6 +23,8 @@
 	import { auftraege, geaendert } from '$lib/auftraege.svelte.js';
 	import { beschriften, dauer, einreihen, einzeln, getJSON, groesse, post, upload, verbindung, vorgaben } from '$lib/api.js';
 	import { sprachname } from '$lib/live/stand.svelte.js';
+	import MoliriLogo from '$lib/MoliriLogo.svelte';
+	import { HANDBUCH, MIT_MOLIRI, MOLIRI } from '$lib/moliri-links.js';
 
 	/** @typedef {{ id: number, name: string }} Sprecher */
 	/** @typedef {{ duration: number, speakers: Sprecher[], preview: string, edits: number, clips: number, done: number }} Inhalt */
@@ -949,6 +951,23 @@
 							<button type="button" class="knopf hell" onclick={oeffneVerbinden}>Ordner verbinden</button>
 						</div>
 					</div>
+					<!-- wer Transcribe neu hat: woher es kommt und dass es auch ohne Moliri ganz da ist -->
+					<aside class="moliri" aria-labelledby="h-moliri">
+						<MoliriLogo class="moliri-zeichen" />
+						<div>
+							<h3 id="h-moliri">Transcribe by Moliri</h3>
+							<p>
+								Transcribe läuft für sich auf deinem Rechner, ohne Konto, und deine Aufnahmen bleiben hier. Es ist
+								auch die Begleit-App zur Museumsdatenbank Moliri: Verbunden diktierst du in Moliris Textfelder, und
+								Transcribe liest den Text aus Scans.
+							</p>
+							<ul class="moliri-wege">
+								<li><a href={HANDBUCH} target="_blank" rel="noopener">Handbuch lesen</a></li>
+								<li><a href={MIT_MOLIRI} target="_blank" rel="noopener">Mit Moliri verbinden</a></li>
+								<li><a href={MOLIRI} target="_blank" rel="noopener">Moliri kennenlernen</a></li>
+							</ul>
+						</div>
+					</aside>
 				{:else if !fertig.length}
 					<p class="leer">
 						{imBereich.length ? 'Hier ist noch kein Transkript fertig. Was du oben transkribierst, steht danach hier.' : 'Hier liegen keine Aufnahmen.'}
@@ -2116,6 +2135,53 @@
 		color: hsl(var(--color-neutral-0));
 		font-weight: 600;
 		letter-spacing: 0.05em;
+	}
+
+	/* unter dem leeren Blatt: Transcribe für sich und als Begleiter von Moliri */
+	.moliri {
+		display: flex;
+		align-items: flex-start;
+		gap: 1.25rem;
+		margin-top: 1.25rem;
+		padding: 1.25rem 1.5rem;
+		border-radius: 0.75rem;
+		background: hsl(var(--color-bg-primary));
+		box-shadow: inset 0 0 0 1px hsl(var(--color-border-secondary));
+	}
+	.moliri :global(.moliri-zeichen) {
+		width: 2.5rem;
+		height: 2.5rem;
+		margin-top: 0.125rem;
+		color: hsl(var(--color-text-primary));
+	}
+	.moliri h3 {
+		margin: 0 0 0.375rem;
+		font-size: 1.0625rem;
+	}
+	.moliri p {
+		max-width: 62ch;
+		margin: 0;
+		color: hsl(var(--color-text-secondary));
+	}
+	.moliri-wege {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 1.5rem;
+		margin: 0.5rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+	.moliri-wege a {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--hit);
+		color: hsl(var(--color-text-primary));
+		font-weight: 600;
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+	.moliri-wege a:hover {
+		text-decoration-thickness: 2px;
 	}
 
 	.wkn {
