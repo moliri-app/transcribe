@@ -98,7 +98,7 @@
 <nav class="appbar" aria-label="Hauptnavigation">
 	<!-- „Transcribe“ führt zur Bibliothek, „by Moliri“ auf Moliris Website (im Browser, neues Fenster) -->
 	<div class="brand">
-		<a class="home" href="/" data-sveltekit-reload aria-label="Transcribe by Moliri, Startseite">
+		<a class="home" href="/" data-sveltekit-reload aria-label="Transcribe, Startseite">
 			<svg viewBox="0 0 24 24" aria-hidden="true">
 				<rect x="2.5" y="8" width="3.2" height="8" rx="1.6" fill="currentColor" />
 				<rect x="7.9" y="3.5" width="3.2" height="17" rx="1.6" class="signal" />
