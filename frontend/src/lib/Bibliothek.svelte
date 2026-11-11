@@ -301,7 +301,11 @@
 	/** @type {ReturnType<typeof setTimeout> | undefined} */
 	let nachProbe;
 
+	/** zählt die Abfragen der Liste: eine ältere, die erst nach einer neueren ankommt, gilt nicht mehr */
+	let abfrage = 0;
+
 	async function ladeAufnahmen() {
+		const diese = ++abfrage;
 		let probt = 0;
 		try {
 			const r = await fetch('/api/index');
@@ -309,6 +313,7 @@
 			probt = Number(r.headers.get('X-Probing')) || 0;
 			/** @type {(Aufnahme & Record<string, unknown>)[]} */
 			const liste = await r.json();
+			if (diese !== abfrage) return;
 			aufnahmen = liste.map(({ engines: _e, speakers: _s, events: _v, url: _u, ...a }) => /** @type {Aufnahme} */ (a));
 		} catch {
 			aufnahmen ??= [];

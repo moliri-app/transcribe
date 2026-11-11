@@ -204,8 +204,8 @@ test.describe('Bibliothek', () => {
 
   test('die Details einer Aufnahme: Dateiname, Ort, Größe, Datum und Transkript', async ({ page, app }) => {
     await page.goto('/');
-    // a recording without a transcript shows its size beside the date
-    await expect(page.getByRole('checkbox', { name: /^Neue Aufnahme\.mp3 58 KB/ })).toBeVisible();
+    // a recording without a transcript shows its length, format and size beside the date
+    await expect(page.getByRole('checkbox', { name: /^Neue Aufnahme\.mp3 0:10 MP3 58 KB/ })).toBeVisible();
     await card(page, KORRIGIERT).getByRole('button', { name: `Details zu ${KORRIGIERT}` }).click();
     const dlg = page.getByRole('dialog', { name: KORRIGIERT });
     await expect(dlg).toContainText(`${KORRIGIERT}.mp3`);
