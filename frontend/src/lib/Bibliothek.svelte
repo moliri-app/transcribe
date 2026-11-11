@@ -1726,14 +1726,14 @@
 		cursor: pointer;
 	}
 	.aufnahme .name {
-		flex: 1 1 5rem;
+		flex: 1 1 8rem;
 		min-width: 0;
 		overflow-wrap: anywhere;
 	}
 	/* where it lies gives way first, so that length, format, size and date stay on the name's line */
 	.aufnahme .wo {
 		flex: 0 1 auto;
-		max-width: 12rem;
+		max-width: 11rem;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
