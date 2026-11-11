@@ -81,8 +81,12 @@
 	let sorte = $state(/** @type {'zuletzt' | 'name' | 'laenge'} */ ('zuletzt'));
 	/** der gewählte Bereich: alle, upload, live oder der Pfad eines Ordners */
 	let bereich = $state(gemerkt());
-	/** „Ordner verbinden“ ist offen */
+	/** „Ordner verbinden“ ist offen, als Dialog über dem Bereich, der gewählt bleibt */
 	let verbinden = $state(false);
+	/** @type {HTMLDialogElement} */
+	let verbindenDialog;
+	/** was beim Verbinden schiefging, im Dialog gezeigt */
+	let verbindenFehler = $state('');
 	let pfad = $state('');
 	let waehlt = $state(false);
 	/** Uhr für die Laufzeit laufender Aufträge, in Sekunden */
@@ -115,7 +119,7 @@
 	/** @param {string} b */
 	function zeige(b) {
 		bereich = b;
-		verbinden = false;
+		schliesseVerbinden();
 		gewaehlt = [];
 		suche = '';
 		try {
@@ -294,17 +298,36 @@
 		try {
 			ordner = await post('/api/folders', { action, path });
 		} catch (e) {
-			meldung = /** @type {Error} */ (e).message;
+			meldeVerbinden(/** @type {Error} */ (e).message);
 			return false;
 		}
 		await ladeAufnahmen();
 		return true;
 	}
 
+	function oeffneVerbinden() {
+		verbindenFehler = '';
+		verbinden = true;
+		verbindenDialog.showModal();
+	}
+
+	function schliesseVerbinden() {
+		if (verbindenDialog?.open) verbindenDialog.close();
+		verbinden = false;
+	}
+
+	/** Steht der Dialog offen, gehört ein Fehler dorthin, sonst in die Meldung.
+	 * @param {string} text */
+	function meldeVerbinden(text) {
+		if (verbinden) verbindenFehler = text;
+		else meldung = text;
+	}
+
 	/** @param {string} path */
 	async function verbinde(path) {
+		verbindenFehler = '';
 		if (!path.trim()) {
-			meldung = 'Bitte einen Ordner wählen oder seinen Pfad einfügen.';
+			meldeVerbinden('Bitte einen Ordner wählen oder seinen Pfad einfügen.');
 			return;
 		}
 		if (!(await ordnerAendern('add', path))) return;
@@ -324,7 +347,7 @@
 			const { path } = await post('/api/folders/pick');
 			if (path) await verbinde(path);
 		} catch (e) {
-			meldung = /** @type {Error} */ (e).message;
+			meldeVerbinden(/** @type {Error} */ (e).message);
 		} finally {
 			waehlt = false;
 		}
@@ -718,7 +741,7 @@
 					{/each}
 				</ul>
 			{/if}
-			<button type="button" class="bereich verbinden" aria-expanded={verbinden} onclick={() => (verbinden = !verbinden)}>
+			<button type="button" class="bereich verbinden" aria-haspopup="dialog" onclick={oeffneVerbinden}>
 				<IconMaterialSymbolsCreateNewFolderOutlineRounded aria-hidden="true" />
 				<span class="bname">Ordner verbinden</span>
 			</button>
@@ -730,43 +753,6 @@
 		</nav>
 
 		<div class="inhalt">
-			{#if verbinden}
-				<section class="blatt" aria-labelledby="h-verbinden">
-					<div class="zeile">
-						<h2 id="h-verbinden">Ordner verbinden</h2>
-						<span class="platz"></span>
-						<button type="button" class="zu" aria-label="Schließen" onclick={() => (verbinden = false)}><IconMaterialSymbolsCloseRounded /></button>
-					</div>
-					<p class="erklaert">
-						Alle Aufnahmen im Ordner und in seinen Unterordnern stehen dann hier, ohne kopiert zu werden. Neue kommen von selbst
-						dazu. {#if ordner.sidecar}Jedes Transkript legt Transcribe als Datei neben seine Aufnahme („Interview.mp3.transcribe.json“):
-							Wer den Ordner mit dir teilt, etwa über Nextcloud, sieht dieselben Transkripte und Korrekturen.{:else}Transkripte
-							bleiben nur in Transcribe; neben die Aufnahmen legen lässt es sich in den Einstellungen.{/if}
-					</p>
-					<div class="wege">
-						{#if ordner.pick}
-							<Button type="primary" size="large" loading={waehlt} onclick={waehlen}>
-								{#snippet iconLeft()}<IconMaterialSymbolsFolderOpenOutlineRounded />{/snippet}
-								Ordner wählen …
-							</Button>
-							<span class="oder">oder</span>
-						{/if}
-						<div class="pfad">
-							<label class="sr" for="pfad">Pfad des Ordners</label>
-							<input
-								id="pfad"
-								class="feld"
-								type="text"
-								placeholder="Pfad einfügen, etwa C:\Nextcloud\Interviews"
-								bind:value={pfad}
-								onkeydown={(e) => e.key === 'Enter' && verbinde(pfad)}
-							/>
-							<Button type="secondary" size="large" onclick={() => verbinde(pfad)}>Verbinden</Button>
-						</div>
-					</div>
-				</section>
-			{/if}
-
 			{#if imOrdner}
 				<div class="ordnerkopf">
 					<div>
@@ -960,7 +946,7 @@
 								Dateien auswählen
 								<input class="sr" type="file" accept="audio/*,video/*" multiple onchange={hochladen} />
 							</label>
-							<button type="button" class="knopf hell" onclick={() => (verbinden = true)}>Ordner verbinden</button>
+							<button type="button" class="knopf hell" onclick={oeffneVerbinden}>Ordner verbinden</button>
 						</div>
 					</div>
 				{:else if !fertig.length}
@@ -1055,6 +1041,42 @@
 
 	<Beschriften bind:this={beschrifter} vorhanden={alleSchlagworte} ondone={beschriftet} />
 	<Dateiinfo bind:this={details} oneditor={(a) => imEditor(a.stem)} />
+
+	<dialog class="verbinden-dialog" bind:this={verbindenDialog} aria-labelledby="h-verbinden" onclose={() => (verbinden = false)}>
+		<div class="zeile">
+			<h2 id="h-verbinden">Ordner verbinden</h2>
+			<span class="platz"></span>
+			<button type="button" class="zu" aria-label="Schließen" onclick={schliesseVerbinden}><IconMaterialSymbolsCloseRounded /></button>
+		</div>
+		<p class="erklaert">
+			Alle Aufnahmen im Ordner und in seinen Unterordnern stehen dann hier, ohne kopiert zu werden. Neue kommen von selbst
+			dazu. {#if ordner.sidecar}Jedes Transkript legt Transcribe als Datei neben seine Aufnahme („Interview.mp3.transcribe.json“):
+				Wer den Ordner mit dir teilt, etwa über Nextcloud, sieht dieselben Transkripte und Korrekturen.{:else}Transkripte
+				bleiben nur in Transcribe; neben die Aufnahmen legen lässt es sich in den Einstellungen.{/if}
+		</p>
+		<div class="wege">
+			{#if ordner.pick}
+				<Button type="primary" size="large" loading={waehlt} onclick={waehlen}>
+					{#snippet iconLeft()}<IconMaterialSymbolsFolderOpenOutlineRounded />{/snippet}
+					Ordner wählen …
+				</Button>
+				<span class="oder">oder</span>
+			{/if}
+			<div class="pfad">
+				<label class="sr" for="pfad">Pfad des Ordners</label>
+				<input
+					id="pfad"
+					class="feld"
+					type="text"
+					placeholder="Pfad einfügen, etwa C:\Nextcloud\Interviews"
+					bind:value={pfad}
+					onkeydown={(e) => e.key === 'Enter' && verbinde(pfad)}
+				/>
+				<Button type="secondary" size="large" onclick={() => verbinde(pfad)}>Verbinden</Button>
+			</div>
+		</div>
+		{#if verbindenFehler}<p class="fehler" role="alert">{verbindenFehler}</p>{/if}
+	</dialog>
 
 	<dialog class="rueckfrage" bind:this={rueckfrage} aria-labelledby="h-loeschen" onclose={() => (loeschen = null)}>
 		{#if loeschen}
@@ -1309,11 +1331,26 @@
 		padding-top: 0.75rem;
 		border-top: 1px solid hsl(var(--color-border-primary));
 	}
-	.verbinden[aria-expanded='true'] {
-		background: hsl(var(--color-bg-primary));
-	}
 
 	/* ---- Ordner verbinden ---- */
+	.verbinden-dialog {
+		width: min(44rem, calc(100vw - 2rem));
+		margin: auto;
+		padding: 1.5rem 1.75rem 1.75rem;
+		border: 0;
+		border-radius: 0.75rem;
+		background: hsl(var(--color-bg-primary));
+		color: hsl(var(--color-text-primary));
+		box-shadow: 0 24px 64px -24px hsl(var(--color-neutral-100) / 0.5);
+	}
+	.verbinden-dialog[open] {
+		display: grid;
+		gap: 1.25rem;
+	}
+	.verbinden-dialog::backdrop {
+		background: hsl(var(--color-neutral-100) / 0.3);
+		backdrop-filter: blur(4px);
+	}
 	.zu {
 		width: var(--hit);
 		height: var(--hit);

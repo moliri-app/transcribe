@@ -88,6 +88,25 @@ test.describe('Verbundene Ordner', () => {
     await areas(page).getByRole('button', { name: 'Ordner verbinden' }).click();
     await page.getByLabel('Pfad des Ordners').fill(join(tmpdir(), 'gibt-es-nicht-4711'));
     await page.getByRole('button', { name: 'Verbinden', exact: true }).click();
-    await expect(page.getByRole('status')).toContainText('Diesen Ordner gibt es nicht');
+    await expect(page.getByRole('dialog', { name: 'Ordner verbinden' }).getByRole('alert')).toContainText('Diesen Ordner gibt es nicht');
+  });
+
+  test('„Ordner verbinden“ öffnet sich als Dialog und schließt sich mit dem verbundenen Ordner', async ({ page }) => {
+    const { folder } = teamFolder();
+    await page.goto('/');
+    await areas(page).getByRole('button', { name: /^Hochgeladen/ }).click();
+    await areas(page).getByRole('button', { name: 'Ordner verbinden' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Ordner verbinden' });
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(areas(page).getByRole('button', { name: /^Hochgeladen/ })).toHaveAttribute('aria-current', 'page');
+
+    await areas(page).getByRole('button', { name: 'Ordner verbinden' }).click();
+    await dialog.getByLabel('Pfad des Ordners').fill(folder);
+    await dialog.getByRole('button', { name: 'Verbinden', exact: true }).click();
+    await expect(dialog).toBeHidden();
+    await expect(areas(page).getByRole('button', { name: /Team-Ordner/ })).toHaveAttribute('aria-current', 'page');
+    await expect(areas(page).getByRole('button', { name: /^Hochgeladen/ })).not.toHaveAttribute('aria-current', 'page');
   });
 });
