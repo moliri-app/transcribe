@@ -319,3 +319,64 @@ func TestCancelPaused(t *testing.T) {
 	}
 	waitFor(t, q, id, Canceled)
 }
+
+// TestBackgroundPriority: the app's priority is lowered only while a job works, not while a live
+// transcription holds it, and given back when it ends.
+func TestBackgroundPriority(t *testing.T) {
+	d := newData(t, "a.mp3")
+	finish := make(chan struct{})
+	run := func(ctx context.Context, _, _ string, _ jobs.Options, _ jobs.Progress) error {
+		for {
+			if err := jobs.Hold(ctx); err != nil {
+				return err
+			}
+			select {
+			case <-finish:
+				return nil
+			case <-time.After(time.Millisecond):
+			}
+		}
+	}
+	q := New(d, run, 0)
+	var low atomic.Bool
+	var calls atomic.Int32
+	q.Background = func(on bool) { low.Store(on); calls.Add(1) }
+	ctx, stop := context.WithCancel(context.Background())
+	defer stop()
+	q.Start(ctx)
+	id := mustAdd(t, q, "a.mp3")
+	waitFor(t, q, id, Running)
+	if !low.Load() {
+		t.Error("a running job left the priority normal")
+	}
+	release := q.Hold()
+	if low.Load() {
+		t.Error("the priority stayed low while a live transcription held the queue")
+	}
+	release()
+	if !low.Load() {
+		t.Error("the priority did not go down again after the hold")
+	}
+	close(finish)
+	waitFor(t, q, id, Done)
+	if low.Load() {
+		t.Error("the priority stayed low after the job")
+	}
+	if n := calls.Load(); n != 4 {
+		t.Errorf("Background called %d times, want 4 (only on changes)", n)
+	}
+}
+
+func mustAdd(t *testing.T, q *Queue, audio string) string {
+	t.Helper()
+	if _, err := q.Add([]string{audio}, nil); err != nil {
+		t.Fatal(err)
+	}
+	for _, j := range q.List() {
+		if j.Audio == audio {
+			return j.ID
+		}
+	}
+	t.Fatal("job not found")
+	return ""
+}
