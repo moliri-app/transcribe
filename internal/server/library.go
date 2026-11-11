@@ -15,12 +15,11 @@ import (
 	"slices"
 	"strconv"
 	"strings"
-	"sync"
-	"time"
 	"unicode/utf8"
 
 	"github.com/moliri-app/transcribe/fileutil"
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/memo"
 	"github.com/moliri-app/transcribe/internal/queue"
 	"github.com/moliri-app/transcribe/internal/shelf"
 	"github.com/moliri-app/transcribe/model"
@@ -28,7 +27,8 @@ import (
 
 // The library page shows each transcribed recording with what it holds: how long, who speaks,
 // how it begins and how much people have worked on it. Reading a long transcript takes a moment,
-// so the summary is kept until _final.json or _annotations.json changes.
+// so the summary is kept until _final.json or _annotations.json changes, in <data>/cache for the
+// next start too (internal/memo).
 
 // summary is what the library shows of a transcribed recording.
 type summary struct {
@@ -46,28 +46,23 @@ type speaker struct {
 	Name string `json:"name"`
 }
 
-type summaryEntry struct {
-	stamp string
-	sum   summary
-}
-
-var summaries sync.Map // results dir -> summaryEntry
-
 const previewLen = 240
 
-// summarize reads the summary of the recording whose results are in rdir; ok is false if it has
-// no transcript.
-func summarize(rdir string) (summary, bool) {
+// summarize reads the summary of the recording whose results are in rdir, or takes the one kept
+// in kept; ok is false if it has no transcript.
+func summarize(kept *memo.Store, rdir string) (summary, bool) {
 	fst, err := os.Stat(filepath.Join(rdir, "_final.json"))
 	if err != nil {
 		return summary{}, false
 	}
-	stamp := fst.ModTime().String()
+	stamp := memo.Stamp(fst)
 	if ast, err := os.Stat(filepath.Join(rdir, "_annotations.json")); err == nil {
-		stamp += ast.ModTime().String()
+		stamp += " " + memo.Stamp(ast)
 	}
-	if e, ok := summaries.Load(rdir); ok && e.(summaryEntry).stamp == stamp {
-		return e.(summaryEntry).sum, true
+	key := "summary:" + filepath.Base(rdir)
+	var ks summary
+	if kept.Get(key, stamp, &ks) {
+		return ks, true
 	}
 	var fin model.Final
 	if fileutil.ReadJSON(filepath.Join(rdir, "_final.json"), &fin) != nil {
@@ -112,7 +107,7 @@ func summarize(rdir string) (summary, bool) {
 		}
 	}
 	s.Preview = cut(text.String(), previewLen)
-	summaries.Store(rdir, summaryEntry{stamp, s})
+	kept.Put(key, stamp, s)
 	return s, true
 }
 
@@ -129,15 +124,6 @@ func cut(s string, n int) string {
 		}
 	}
 	return strings.TrimRight(s[:i], " ,;:") + " …"
-}
-
-// added is when the recording came into audio/ (unix seconds), and how big it is (bytes).
-func added(path string) (int64, int64) {
-	st, err := os.Stat(path)
-	if err != nil {
-		return time.Now().Unix(), 0
-	}
-	return st.ModTime().Unix(), st.Size()
 }
 
 // deleteRecording handles POST /api/delete?name=<file in audio/>: the recording goes from the
@@ -187,7 +173,7 @@ func (s *Server) removeRecording(name string) error {
 		return nil
 	}
 	rdir := filepath.Join(s.resultsDir(), stem)
-	summaries.Delete(rdir)
+	s.kept().Delete("summary:" + stem)
 	_ = shelf.Forget(s.cfg.DataDir, stem)
 	return os.RemoveAll(rdir)
 }

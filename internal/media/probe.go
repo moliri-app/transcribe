@@ -38,8 +38,8 @@ type Video struct {
 	FPS    float64 `json:"fps"`
 }
 
-// Probe reads what there is to know about the recording at path.
-func Probe(path string) (*Info, error) {
+// probe asks ffprobe what there is to know about the recording at path (Probe keeps the answer).
+func probe(path string) (*Info, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	out, err := proc.Hide(exec.CommandContext(ctx, tool("ffprobe"), "-v", "error",

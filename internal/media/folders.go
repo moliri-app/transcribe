@@ -11,10 +11,12 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/moliri-app/transcribe/fileutil"
 	"github.com/moliri-app/transcribe/internal/prefs"
 )
 
@@ -85,7 +87,20 @@ var (
 	// walkMu lets one walk of the folders run at a time: who waits for a listing takes the one
 	// another just made
 	walkMu sync.Mutex
+	// kept are the data dirs whose listing from the last run was looked for already: it is taken
+	// only for the first listing, never after Forget
+	kept = map[string]bool{}
 )
+
+// listing is the last listing of the folders, kept in <data>/cache/folders.json: the first listing
+// after a start gives it at once and walks the folders in the background, which on a big or slow
+// folder takes long.
+type listing struct {
+	Key   string   `json:"key"`
+	Items []Linked `json:"items"`
+}
+
+func listingPath(dataDir string) string { return filepath.Join(dataDir, "cache", "folders.json") }
 
 // fresh is how long a listing is given as it is. An older one is still given at once (a walk of a
 // large folder, such as Downloads, can take seconds while a transcription keeps the computer
@@ -94,11 +109,19 @@ var (
 const fresh = 2 * time.Second
 
 // LinkedIn lists the recordings in the connected folders, also in their subfolders. Only the first
-// listing, or the first after the folders changed or Forget, waits for the folders to be walked.
+// listing, or the first after the folders changed or Forget, waits for the folders to be walked;
+// the first after a start not even then, when the last run kept its listing.
 func LinkedIn(dataDir string) []Linked {
 	folders := prefs.Load(dataDir).Folders
 	key := strings.Join(folders, "\x00")
 	scanMu.Lock()
+	if _, ok := scans[dataDir]; !ok && !kept[dataDir] {
+		kept[dataDir] = true
+		var l listing
+		if fileutil.ReadJSON(listingPath(dataDir), &l) == nil && l.Key == key {
+			scans[dataDir] = scan{time.Time{}, key, l.Items} // as old as can be: walked again at once
+		}
+	}
 	if s, ok := scans[dataDir]; ok && s.key == key {
 		if time.Since(s.at) >= fresh && !rescans[dataDir] {
 			rescans[dataDir] = true
@@ -132,10 +155,14 @@ func rescan(dataDir string, folders []string, key string, since time.Time) []Lin
 	}
 	items := walkFolders(dataDir, folders)
 	scanMu.Lock()
-	if forgets[dataDir] == gen {
+	keep := forgets[dataDir] == gen
+	if keep {
 		scans[dataDir] = scan{time.Now(), key, items}
 	}
 	scanMu.Unlock()
+	if keep && (!ok || s.key != key || !slices.Equal(s.items, items)) {
+		_ = fileutil.WriteJSON(listingPath(dataDir), listing{key, items})
+	}
 	return items
 }
 
@@ -182,6 +209,7 @@ func Forget(dataDir string) {
 	scanMu.Lock()
 	delete(scans, dataDir)
 	forgets[dataDir]++
+	kept[dataDir] = true
 	scanMu.Unlock()
 }
 

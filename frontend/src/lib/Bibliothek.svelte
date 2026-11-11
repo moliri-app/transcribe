@@ -28,9 +28,13 @@
 
 	/** @typedef {{ id: number, name: string }} Sprecher */
 	/** @typedef {{ duration: number, speakers: Sprecher[], preview: string, edits: number, clips: number, done: number }} Inhalt */
-	/** title: der Name in Transcribe (sonst der der Datei), file: der Name der Datei ohne Endung, size: Bytes
-	 * @typedef {{ name: string, stem: string, title: string, file: string, tags: string[], hidden: boolean, video: boolean, added: number, size: number, summary?: Inhalt,
-	 *   source: 'upload' | 'live' | 'folder', folder?: string, dir?: string, path?: string, sidecar?: boolean }} Aufnahme */
+	/** was ffprobe über die Datei sagt (der Server fragt es im Hintergrund und merkt es sich): Länge in Sekunden, Format und Ton in
+	 * Worten, wann aufgenommen (RFC 3339, wie die Datei es nennt)
+	 * @typedef {{ duration: number, format: string, codec: string, recorded: string }} Medium */
+	/** title: der Name in Transcribe (sonst der der Datei), file: der Name der Datei ohne Endung, size: Bytes, added: zuletzt
+	 * geändert, created: angelegt (Sekunden)
+	 * @typedef {{ name: string, stem: string, title: string, file: string, tags: string[], hidden: boolean, video: boolean, added: number, created?: number,
+	 *   size: number, media?: Medium, summary?: Inhalt, source: 'upload' | 'live' | 'folder', folder?: string, dir?: string, path?: string, sidecar?: boolean }} Aufnahme */
 	/** @typedef {{ id: string, audio: string, stem: string, status: string, progress: number, step: string | null,
 	 *   log: string[] | null, started: number | null, finished: number | null, error: string | null, note: string | null,
 	 *   options: { preset: string, speakers: number | null, language?: string, engine?: string } }} Auftrag */
@@ -59,12 +63,13 @@
 		['live', 'Live-Aufnahmen']
 	]);
 
+	// Was die Bibliothek zuletzt zeigte, steht beim Öffnen sofort da; was der Server dann sagt, ersetzt es.
 	/** @type {Aufnahme[] | null} */
-	let aufnahmen = $state(null);
+	let aufnahmen = $state(vorrat('aufnahmen'));
 	/** @type {Auftrag[] | null} */
-	let jobs = $state(null);
+	let jobs = $state(vorrat('auftraege'));
 	/** @type {Ordnerstand} */
-	let ordner = $state({ folders: [], sidecar: true, pick: false });
+	let ordner = $state(vorrat('ordner') ?? { folders: [], sidecar: true, pick: false });
 	let offline = $state(false);
 	/** die Transkriptionen ruhen: von Hand pausiert (bis „Fortsetzen“), oder solange live transkribiert wird */
 	let angehalten = $state(false);
@@ -109,6 +114,30 @@
 	let spieler = $state();
 	/** @type {Dateiinfo} */
 	let details;
+
+	/** was die Bibliothek beim letzten Mal unter k zeigte
+	 * @param {string} k */
+	function vorrat(k) {
+		try {
+			return JSON.parse(localStorage.getItem('bib:vorrat:' + k) ?? 'null');
+		} catch {
+			return null;
+		}
+	}
+
+	/** @type {Record<string, string>} */
+	const gemerkteTexte = {};
+	/** @param {string} k @param {unknown} v */
+	function merke(k, v) {
+		try {
+			const t = JSON.stringify(v);
+			if (gemerkteTexte[k] === t) return;
+			gemerkteTexte[k] = t;
+			localStorage.setItem('bib:vorrat:' + k, t);
+		} catch {
+			// voll oder ohne Speicher: dann wartet die Bibliothek beim nächsten Öffnen auf den Server
+		}
+	}
 
 	function gemerkt() {
 		try {
@@ -227,6 +256,27 @@
 		});
 	}
 
+	/** wann die Aufnahme entstand: wie die Datei selbst es sagt, sonst das Frühere von angelegt und geändert (eine kopierte
+	 * Datei ist neu angelegt, aber nicht neu geändert)
+	 * @param {Aufnahme} a @returns {[number, string]} Sekunden und was das ist */
+	function entstanden(a) {
+		const t = a.media?.recorded ? Date.parse(a.media.recorded) / 1000 : NaN;
+		if (!isNaN(t)) return [t, 'Aufgenommen'];
+		return a.created && a.created < a.added ? [a.created, 'Angelegt'] : [a.added, 'Geändert'];
+	}
+
+	/** @param {number} sek */
+	const datum = (sek) =>
+		new Date(sek * 1000).toLocaleString('de-DE', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+	/** das Format, wie die Endung es nennt: MP3, WAV, MP4
+	 * @param {string} name */
+	const endung = (name) => (name.match(/\.([^.]+)$/)?.[1] ?? '').toUpperCase();
+
+	/** Format und Ton in Worten, für den Hinweis über dem Format
+	 * @param {Aufnahme} a */
+	const formatInWorten = (a) => [a.media?.format, a.media?.codec].filter(Boolean).join(' · ') || undefined;
+
 	/** die Optionen eines Auftrags in Worten
 	 * @param {Auftrag} j */
 	function wie(j) {
@@ -248,13 +298,26 @@
 		return j?.status === 'done' && !!j.finished && jetzt - j.finished < 86400;
 	}
 
+	/** @type {ReturnType<typeof setTimeout> | undefined} */
+	let nachProbe;
+
 	async function ladeAufnahmen() {
+		let probt = 0;
 		try {
-			aufnahmen = await getJSON('/api/index');
+			const r = await fetch('/api/index');
+			if (!r.ok) throw new Error(r.statusText);
+			probt = Number(r.headers.get('X-Probing')) || 0;
+			/** @type {(Aufnahme & Record<string, unknown>)[]} */
+			const liste = await r.json();
+			aufnahmen = liste.map(({ engines: _e, speakers: _s, events: _v, url: _u, ...a }) => /** @type {Aufnahme} */ (a));
 		} catch {
 			aufnahmen ??= [];
 			return;
 		}
+		merke('aufnahmen', aufnahmen);
+		// der Server liest Länge und Format neuer Dateien noch: gleich noch einmal fragen
+		clearTimeout(nachProbe);
+		if (probt) nachProbe = setTimeout(ladeAufnahmen, 1500);
 		// ein Schlagwort, das keine Aufnahme mehr trägt, und „Ausgeblendet“ ohne Aufnahme sind keine Bereiche mehr
 		if ((bereich.startsWith('tag:') || bereich === 'versteckt') && !zahlen[bereich]?.alle) zeige('alle');
 	}
@@ -262,6 +325,7 @@
 	async function ladeOrdner() {
 		try {
 			ordner = await getJSON('/api/folders');
+			merke('ordner', ordner);
 		} catch {
 			// bleibt, wie es war
 		}
@@ -280,6 +344,7 @@
 		try {
 			const q = await getJSON('/api/queue', { signal: AbortSignal.timeout(8000) });
 			jobs = q.jobs;
+			merke('auftraege', q.jobs.map((/** @type {Auftrag} */ j) => ({ ...j, log: null })));
 			angehalten = !!q.paused;
 			liveHaelt = !!q.live;
 			server.ok();
@@ -600,6 +665,7 @@
 		return () => {
 			clearInterval(t);
 			clearInterval(o);
+			clearTimeout(nachProbe);
 		};
 	});
 </script>
@@ -876,6 +942,7 @@
 					<div class="aufnahmen" role="group" aria-label="Aufnahmen ohne Transkript">
 						{#each neu as a (a.name)}
 							{@const wo = ort(a)}
+							{@const [wannEntstanden, wasEntstanden] = entstanden(a)}
 							<div class="aufnahme" class:gewaehlt={gewaehlt.includes(a.name)}>
 								{@render abspielknopf(a)}
 								<label title={a.path}>
@@ -886,7 +953,12 @@
 									{#if a.video}
 										<span class="art" title="Video"><IconMaterialSymbolsMovieOutlineRounded aria-hidden="true" /><span class="sr">Video</span></span>
 									{/if}
-									<span class="hinzu">{#if a.size}<span class="groesse">{groesse(a.size)}</span>{/if}{wann(a.added)}</span>
+									<span class="eckdaten">
+										<span class="laenge">{a.media ? dauer(a.media.duration) : ''}</span>
+										<span class="format" title={formatInWorten(a)}>{endung(a.name)}</span>
+										<span class="groesse">{a.size ? groesse(a.size) : ''}</span>
+										<span class="datum" title="{wasEntstanden} am {datum(wannEntstanden)}">{wann(wannEntstanden)}</span>
+									</span>
 								</label>
 								{@render knoepfe(a)}
 							</div>
@@ -982,6 +1054,7 @@
 							{@const arbeitet = !!j && LAUFEND.includes(j.status)}
 							{@const erster = s.speakers[0]}
 							{@const wo = ort(a)}
+							{@const [wannEntstanden, wasEntstanden] = entstanden(a)}
 							<li class="eintrag" class:arbeitet>
 								{@render abspielknopf(a)}
 								<div class="haupt">
@@ -1015,7 +1088,7 @@
 								</ul>
 								<p class="stand">
 									{#if a.video}<IconMaterialSymbolsMovieOutlineRounded aria-label="Video" />{/if}
-									<span class="zeit">{dauer(s.duration)}</span>
+									<span class="zeit">{dauer(s.duration)} <span class="format" title={formatInWorten(a)}>{endung(a.name)}</span></span>
 									<span class="sr">,</span>
 									<span class="leise">{s.speakers.length === 1 ? '1 Sprecher' : `${s.speakers.length} Sprecher`}</span>
 								</p>
@@ -1023,7 +1096,7 @@
 									{#if s.edits}<span title="Von Hand korrigiert"><IconMaterialSymbolsEditOutlineRounded aria-hidden="true" />{s.edits === 1 ? '1 Korrektur' : `${s.edits} Korrekturen`}</span>{/if}
 									{#if s.clips}<span title="Clips"><IconMaterialSymbolsContentCutRounded aria-hidden="true" />{s.clips === 1 ? '1 Clip' : `${s.clips} Clips`}</span>{/if}
 								</p>
-								<p class="wann">{wann(s.done)}</p>
+								<p class="wann" title="Transkribiert am {datum(s.done)}, {wasEntstanden.toLowerCase()} am {datum(wannEntstanden)}">{wann(s.done)}</p>
 								<div class="knoepfe-zeile">
 									<button
 										class="neu-tx"
@@ -1659,16 +1732,28 @@
 		display: inline-flex;
 		color: hsl(var(--color-text-secondary));
 	}
-	.hinzu {
+	/* Länge, Format, Größe und Datum in festen Spalten, damit sie untereinander stehen */
+	.eckdaten {
 		margin-left: auto;
 		padding-left: 1rem;
+		display: grid;
+		grid-template-columns: 4.5rem 3.25rem 4.75rem 7.5rem;
+		gap: 0.75rem;
 		font-size: 0.9375rem;
 		color: hsl(var(--color-text-tertiary));
 		white-space: nowrap;
-	}
-	.groesse {
-		margin-right: 1rem;
 		font-variant-numeric: tabular-nums;
+	}
+	.eckdaten > span {
+		text-align: right;
+	}
+	.laenge {
+		color: hsl(var(--color-text-secondary));
+	}
+	.format {
+		font-size: 0.8125rem;
+		letter-spacing: 0.04em;
+		color: hsl(var(--color-text-tertiary));
 	}
 	.aufnahme .anhoeren {
 		margin-left: 0.25rem;
