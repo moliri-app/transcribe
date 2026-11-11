@@ -22,6 +22,8 @@
 	import AufnahmeWahl from '$lib/live/AufnahmeWahl.svelte';
 	import StimmeWahl from '$lib/live/StimmeWahl.svelte';
 	import { live, LOESCHEN, uhrzeit } from '$lib/live/stand.svelte.js';
+	import MoliriLogo from '$lib/MoliriLogo.svelte';
+	import { HANDBUCH, MOLIRI } from '$lib/moliri-links.js';
 
 	/** @typedef {{ key: string, path: string, size: number }} Ordner */
 	/** @typedef {{ name: string, label: string, path: string, installed: boolean, size: number, state: string,
@@ -1799,6 +1801,14 @@ ws.onmessage = (e) => {
 
 			<section id="programm" class="blatt" aria-labelledby="h-programm">
 				<h2 id="h-programm">Über Transcribe</h2>
+				<div class="herkunft">
+					<MoliriLogo class="herkunft-zeichen" />
+					<p>
+						Transcribe by Moliri ist frei und läuft für sich. Es ist auch die Begleit-App zur Museumsdatenbank
+						<a href={MOLIRI} target="_blank" rel="noopener">Moliri</a>. Wie alles geht, steht im
+						<a href={HANDBUCH} target="_blank" rel="noopener">Handbuch</a>.
+					</p>
+				</div>
 				{#if update.stand}
 					{@const u = update.stand}
 					{@const neu = versionText(u.latest)}
@@ -2344,6 +2354,26 @@ ws.onmessage = (e) => {
 	}
 	.weiter:hover {
 		text-decoration-color: currentColor;
+	}
+
+	/* Über Transcribe: woher es kommt, mit Moliris Zeichen */
+	.herkunft {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+	}
+	.herkunft :global(.herkunft-zeichen) {
+		width: 2rem;
+		height: 2rem;
+		margin-top: 0.125rem;
+	}
+	.herkunft p {
+		margin: 0;
+		max-width: 62ch;
+	}
+	.herkunft a {
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
 	}
 
 	/* Programme: wer fragt, auf einen Blick abgesetzt */

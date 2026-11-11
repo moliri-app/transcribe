@@ -12,6 +12,8 @@
 	import { beobachteUpdate, update, versionText } from '$lib/update.svelte.js';
 	import Dropdown from '$lib/moliri/components/ui/Dropdown.svelte';
 	import DropdownItem from '$lib/moliri/components/ui/DropdownItem.svelte';
+	import MoliriLogo from '$lib/MoliriLogo.svelte';
+	import { MOLIRI } from '$lib/moliri-links.js';
 
 	// Jeder Eintrag lädt die Seite neu vom Server: welche Oberfläche eine Seite hat, alte oder
 	// neue, entscheidet internal/server/pages.go, nicht diese App.
@@ -94,15 +96,21 @@
 </script>
 
 <nav class="appbar" aria-label="Hauptnavigation">
-	<a class="brand" href="/" data-sveltekit-reload aria-label="Transcribe by Moliri, Startseite">
-		<svg viewBox="0 0 24 24" aria-hidden="true">
-			<rect x="2.5" y="8" width="3.2" height="8" rx="1.6" fill="currentColor" />
-			<rect x="7.9" y="3.5" width="3.2" height="17" rx="1.6" class="signal" />
-			<rect x="13.3" y="6.5" width="3.2" height="11" rx="1.6" fill="currentColor" />
-			<rect x="18.7" y="9.5" width="2.8" height="5" rx="1.4" fill="currentColor" />
-		</svg>
-		<span class="word">Transcribe <span class="by">by Moliri</span></span>
-	</a>
+	<!-- „Transcribe“ führt zur Bibliothek, „by Moliri“ auf Moliris Website (im Browser, neues Fenster) -->
+	<div class="brand">
+		<a class="home" href="/" data-sveltekit-reload aria-label="Transcribe by Moliri, Startseite">
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<rect x="2.5" y="8" width="3.2" height="8" rx="1.6" fill="currentColor" />
+				<rect x="7.9" y="3.5" width="3.2" height="17" rx="1.6" class="signal" />
+				<rect x="13.3" y="6.5" width="3.2" height="11" rx="1.6" fill="currentColor" />
+				<rect x="18.7" y="9.5" width="2.8" height="5" rx="1.4" fill="currentColor" />
+			</svg>
+			<span class="word">Transcribe</span>
+		</a>
+		<a class="by" href={MOLIRI} target="_blank" rel="noopener" title="Moliri, die Museumsdatenbank: Website öffnen">
+			by <MoliriLogo class="mark" /> Moliri<span class="sr"> (öffnet die Website von Moliri)</span>
+		</a>
+	</div>
 	<div class="tabs">
 		{#each tabs as t (t.href)}
 			{#if t.end && neu}
@@ -177,17 +185,25 @@
 	.brand {
 		display: flex;
 		align-items: center;
-		gap: 0.625rem;
-		min-height: var(--hit);
+		gap: 0.375rem;
 		padding-right: 0.5rem;
 		font-size: 1.0625rem;
 		font-weight: 700;
 		letter-spacing: -0.005em;
-		text-decoration: none;
 		white-space: nowrap;
 		flex: none;
 	}
-	.brand svg {
+	.home,
+	.by {
+		display: flex;
+		align-items: center;
+		min-height: var(--hit);
+		text-decoration: none;
+	}
+	.home {
+		gap: 0.625rem;
+	}
+	.home svg {
 		width: 24px;
 		height: 24px;
 		flex: none;
@@ -197,8 +213,31 @@
 	}
 	/* Nebelgrau auf Tinte: 14,6:1 */
 	.by {
+		gap: 0.3em;
+		padding: 0 0.375rem;
+		border-radius: 0.5rem;
 		font-weight: 500;
 		color: hsl(var(--color-neutral-10));
+		transition: color 0.15s;
+	}
+	.by:hover {
+		color: hsl(var(--color-text-inverse));
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+	/* Moliris Zeichen dreht sich beim Darüberfahren, wie im Kopf von www.moliri.app */
+	.by :global(.mark) {
+		width: 0.95em;
+		height: 0.95em;
+		transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+	.by:hover :global(.mark) {
+		transform: rotate(160deg);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.by :global(.mark) {
+			transition: none;
+		}
 	}
 
 	.tabs {
@@ -252,7 +291,8 @@
 		color: hsl(var(--color-text-primary));
 	}
 	.tab:focus-visible,
-	.brand:focus-visible {
+	.home:focus-visible,
+	.by:focus-visible {
 		outline: 2px solid hsl(var(--color-green-100));
 		outline-offset: -2px;
 		border-radius: 2rem;
@@ -331,7 +371,8 @@
 			gap: 0.25rem;
 			padding: 0 0.25rem 0 0.75rem;
 		}
-		.word {
+		.word,
+		.by {
 			display: none;
 		}
 		.tab {
