@@ -1730,7 +1730,12 @@
 		min-width: 0;
 		overflow-wrap: anywhere;
 	}
+	/* where it lies gives way first, so that length, format, size and date stay on the name's line */
 	.aufnahme .wo {
+		flex: 0 1 auto;
+		max-width: 12rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 	.art {
@@ -1742,8 +1747,8 @@
 		margin-left: auto;
 		padding-left: 1rem;
 		display: grid;
-		grid-template-columns: 4.5rem 3.25rem 4.75rem 7.5rem;
-		gap: 0.75rem;
+		grid-template-columns: 3.5rem 3rem 4.25rem 6.5rem;
+		gap: 0.6rem;
 		font-size: 0.9375rem;
 		color: hsl(var(--color-text-tertiary));
 		white-space: nowrap;
