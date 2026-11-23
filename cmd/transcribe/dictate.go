@@ -129,7 +129,7 @@ func (d *dictation) toggle() {
 		d.on = nil
 		d.mu.Unlock()
 		t.escape(false)
-		t.show(overlay{dot: dotWait, title: tx("Dictation did not work"), body: err.Error()}, 6*time.Second)
+		t.show(overlay{dot: dotWait, title: tx("Dictation did not work"), body: errorText(err)}, 6*time.Second)
 		return
 	}
 	d.mu.Lock()
@@ -234,7 +234,7 @@ func (d *dictation) end(on *dictating, cancel bool) {
 	case cancel:
 		t.show(overlay{dot: dotWait, title: tx("Dictation cancelled"), body: tx("Nothing was inserted.")}, 2*time.Second)
 	case text == "" && on.l.Err() != nil:
-		t.show(overlay{dot: dotWait, title: tx("Dictation did not work"), body: on.l.Err().Error()}, 6*time.Second)
+		t.show(overlay{dot: dotWait, title: tx("Dictation did not work"), body: errorText(on.l.Err())}, 6*time.Second)
 	case text == "":
 		t.show(overlay{dot: dotWait, title: tx("Nothing understood"), body: tx("No text came through. %s starts a new dictation.", keyLabel(on.key))}, 4*time.Second)
 	default:
