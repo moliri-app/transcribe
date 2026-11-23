@@ -401,7 +401,7 @@ func setClipboard(text string) error {
 		time.Sleep(25 * time.Millisecond)
 	}
 	if !opened {
-		return errors.New("Die Zwischenablage ist von einem anderen Programm belegt.")
+		return errors.New(tx("Another program is using the clipboard."))
 	}
 	defer procCloseClipboard.Call()
 	procEmptyClipboard.Call()

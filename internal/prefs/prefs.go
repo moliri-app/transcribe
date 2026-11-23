@@ -64,6 +64,10 @@ type Prefs struct {
 	OCREngine string  `json:"ocrEngine,omitempty"`
 	OCRAPI    Service `json:"ocrApi,omitzero"`
 
+	// UILocale is the interface language the pages last reported (one of UILocales), for what the
+	// EXE shows itself: the tray menu, notifications, the dictation window. "" until a page reported.
+	UILocale string `json:"uiLocale,omitempty"`
+
 	DictateKey         string `json:"dictateKey,omitempty"`         // global shortcut for dictating: one of DictateKeys, or "off"
 	DictateNoInsert    bool   `json:"dictateNoInsert,omitempty"`    // dictated text is not inserted at the cursor
 	DictateNoClipboard bool   `json:"dictateNoClipboard,omitempty"` // dictated text does not go to the clipboard
@@ -86,6 +90,21 @@ type Service struct {
 	URL      string `json:"url,omitempty"`
 	Model    string `json:"model,omitempty"`
 	Key      string `json:"key,omitempty"`
+}
+
+// UILocales are the interface languages (Moliri's, frontend/src/lib/moliri/i18n/locale.js).
+var UILocales = []string{"en", "de", "es", "fr", "ja", "uk", "el"}
+
+// UILocale is s as one of UILocales ("de-DE" counts as "de"), or "".
+func UILocale(s string) string {
+	s = strings.ToLower(strings.TrimSpace(s))
+	if i := strings.IndexAny(s, "-_."); i >= 0 {
+		s = s[:i]
+	}
+	if slices.Contains(UILocales, s) {
+		return s
+	}
+	return ""
 }
 
 // DictateKeys are the shortcuts one can choose for dictating, the default first, each with its
@@ -182,6 +201,7 @@ func (p *Prefs) normalize() {
 	if !engineID(p.OCREngine) {
 		p.OCREngine = ""
 	}
+	p.UILocale = UILocale(p.UILocale)
 	p.LiveAPIKeepHours = max(0, p.LiveAPIKeepHours)
 	p.LiveWords = normWords(p.LiveWords)
 	p.Folders = normFolders(p.Folders)

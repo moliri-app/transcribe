@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/queue"
 )
 
@@ -59,5 +60,24 @@ func TestRecognitionPrefs(t *testing.T) {
 	_ = json.Unmarshal(do(s, "GET", "/api/queue", "", nil).Body.Bytes(), &q)
 	if len(q.Jobs) != 2 || q.Jobs[1].Options.Engine != "local" {
 		t.Errorf("chosen engine: %+v", q.Jobs)
+	}
+}
+
+// The pages' heartbeat says the interface language; the settings keep it for the tray menu,
+// notifications and the dictation window. A foreign page cannot change it.
+func TestPingKeepsInterfaceLanguage(t *testing.T) {
+	s, d := newServer(t)
+	do(s, "POST", "/api/ping?lang=fr", "", nil)
+	if l := prefs.Load(d).UILocale; l != "fr" {
+		t.Fatalf("after ping: %q", l)
+	}
+	do(s, "POST", "/api/ping?lang=xx", "", nil)
+	do(s, "POST", "/api/ping?lang=ja", "", map[string]string{"Origin": "https://example.com"})
+	if l := prefs.Load(d).UILocale; l != "fr" {
+		t.Errorf("unknown or foreign: %q", l)
+	}
+	do(s, "POST", "/api/ping?lang=de-DE", "", nil)
+	if l := prefs.Load(d).UILocale; l != "de" {
+		t.Errorf("de-DE: %q", l)
 	}
 }

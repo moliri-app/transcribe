@@ -37,3 +37,12 @@ job and dictation shortcuts too); a new message needs its entry there, which
 `TestFrontendKnowsEveryMessage` in `internal/msg` checks. Engine packages cannot import
 `internal/msg`: they return errors of their own (`pipeline.ErrEmpty`, `*pipeline.ShortError`) that
 `internal/` turns into messages.
+
+## What the EXE draws itself
+
+The tray menu, Windows notifications, the dictation window and message boxes are drawn by Go, not
+by the pages. Their texts are written in English as `tx("…")` in `cmd/transcribe` and translated in
+the catalogue in `cmd/transcribe/texts.go`; a new or changed text needs its line there for every
+language (`TestEveryTextTranslated` checks). The language is the one the pages last reported with
+their heartbeat (`/api/ping?lang=`, kept as `uiLocale` in the settings), else Windows' display
+language, else English.

@@ -81,7 +81,7 @@ func relaunchArgs(args []string, port int, noBrowser bool) []string {
 func relaunch(exe string, args []string) {
 	cmd := exec.Command(exe, args...)
 	if err := cmd.Start(); err != nil {
-		fail(fmt.Errorf("die neue Version ließ sich nicht starten (%s): %w", exe, err))
+		fail(fmt.Errorf("%s: %w", tx("The new version could not be started (%s)", exe), err))
 	}
 	_ = cmd.Process.Release()
 }
@@ -95,11 +95,11 @@ func updateMenuItem(u *update.Updater) (string, bool) {
 	v := strings.TrimPrefix(st.Latest, "v")
 	switch st.State {
 	case update.Available, update.Failed:
-		return "Auf Version " + v + " aktualisieren", true
+		return tx("Update to version %s", v), true
 	case update.Downloading:
-		return fmt.Sprintf("Version %s wird geladen … %d %%", v, int(st.Progress*100)), false
+		return tx("Downloading version %s … %d %%", v, int(st.Progress*100)), false
 	case update.Waiting:
-		return "Update startet, sobald Aufträge und Aufnahmen fertig sind", false
+		return tx("The update starts once jobs and recordings are done"), false
 	}
 	return "", false
 }

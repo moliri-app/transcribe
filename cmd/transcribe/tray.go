@@ -6,7 +6,7 @@ package main
 
 // trayActions are what the tray icon's menu does; each runs on its own goroutine.
 type trayActions struct {
-	open     func() // click on the icon, or "Transcribe öffnen"
+	open     func() // click on the icon, or "Open Transcribe"
 	settings func()
 	quit     func()
 	// the shortcut for dictating (dictate.go), and Esc while dictating
