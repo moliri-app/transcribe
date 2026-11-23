@@ -32,7 +32,7 @@ Starke Automatik ohne Zutun, gekoppelt an eine Korrekturschicht, die von der Mas
 ## Capabilities and Constraints
 
 - Öffentlich als freie Software unter der Mozilla Public License 2.0 (Repo `github.com/moliri-app/transcribe`); Drittkomponenten und Modelle mit Lizenz und Namensnennung in `NOTICE`.
-- Oberflächensprache Deutsch.
+- Oberflächensprachen wie in Moliri: Deutsch, Englisch, Spanisch, Französisch, Japanisch, Ukrainisch, Griechisch (Einstellungen › System › Sprache; sonst die Sprache von Windows).
 - Bibliothek: Aufnahmen benennen, verschlagworten und ausblenden, ohne die Datei anzufassen (`library.json` im Datenordner); so auch in verbundenen Ordnern, in denen Transcribe nichts löscht.
 - Bibliothek: jede Aufnahme, mit Transkript oder ohne, gleich in der Liste anhören; ihre Details (Dateiname, Ort, Größe, Länge, Aufnahme-, Erstellungs- und Änderungsdatum, Format, Ton, Bild) in einem Dialog (GET /api/fileinfo).
 - Korrekturen: Sprecher benennen, zusammenlegen, Sprache pro Sprecher oder Stelle, Text ersetzen und einfügen, automatisch gespeichert, rückgängig machbar.

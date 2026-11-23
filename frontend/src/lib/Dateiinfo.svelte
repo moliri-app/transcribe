@@ -9,6 +9,8 @@
 	import Button from '$lib/moliri/components/ui/Button.svelte';
 	import Abspielen from '$lib/live/Abspielen.svelte';
 	import { dauer, getJSON, groesse } from '$lib/api.js';
+	import { getLocale } from '$lib/moliri/i18n/locale.js';
+	import plural from '../locales/plural.js';
 
 	/** @typedef {{ format: string, duration: number, bitrate: number, recorded: string, title: string, artist: string,
 	 *   codec: string, sampleRate: number, channels: number, video?: { codec: string, width: number, height: number, fps: number } }} Medium */
@@ -47,18 +49,18 @@
 	function datum(t) {
 		const d = typeof t === 'number' ? new Date(t * 1000) : new Date(t);
 		if (isNaN(d.getTime())) return String(t);
-		return d.toLocaleString('de-DE', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+		return d.toLocaleString(getLocale(), { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 	}
 
 	/** @param {number} n */
-	const kanaele = (n) => (n === 1 ? 'Mono' : n === 2 ? 'Stereo' : `${n} Kanäle`);
+	const kanaele = (n) => (n === 1 ? /* @wc-include */ 'Mono' : n === 2 ? /* @wc-include */ 'Stereo' : /* @wc-include */ `${n} channels`);
 
 	/** der Ton in Worten: „AAC · 44,1 kHz · Stereo · 128 kbit/s“
 	 * @param {Medium} m */
 	function ton(m) {
 		return [
 			m.codec,
-			m.sampleRate ? `${(m.sampleRate / 1000).toLocaleString('de-DE', { maximumFractionDigits: 1 })} kHz` : '',
+			m.sampleRate ? `${(m.sampleRate / 1000).toLocaleString(getLocale(), { maximumFractionDigits: 1 })} kHz` : '',
 			m.channels ? kanaele(m.channels) : '',
 			m.bitrate ? `${Math.round(m.bitrate / 1000)} kbit/s` : ''
 		]
@@ -72,20 +74,33 @@
 		return [
 			v.width && v.height ? `${v.width} × ${v.height}` : '',
 			v.codec,
-			v.fps ? `${v.fps.toLocaleString('de-DE', { maximumFractionDigits: 2 })} Bilder/s` : ''
+			v.fps ? fps(v.fps) : ''
 		]
 			.filter(Boolean)
 			.join(' · ');
+	}
+
+	/** 30 fps
+	 * @param {number} n */
+	function fps(n) {
+		const zahl = n.toLocaleString(getLocale(), { maximumFractionDigits: 2 });
+		return /* @wc-include */ `${zahl} fps`;
+	}
+
+	/** @param {number} t */
+	function fertigSeit(t) {
+		const wann = datum(t);
+		return /* @wc-include */ `ready since ${wann}`;
 	}
 
 	/** der Stand des Transkripts: „fertig seit 8. November 2026, 14:05 · 2 Sprecher · 3 Korrekturen“
 	 * @param {NonNullable<Zeigbar['summary']>} s */
 	function transkript(s) {
 		return [
-			`fertig seit ${datum(s.done)}`,
-			s.speakers.length === 1 ? '1 Sprecher' : `${s.speakers.length} Sprecher`,
-			s.edits === 1 ? '1 Korrektur von Hand' : s.edits ? `${s.edits} Korrekturen von Hand` : '',
-			s.clips === 1 ? '1 Clip' : s.clips ? `${s.clips} Clips` : ''
+			fertigSeit(s.done),
+			plural(s.speakers.length, ['# speaker', '# speakers']),
+			s.edits ? plural(s.edits, ['# manual correction', '# manual corrections']) : '',
+			s.clips ? plural(s.clips, ['# clip', '# clips']) : ''
 		]
 			.filter(Boolean)
 			.join(' · ');
@@ -98,34 +113,34 @@
 		<h2 id="h-details">{a.title}</h2>
 		<Abspielen datei={a.name} titel={a.title} />
 		{#if fehler}
-			<p class="fehler" role="alert">Die Angaben zur Datei ließen sich nicht lesen: {fehler}</p>
+			<p class="fehler" role="alert">The file details could not be read: {fehler}</p>
 		{:else if !info}
-			<p class="leise">Lese die Datei …</p>
+			<p class="leise">Reading the file…</p>
 		{:else}
 			<dl>
-				<dt>Dateiname</dt>
+				<dt>File name</dt>
 				<dd>{info.file}</dd>
-				<dt>Ort</dt>
+				<dt>Location</dt>
 				<dd class="pfad">{info.path}</dd>
-				<dt>Größe</dt>
+				<dt>Size</dt>
 				<dd>{groesse(info.size)}</dd>
 				{#if m?.duration || a.summary}
-					<dt>Länge</dt>
+					<dt>Length</dt>
 					<dd class="zahl">{dauer(m?.duration || a.summary?.duration || 0)}</dd>
 				{/if}
 				{#if m?.recorded}
-					<dt>Aufgenommen</dt>
-					<dd>{datum(m.recorded)} <span class="leise">(laut Datei)</span></dd>
+					<dt>Recorded</dt>
+					<dd>{datum(m.recorded)} <span class="leise">(according to the file)</span></dd>
 				{/if}
 				{#if info.created}
-					<dt>Erstellt</dt>
+					<dt>Created</dt>
 					<!-- eine kopierte Datei ist hier jünger als ihr Inhalt -->
-					<dd>{datum(info.created)}{#if info.created > info.modified + 60}&nbsp;<span class="leise">(hierher kopiert)</span>{/if}</dd>
+					<dd>{datum(info.created)}{#if info.created > info.modified + 60}&nbsp;<span class="leise">(copied here)</span>{/if}</dd>
 				{/if}
-				<dt>Geändert</dt>
+				<dt>Modified</dt>
 				<dd>{datum(info.modified)}</dd>
 				{#if m?.title || m?.artist}
-					<dt>In der Datei</dt>
+					<dt>In the file</dt>
 					<dd>{[m.title, m.artist].filter(Boolean).join(' · ')}</dd>
 				{/if}
 				{#if m?.format}
@@ -133,35 +148,35 @@
 					<dd>{m.format}</dd>
 				{/if}
 				{#if m && ton(m)}
-					<dt>Ton</dt>
+					<dt>Sound</dt>
 					<dd>{ton(m)}</dd>
 				{/if}
 				{#if m?.video}
-					<dt>Bild</dt>
+					<dt>Picture</dt>
 					<dd>{bild(m.video)}</dd>
 				{/if}
-				<dt>Transkript</dt>
+				<dt>Transcript</dt>
 				<dd>
 					{#if a.summary}
-						{transkript(a.summary)}{#if a.sidecar}<br /><span class="leise">liegt als Datei neben der Aufnahme</span>{/if}
+						{transkript(a.summary)}{#if a.sidecar}<br /><span class="leise">saved as a file next to the recording</span>{/if}
 					{:else}
-						noch keins
+						none yet
 					{/if}
 				</dd>
 			</dl>
 			{#if !m}
-				<p class="leise">Was in der Datei steckt (Länge, Format), lässt sich gerade nicht lesen.</p>
+				<p class="leise">What is in the file (length, format) cannot be read right now.</p>
 			{/if}
 		{/if}
 		<div class="fuss">
 			{#if a.summary && oneditor}
 				{@const z = a}
 				<a class="editor" href="/editor" data-sveltekit-reload onclick={() => oneditor(z)}>
-					<IconMaterialSymbolsEditOutlineRounded aria-hidden="true" />Im Editor öffnen
+					<IconMaterialSymbolsEditOutlineRounded aria-hidden="true" />Open in editor
 				</a>
 			{/if}
 			<span class="platz"></span>
-			<Button type="secondary" size="large" autofocus onclick={() => dlg.close()}>Schließen</Button>
+			<Button type="secondary" size="large" autofocus onclick={() => dlg.close()}>Close</Button>
 		</div>
 	{/if}
 </dialog>

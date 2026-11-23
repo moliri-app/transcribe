@@ -23,7 +23,10 @@
 	import StimmeWahl from '$lib/live/StimmeWahl.svelte';
 	import { live, LOESCHEN, uhrzeit } from '$lib/live/stand.svelte.js';
 	import MoliriLogo from '$lib/MoliriLogo.svelte';
+	import Oberflaechensprache from '$lib/Oberflaechensprache.svelte';
 	import { HANDBUCH, MOLIRI } from '$lib/moliri-links.js';
+	import { getLocale } from '$lib/moliri/i18n/locale.js';
+	import plural from '../../locales/plural.js';
 
 	/** @typedef {{ key: string, path: string, size: number }} Ordner */
 	/** @typedef {{ name: string, label: string, path: string, installed: boolean, size: number, state: string,
@@ -37,18 +40,18 @@
 	 *   restartNeeded: boolean }} Gpu */
 
 	const ORDNER = /** @type {Record<string, string>} */ ({
-		data: 'Datenordner',
-		audio: 'Aufnahmen',
-		results: 'Ergebnisse',
-		models: 'Modelle',
-		lib: 'Erkennungs-Runtime',
+		data: /* @wc-include */ 'Data folder',
+		audio: /* @wc-include */ 'Recordings',
+		results: /* @wc-include */ 'Results',
+		models: /* @wc-include */ 'Models',
+		lib: /* @wc-include */ 'Recognition runtime',
 		bin: 'ffmpeg'
 	});
 
 
 	const groesse = (/** @type {number} */ n) =>
 		n >= 1073741824
-			? (n / 1073741824).toFixed(2).replace('.', ',') + ' GB'
+			? (n / 1073741824).toLocaleString(getLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' GB'
 			: n >= 1048576
 				? Math.round(n / 1048576) + ' MB'
 				: n > 0
@@ -58,13 +61,21 @@
 
 	// ---- Erkennung ----
 	const ARTEN = [
-		['local', 'Nur auf diesem Rechner', 'Die Modelle laufen hier. Keine Aufnahme verlässt den Rechner.'],
+		[
+			'local',
+			/* @wc-include */ 'Only on this computer',
+			/* @wc-include */ 'The models run here. No recording leaves the computer.'
+		],
 		[
 			'api',
-			'Nur über eine API',
-			'Die Aufnahmen gehen zur Erkennung an einen Dienst, im Internet oder im eigenen Netz. Die App lädt dafür keine Modelle.'
+			/* @wc-include */ 'Only through an API',
+			/* @wc-include */ 'Recordings go to a service for recognition, on the internet or on your own network. The app downloads no models for this.'
 		],
-		['both', 'Beides', 'Du legst fest, was Live und ganze Aufnahmen nutzen, und wählst bei jedem Auftrag neu, wenn du willst.']
+		[
+			'both',
+			/* @wc-include */ 'Both',
+			/* @wc-include */ 'You decide what Live and whole recordings use, and can choose again for each job if you like.'
+		]
 	];
 	/** @typedef {{ id: string, label: string, kind: string, url: string, model: string, keys?: string, noKey?: boolean,
 	 *   speakers?: boolean, realtime?: boolean }} Dienst */
@@ -90,7 +101,7 @@
 		try {
 			erkennungAus(await post('/api/prefs', patch));
 		} catch (e) {
-			erkennungFehler = 'Nicht gespeichert: ' + /** @type {Error} */ (e).message;
+			erkennungFehler = /* @wc-include */ `Not saved: ${/** @type {Error} */ (e).message}`;
 			return false;
 		}
 		// dürfen die Modelle wieder genutzt werden, lädt die App, was fehlt; die Leiste zeigt es
@@ -113,7 +124,7 @@
 		schluesselStand = '';
 		if (await erkennungSetzen({ api: { key: wert } })) {
 			schluessel = '';
-			schluesselStand = wert ? 'Schlüssel gespeichert.' : 'Schlüssel entfernt.';
+			schluesselStand = wert ? /* @wc-include */ 'Key saved.' : /* @wc-include */ 'Key removed.';
 		}
 		speichertSchluessel = false;
 	}
@@ -123,6 +134,7 @@
 	let verbunden = $state(null);
 	let nebenAn = $state(true);
 	let ordnerStand = $state('');
+	let ordnerFehler = $state(false);
 
 	async function ladeVerbunden() {
 		verbunden = await getJSON('/api/folders');
@@ -132,12 +144,17 @@
 	/** @param {{ action: 'remove' | 'sidecar', path?: string, on?: boolean }} body */
 	async function verbundenAendern(body) {
 		ordnerStand = '';
+		ordnerFehler = false;
 		try {
 			verbunden = await post('/api/folders', body);
 			nebenAn = verbunden?.sidecar ?? true;
-			ordnerStand = body.action === 'remove' ? 'Getrennt. Die Aufnahmen und Transkripte im Ordner bleiben, wo sie sind.' : 'Gespeichert.';
+			ordnerStand =
+				body.action === 'remove'
+					? /* @wc-include */ 'Disconnected. The recordings and transcripts in the folder stay where they are.'
+					: /* @wc-include */ 'Saved.';
 		} catch (e) {
-			ordnerStand = 'Nicht gespeichert: ' + /** @type {Error} */ (e).message;
+			ordnerStand = /* @wc-include */ `Not saved: ${/** @type {Error} */ (e).message}`;
+			ordnerFehler = true;
 		}
 	}
 
@@ -147,6 +164,8 @@
 	let sofort = $state(false);
 	let geladen = $state(false);
 	let gespeichert = $state('');
+	/** the message in gespeichert is an error */
+	let gespeichertFehler = $state(false);
 	/** @type {ReturnType<typeof setTimeout> | undefined} */
 	let gespeichertUhr;
 
@@ -164,12 +183,14 @@
 		// leeren, damit „Gespeichert.“ für diese Änderung steht, nicht für die vorige
 		clearTimeout(gespeichertUhr);
 		gespeichert = '';
+		gespeichertFehler = false;
 		try {
 			await post('/api/prefs', patch);
-			gespeichert = 'Gespeichert.';
+			gespeichert = /* @wc-include */ 'Saved.';
 			gespeichertUhr = setTimeout(() => (gespeichert = ''), 2000);
 		} catch (e) {
-			gespeichert = 'Nicht gespeichert: ' + /** @type {Error} */ (e).message;
+			gespeichert = /* @wc-include */ `Not saved: ${/** @type {Error} */ (e).message}`;
+			gespeichertFehler = true;
 		}
 	}
 
@@ -425,31 +446,22 @@
 	let gelesen = $state(null);
 	let ocrFehler = $state('');
 
-	/** die Modelle von Tesseract mit Namen (models/status.go) */
-	const OCR_SPRACHEN = /** @type {Record<string, string>} */ ({
-		deu: 'Deutsch',
-		eng: 'Englisch',
-		frk: 'Fraktur (frk)',
-		Fraktur: 'Fraktur-Schrift',
-		frak2021: 'Fraktur (frak2021)',
-		latin: 'Lateinische Schrift (Deutsch, Englisch, …)',
-		fra: 'Französisch',
-		ita: 'Italienisch',
-		spa: 'Spanisch',
-		nld: 'Niederländisch',
-		pol: 'Polnisch',
-		ces: 'Tschechisch',
-		dan: 'Dänisch',
-		swe: 'Schwedisch',
-		nor: 'Norwegisch',
-		rus: 'Russisch'
+	/** Tesseract's models in their order (models/status.go) */
+	const OCR_REIHE = ['deu', 'eng', 'frk', 'Fraktur', 'frak2021', 'latin', 'fra', 'ita', 'spa', 'nld', 'pol', 'ces', 'dan', 'swe', 'nor', 'rus'];
+	/** names of the models that are not a language; languages are named by Intl in the interface language */
+	const OCR_SCHRIFTEN = /** @type {Record<string, string>} */ ({
+		frk: /* @wc-include */ 'Fraktur (frk)',
+		Fraktur: /* @wc-include */ 'Fraktur script',
+		frak2021: /* @wc-include */ 'Fraktur (frak2021)',
+		latin: /* @wc-include */ 'Latin script (German, English, …)'
 	});
+	const sprachName = new Intl.DisplayNames([getLocale()], { type: 'language' });
 	/** was jede Erkennung gut kann (ocr) */
 	const OCR_LESER = /** @type {Record<string, string>} */ ({
-		tesseract: 'Liest Druck und Schreibmaschine, mit eigenen Modellen für Fraktur.',
-		onnx: 'Liest gedruckte lateinische Schrift sehr genau, auch Karteikarten und Listen, und kennt die Lage jedes Worts; auf der Grafikkarte schnell. Für Fraktur ist Tesseract besser.',
-		os: 'Die Texterkennung von Windows: sofort da und sehr schnell, mit der Lage jedes Worts, aber ohne Fraktur und Handschrift. Ihre Sprachen kommen aus Windows; weitere fügst du unter Einstellungen › Zeit und Sprache › Sprache hinzu.',
-		api: 'Ein KI-Modell liest das Bild, in jeder Sprache und Schrift, auch Handschrift und Kurrent. Es findet die Zeilen, aber nicht die Lage jedes Worts. Das Bild geht dafür an den Dienst, abgerechnet wird über deinen Schlüssel.'
+		tesseract: /* @wc-include */ 'Reads print and typewriting, with its own models for Fraktur.',
+		onnx: /* @wc-include */ 'Reads printed Latin script very accurately, including index cards and lists, and knows where each word is; fast on the graphics card. For Fraktur, Tesseract is better.',
+		os: /* @wc-include */ 'The text recognition built into Windows: available at once and very fast, with the position of each word, but without Fraktur or handwriting. Its languages come from Windows; you add more under Settings › Time & language › Language.',
+		api: /* @wc-include */ 'An AI model reads the image, in any language and script, including handwriting and Kurrent. It finds the lines, but not the position of each word. For this, the image goes to the service, billed through your key.'
 	});
 	/** die Sprache, mit der eine Erkennung beim Ausprobieren anfängt
 	 * @param {Leser} l */
@@ -458,16 +470,16 @@
 		return s.includes('deu') ? 'deu' : (s[0] ?? 'deu');
 	};
 	const OCR_LAYOUTS = /** @type {Record<string, string>} */ ({
-		auto: 'Seite mit Spalten (automatisch)',
-		lines: 'Zeilen, etwa Karteikarte oder Formular',
-		block: 'Ein Textblock, etwa ein Etikett',
-		sparse: 'Verstreut, etwa Schrift auf Objekten'
+		auto: /* @wc-include */ 'Page with columns (automatic)',
+		lines: /* @wc-include */ 'Lines, such as an index card or form',
+		block: /* @wc-include */ 'A single block of text, such as a label',
+		sparse: /* @wc-include */ 'Scattered, such as lettering on objects'
 	});
-	const ocrName = (/** @type {string} */ l) => OCR_SPRACHEN[l] ?? l;
+	const ocrName = (/** @type {string} */ l) => OCR_SCHRIFTEN[l] ?? (OCR_REIHE.includes(l) ? sprachName.of(l) : undefined) ?? l;
 	/** in der Reihenfolge oben, unbekannte danach */
 	const ocrReihe = (/** @type {string[]} */ l) => {
 		const rang = (/** @type {string} */ x) => {
-			const i = Object.keys(OCR_SPRACHEN).indexOf(x);
+			const i = OCR_REIHE.indexOf(x);
 			return i < 0 ? 99 : i;
 		};
 		return l.toSorted((a, b) => rang(a) - rang(b));
@@ -568,7 +580,7 @@
 		try {
 			ocrDienstAus(await post('/api/prefs', patch));
 		} catch (e) {
-			ocrDienstFehler = 'Nicht gespeichert: ' + /** @type {Error} */ (e).message;
+			ocrDienstFehler = /* @wc-include */ `Not saved: ${/** @type {Error} */ (e).message}`;
 			return false;
 		}
 		ladeOcr(); // ob der KI-Dienst liest, hängt an Schlüssel und Modell; die Vorgabe steht in der Liste vorn
@@ -587,7 +599,7 @@
 		ocrSchluesselStand = '';
 		if (await ocrDienstSetzen({ ocrApi: { key: wert } })) {
 			ocrSchluessel = '';
-			ocrSchluesselStand = wert ? 'Schlüssel gespeichert.' : 'Schlüssel entfernt.';
+			ocrSchluesselStand = wert ? /* @wc-include */ 'Key saved.' : /* @wc-include */ 'Key removed.';
 		}
 		speichertOcrSchluessel = false;
 	}
@@ -605,7 +617,7 @@
 			kopiert = true;
 			setTimeout(() => (kopiert = false), 2000);
 		} catch {
-			kopierFehler = 'Kopieren ging nicht.';
+			kopierFehler = /* @wc-include */ 'Copying didn’t work.';
 		}
 	}
 
@@ -613,48 +625,100 @@
 	const KATEGORIEN = /** @type {const} */ ([
 		{
 			id: 'transkribieren',
-			name: 'Transkribieren',
+			name: /* @wc-include */ 'Transcribing',
 			abschnitte: [
-				['erkennung', 'Erkennung'],
-				['neu', 'Neue Aufnahmen'],
-				['ordner', 'Verbundene Ordner']
+				[
+					'erkennung',
+					/* @wc-include */ 'Recognition'
+				],
+				[
+					'neu',
+					/* @wc-include */ 'New recordings'
+				],
+				[
+					'ordner',
+					/* @wc-include */ 'Connected folders'
+				]
 			]
 		},
 		{
 			id: 'live',
-			name: 'Live und Diktieren',
+			name: /* @wc-include */ 'Live and dictation',
 			abschnitte: [
-				['aufnahme', 'Aufnahme'],
-				['stimme', 'Meine Stimme'],
-				['diktieren', 'Diktieren']
+				[
+					'aufnahme',
+					/* @wc-include */ 'Recording'
+				],
+				[
+					'stimme',
+					/* @wc-include */ 'My voice'
+				],
+				[
+					'diktieren',
+					/* @wc-include */ 'Dictation'
+				]
 			]
 		},
 		{
 			id: 'programme',
-			name: 'Programme',
+			name: /* @wc-include */ 'Apps',
 			abschnitte: [
-				['zugriff', 'Zugriff'],
-				['bereit', 'Im Hintergrund'],
-				['adresse', 'Adresse'],
-				['anfragen', 'Gespeicherte Anfragen']
+				[
+					'zugriff',
+					/* @wc-include */ 'Access'
+				],
+				[
+					'bereit',
+					/* @wc-include */ 'In the background'
+				],
+				[
+					'adresse',
+					/* @wc-include */ 'Address'
+				],
+				[
+					'anfragen',
+					/* @wc-include */ 'Saved requests'
+				]
 			]
 		},
 		{
 			id: 'ocr',
-			name: 'Texterkennung',
+			name: /* @wc-include */ 'Text recognition',
 			abschnitte: [
-				['ocr-leser', 'Erkennungen'],
-				['ocr-ki', 'KI-Dienst'],
-				['ocr-probe', 'Ausprobieren']
+				[
+					'ocr-leser',
+					/* @wc-include */ 'Engines'
+				],
+				[
+					'ocr-ki',
+					/* @wc-include */ 'AI service'
+				],
+				[
+					'ocr-probe',
+					/* @wc-include */ 'Try it'
+				]
 			]
 		},
 		{
 			id: 'system',
-			name: 'System',
+			name: /* @wc-include */ 'System',
 			abschnitte: [
-				['gpu', 'Grafikkarte'],
-				['speicher', 'Speicher und Modelle'],
-				['programm', 'Über Transcribe']
+				[
+					'sprache',
+					/* @wc-include */ 'Language'
+				],
+				[
+					'gpu',
+					/* @wc-include */ 'Graphics card'
+				],
+				[
+					'speicher',
+					/* @wc-include */ 'Storage and models'
+				],
+				[
+					'programm',
+					/* @wc-include */ 'About Transcribe'
+				]
 			]
 		}
 	]);
@@ -754,8 +818,8 @@
 	function wann(sekunden) {
 		const d = new Date(sekunden * 1000);
 		const heute = new Date().toDateString() === d.toDateString();
-		const uhr = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-		return heute ? `heute um ${uhr}` : `am ${d.toLocaleDateString('de-DE')} um ${uhr}`;
+		const uhr = d.toLocaleTimeString(getLocale(), { hour: '2-digit', minute: '2-digit' });
+		return heute ? /* @wc-include */ `today at ${uhr}` : /* @wc-include */ `on ${d.toLocaleDateString(getLocale())} at ${uhr}`;
 	}
 
 	onMount(() => {
@@ -765,7 +829,10 @@
 			ladeOcr(),
 			ladeHintergrund(),
 			ladeDiktat(),
-			ladeVorgaben().catch(() => (gespeichert = 'Die Vorgaben ließen sich nicht laden.')),
+			ladeVorgaben().catch(() => {
+				gespeichert = /* @wc-include */ 'The defaults could not be loaded.';
+				gespeichertFehler = true;
+			}),
 			ladeVerbunden().catch(() => {}),
 			ladeStand(),
 			ladeGpu()
@@ -793,22 +860,22 @@
 	});
 </script>
 
-<svelte:head><title>Einstellungen · Transcribe by Moliri</title></svelte:head>
+<svelte:head><title>Settings · Transcribe by Moliri</title></svelte:head>
 
 <main>
 	<header class="kopf">
-		<h1>Einstellungen</h1>
-		<p>Änderungen gelten sofort, speichern musst du nichts.</p>
+		<h1>Settings</h1>
+		<p>Changes apply at once; there is nothing to save.</p>
 	</header>
 
 	<div class="rahmen">
-		<nav class="menue" aria-label="Kategorien der Einstellungen" bind:this={menueLeiste}>
+		<nav class="menue" aria-label="Settings categories" bind:this={menueLeiste}>
 			<ul>
 				{#each menue as k (k.id)}
 					<li>
 						<a class="kategorie" href="#{k.id}" aria-current={offen.id === k.id ? 'page' : undefined}>{k.name}</a>
 						{#if offen.id === k.id}
-							<ul class="unter" aria-label="Abschnitte">
+							<ul class="unter" aria-label="Sections">
 								{#each k.abschnitte as [id, name] (id)}
 									<li>
 										<a href="#{id}" aria-current={aktuell === id ? 'location' : undefined} onclick={() => (aktuell = angeklickt = id)}>{name}</a>
@@ -824,17 +891,17 @@
 		<div class="abschnitte" {@attach beobachten}>
 			{#if offen.id === 'transkribieren'}
 			<section id="erkennung" class="blatt" aria-labelledby="h-erkennung">
-				<h2 id="h-erkennung">Erkennung</h2>
+				<h2 id="h-erkennung">Recognition</h2>
 				<p class="hinweis">
-					Die Sprache in deinen Aufnahmen erkennen die Modelle auf diesem Rechner oder ein Dienst über seine API, im
-					Internet oder im eigenen Netz.
+					Speech in your recordings is recognized by the models on this computer or by a service through its API, on the internet
+					or on your own network.
 				</p>
 				{#if !erkennung}
-					<p class="leer">Lade …</p>
+					<p class="leer">Loading…</p>
 				{:else}
 					{@const e = erkennung}
 					<fieldset class="arten">
-						<legend class="sr">Wo die Sprache erkannt wird</legend>
+						<legend class="sr">Where speech is recognized</legend>
 						{#each ARTEN as [wert, titel, text] (wert)}
 							<label class="art" class:gewaehlt={e.recognition === wert}>
 								<input
@@ -858,13 +925,13 @@
 						<div class="api">
 							<div class="apifelder">
 								<label class="feldname">
-									Dienst
+									Service
 									<select class="feld" value={a.provider} onchange={(ev) => apiSetzen({ provider: ev.currentTarget.value })}>
 										{#each e.apiProviders as d (d.id)}<option value={d.id}>{d.label}</option>{/each}
 									</select>
 								</label>
 								<label class="feldname adresse">
-									Adresse
+									Address
 									<input
 										class="feld"
 										spellcheck="false"
@@ -873,20 +940,22 @@
 									/>
 								</label>
 								<label class="feldname">
-									Modell
+									Model
 									<input class="feld" spellcheck="false" value={a.model} onchange={(ev) => apiSetzen({ model: ev.currentTarget.value })} />
 								</label>
 							</div>
 							<p class="hinweis">
 								{#if dienst.kind === 'openai'}
-									Spricht die OpenAI-kompatible Schnittstelle, wie OpenAI, Groq, Mistral oder ein eigener Server (etwa
-									Speaches oder LocalAI). Sie unterscheidet keine Sprecher, und Live zeigt den Text erst nach jeder Sprechpause.
+									Speaks the OpenAI-compatible interface, like OpenAI, Groq, Mistral or a server of your own (such as Speaches or LocalAI).
+									It does not tell speakers apart, and Live only shows the text after each pause.
 								{:else}
-									Unterscheidet Sprecher und erkennt Geräusche wie Lachen oder Applaus; Live zeigt den Text schon beim Sprechen.
+									Tells speakers apart and recognizes sounds such as laughter or applause; Live shows the text while you speak.
 								{/if}
 							</p>
 
-							<label class="feldname" for="schluessel">API-Schlüssel{dienst.noKey ? ' (falls der Server einen verlangt)' : ''}</label>
+							<label class="feldname" for="schluessel"
+								>{dienst.noKey ? /* @wc-include */ 'API key (if the server requires one)' : /* @wc-include */ 'API key'}</label
+							>
 							<form
 								class="schluesselzeile"
 								onsubmit={(ev) => {
@@ -900,28 +969,31 @@
 									type="password"
 									autocomplete="off"
 									spellcheck="false"
-									placeholder={a.keySet ? `hinterlegt${a.keyHint ? ` (endet auf ${a.keyHint})` : ''}` : 'Schlüssel'}
+									placeholder={a.keySet
+										? a.keyHint
+											? /* @wc-include */ `stored (ends in ${a.keyHint})`
+											: /* @wc-include */ 'stored'
+										: /* @wc-include */ 'Key'}
 									bind:value={schluessel}
 								/>
 								<Button type="primary" size="large" nativeType="submit" disabled={!schluessel.trim()} loading={speichertSchluessel}>
-									{a.keySet ? 'Ersetzen' : 'Speichern'}
+									{a.keySet ? /* @wc-include */ 'Replace' : /* @wc-include */ 'Save'}
 								</Button>
 								{#if a.keySet}
-									<Button type="secondary" size="large" onclick={() => schluesselSpeichern('')}>Entfernen</Button>
+									<Button type="secondary" size="large" onclick={() => schluesselSpeichern('')}>Remove</Button>
 								{/if}
 							</form>
 							{#if schluesselStand}
 								<p class="gespeichert" role="status">{schluesselStand}</p>
 							{:else if !a.keySet && !dienst.noKey}
-								<p class="warnung">Ohne Schlüssel kann die App {dienst.label} nicht nutzen.</p>
+								<p class="warnung">Without a key, the app can’t use {dienst.label}.</p>
 							{/if}
 							<p class="hinweis">
 								{#if dienst.keys}
-									Den Schlüssel legst du in deinem Konto bei
-									<a href={dienst.keys} target="_blank" rel="noreferrer">{dienst.label}</a> an. Abgerechnet wird meist nach
-									Minuten Audio.
+									You create the key in your account at
+									<a href={dienst.keys} target="_blank" rel="noreferrer">{dienst.label}</a>. Billing is usually per minute of audio.
 								{/if}
-								Der Schlüssel bleibt in den Einstellungen auf diesem Rechner.
+								The key stays in the settings on this computer.
 							</p>
 						</div>
 					{/if}
@@ -929,21 +1001,21 @@
 					{#if e.recognition === 'both'}
 						<div class="schalter">
 							<label class="feldname">
-								Live und Diktieren
+								Live and dictation
 								<select class="feld" value={e.liveEngine} onchange={(ev) => erkennungSetzen({ liveEngine: ev.currentTarget.value })}>
 									{#each Object.entries(ENGINES) as [wert, name] (wert)}<option value={wert}>{name}</option>{/each}
 								</select>
 							</label>
 							<label class="feldname">
-								Ganze Aufnahmen
+								Whole recordings
 								<select class="feld" value={e.fileEngine} onchange={(ev) => erkennungSetzen({ fileEngine: ev.currentTarget.value })}>
 									{#each Object.entries(ENGINES) as [wert, name] (wert)}<option value={wert}>{name}</option>{/each}
 								</select>
 							</label>
 						</div>
 						<p class="hinweis">
-							Für ganze Aufnahmen ist das die Vorgabe: In der Bibliothek und beim Ablegen von Dateien wählst du bei jeder
-							Aufnahme, was erkennen soll.
+							For whole recordings this is the default: in the library and when you drop files, you choose for each recording what
+							should recognize it.
 						</p>
 					{/if}
 					{#if erkennungFehler}<p class="warnung">{erkennungFehler}</p>{/if}
@@ -952,12 +1024,12 @@
 
 			<section id="neu" class="blatt" aria-labelledby="h-neu">
 				<div class="zeile">
-					<h2 id="h-neu">Neue Aufnahmen</h2>
-					<p class="gespeichert" class:fehler={gespeichert && gespeichert !== 'Gespeichert.'} role="status">{gespeichert}</p>
+					<h2 id="h-neu">New recordings</h2>
+					<p class="gespeichert" class:fehler={gespeichert && gespeichertFehler} role="status">{gespeichert}</p>
 				</div>
 				<p class="hinweis">
-					Damit fängt jede Aufnahme an, die du ins Fenster ziehst oder in der Bibliothek transkribierst. Dort lässt es sich
-					für einzelne Aufnahmen ändern.
+					Every recording you drag into the window or transcribe in the library starts with these. You can change them there for
+					individual recordings.
 				</p>
 
 				<!-- gesperrt, bis die Vorgaben da sind: eine Änderung davor ginge verloren -->
@@ -966,27 +1038,27 @@
 				</fieldset>
 
 				<dl class="erklaerung">
-					<dt>Sprecher</dt>
+					<dt>Speakers</dt>
 					<dd>
-						Meist erkennt die App selbst, wie viele Menschen sprechen. Eine feste Zahl hilft, wenn sich Stimmen ähneln oder
-						jemand nur kurz spricht.
+						Usually the app detects by itself how many people are speaking. A fixed number helps when voices sound alike or someone
+						speaks only briefly.
 					</dd>
-					<dt>Sprachen</dt>
+					<dt>Languages</dt>
 					<dd>
-						Automatisch erkennt die App jede Sprache. Nennst du die Sprachen, die vorkommen, wählt sie nur unter diesen;
-						das hilft bei Mundart und kurzen fremdsprachigen Stellen.
+						On automatic, the app recognizes any language. If you name the languages that occur, it chooses only among them; this
+						helps with dialect and short passages in other languages.
 					</dd>
 				</dl>
 
 				<div class="ablegen">
-					<h3 class="feldname">Wenn du Dateien oder Ordner ins Fenster ziehst</h3>
+					<h3 class="feldname">When you drag files or folders into the window</h3>
 					<Toggle
 						bind:checked={sofort}
 						disabled={!geladen}
-						title="Sofort mit diesen Vorgaben starten"
+						title="Start right away with these defaults"
 						description={sofort
-							? 'Die Aufnahmen werden gleich transkribiert.'
-							: 'Aus: Die App fragt erst nach Sprechern und Sprachen und startet, wenn du bestätigst.'}
+							? /* @wc-include */ 'The recordings are transcribed right away.'
+							: /* @wc-include */ 'Off: the app first asks about speakers and languages and starts when you confirm.'}
 						onclick={() => speichern({ dropMode: sofort ? 'auto' : 'ask' })}
 					/>
 				</div>
@@ -994,27 +1066,27 @@
 
 			<section id="ordner" class="blatt" aria-labelledby="h-ordner">
 				<div class="zeile">
-					<h2 id="h-ordner">Verbundene Ordner</h2>
+					<h2 id="h-ordner">Connected folders</h2>
 					<!-- nur da, wenn es etwas sagt: die Seite hat sonst einen Status, den der übrigen Vorgaben -->
-					{#if ordnerStand}<p class="gespeichert" class:fehler={ordnerStand.startsWith('Nicht')} role="status">{ordnerStand}</p>{/if}
+					{#if ordnerStand}<p class="gespeichert" class:fehler={ordnerFehler} role="status">{ordnerStand}</p>{/if}
 				</div>
 				<p class="hinweis">
-					Die Aufnahmen eines verbundenen Ordners stehen in der Bibliothek, ohne kopiert zu werden, auch die in seinen
-					Unterordnern. Verbinden lässt sich ein Ordner in der <a href="/">Bibliothek</a>. Transcribe löscht darin nie etwas.
+					The recordings in a connected folder appear in the library without being copied, including those in its subfolders.
+					You can connect a folder in the <a href="/">library</a>. Transcribe never deletes anything in it.
 				</p>
 				{#if verbunden?.folders.length}
-					<ul class="liste" aria-label="Verbundene Ordner">
+					<ul class="liste" aria-label="Connected folders">
 						{#each verbunden.folders as f (f.path)}
 							<li class="eintrag">
 								<div class="was">
 									<span class="name">{f.name}</span>
-									<span class="pfad">{f.path}{f.exists ? '' : ' (nicht erreichbar)'}</span>
+									<span class="pfad">{f.exists ? f.path : /* @wc-include */ `${f.path} (not reachable)`}</span>
 								</div>
 								<span></span>
 								<div class="tun">
-									<Button type="secondary" size="large" aria-label="{f.name} trennen" onclick={() => verbundenAendern({ action: 'remove', path: f.path })}>
+									<Button type="secondary" size="large" aria-label="Disconnect {f.name}" onclick={() => verbundenAendern({ action: 'remove', path: f.path })}>
 										{#snippet iconLeft()}<IconMaterialSymbolsLinkOffRounded />{/snippet}
-										Trennen
+										Disconnect
 									</Button>
 								</div>
 							</li>
@@ -1025,10 +1097,10 @@
 					<Toggle
 						bind:checked={nebenAn}
 						disabled={!verbunden}
-						title="Transkripte neben die Aufnahmen legen"
+						title="Save transcripts next to the recordings"
 						description={nebenAn
-							? 'Jedes Transkript liegt auch als Datei neben seiner Aufnahme („Interview.mp3.transcribe.json“), mit Korrekturen und Clips. Wer den Ordner teilt, etwa über Nextcloud, sieht und bearbeitet dieselben Transkripte.'
-							: 'Aus: Transkripte bleiben nur in Transcribe. Liegt schon eins neben einer Aufnahme, liest die App es trotzdem.'}
+							? /* @wc-include */ 'Every transcript is also saved as a file next to its recording (“Interview.mp3.transcribe.json”), with corrections and clips. Anyone you share the folder with, for example via Nextcloud, sees and edits the same transcripts.'
+							: /* @wc-include */ 'Off: transcripts stay in Transcribe only. If there is already one next to a recording, the app reads it anyway.'}
 						onclick={() => verbundenAendern({ action: 'sidecar', on: nebenAn })}
 					/>
 				</div>
@@ -1038,58 +1110,58 @@
 
 			{#if offen.id === 'programme'}
 				<section id="zugriff" class="blatt" aria-labelledby="h-zugriff">
-					<h2 id="h-zugriff">Zugriff</h2>
+					<h2 id="h-zugriff">Access</h2>
 					<p class="hinweis">
-						Programme wie Moliri holen sich bei Transcribe Sprache als Text und lassen Text aus Bildern lesen. Programme
-						auf diesem Rechner dürfen das immer, Webseiten von anderen Adressen erst, wenn du sie erlaubst. Versucht es
-						eine, fragt Transcribe nach, wo du gerade bist, und ist das Fenster zu, mit einer Benachrichtigung.
+						Apps like Moliri get speech as text from Transcribe and have it read text from images. Apps on this computer may
+						always do so, websites from other addresses only once you allow them. When one tries, Transcribe asks wherever you
+						are, and with a notification if the window is closed.
 					</p>
 					{#if live.abgelehnt.length}
 						<div class="fragen">
-							<h3 class="teil">Möchten Transcribe nutzen</h3>
-							<ul class="liste" aria-label="Möchten Transcribe nutzen">
+							<h3 class="teil">Want to use Transcribe</h3>
+							<ul class="liste" aria-label="Want to use Transcribe">
 								{#each live.abgelehnt as z (z.origin)}
 									<li class="eintrag">
 										<div class="was">
-											<span class="name">{z.origin === 'null' ? 'Eine Datei oder eingebettete Seite' : z.origin}</span>
+											<span class="name">{z.origin === 'null' ? /* @wc-include */ 'A file or embedded page' : z.origin}</span>
 											<span class="pfad">
-												{z.client && !z.origin.endsWith(`//${z.client}`) && z.client !== z.origin ? `${z.client}, ` : ''}fragte um {uhrzeit(z.at)}
+												{z.client && !z.origin.endsWith(`//${z.client}`) && z.client !== z.origin ? `${z.client}, ` : ''}asked at {uhrzeit(z.at)}
 											</span>
 										</div>
 										<span></span>
 										<div class="tun">
-											<Button type="primary" size="large" onclick={() => live.freigeben(z.origin, true)}>Erlauben</Button>
-											<Button type="secondary" size="large" onclick={() => live.freigeben(z.origin, false)}>Ablehnen</Button>
+											<Button type="primary" size="large" onclick={() => live.freigeben(z.origin, true)}>Allow</Button>
+											<Button type="secondary" size="large" onclick={() => live.freigeben(z.origin, false)}>Deny</Button>
 										</div>
 									</li>
 								{/each}
 							</ul>
 						</div>
 					{/if}
-					<h3 class="teil">Erlaubte Webseiten</h3>
+					<h3 class="teil">Allowed websites</h3>
 					{#if live.erlaubt.length}
-						<ul class="liste" aria-label="Erlaubte Webseiten">
+						<ul class="liste" aria-label="Allowed websites">
 							{#each live.erlaubt as o (o)}
 								<li class="eintrag">
 									<div class="was"><span class="name">{o}</span></div>
 									<span></span>
 									<div class="tun">
-										<Button type="tertiary" size="large" onclick={() => live.freigeben(o, false)}>Nicht mehr erlauben</Button>
+										<Button type="tertiary" size="large" onclick={() => live.freigeben(o, false)}>Stop allowing</Button>
 									</div>
 								</li>
 							{/each}
 						</ul>
 					{:else}
-						<p class="leer">Noch keine Webseite erlaubt.</p>
+						<p class="leer">No website allowed yet.</p>
 					{/if}
-					<p class="meta">Die Erlaubnis gilt für Live-Transkription und Texterkennung.</p>
+					<p class="meta">The permission applies to live transcription and text recognition.</p>
 				</section>
 
 				<section id="bereit" class="blatt" aria-labelledby="h-bereit">
-					<h2 id="h-bereit">Im Hintergrund</h2>
+					<h2 id="h-bereit">In the background</h2>
 					<p class="hinweis">
-						Programme erreichen Transcribe nur, solange es läuft, auf Wunsch auch ohne offenes Fenster als Symbol im
-						Infobereich der Taskleiste.
+						Apps can only reach Transcribe while it is running; if you like, also without an open window, as an icon in the
+						notification area of the taskbar.
 					</p>
 					{#if hintergrund}
 						{@const h = hintergrund}
@@ -1097,31 +1169,31 @@
 							{#if h.ready !== undefined}
 								<Toggle
 									checked={h.ready}
-									title="Im Hintergrund bereit"
+									title="Ready in the background"
 									description={h.ready
-										? 'Programme dürfen über Transcribe das Mikrofon aufnehmen lassen, und die Erkennung bleibt geladen, damit alles sofort startet. Das belegt etwa 1 GB Arbeitsspeicher. Audiodaten und Bilder, die ein Programm schickt, verarbeitet Transcribe immer.'
-										: 'Aus: Programme dürfen das Mikrofon nicht über Transcribe aufnehmen lassen, und nichts bleibt geladen. Audiodaten und Bilder, die ein Programm schickt, verarbeitet Transcribe trotzdem. Von Hand aufnehmen und diktieren geht auch, es startet nur etwas langsamer.'}
+										? /* @wc-include */ 'Apps may have Transcribe record from the microphone, and recognition stays loaded so that everything starts at once. This takes about 1 GB of memory. Transcribe always processes audio and images that an app sends.'
+										: /* @wc-include */ 'Off: apps may not have Transcribe record from the microphone, and nothing stays loaded. Transcribe still processes audio and images that an app sends. Recording and dictating by hand work too; they just start a little more slowly.'}
 									onclick={() => hintergrundSetzen({ ready: !h.ready })}
 								/>
 							{/if}
 							{#if h.supported}
 								<Toggle
 									checked={h.autostart}
-									title="Mit Windows starten"
+									title="Start with Windows"
 									description={h.autostart
-										? 'Transcribe startet beim Anmelden ohne Fenster und wartet im Infobereich.'
-										: 'Aus: Transcribe startet erst, wenn du es öffnest.'}
+										? /* @wc-include */ 'Transcribe starts without a window when you sign in and waits in the notification area.'
+										: /* @wc-include */ 'Off: Transcribe only starts when you open it.'}
 									onclick={() => hintergrundSetzen({ autostart: !h.autostart })}
 								/>
 								<Toggle
 									checked={h.background || h.autostart}
 									disabled={h.autostart}
-									title="Nach dem Schließen weiterlaufen"
+									title="Keep running after closing"
 									description={h.autostart
-										? 'Gilt immer, solange Transcribe mit Windows startet.'
+										? /* @wc-include */ 'Always on while Transcribe starts with Windows.'
 										: h.background
-											? 'Schließt du das Fenster, bleibt Transcribe im Infobereich: ein Klick darauf öffnet es, mit Rechtsklick beendest du es.'
-											: 'Aus: Schließt du das Fenster, beendet sich Transcribe, sobald nichts mehr zu tun ist.'}
+											? /* @wc-include */ 'When you close the window, Transcribe stays in the notification area: click it to open it, right-click it to quit.'
+											: /* @wc-include */ 'Off: when you close the window, Transcribe quits as soon as there is nothing left to do.'}
 									onclick={() => hintergrundSetzen({ background: !h.background })}
 								/>
 							{/if}
@@ -1131,44 +1203,44 @@
 				</section>
 
 				<section id="adresse" class="blatt" aria-labelledby="h-adresse">
-					<h2 id="h-adresse">Adresse</h2>
-					<p class="hinweis">Unter dieser Adresse erreichen Programme Transcribe. In Moliri trägst du sie im Profil ein:</p>
+					<h2 id="h-adresse">Address</h2>
+					<p class="hinweis">Apps reach Transcribe at this address. In Moliri, you enter it in your profile:</p>
 					<div class="apiadresse">
 						<code>{grundadresse}</code>
 						<Button type="secondary" size="large" onclick={kopieren}>
 							{#snippet iconLeft()}<IconMaterialSymbolsContentCopyOutlineRounded />{/snippet}
-							{kopiert ? 'Kopiert' : 'Adresse kopieren'}
+							{kopiert ? /* @wc-include */ 'Copied' : /* @wc-include */ 'Copy address'}
 						</Button>
 					</div>
 					{#if kopierFehler}<p class="warnung" role="status">{kopierFehler}</p>{/if}
 					<dl class="modi">
-						<dt>Audio schicken</dt>
-						<dd>Das Programm nimmt selbst auf und schickt den Ton; der Text kommt sofort zurück.</dd>
-						<dt>Mithören lassen <code>?mode=mic</code></dt>
+						<dt>Send audio</dt>
+						<dd>The app records by itself and sends the sound; the text comes back right away.</dd>
+						<dt>Let Transcribe listen in <code>?mode=mic</code></dt>
 						<dd>
-							Das Programm sagt nur „ab jetzt“ und „bis jetzt“. Dazwischen nimmt Transcribe auf, was unter
-							<a href="#aufnahme">Live und Diktieren › Aufnahme</a> gewählt ist, und schickt den Text laufend an das Programm.
-							{#if !live.an}<strong>Das geht nur, solange „Im Hintergrund bereit“ an ist.</strong>{/if}
+							The app only says “from now on” and “up to now”. In between, Transcribe records what is selected under
+							<a href="#aufnahme">Live and dictation › Recording</a> and keeps sending the text to the app.
+							{#if !live.an}<strong>This only works while “Ready in the background” is on.</strong>{/if}
 						</dd>
 					</dl>
 					<p class="meta">
-						Jede Anfrage steht auf der Seite <a href="/live">Live</a> als Aufnahme „Per API“; was Programme lesen lassen, das
-						Sprachmodell fragen oder für die Suche nach Bedeutung umwandeln, steht dort unter „KI & OCR“. Solange
-						Transcribe einem Programm Text liefert, beendet es sich nicht.
+						Every request appears on the <a href="/live">Live</a> page as a recording “Via API”; what apps have read, ask the
+						language model or convert for search by meaning appears there under “AI & OCR”. As long as Transcribe is delivering
+						text to an app, it does not quit.
 					</p>
 					<details class="protokoll">
-						<summary>Für Entwickler: so spricht man mit Transcribe</summary>
+						<summary>For developers: how to talk to Transcribe</summary>
 						<p>
-							WebSocket auf <code>{adresse}</code>. Parameter: <code>mode=audio</code> (Standard) oder <code>mic</code>,
-							<code>name=</code> wie die Aufnahme heißen soll, bei Audio <code>sample_rate=16000</code> und
-							<code>encoding=s16le</code> oder <code>f32le</code> (Mono).
+							WebSocket at <code>{adresse}</code>. Parameters: <code>mode=audio</code> (default) or <code>mic</code>,
+							<code>name=</code> what the recording should be called, for audio <code>sample_rate=16000</code> and
+							<code>encoding=s16le</code> or <code>f32le</code> (mono).
 						</p>
 						<p>
-							Audio geht als binäre Nachrichten hin. Zurück kommen JSON-Nachrichten: <code>ready</code>, laufend
-							<code>partial</code> (der Satz, der gerade gesprochen wird), <code>final</code> (fertiger Satz, mit
-							<code>start</code> und <code>end</code> in Sekunden), am Ende <code>done</code>, bei Problemen
-							<code>error</code>. <code>{'{"type":"stop"}'}</code> beendet: Transcribe schickt noch, was bis jetzt gesagt
-							wurde, dann <code>done</code>.
+							Audio goes in as binary messages. JSON messages come back: <code>ready</code>, continuously
+							<code>partial</code> (the sentence being spoken), <code>final</code> (finished sentence, with
+							<code>start</code> and <code>end</code> in seconds), at the end <code>done</code>, on problems
+							<code>error</code>. <code>{'{"type":"stop"}'}</code> ends it: Transcribe still sends what has been said so
+							far, then <code>done</code>.
 						</p>
 						<pre>{`const ws = new WebSocket('${adresse}?mode=mic&name=Moliri');
 ws.onmessage = (e) => {
@@ -1176,33 +1248,33 @@ ws.onmessage = (e) => {
   if (m.type === 'partial') feld.placeholder = m.text;
   if (m.type === 'final') feld.value += m.text + ' ';
 };
-// später: ws.send(JSON.stringify({ type: 'stop' }));`}</pre>
+// later: ws.send(JSON.stringify({ type: 'stop' }));`}</pre>
 					</details>
 				</section>
 
 				<section id="anfragen" class="blatt" aria-labelledby="h-anfragen">
-					<h2 id="h-anfragen">Gespeicherte Anfragen</h2>
+					<h2 id="h-anfragen">Saved requests</h2>
 					<div class="schalter">
 						<Toggle
 							bind:checked={() => live.apiSpeichern, (v) => live.apiSpeichernSetzen(v)}
-							title="Anfragen als Aufnahme speichern"
+							title="Save requests as recordings"
 							description={live.apiSpeichern
-								? 'Jede Anfrage bleibt auf der Seite Live stehen, mit ihrem Text, auch nach einem Neustart.'
-								: 'Aus: Eine Anfrage steht auf der Seite Live nur, solange sie läuft, und ein paar Minuten danach. Auf dem Rechner bleibt nichts davon.'}
+								? /* @wc-include */ 'Every request stays on the Live page, with its text, even after a restart.'
+								: /* @wc-include */ 'Off: a request only appears on the Live page while it runs and for a few minutes afterwards. Nothing of it stays on the computer.'}
 						/>
 						{#if live.apiSpeichern}
 							<label class="feldname">
-								Automatisch löschen
+								Delete automatically
 								<select class="feld" value={live.apiLoeschen} onchange={(e) => live.apiLoeschenSetzen(Number(e.currentTarget.value))}>
 									{#each LOESCHEN as [stunden, name] (stunden)}<option value={stunden}>{name}</option>{/each}
 									{#if !LOESCHEN.some(([stunden]) => stunden === live.apiLoeschen)}
-										<option value={live.apiLoeschen}>Nach {live.apiLoeschen} Stunden</option>
+										<option value={live.apiLoeschen}>After {live.apiLoeschen} hours</option>
 									{/if}
 								</select>
 							</label>
 							<p class="meta">
-								Gezählt ab dem Ende einer Anfrage; das gilt auch für die, die schon gespeichert sind. Aufnahmen, die du auf
-								der Seite Live startest, und Diktate bleiben.
+								Counted from the end of a request; this also applies to those already saved. Recordings you start on the Live page
+								and dictations are kept.
 							</p>
 						{/if}
 					</div>
@@ -1212,13 +1284,13 @@ ws.onmessage = (e) => {
 
 			{#if offen.id === 'ocr' && ocr !== false}
 				<section id="ocr-leser" class="blatt" aria-labelledby="h-ocr">
-					<h2 id="h-ocr">Texterkennung</h2>
+					<h2 id="h-ocr">Text recognition</h2>
 					<p class="hinweis">
-						Transcribe liest auch Text aus Bildern, etwa Karteikarten, Etiketten oder Frakturdruck, für Programme wie
-						Moliri. Das Bild verlässt den Rechner nicht, außer du lässt einen KI-Dienst lesen.
+						Transcribe also reads text from images, such as index cards, labels or Fraktur print, for apps like Moliri. The image
+						does not leave the computer unless you let an AI service read it.
 					</p>
 					{#if !ocr}
-						<p class="leer">Lade …</p>
+						<p class="leer">Loading…</p>
 					{:else}
 						{#each ocr.engines as l (l.id)}
 							<div class="leser">
@@ -1226,24 +1298,30 @@ ws.onmessage = (e) => {
 									<IconMaterialSymbolsDocumentScannerOutlineRounded aria-hidden="true" />
 									<strong>{l.name}</strong>
 									<span class="meta">
-										{l.id === 'api' ? `Modell ${l.version}` : l.version ? `Version ${l.version}` : l.gpu ? 'auf der Grafikkarte' : ''}
+										{l.id === 'api'
+											? /* @wc-include */ `Model ${l.version}`
+											: l.version
+												? /* @wc-include */ `Version ${l.version}`
+												: l.gpu
+													? /* @wc-include */ 'on the graphics card'
+													: ''}
 									</span>
 									{#if l.ready}
-										<span class="zustand da"><IconMaterialSymbolsCheckRounded aria-hidden="true" />bereit</span>
+										<span class="zustand da"><IconMaterialSymbolsCheckRounded aria-hidden="true" />ready</span>
 									{:else if l.usable}
-										<span class="zustand">lädt beim ersten Lesen</span>
+										<span class="zustand">downloads on first read</span>
 									{:else}
-										<span class="zustand fehlt">{l.id === 'api' ? 'nicht eingerichtet' : 'nicht installiert'}</span>
+										<span class="zustand fehlt">{l.id === 'api' ? /* @wc-include */ 'not set up' : /* @wc-include */ 'not installed'}</span>
 									{/if}
 								</p>
 								<p class="hinweis">
 									{OCR_LESER[l.id] ?? ''}
-									{#if l.languages.length && l.id !== 'api'}Installiert: {ocrReihe(l.languages).map(ocrName).join(', ')}.{/if}
+									{#if l.languages.length && l.id !== 'api'}Installed: {ocrReihe(l.languages).map(ocrName).join(', ')}.{/if}
 									{#if l.download.length}
-										Beim ersten Lesen geladen: {ocrReihe(l.download).map(ocrName).join(', ')}.{/if}
+										Downloaded on first read: {ocrReihe(l.download).map(ocrName).join(', ')}.{/if}
 									{#if !l.usable && l.id === 'tesseract'}
-										Unter Linux und macOS liest das installierte Programm <code>tesseract</code>; installiere es mit seinen
-										Sprachen, dann lade diese Seite neu.
+										On Linux and macOS, the installed program <code>tesseract</code> does the reading; install it with its languages,
+										then reload this page.
 									{:else if !l.usable && l.error}
 										{l.error}.
 									{/if}
@@ -1256,19 +1334,19 @@ ws.onmessage = (e) => {
 							{@const vorgabe = ocr.engines.find((l) => l.id === od.ocrEngine)}
 							<div class="schalter">
 								<label class="feldname">
-									Für Moliri und andere Programme
+									For Moliri and other apps
 									<select class="feld" value={od.ocrEngine} onchange={(ev) => ocrDienstSetzen({ ocrEngine: ev.currentTarget.value })}>
-										<option value="">Automatisch</option>
+										<option value="">{/* @wc-include */ 'Automatic'}</option>
 										{#each ocr.engines as l (l.id)}<option value={l.id}>{l.name}</option>{/each}
 									</select>
 								</label>
 							</div>
 							<p class="hinweis">
-								Damit liest Transcribe, wenn ein Programm keine Erkennung nennt, wie Moliri. Automatisch nimmt die erste,
-								die liest, nie den KI-Dienst.
+								Transcribe reads with this when an app names no engine, as Moliri does. Automatic takes the first one that can read,
+								never the AI service.
 							</p>
 							{#if vorgabe && !vorgabe.usable}
-								<p class="warnung">{vorgabe.name} liest noch nicht, bis dahin wählt Transcribe automatisch.</p>
+								<p class="warnung">{vorgabe.name} can’t read yet; until then, Transcribe chooses automatically.</p>
 							{/if}
 
 							{#if ocrDienstFehler}<p class="warnung">{ocrDienstFehler}</p>{/if}
@@ -1281,36 +1359,38 @@ ws.onmessage = (e) => {
 					{@const a = od.ocrApi}
 					{@const dienst = od.ocrApiProviders.find((d) => d.id === a.provider) ?? od.ocrApiProviders[0]}
 					<section id="ocr-ki" class="blatt" aria-labelledby="h-ocr-ki">
-						<h2 id="h-ocr-ki">KI-Dienst</h2>
+						<h2 id="h-ocr-ki">AI service</h2>
 						<p class="hinweis">
-							Mit deinem eigenen Schlüssel liest ein KI-Modell im Internet oder im eigenen Netz. Das ist ein anderer Dienst
-							als der für die Sprache unter <a href="#erkennung">Transkribieren › Erkennung</a>, mit eigenem Modell und Schlüssel.
+							With your own key, an AI model on the internet or on your own network does the reading. This is a different service
+							from the one for speech under <a href="#erkennung">Transcribing › Recognition</a>, with its own model and key.
 						</p>
 						<div class="api">
 							<div class="apifelder">
 								<label class="feldname">
-									Dienst
+									Service
 									<select class="feld" value={a.provider} onchange={(ev) => ocrApiSetzen({ provider: ev.currentTarget.value })}>
 										{#each od.ocrApiProviders as d (d.id)}<option value={d.id}>{d.label}</option>{/each}
 									</select>
 								</label>
 								<label class="feldname adresse">
-									Adresse
+									Address
 									<input class="feld" spellcheck="false" value={a.url} onchange={(ev) => ocrApiSetzen({ url: ev.currentTarget.value })} />
 								</label>
 								<label class="feldname">
-									Modell
+									Model
 									<input class="feld" spellcheck="false" value={a.model} onchange={(ev) => ocrApiSetzen({ model: ev.currentTarget.value })} />
 								</label>
 							</div>
 							{#if dienst.kind === 'openai'}
 								<p class="hinweis">
-									Spricht die OpenAI-kompatible Schnittstelle, wie OpenAI, Mistral oder ein eigener Server (etwa Ollama). Das
-									Modell muss Bilder lesen können, etwa qwen2.5vl.
+									Speaks the OpenAI-compatible interface, like OpenAI, Mistral or a server of your own (such as Ollama). The model
+									must be able to read images, such as qwen2.5vl.
 								</p>
 							{/if}
 
-							<label class="feldname" for="ocr-schluessel">API-Schlüssel{dienst.noKey ? ' (falls der Server einen verlangt)' : ''}</label>
+							<label class="feldname" for="ocr-schluessel"
+								>{dienst.noKey ? /* @wc-include */ 'API key (if the server requires one)' : /* @wc-include */ 'API key'}</label
+							>
 							<form
 								class="schluesselzeile"
 								onsubmit={(ev) => {
@@ -1324,28 +1404,31 @@ ws.onmessage = (e) => {
 									type="password"
 									autocomplete="off"
 									spellcheck="false"
-									placeholder={a.keySet ? `hinterlegt${a.keyHint ? ` (endet auf ${a.keyHint})` : ''}` : 'Schlüssel'}
+									placeholder={a.keySet
+										? a.keyHint
+											? /* @wc-include */ `stored (ends in ${a.keyHint})`
+											: /* @wc-include */ 'stored'
+										: /* @wc-include */ 'Key'}
 									bind:value={ocrSchluessel}
 								/>
 								<Button type="primary" size="large" nativeType="submit" disabled={!ocrSchluessel.trim()} loading={speichertOcrSchluessel}>
-									{a.keySet ? 'Ersetzen' : 'Speichern'}
+									{a.keySet ? /* @wc-include */ 'Replace' : /* @wc-include */ 'Save'}
 								</Button>
 								{#if a.keySet}
-									<Button type="secondary" size="large" onclick={() => ocrSchluesselSpeichern('')}>Entfernen</Button>
+									<Button type="secondary" size="large" onclick={() => ocrSchluesselSpeichern('')}>Remove</Button>
 								{/if}
 							</form>
 							{#if ocrSchluesselStand}
 								<p class="gespeichert" role="status">{ocrSchluesselStand}</p>
 							{:else if !a.keySet && !dienst.noKey}
-								<p class="warnung">Ohne Schlüssel kann die App {dienst.label} nicht nutzen.</p>
+								<p class="warnung">Without a key, the app can’t use {dienst.label}.</p>
 							{/if}
 							<p class="hinweis">
 								{#if dienst.keys}
-									Den Schlüssel legst du in deinem Konto bei
-									<a href={dienst.keys} target="_blank" rel="noreferrer">{dienst.label}</a> an. Abgerechnet wird nach
-									Tokens, für jedes Bild und den Text, den das Modell schreibt.
+									You create the key in your account at
+									<a href={dienst.keys} target="_blank" rel="noreferrer">{dienst.label}</a>. Billing is per token, for each image and for the text the model writes.
 								{/if}
-								Der Schlüssel bleibt in den Einstellungen auf diesem Rechner; Moliri bekommt ihn nicht.
+								The key stays in the settings on this computer; Moliri does not get it.
 							</p>
 						</div>
 						{#if ocrDienstFehler}<p class="warnung">{ocrDienstFehler}</p>{/if}
@@ -1356,17 +1439,17 @@ ws.onmessage = (e) => {
 					{@const lesbar = ocrLesbar()}
 					{@const leser = lesbar.find((l) => l.id === ocrLeser) ?? lesbar[0]}
 					<section id="ocr-probe" class="blatt" aria-labelledby="h-ocr-probe">
-						<h2 id="h-ocr-probe">Ausprobieren</h2>
-						<p class="hinweis">Lies ein eigenes Bild, mit der Erkennung, der Sprache und der Art von Text, die du wählst.</p>
+						<h2 id="h-ocr-probe">Try it</h2>
+						<p class="hinweis">Read an image of your own, with the engine, language and kind of text you choose.</p>
 						{#if !leser}
-							<p class="leer">Noch kann keine Erkennung lesen.</p>
+							<p class="leer">No engine can read yet.</p>
 						{:else}
 							{@const sprachen = ocrReihe([...leser.languages, ...leser.download])}
 							<div class="probe">
 								<div class="apifelder">
 									{#if lesbar.length > 1}
 										<label class="feldname">
-											Erkennung
+											Engine
 											<select
 												class="feld"
 												value={leser.id}
@@ -1384,20 +1467,20 @@ ws.onmessage = (e) => {
 										</label>
 									{/if}
 									<label class="feldname">
-										Sprache und Schrift
+										Language and script
 										<select class="feld" bind:value={ocrSprachen}>
 											{#each sprachen as s (s)}<option value={s}>{ocrName(s)}</option>{/each}
 											{#if sprachen.includes('deu') && sprachen.includes('frak2021')}
-												<option value="deu+frak2021">Deutsch und Fraktur</option>
+												<option value="deu+frak2021">German and Fraktur</option>
 											{/if}
 											{#if sprachen.includes('deu') && sprachen.includes('eng')}
-												<option value="deu+eng">Deutsch und Englisch</option>
+												<option value="deu+eng">German and English</option>
 											{/if}
 										</select>
 									</label>
 									{#if leser.layouts.length > 1}
 										<label class="feldname">
-											Was auf dem Bild ist
+											What the image shows
 											<select class="feld" bind:value={ocrLayout}>
 												{#each leser.layouts as la (la)}<option value={la}>{OCR_LAYOUTS[la] ?? la}</option>{/each}
 											</select>
@@ -1406,16 +1489,16 @@ ws.onmessage = (e) => {
 								</div>
 								<label class="bildwahl" class:liest>
 									{#if liest}<IconEosIconsLoading aria-hidden="true" />{:else}<IconMaterialSymbolsImageOutlineRounded aria-hidden="true" />{/if}
-									{liest ? 'Liest …' : 'Bild lesen'}
+									{liest ? /* @wc-include */ 'Reading…' : /* @wc-include */ 'Read image'}
 									<input class="sr" type="file" accept="image/*" disabled={liest} onchange={bildLesen} />
 								</label>
 								{#if liest && leser.id === 'api'}
-									<p class="hinweis">Das Bild ist beim KI-Dienst. Große Modelle denken bei einer vollen Seite eine Weile nach.</p>
+									<p class="hinweis">The image is with the AI service. Large models think about a full page for a while.</p>
 								{:else if liest && !leser.ready}
 									<p class="hinweis">
 										{leser.id === 'onnx'
-											? 'Beim ersten Mal lädt Transcribe die Modelle von PP-OCRv5 herunter (13 MB), das dauert etwas.'
-											: 'Beim ersten Mal lädt Transcribe Tesseract und die Sprache herunter, das dauert etwas.'}
+											? /* @wc-include */ 'The first time, Transcribe downloads the PP-OCRv5 models (13 MB); this takes a moment.'
+											: /* @wc-include */ 'The first time, Transcribe downloads Tesseract and the language; this takes a moment.'}
 									</p>
 								{/if}
 								{#if ocrFehler}<p class="warnung">{ocrFehler}</p>{/if}
@@ -1425,18 +1508,19 @@ ws.onmessage = (e) => {
 											class="seite"
 											viewBox="0 0 {gelesen.breite} {gelesen.hoehe}"
 											role="img"
-											aria-label="Das gelesene Bild, die gefundenen Wörter umrahmt"
+											aria-label="The image that was read, with the words found outlined"
 										>
 											<image href={gelesen.bild} width={gelesen.breite} height={gelesen.hoehe} />
 											{#each gelesen.kaesten as k, i (i)}<rect x={k[0]} y={k[1]} width={k[2]} height={k[3]} />{/each}
 										</svg>
 										<div class="gelesen">
 											<p class="meta">
-												{gelesen.zeilen === 1 ? '1 Zeile' : `${gelesen.zeilen} Zeilen`} in {gelesen.sekunden
-													.toFixed(1)
-													.replace('.', ',')} s{gelesen.leser ? `, ${gelesen.leser}` : ''}
+												{plural(gelesen.zeilen, ['# line', '# lines'])} in {gelesen.sekunden.toLocaleString(getLocale(), {
+													minimumFractionDigits: 1,
+													maximumFractionDigits: 1
+												})} s{gelesen.leser ? `, ${gelesen.leser}` : ''}
 											</p>
-											<pre>{gelesen.text || 'Kein Text gefunden.'}</pre>
+											<pre>{gelesen.text || /* @wc-include */ 'No text found.'}</pre>
 										</div>
 									</div>
 								{/if}
@@ -1448,18 +1532,18 @@ ws.onmessage = (e) => {
 
 			{#if offen.id === 'live'}
 				<section id="aufnahme" class="blatt" aria-labelledby="h-aufnahme">
-					<h2 id="h-aufnahme">Aufnahme</h2>
+					<h2 id="h-aufnahme">Recording</h2>
 					<p class="hinweis">
-						So nimmt Transcribe auf der Seite <a href="/live">Live</a> auf, beim Diktieren und für Programme, die mithören
-						lassen. Quelle, Mikrofon und Sprachen erreichst du auch dort unter „Einrichten“.
+						This is how Transcribe records on the <a href="/live">Live</a> page, when dictating and for apps that let it listen
+						in. You can also reach source, microphone and languages there under “Set up”.
 					</p>
 					<div class="schalter"><AufnahmeWahl /></div>
 					{#if live.meldung}<p class="hinweis" role="status">{live.meldung}</p>{/if}
 				</section>
 
 				<section id="stimme" class="blatt" aria-labelledby="h-stimme">
-					<h2 id="h-stimme">Meine Stimme</h2>
-					<p class="hinweis">Was gesprochen wird und wie der Live-Text es schreibt, auch beim Diktieren.</p>
+					<h2 id="h-stimme">My voice</h2>
+					<p class="hinweis">What is spoken and how the live text writes it, also when dictating.</p>
 					<div class="schalter"><StimmeWahl /></div>
 				</section>
 
@@ -1467,50 +1551,52 @@ ws.onmessage = (e) => {
 				{@const dk = diktat}
 				{@const kuerzel = dk.keys.find((k) => k.key === dk.key)?.label}
 				<section id="diktieren" class="blatt" aria-labelledby="h-diktat">
-					<h2 id="h-diktat">Diktieren in jedem Programm</h2>
+					<h2 id="h-diktat">Dictate into any app</h2>
 					<p class="hinweis">
 						{#if kuerzel}
-							Drücke <kbd>{kuerzel}</kbd> in einem beliebigen Programm und sprich, dann drücke es noch einmal.
-							<kbd>Esc</kbd> bricht ab. Ein kleines Fenster über der Taskleiste zeigt, dass Transcribe zuhört und was
-							es verstanden hat, wie ein Untertitel. Ein Klick darauf öffnet das Diktat auf der Seite Live.
+							Press <kbd>{kuerzel}</kbd> in any app and speak, then press it again.
+							<kbd>Esc</kbd> cancels. A small window above the taskbar shows that Transcribe is listening and what it has
+							understood, like a subtitle. Clicking it opens the dictation on the Live page.
 						{:else}
-							Mit einem Tastenkürzel diktierst du in jedes Programm: Text, der dort erscheint, wo der Cursor steht.
+							With a keyboard shortcut you dictate into any app: text that appears where the cursor is.
 						{/if}
 					</p>
 					<div class="schalter">
 						<label class="feldname">
-							Tastenkürzel
+							Keyboard shortcut
 							<select class="feld" value={dk.key} onchange={(e) => diktatSetzen({ key: e.currentTarget.value })}>
 								{#each dk.keys as k (k.key)}<option value={k.key}>{k.label}</option>{/each}
-								<option value="off">Aus</option>
+								<option value="off">{/* @wc-include */ 'Off'}</option>
 							</select>
 						</label>
 						<Toggle
 							checked={dk.insert}
 							disabled={dk.key === 'off'}
-							title="Am Cursor einfügen"
-							description={dk.insert ? 'Der Text erscheint, wo der Cursor steht.' : 'Aus: Der Text wird nirgends eingefügt.'}
+							title="Insert at the cursor"
+							description={dk.insert
+								? /* @wc-include */ 'The text appears where the cursor is.'
+								: /* @wc-include */ 'Off: the text is not inserted anywhere.'}
 							onclick={() => diktatSetzen({ insert: !dk.insert })}
 						/>
 						<Toggle
 							checked={dk.clipboard}
 							disabled={dk.key === 'off'}
-							title="In die Zwischenablage"
+							title="Copy to clipboard"
 							description={dk.clipboard
-								? 'Der Text liegt danach in der Zwischenablage, für Strg + V.'
-								: 'Aus: Die Zwischenablage bleibt, wie sie war.'}
+								? /* @wc-include */ 'The text is then on the clipboard, for Ctrl + V.'
+								: /* @wc-include */ 'Off: the clipboard stays as it was.'}
 							onclick={() => diktatSetzen({ clipboard: !dk.clipboard })}
 						/>
 					</div>
 					{#if dk.key !== 'off' && !dk.insert && !dk.clipboard}
 						<p class="hinweis">
-							Beides aus: Das Diktat erscheint nur im kleinen Fenster und bleibt auf der Seite Live stehen, als Notiz
-							oder zum Kopieren von Hand.
+							Both off: the dictation only appears in the small window and stays on the Live page, as a note or for copying by
+							hand.
 						</p>
 					{/if}
 					<p class="hinweis">
-						Diktiert wird mit dem Mikrofon und der Sprache, die auf der Seite <a href="/live">Live</a> eingestellt sind.
-						Jedes Diktat steht danach auch dort.
+						Dictation uses the microphone and language set on the <a href="/live">Live</a> page. Every dictation then appears
+						there too.
 					</p>
 					{#if dk.error}<p class="warnung">{dk.error}</p>{/if}
 					{#if diktatFehler}<p class="warnung">{diktatFehler}</p>{/if}
@@ -1519,39 +1605,50 @@ ws.onmessage = (e) => {
 			{/if}
 
 			{#if offen.id === 'system'}
+			<section id="sprache" class="blatt" aria-labelledby="h-sprache">
+				<h2 id="h-sprache">Language</h2>
+				<label class="feldname" for="oberflaechensprache">Language of the interface</label>
+				<Oberflaechensprache id="oberflaechensprache" />
+				<p class="hinweis">Until you choose one, Transcribe follows the language of Windows.</p>
+			</section>
+
 			<section id="gpu" class="blatt" aria-labelledby="h-gpu">
-				<h2 id="h-gpu">Grafikkarte</h2>
+				<h2 id="h-gpu">Graphics card</h2>
 				{#if !gpu}
-					<p class="leer">Prüfe die Grafikkarte …</p>
+					<p class="leer">Checking the graphics card…</p>
 				{:else if !gpu.gpu.present}
-					<p>Keine NVIDIA-GPU erkannt. Die Erkennung läuft auf dem Prozessor (CPU).</p>
-					<p class="hinweis">GPU-Beschleunigung gibt es nur mit NVIDIA-Grafikkarten (CUDA) unter Windows und Linux.</p>
+					<p>No NVIDIA GPU detected. Recognition runs on the processor (CPU).</p>
+					<p class="hinweis">GPU acceleration is only available with NVIDIA graphics cards (CUDA) on Windows and Linux.</p>
 				{:else}
 					{@const g = gpu.gpu}
 					{@const laedt = imGang(nvidia) ? nvidia : imGang(cuda) ? cuda : null}
 					<p class="karte">
 						<IconMaterialSymbolsMemoryOutlineRounded aria-hidden="true" />
 						<strong>{g.name}</strong>
-						<span class="meta">{Math.round(g.memoryMB / 1024)} GB · Treiber {g.driver}</span>
+						<span class="meta">{Math.round(g.memoryMB / 1024)} GB · Driver {g.driver}</span>
 					</p>
 					{#if !g.supported}
-						<p class="hinweis">Für diese Grafikkarte oder dieses System gibt es keine passende GPU-Runtime.</p>
+						<p class="hinweis">There is no suitable GPU runtime for this graphics card or system.</p>
 					{:else if laedt}
-						{@const was = laedt === nvidia ? 'Bibliotheken von NVIDIA werden geladen' : 'GPU-Runtime wird geladen'}
-						<p>{was}{laedt.total ? ` – ${laedt.done ? groesse(laedt.done) : '0 MB'} von ${groesse(laedt.total)}` : ' …'}</p>
+						{@const was = laedt === nvidia ? /* @wc-include */ 'Downloading libraries from NVIDIA' : /* @wc-include */ 'Downloading the GPU runtime'}
+						{@const schon = laedt.done ? groesse(laedt.done) : '0 MB'}
+						<p>
+							{laedt.total
+								? /* @wc-include */ `${was} – ${schon} of ${groesse(laedt.total)}`
+								: /* @wc-include */ `${was}…`}
+						</p>
 						<div class="balken" role="progressbar" aria-label={was} aria-valuenow={prozent(laedt)} aria-valuemin="0" aria-valuemax="100">
 							<i style:width="{prozent(laedt)}%"></i>
 						</div>
-						{#if laedt === nvidia && imGang(cuda)}<p class="hinweis">Danach folgt die GPU-Runtime.</p>{/if}
+						{#if laedt === nvidia && imGang(cuda)}<p class="hinweis">The GPU runtime follows after that.</p>{/if}
 					{:else if !g.ready}
 						{@const toolkit = g.cudaMajor === 13 ? 'https://developer.nvidia.com/cuda-downloads' : 'https://developer.nvidia.com/cuda-toolkit-archive'}
-						<p class="warnung">Für die GPU fehlen Bibliotheken von NVIDIA: {g.missing.join(', ')}.</p>
+						<p class="warnung">The GPU is missing libraries from NVIDIA: {g.missing.join(', ')}.</p>
 						{#if g.fetch}
 							<p class="hinweis">
-								Die App kann sie selbst bei NVIDIA laden, etwa {groesse(g.fetch)}{#if !gpu.installed}, dazu die GPU-Runtime
-									mit etwa 500 MB{/if}. Das geschieht einmal. Mit „{gpu.installed ? 'Bibliotheken laden' : 'GPU einrichten'}“
-								stimmst du den Lizenzbedingungen von NVIDIA zu, für das
-								<a href="https://docs.nvidia.com/cuda/eula/" target="_blank" rel="noreferrer">CUDA Toolkit</a> und für
+								The app can download them from NVIDIA itself, about {groesse(g.fetch)}{#if !gpu.installed}, plus the GPU runtime
+									of about 500 MB{/if}. This happens once. By choosing “{gpu.installed ? /* @wc-include */ 'Download libraries' : /* @wc-include */ 'Set up GPU'}”, you accept NVIDIA’s license terms for the
+								<a href="https://docs.nvidia.com/cuda/eula/" target="_blank" rel="noreferrer">CUDA Toolkit</a> and for
 								<a href="https://docs.nvidia.com/deeplearning/cudnn/latest/reference/eula.html" target="_blank" rel="noreferrer">cuDNN</a>.
 							</p>
 							<div class="handeln">
@@ -1562,53 +1659,53 @@ ws.onmessage = (e) => {
 									onclick={() => (gpu?.installed ? herunterladen('nvidia') : gpuLaden())}
 								>
 									{#snippet iconLeft()}<IconMaterialSymbolsDownloadRounded />{/snippet}
-									{gpu.installed ? 'Bibliotheken laden' : 'GPU einrichten'}
+									{gpu.installed ? /* @wc-include */ 'Download libraries' : /* @wc-include */ 'Set up GPU'}
 								</Button>
 								<Button type="secondary" size="large" loading={pruefe} onclick={erneutPruefen}>
 									{#snippet iconLeft()}<IconMaterialSymbolsRefreshRounded />{/snippet}
-									Erneut prüfen
+									Check again
 								</Button>
 							</div>
 							{#if fehler.nvidia || gpuFehler}
 								<p class="warnung">{fehler.nvidia || gpuFehler}</p>
 							{:else if nvidia?.state === 'error'}
 								<div>
-									<p class="warnung">Download fehlgeschlagen. Ist der Rechner mit dem Internet verbunden?</p>
+									<p class="warnung">Download failed. Is the computer connected to the internet?</p>
 									<details>
-										<summary>Einzelheiten</summary>
+										<summary>Technical details</summary>
 										<p class="technik">{nvidia.error}</p>
 									</details>
 								</div>
 							{/if}
 							<p class="hinweis">
-								Lieber selbst installieren? Das
-								<a href={toolkit} target="_blank" rel="noreferrer">CUDA Toolkit {g.cudaMajor}</a> und
-								<a href="https://developer.nvidia.com/cudnn-downloads" target="_blank" rel="noreferrer">cuDNN 9</a> gibt es
-								bei NVIDIA, danach hier „Erneut prüfen“.
+								Rather install them yourself? The
+								<a href={toolkit} target="_blank" rel="noreferrer">CUDA Toolkit {g.cudaMajor}</a> and
+								<a href="https://developer.nvidia.com/cudnn-downloads" target="_blank" rel="noreferrer">cuDNN 9</a> are available from NVIDIA;
+								afterwards, choose “Check again” here.
 							</p>
 						{:else}
 							<p class="hinweis">
-								Installiere das
-								<a href={toolkit} target="_blank" rel="noreferrer">CUDA Toolkit {g.cudaMajor}</a> und
-								<a href="https://developer.nvidia.com/cudnn-downloads" target="_blank" rel="noreferrer">cuDNN 9</a> von
-								NVIDIA, dann prüfe hier erneut.
+								Install the
+								<a href={toolkit} target="_blank" rel="noreferrer">CUDA Toolkit {g.cudaMajor}</a> and
+								<a href="https://developer.nvidia.com/cudnn-downloads" target="_blank" rel="noreferrer">cuDNN 9</a> from
+								NVIDIA, then check again here.
 							</p>
 							<div class="handeln">
 								<Button type="secondary" size="large" loading={pruefe} onclick={erneutPruefen}>
 									{#snippet iconLeft()}<IconMaterialSymbolsRefreshRounded />{/snippet}
-									Erneut prüfen
+									Check again
 								</Button>
 							</div>
 						{/if}
 					{:else if !gpu.installed}
 						<p class="hinweis">
-							Die GPU-Runtime (CUDA {g.cudaMajor}) ist etwa 500 MB groß und wird einmal geladen. Ohne sie läuft alles auf
-							dem Prozessor.
+							The GPU runtime (CUDA {g.cudaMajor}) is about 500 MB and is downloaded once. Without it, everything runs on the
+							processor.
 						</p>
 						<div class="handeln">
 							<Button type="primary" size="large" onclick={gpuLaden}>
 								{#snippet iconLeft()}<IconMaterialSymbolsDownloadRounded />{/snippet}
-								GPU-Runtime herunterladen
+								Download the GPU runtime
 							</Button>
 						</div>
 						{#if cuda?.state === 'error'}<p class="warnung">{cuda.error}</p>{/if}
@@ -1616,45 +1713,44 @@ ws.onmessage = (e) => {
 					{:else}
 						<Toggle
 							checked={gpu.accel === 'cuda'}
-							title="Mit der GPU rechnen (CUDA)"
-							description="Aus: Die Erkennung läuft auf dem Prozessor."
+							title="Compute on the GPU (CUDA)"
+							description="Off: recognition runs on the processor."
 							onclick={() => mitGpu(gpu?.accel !== 'cuda')}
 						/>
 						<p>
-							Gerade in Benutzung: <strong>{gpu.active === 'cuda' ? 'GPU' : 'Prozessor (CPU)'}</strong>.
-							{#if gpu.restartNeeded}<span class="warnung">Die Änderung wirkt, wenn du die App neu startest.</span>{/if}
+							Currently in use: <strong>{gpu.active === 'cuda' ? 'GPU' : /* @wc-include */ 'Processor (CPU)'}</strong>.
+							{#if gpu.restartNeeded}<span class="warnung">The change takes effect when you restart the app.</span>{/if}
 						</p>
 					{/if}
 				{/if}
 			</section>
 
 			<section id="speicher" class="blatt" aria-labelledby="h-speicher">
-				<h2 id="h-speicher">Speicher und Modelle</h2>
+				<h2 id="h-speicher">Storage and models</h2>
 				<p class="hinweis">
-					Alles liegt im Datenordner: Aufnahmen, Ergebnisse, Modelle und Einstellungen. Zum Sichern genügt es, diesen Ordner
-					zu kopieren. Wo die EXE liegt, spielt keine Rolle.
+					Everything is in the data folder: recordings, results, models and settings. To back up, copying this folder is enough.
+					Where the EXE is doesn’t matter.
 				</p>
 				{#if ort}
-					<h3 class="teil">Ort des Datenordners</h3>
+					<h3 class="teil">Location of the data folder</h3>
 					<p class="ortzeile">
 						<span class="pfad">{ort.dataDir}</span>
-						{#if amStandard}<span class="zustand da">Standard</span>{/if}
+						{#if amStandard}<span class="zustand da">Default</span>{/if}
 					</p>
 					{#if ort.fixed}
 						<p class="hinweis">
-							Beim Start mit <code>--data</code> oder <code>TRANSCRIBE_DATA</code> festgelegt; deshalb lässt er sich hier nicht
-							ändern.
+							Set at startup with <code>--data</code> or <code>TRANSCRIBE_DATA</code>, so it can’t be changed here.
 						</p>
 					{:else if umzug?.state === 'restarting' || (ortUnterwegs && (offline || !umzug))}
 						<!-- kopiert ist es oft zwischen zwei Abfragen, dann ist die App schon beim Neustart -->
-						<p role="status">Die Daten sind umgezogen. Transcribe startet neu …</p>
+						<p role="status">The data has moved. Transcribe is restarting…</p>
 					{:else if umzug?.state === 'copying'}
 						<div class="umzug" role="status">
-							<p>Die Daten ziehen nach <span class="pfad">{umzug.target}</span> um: {groesse(umzug.done)} von {groesse(umzug.total)}</p>
+							<p>Moving the data to <span class="pfad">{umzug.target}</span>: {groesse(umzug.done)} of {groesse(umzug.total)}</p>
 							<div
 								class="balken"
 								role="progressbar"
-								aria-label="Umzug des Datenordners"
+								aria-label="Moving the data folder"
 								aria-valuenow={umzug.total ? Math.round((umzug.done * 100) / umzug.total) : 0}
 								aria-valuemin="0"
 								aria-valuemax="100"
@@ -1664,23 +1760,23 @@ ws.onmessage = (e) => {
 						</div>
 					{:else if ortZiel}
 						<div class="umzug">
-							<h4>Datenordner umziehen?</h4>
+							<h4>Move the data folder?</h4>
 							<p>
-								Die Daten ({groesse(ortZiel.size)}) ziehen nach <span class="pfad">{ortZiel.target}</span>. Danach startet
-								Transcribe neu und löscht den alten Ordner.
+								The data ({groesse(ortZiel.size)}) moves to <span class="pfad">{ortZiel.target}</span>. Then Transcribe restarts
+								and deletes the old folder.
 							</p>
 							<div class="handeln">
 								<Button type="primary" size="large" loading={ortLaeuft === 'umziehen'} onclick={umziehen}>
 									{#snippet iconLeft()}<IconMaterialSymbolsDriveFileMoveOutlineRounded />{/snippet}
-									Umziehen
+									Move
 								</Button>
-								<Button type="secondary" size="large" onclick={() => (ortZiel = null)}>Abbrechen</Button>
+								<Button type="secondary" size="large" onclick={() => (ortZiel = null)}>Cancel</Button>
 							</div>
 						</div>
 					{:else}
 						{#if !ort.pick}
 							<div class="schluesselzeile">
-								<input class="feld" spellcheck="false" placeholder="Neuer Ort, z. B. /mnt/daten/transcribe" bind:value={ortEingabe} aria-label="Neuer Ort des Datenordners" />
+								<input class="feld" spellcheck="false" placeholder="New location, e.g. /mnt/data/transcribe" bind:value={ortEingabe} aria-label="New location of the data folder" />
 							</div>
 						{/if}
 						<div class="handeln">
@@ -1692,26 +1788,26 @@ ws.onmessage = (e) => {
 								onclick={() => (ort.pick ? ortWaehlen() : ortPruefen(ortEingabe.trim()))}
 							>
 								{#snippet iconLeft()}<IconMaterialSymbolsDriveFileMoveOutlineRounded />{/snippet}
-								Anderen Ort wählen …
+								Choose another location…
 							</Button>
 							{#if !amStandard}
 								<Button type="secondary" size="large" loading={ortLaeuft === 'standard'} onclick={() => ortPruefen('')}>
-									Zurück an den Standardort
+									Back to the default location
 								</Button>
 							{/if}
 						</div>
-						{#if ortFertig}<p role="status">Die Daten liegen jetzt in <span class="pfad">{ortFertig}</span>.</p>{/if}
+						{#if ortFertig}<p role="status">The data is now in <span class="pfad">{ortFertig}</span>.</p>{/if}
 					{/if}
 					{#if umzug?.state === 'error'}<p class="warnung">{umzug.error}</p>{/if}
 					{#if ortFehler}<p class="warnung">{ortFehler}</p>{/if}
 				{/if}
-				<h3 class="teil">Speicherorte</h3>
+				<h3 class="teil">Storage locations</h3>
 				{#if offline && !ortUnterwegs}
-					<p class="leer fehler">Keine Verbindung zu Transcribe. Läuft das Programm noch?</p>
+					<p class="leer fehler">No connection to Transcribe. Is the app still running?</p>
 				{:else if !stand}
-					<p class="leer">Lade …</p>
+					<p class="leer">Loading…</p>
 				{:else}
-					<ul class="liste" aria-label="Speicherorte">
+					<ul class="liste" aria-label="Storage locations">
 						{#each stand.folders as f (f.key)}
 							{@const name = ORDNER[f.key] || f.key}
 							<li class="eintrag">
@@ -1721,9 +1817,9 @@ ws.onmessage = (e) => {
 								</div>
 								<span class="groesse">{groesse(f.size)}</span>
 								<div class="tun">
-									<Button type="secondary" size="large" aria-label="{name} öffnen" onclick={() => oeffnen(f.key)}>
+									<Button type="secondary" size="large" aria-label="Open {name}" onclick={() => oeffnen(f.key)}>
 										{#snippet iconLeft()}<IconMaterialSymbolsFolderOpenOutlineRounded />{/snippet}
-										Öffnen
+										Open
 									</Button>
 								</div>
 								{#if fehler[f.key]}<p class="fehler voll">{fehler[f.key]}</p>{/if}
@@ -1732,52 +1828,54 @@ ws.onmessage = (e) => {
 					</ul>
 				{/if}
 
-				<h3 class="teil">Modelle und Komponenten</h3>
+				<h3 class="teil">Models and components</h3>
 				<p class="hinweis">
 					{#if erkennung?.recognition === 'api'}
-						Die Erkennung läuft über die API, deshalb lädt die App keine Modelle, nur ffmpeg für Wellenform und Export.
-						Was schon da ist, bleibt liegen.
+						Recognition runs through the API, so the app downloads no models, only ffmpeg for the waveform and export. Whatever
+						is already there stays.
 					{:else}
-						Die App lädt sie beim ersten Start. Was „bei Bedarf“ heißt, kommt erst dazu, wenn es gebraucht wird, etwa Whisper
-						turbo für Fremdsprachen.
+						The app downloads them on first start. Anything marked “on demand” is only added when it is needed, such as Whisper
+						turbo for other languages.
 					{/if}
 				</p>
 				{#if stand}
-					<ul class="liste" aria-label="Modelle und Komponenten">
+					<ul class="liste" aria-label="Models and components">
 						{#each komponenten as c (c.name)}
 							{@const laedt = c.state === 'downloading'}
 							<li class="eintrag">
 								<div class="was">
 									<span class="name">{c.label || c.name}</span>
-									{#if c.device}<span class="geraet">läuft auf der Grafikkarte: {c.device}</span>{/if}
+									{#if c.device}<span class="geraet">runs on the graphics card: {c.device}</span>{/if}
 									<span class="pfad">{c.path}</span>
 								</div>
 								<span class="groesse">{laedt && c.total ? `${groesse(c.done)} / ${groesse(c.total)}` : groesse(c.size)}</span>
 								<div class="tun">
 									{#if laedt}
-										<span class="zustand laedt">lädt {c.total ? `${prozent(c)} %` : '…'}</span>
+										<span class="zustand laedt">downloading {c.total ? `${prozent(c)} %` : '…'}</span>
 									{:else if c.state === 'error'}
-										<span class="zustand fehlt">Fehler</span>
+										<span class="zustand fehlt">Error</span>
 									{:else if c.installed}
-										<span class="zustand da"><IconMaterialSymbolsCheckRounded aria-hidden="true" />installiert</span>
+										<span class="zustand da"><IconMaterialSymbolsCheckRounded aria-hidden="true" />installed</span>
 									{:else}
-										<span class="zustand" class:fehlt={!c.onDemand}>{c.onDemand ? 'bei Bedarf' : 'fehlt'}</span>
+										<span class="zustand" class:fehlt={!c.onDemand}>{c.onDemand ? /* @wc-include */ 'on demand' : /* @wc-include */ 'missing'}</span>
 									{/if}
 									{#if !c.installed && !laedt}
 										<Button
 											type="secondary"
 											size="large"
 											loading={fordert.includes(c.name)}
-											aria-label="{c.label || c.name} {c.state === 'error' ? 'erneut laden' : 'herunterladen'}"
+											aria-label={c.state === 'error'
+												? /* @wc-include */ `Download ${c.label || c.name} again`
+												: /* @wc-include */ `Download ${c.label || c.name}`}
 											onclick={() => herunterladen(c.name)}
 										>
 											{#snippet iconLeft()}<IconMaterialSymbolsDownloadRounded />{/snippet}
-											{c.state === 'error' ? 'Erneut laden' : 'Herunterladen'}
+											{c.state === 'error' ? /* @wc-include */ 'Download again' : /* @wc-include */ 'Download'}
 										</Button>
 									{/if}
 								</div>
 								{#if laedt && c.total}
-									<div class="balken voll" role="progressbar" aria-label="Download {c.label || c.name}" aria-valuenow={prozent(c)} aria-valuemin="0" aria-valuemax="100">
+									<div class="balken voll" role="progressbar" aria-label="Downloading {c.label || c.name}" aria-valuenow={prozent(c)} aria-valuemin="0" aria-valuemax="100">
 										<i style:width="{prozent(c)}%"></i>
 									</div>
 								{/if}
@@ -1786,9 +1884,9 @@ ws.onmessage = (e) => {
 								{:else if c.error}
 									<!-- die Meldung des Servers ist technisch (URL, Proxy); zuerst ein Satz, der weiterhilft -->
 									<div class="voll">
-										<p class="fehler">Download fehlgeschlagen. Ist der Rechner mit dem Internet verbunden?</p>
+										<p class="fehler">Download failed. Is the computer connected to the internet?</p>
 										<details>
-											<summary>Einzelheiten</summary>
+											<summary>Technical details</summary>
 											<p class="technik">{c.error}</p>
 										</details>
 									</div>
@@ -1800,13 +1898,13 @@ ws.onmessage = (e) => {
 			</section>
 
 			<section id="programm" class="blatt" aria-labelledby="h-programm">
-				<h2 id="h-programm">Über Transcribe</h2>
+				<h2 id="h-programm">About Transcribe</h2>
 				<div class="herkunft">
 					<MoliriLogo class="herkunft-zeichen" />
 					<p>
-						Transcribe by Moliri ist frei und läuft für sich. Es ist auch die Begleit-App zur Museumsdatenbank
-						<a href={MOLIRI} target="_blank" rel="noopener">Moliri</a>. Wie alles geht, steht im
-						<a href={HANDBUCH} target="_blank" rel="noopener">Handbuch</a>.
+						Transcribe by Moliri is free and runs on its own. It is also the companion app to the museum database
+						<a href={MOLIRI} target="_blank" rel="noopener">Moliri</a>. How everything works is explained in the
+						<a href={HANDBUCH} target="_blank" rel="noopener">manual</a>.
 					</p>
 				</div>
 				{#if update.stand}
@@ -1815,44 +1913,46 @@ ws.onmessage = (e) => {
 					<p class="karte">
 						<strong>Version {versionText(u.version)}</strong>
 						{#if u.checks && u.state === 'current'}
-							<span class="meta">die neueste{u.checked ? `, zuletzt nachgesehen ${wann(u.checked)}` : ''}</span>
+							<span class="meta"
+								>{u.checked ? /* @wc-include */ `the latest, last checked ${wann(u.checked)}` : /* @wc-include */ 'the latest'}</span
+							>
 						{/if}
 					</p>
 					{#if vorher}
-						<p class="gespeichert" role="status">Aktualisiert von Version {versionText(vorher)} auf {versionText(u.version)}.</p>
+						<p class="gespeichert" role="status">Updated from version {versionText(vorher)} to {versionText(u.version)}.</p>
 					{/if}
 					{#if u.manual}
 						<p class="hinweis">
-							Unter Linux und macOS aktualisiert sich Transcribe nicht selbst. Neue Versionen gibt es unter
+							On Linux and macOS, Transcribe does not update itself. New versions are available under
 							<a href="https://github.com/moliri-app/transcribe/releases" target="_blank" rel="noreferrer">Releases</a>.
 						</p>
 					{:else if !u.checks}
 						<p class="hinweis">
-							Eine Entwicklerversion sucht nicht nach Updates. Fertige Versionen gibt es unter
+							A development version does not check for updates. Finished versions are available under
 							<a href="https://github.com/moliri-app/transcribe/releases" target="_blank" rel="noreferrer">Releases</a>.
 						</p>
 					{:else if u.state === 'available' || u.state === 'failed'}
 						<div class="update" role="group" aria-labelledby="h-update">
-							<h3 id="h-update">Version {neu} ist da</h3>
+							<h3 id="h-update">Version {neu} is available</h3>
 							<p class="hinweis">
-								Transcribe lädt sie herunter, tauscht das Programm aus und startet neu. Laufende Aufträge und
-								Aufnahmen laufen vorher zu Ende, deine Aufnahmen und Einstellungen bleiben, wie sie sind.
-								{#if u.page}<a href={u.page} target="_blank" rel="noreferrer">Was ist neu?</a>{/if}
+								Transcribe downloads it, replaces the program and restarts. Running jobs and recordings finish first; your
+								recordings and settings stay as they are.
+								{#if u.page}<a href={u.page} target="_blank" rel="noreferrer">What’s new?</a>{/if}
 							</p>
 							<div class="handeln">
 								<Button type="primary" size="large" loading={updateLaeuft === 'install'} onclick={() => updateTun('install')}>
 									{#snippet iconLeft()}<IconMaterialSymbolsUpgradeRounded />{/snippet}
-									{u.state === 'failed' ? 'Erneut versuchen' : 'Jetzt aktualisieren'}
+									{u.state === 'failed' ? /* @wc-include */ 'Try again' : /* @wc-include */ 'Update now'}
 								</Button>
 							</div>
 							{#if u.state === 'failed'}<p class="warnung">{u.error}</p>{/if}
 						</div>
 					{:else if u.state === 'downloading'}
-						<p>Version {neu} wird geladen …</p>
+						<p>Downloading version {neu}…</p>
 						<div
 							class="balken"
 							role="progressbar"
-							aria-label="Version {neu} wird geladen"
+							aria-label="Downloading version {neu}"
 							aria-valuenow={Math.round((u.progress ?? 0) * 100)}
 							aria-valuemin="0"
 							aria-valuemax="100"
@@ -1861,16 +1961,15 @@ ws.onmessage = (e) => {
 						</div>
 					{:else if u.state === 'waiting'}
 						<p role="status">
-							Version {neu} ist installiert. Transcribe startet neu, sobald laufende Aufträge und Aufnahmen fertig
-							sind.
+							Version {neu} is installed. Transcribe restarts as soon as running jobs and recordings are finished.
 						</p>
 					{:else if u.state === 'restarting' || update.weg}
-						<p role="status">Transcribe startet neu …</p>
+						<p role="status">Transcribe is restarting…</p>
 					{:else}
 						<div class="handeln">
 							<Button type="secondary" size="large" loading={updateLaeuft === 'check'} onclick={() => updateTun('check')}>
 								{#snippet iconLeft()}<IconMaterialSymbolsRefreshRounded />{/snippet}
-								Nach Updates suchen
+								Check for updates
 							</Button>
 						</div>
 					{/if}
@@ -1878,9 +1977,9 @@ ws.onmessage = (e) => {
 				{/if}
 				{#if stand}
 					<dl class="angaben">
-						<dt>Programm</dt>
+						<dt>Program</dt>
 						<dd class="pfad">{stand.exe}</dd>
-						<dt>Protokoll</dt>
+						<dt>Log</dt>
 						<dd class="pfad">{stand.log}</dd>
 						<dt>System</dt>
 						<dd>{stand.os}</dd>
@@ -1889,7 +1988,7 @@ ws.onmessage = (e) => {
 					</dl>
 				{/if}
 				<a class="weiter" href="/lizenzen">
-					Lizenzen und Drittkomponenten <IconMaterialSymbolsArrowForwardRounded aria-hidden="true" />
+					Licenses and third-party components <IconMaterialSymbolsArrowForwardRounded aria-hidden="true" />
 				</a>
 			</section>
 			{/if}

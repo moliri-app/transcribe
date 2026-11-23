@@ -1,8 +1,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/files/transcript/editor/Player.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/files/transcript/editor/Player.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
@@ -12,8 +12,7 @@
      gerade spricht, Schleife und Sprecherfilter; rechts Geschwindigkeit und Mitlaufen. Eine eigene
      Spur für die Stelle gibt es nicht: die Zeitleiste darunter ist sie. -->
 <script>
-	import * as m from '$lib/moliri/texte.js';
-	import { getLocale } from '$lib/moliri/locale.js';
+	import { getLocale } from '$lib/moliri/i18n/locale.js';
 	import { fmt, itemAt } from './model.js';
 	import { spkColor } from './editor.svelte.js';
 
@@ -35,15 +34,15 @@
 	const d = $derived(ed.duration());
 </script>
 
-<div class="player" role="group" aria-label={m.te_player()}>
+<div class="player" role="group" aria-label="Player">
 	<div class="transport">
-		<button class="rund" aria-label={m.te_player_back()} title="{m.te_player_back()} (←)" onclick={() => ed.skip(-5)}>
+		<button class="rund" aria-label={/* @wc-include */ '5 seconds back'} title="{/* @wc-include */ '5 seconds back'} (←)" onclick={() => ed.skip(-5)}>
 			<IconMaterialSymbolsReplay5Rounded />
 		</button>
-		<button class="play" aria-label={ed.playing ? m.te_player_pause() : m.te_player_play()} onclick={() => ed.toggle()}>
+		<button class="play" aria-label={ed.playing ? /* @wc-include */ 'Pause (space)' : /* @wc-include */ 'Play (space)'} onclick={() => ed.toggle()}>
 			{#if ed.playing}<IconMaterialSymbolsPauseRounded />{:else}<IconMaterialSymbolsPlayArrowRounded />{/if}
 		</button>
-		<button class="rund" aria-label={m.te_player_forward()} title="{m.te_player_forward()} (→)" onclick={() => ed.skip(5)}>
+		<button class="rund" aria-label={/* @wc-include */ '5 seconds forward'} title="{/* @wc-include */ '5 seconds forward'} (→)" onclick={() => ed.skip(5)}>
 			<IconMaterialSymbolsForward5Rounded />
 		</button>
 	</div>
@@ -57,14 +56,14 @@
 			{#if ed.loop}
 				<span class="filter">
 					<IconMaterialSymbolsRepeatRounded />
-					<span>{m.te_loop()} <span class="zahl">{fmt(ed.loop.a)}–{fmt(ed.loop.b)}</span></span>
-					<button title="{m.te_loop_end()} (Esc)" onclick={() => (ed.loop = null)}><IconMaterialSymbolsCloseRounded />{m.te_loop_end_short()}</button>
+					<span>Loop <span class="zahl">{fmt(ed.loop.a)}–{fmt(ed.loop.b)}</span></span>
+					<button title="{/* @wc-include */ 'End the loop'} (Esc)" onclick={() => (ed.loop = null)}><IconMaterialSymbolsCloseRounded />end</button>
 				</span>
 			{/if}
 			{#if ed.filterLabel}
 				<span class="filter">
 					<span>{ed.filterLabel}</span>
-					<button title={m.te_show_all_speakers()} onclick={() => ed.showAll()}><IconMaterialSymbolsCloseRounded />{m.te_show_all_short()}</button>
+					<button title="Show all speakers again" onclick={() => ed.showAll()}><IconMaterialSymbolsCloseRounded />show all</button>
 				</span>
 			{/if}
 		</div>
@@ -72,12 +71,12 @@
 	<div class="rechts">
 		<label class="tempo">
 			<IconMaterialSymbolsSpeedRounded />
-			<select aria-label={m.te_player_speed()} value={String(ed.rate)} onchange={(e) => ed.setRate(+e.currentTarget.value)}>
+			<select aria-label="Speed" value={String(ed.rate)} onchange={(e) => ed.setRate(+e.currentTarget.value)}>
 				{#each RATES as [v, l] (v)}<option value={String(v)}>{l}</option>{/each}
 			</select>
 		</label>
-		<button class="mitlaufen" aria-pressed={ed.follow} title={m.te_follow_hint()} onclick={() => (ed.follow = !ed.follow)}>
-			<IconMaterialSymbolsVerticalAlignCenterRounded /><span class="lbl">{m.te_follow()}</span>
+		<button class="mitlaufen" aria-pressed={ed.follow} title="Text and timeline follow the playback" onclick={() => (ed.follow = !ed.follow)}>
+			<IconMaterialSymbolsVerticalAlignCenterRounded /><span class="lbl">Follow</span>
 		</button>
 	</div>
 </div>

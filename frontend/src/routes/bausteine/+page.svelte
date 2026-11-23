@@ -19,10 +19,15 @@
 	let sprecher = $state(false);
 	let reiter = $state('lesen');
 	let modal = $state(false);
-	let qualitaet = $state('Ausgewogen');
-
-	const probe =
-		'Herr Berger erzählt, wie er 1958 als Lehrling in der Papierfabrik anfing: „Die Filze haben wir jeden Samstag gewaschen, von Hand.“';
+	const QUALITAETEN = [
+{ id: 'schnell', name: /* @wc-include */ 'Fast' },
+	{ id: 'ausgewogen', name: /* @wc-include */ 'Balanced' },
+		{ id: 'genau', name: /* @wc-include */ 'Accurate' }
+		];
+		let qualitaet = $state('ausgewogen');
+		
+		const probe =
+		/* @wc-include */ 'Mr Berger tells how he started as an apprentice at the paper mill in 1958: “We washed the felts by hand, every Saturday.”';
 
 	function laden() {
 		loading = true;
@@ -31,115 +36,115 @@
 </script>
 
 <svelte:head>
-	<title>Bausteine · Transcribe by Moliri</title>
+	<title>Components · Transcribe by Moliri</title>
 </svelte:head>
 
 <main>
 	<header>
-		<h1>Bausteine</h1>
+		<h1>Components</h1>
 		<p>
-			Die Komponenten, die Transcribe aus Moliri übernimmt. Sie liegen gespiegelt unter
-			<code>frontend/src/lib/moliri</code> und werden nur in Moliri geändert.
+			The components Transcribe takes over from Moliri. They are mirrored under
+			<code>frontend/src/lib/moliri</code> and are only changed in Moliri.
 		</p>
 	</header>
 
 	<section aria-labelledby="h-knoepfe">
-		<h2 id="h-knoepfe">Knöpfe</h2>
+		<h2 id="h-knoepfe">Buttons</h2>
 		<div class="row">
-			<Button type="primary">Speichern</Button>
-			<Button type="secondary">Abbrechen</Button>
-			<Button type="tertiary">Rückgängig</Button>
-			<Button type="primary" variant="positive">Transkribieren</Button>
-			<Button type="primary" variant="negative">Löschen</Button>
+			<Button type="primary">Save</Button>
+			<Button type="secondary">Cancel</Button>
+			<Button type="tertiary">Undo</Button>
+			<Button type="primary" variant="positive">Start transcription</Button>
+			<Button type="primary" variant="negative">Delete</Button>
 			<Button type="primary" size="large" {loading} onclick={laden}>
 				{#snippet iconLeft()}<IconMaterialSymbolsPlayArrowRounded />{/snippet}
-				Laden zeigen
+				Show loading
 			</Button>
 		</div>
 		<div class="row ink">
-			<Button type="tertiary" variant="inverse">Auf Tinte</Button>
-			<Button type="primary" variant="inverse">Papier auf Tinte</Button>
+			<Button type="tertiary" variant="inverse">On ink</Button>
+			<Button type="primary" variant="inverse">Paper on ink</Button>
 		</div>
 	</section>
 
 	<section aria-labelledby="h-schalter">
-		<h2 id="h-schalter">Schalter</h2>
+		<h2 id="h-schalter">Switches</h2>
 		<div class="stack">
-			<Toggle bind:checked={mitlesen} title="Mitlesen" description="Markiert beim Abspielen das gesprochene Wort." />
+			<Toggle bind:checked={mitlesen} title="Follow along" description="Highlights the spoken word during playback." />
 			<Toggle
 				bind:checked={sprecher}
-				title="Sprecher überspringen"
-				description="Ausgeblendete Sprecher werden beim Abspielen übersprungen."
-				tooltip={{ title: 'Sprecher überspringen', content: 'Wirkt nur auf Sprecher, die im Editor ausgeblendet sind.' }}
+				title="Skip speakers"
+				description="Hidden speakers are skipped during playback."
+				tooltip={{ title: /* @wc-include */ 'Skip speakers', content: /* @wc-include */ 'Only affects speakers hidden in the editor.' }}
 			/>
 		</div>
 	</section>
 
 	<section aria-labelledby="h-reiter">
-		<h2 id="h-reiter">Reiter</h2>
+		<h2 id="h-reiter">Tabs</h2>
 		<Tabs
 			bind:activeTab={reiter}
 			tabs={[
-				{ id: 'lesen', label: 'Lesen' },
-				{ id: 'korrigieren', label: 'Korrigieren' },
-				{ id: 'clips', label: 'Clips' }
+				{ id: 'lesen', label: /* @wc-include */ 'Read' },
+				{ id: 'korrigieren', label: /* @wc-include */ 'Correct' },
+				{ id: 'clips', label: /* @wc-include */ 'Clips' }
 			]}
 		>
 			{#snippet children(/** @type {string} */ id)}
-				<p class="panel">Reiter „{id}“ ist offen.</p>
+				<p class="panel">Tab “{id}” is open.</p>
 			{/snippet}
 		</Tabs>
 	</section>
 
 	<section aria-labelledby="h-auswahl">
-		<h2 id="h-auswahl">Auswahl, Dialog, Hinweis</h2>
+		<h2 id="h-auswahl">Selection, dialog, hint</h2>
 		<div class="row">
 			<Dropdown placement="bottom-start" minWidth="14rem">
 				{#snippet trigger()}
-					<span class="pick">Qualität: {qualitaet} <IconMaterialSymbolsKeyboardArrowDownRounded /></span>
+					<span class="pick">Quality: {QUALITAETEN.find((q) => q.id === qualitaet)?.name} <IconMaterialSymbolsKeyboardArrowDownRounded /></span>
 				{/snippet}
 				{#snippet children()}
-					{#each ['Schnell', 'Ausgewogen', 'Genau'] as q (q)}
-						<DropdownItem selected={q === qualitaet} onselected={() => (qualitaet = q)}>{q}</DropdownItem>
+					{#each QUALITAETEN as q (q.id)}
+						<DropdownItem selected={q.id === qualitaet} onselected={() => (qualitaet = q.id)}>{q.name}</DropdownItem>
 					{/each}
 				{/snippet}
 			</Dropdown>
-			<Button type="secondary" onclick={() => (modal = true)}>Dialog öffnen</Button>
-			<KeyboardTooltip textBefore="Abspielen" shortcuts={['Leertaste']}>
+			<Button type="secondary" onclick={() => (modal = true)}>Open dialog</Button>
+			<KeyboardTooltip textBefore={/* @wc-include */ 'Play'} shortcuts={[/* @wc-include */ 'Spacebar']}>
 				<Button type="tertiary">
 					{#snippet iconLeft()}<IconMaterialSymbolsKeyboardOutlineRounded />{/snippet}
-					Mit Tastenkürzel
+					With shortcut
 				</Button>
 			</KeyboardTooltip>
 		</div>
-		<LoadingWrapper {loading} message="Lädt …">
-			<p class="panel">Dieser Kasten zeigt „Lädt“, solange „Laden zeigen“ läuft.</p>
+		<LoadingWrapper {loading} message={/* @wc-include */ 'Loading …'}>
+			<p class="panel">This box shows “Loading” while “Show loading” is running.</p>
 		</LoadingWrapper>
 	</section>
 
 	<section aria-labelledby="h-schrift">
-		<h2 id="h-schrift">Schriftprobe</h2>
-		<p>Lesetext im Editor (20px) und Bedienung (15px), links die Schrift der Oberfläche, rechts ihre Mono-Schwester für Code.</p>
+		<h2 id="h-schrift">Type sample</h2>
+		<p>Body text in the editor (20px) and controls (15px): on the left the interface font, on the right its mono sister for code.</p>
 		<div class="fonts">
 			<figure style="font-family: var(--font-ui)">
 				<figcaption>Atkinson Hyperlegible Next (--font-ui)</figcaption>
 				<p class="lead">{probe}</p>
-				<p class="ctl">Sprecher benennen · Clip anlegen · 00:12:48 · Il1 0O</p>
+				<p class="ctl">Name speaker · Create clip · 00:12:48 · Il1 0O</p>
 			</figure>
 			<figure style="font-family: var(--font-mono)">
 				<figcaption>Atkinson Hyperlegible Mono (--font-mono)</figcaption>
 				<p class="lead">{probe}</p>
-				<p class="ctl">Sprecher benennen · Clip anlegen · 00:12:48 · Il1 0O</p>
+				<p class="ctl">Name speaker · Create clip · 00:12:48 · Il1 0O</p>
 			</figure>
 		</div>
 	</section>
 </main>
 
-<Modal isOpen={modal} title="Sprecher zusammenlegen" size="small" onClose={() => (modal = false)}>
-	<p>„Sprecher 2“ und „Herr Berger“ sind dieselbe Person. Zusammenlegen?</p>
+<Modal isOpen={modal} title="Merge speakers" size="small" onClose={() => (modal = false)}>
+	<p>“Speaker 2” and “Mr Berger” are the same person. Merge?</p>
 	{#snippet actions()}
-		<Button type="secondary" onclick={() => (modal = false)}>Abbrechen</Button>
-		<Button type="primary" variant="positive" onclick={() => (modal = false)}>Zusammenlegen</Button>
+		<Button type="secondary" onclick={() => (modal = false)}>Cancel</Button>
+		<Button type="primary" variant="positive" onclick={() => (modal = false)}>Merge</Button>
 	{/snippet}
 </Modal>
 

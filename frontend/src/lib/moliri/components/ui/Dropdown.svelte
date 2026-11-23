@@ -1,8 +1,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/ui/Dropdown.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/ui/Dropdown.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <!-- Enhanced Dropdown Component using svelte-floating-ui -->
 <script module>
   const openDropdowns = new Set();
@@ -11,6 +11,18 @@
     openDropdowns.forEach((dropdown) => {
       dropdown.close();
     });
+  }
+
+  /**
+   * Something that shows a dropdown's content elsewhere (a sheet on a phone) and is to close when
+   * the dropdowns do: an item chosen, another dropdown opened.
+   * @param {() => void} close
+   * @returns {() => void} unregisters it
+   */
+  export function closeWithDropdowns(close) {
+    const entry = { close };
+    openDropdowns.add(entry);
+    return () => openDropdowns.delete(entry);
   }
 </script>
 

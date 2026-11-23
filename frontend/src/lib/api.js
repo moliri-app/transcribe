@@ -4,10 +4,17 @@
 
 // Zugriff auf die HTTP-API der EXE (internal/server) und was mehrere Seiten daran brauchen.
 
+import { getLocale } from '$lib/moliri/i18n/locale.js';
+import plural from '../locales/plural.js';
+
 /** @param {string} url @param {RequestInit} [init] */
 export async function getJSON(url, init) {
 	const r = await fetch(url, init);
-	if (!r.ok) throw new Error(r.statusText || `Fehler ${r.status}`);
+	if (!r.ok) {
+		// not inside `throw`: wuchale does not look there
+		const msg = r.statusText || /* @wc-include */ `Error ${r.status}`;
+		throw new Error(msg);
+	}
 	return r.json();
 }
 
@@ -103,8 +110,15 @@ export function sprecherAus(preset, speakers) {
 /** Wo erkannt wird (Einstellungen, Erkennung): nur hier, nur extern oder beides */
 export const ERKENNUNG = /** @type {const} */ (['local', 'api', 'both']);
 
-/** Die beiden Wege zu erkennen, wie die Seiten sie nennen */
-export const ENGINES = /** @type {Record<string, string>} */ ({ local: 'Auf diesem Rechner', api: 'Über die API' });
+/** Die beiden Wege zu erkennen, wie die Seiten sie nennen (getters: read in the interface language) */
+export const ENGINES = /** @type {Record<string, string>} */ ({
+	get local() {
+		return /* @wc-include */ 'On this computer';
+	},
+	get api() {
+		return /* @wc-include */ 'Via the API';
+	}
+});
 
 /**
  * Die Vorgaben aus den Einstellungen als Startwerte für neue Aufträge, dazu, wo erkannt wird.
@@ -158,9 +172,9 @@ export function dauer(s) {
  * @param {number} b Bytes
  */
 export function groesse(b) {
-	if (b < 1000) return `${b} Byte`;
+	if (b < 1000) return plural(b, ['# byte', '# bytes']);
 	const [n, e] = b < 1e6 ? [b / 1e3, 'KB'] : b < 1e9 ? [b / 1e6, 'MB'] : [b / 1e9, 'GB'];
-	return `${n.toLocaleString('de-DE', { maximumFractionDigits: n < 10 ? 1 : 0 })} ${e}`;
+	return `${n.toLocaleString(getLocale(), { maximumFractionDigits: n < 10 ? 1 : 0 })} ${e}`;
 }
 
 /**

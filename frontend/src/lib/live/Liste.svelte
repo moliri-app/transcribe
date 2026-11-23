@@ -8,6 +8,7 @@
 	import { dauer } from '$lib/api.js';
 	import { anfrage, DIENSTE, live, laenge, QUELLEN, sekunden, tag, uhrzeit, vonHand, WARTET, wer, worum } from './stand.svelte.js';
 	import { ausschnitt, HERKUNFT, passt, SORTIERUNG, sortieren, stellenIn, stuecke, suchen } from './suche.js';
+	import plural from '../../locales/plural.js';
 
 	/** @typedef {import('./stand.svelte.js').Notiz} Notiz */
 
@@ -100,29 +101,29 @@
 
 <svelte:window onkeydown={global} />
 
-<aside class="leiste" aria-label="Aufnahmen">
+<aside class="leiste" aria-label="Recordings">
 	<div class="finden">
 		<label class="suche">
-			<span class="sr">In allen Aufnahmen suchen</span>
+			<span class="sr">Search all recordings</span>
 			<IconMaterialSymbolsSearchRounded aria-hidden="true" />
 			<input
 				bind:this={feld}
 				bind:value={q}
 				class="feld"
 				type="search"
-				placeholder="In allen Aufnahmen suchen"
+				placeholder="Search all recordings"
 				autocomplete="off"
 				spellcheck="false"
 				onkeydown={(e) => e.key === 'Escape' && q && (e.preventDefault(), (q = ''))}
 			/>
 			{#if q}
-				<button class="leeren" type="button" title="Suche leeren" onclick={() => ((q = ''), feld?.focus())}>
-					<IconMaterialSymbolsCloseRounded aria-hidden="true" /><span class="sr">Suche leeren</span>
+				<button class="leeren" type="button" title="Clear search" onclick={() => ((q = ''), feld?.focus())}>
+					<IconMaterialSymbolsCloseRounded aria-hidden="true" /><span class="sr">Clear search</span>
 				</button>
 			{/if}
 		</label>
 
-		<div class="filter" role="radiogroup" aria-label="Herkunft">
+		<div class="filter" role="radiogroup" aria-label="Origin">
 			{#each Object.entries(HERKUNFT) as [k, name] (k)}
 				<label class="pille" class:an={herkunft === k}>
 					<input class="sr" type="radio" name="herkunft" value={k} bind:group={herkunft} />
@@ -137,41 +138,47 @@
 				{#if live.notizen === null}
 					&nbsp;
 				{:else if sucht}
-					{sichtbar.length === 1 ? 'ein Treffer' : `${sichtbar.length || 'keine'} Treffer`}
+					{sichtbar.length ? plural(sichtbar.length, ['# match', '# matches']) : /* @wc-include */ 'no matches'}
 				{:else}
 					{#if herkunft === 'ki'}
-						{sichtbar.length === 1 ? 'eine Anfrage' : `${sichtbar.length} Anfragen`}
+						{plural(sichtbar.length, ['# request', '# requests'])}
 					{:else}
-						{sichtbar.length === 1 ? 'eine Aufnahme' : `${sichtbar.length} Aufnahmen`}
+						{plural(sichtbar.length, ['# recording', '# recordings'])}
 					{/if}
 				{/if}
 			</span>
 			<label class="sortieren">
-				<span class="sr">Sortierung</span>
-				<select class="feld" bind:value={sortierung} disabled={sucht} title={sucht ? 'Beim Suchen stehen die besten Treffer oben' : undefined}>
-					{#each Object.entries(SORTIERUNG) as [k, name] (k)}<option value={k}>{sucht ? 'Beste Treffer' : name}</option>{/each}
+				<span class="sr">Sorting</span>
+				<select class="feld" bind:value={sortierung} disabled={sucht} title={sucht ? /* @wc-include */ 'When searching, the best matches come first' : undefined}>
+					{#each Object.entries(SORTIERUNG) as [k, name] (k)}<option value={k}>{sucht ? /* @wc-include */ 'Best matches' : name}</option>{/each}
 				</select>
 			</label>
 		</div>
 	</div>
 
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-	<div class="liste" onkeydown={taste} role="list" aria-label="Aufnahmen">
+	<div class="liste" onkeydown={taste} role="list" aria-label="Recordings">
 		{#if live.notizen === null}
 			{#each [0, 1, 2] as i (i)}<div class="platzhalter" aria-hidden="true"><i></i><i></i><i></i></div>{/each}
 		{:else if !alle.length}
 			<p class="leer">
-				Noch keine Aufnahmen. Unten startest du eine, oder ein Programm schickt Sprache über die API.
+				No recordings yet. Start one below, or have an app send speech through the API.
 			</p>
 		{:else if !sichtbar.length}
 			<p class="leer">
-				{#if sucht}
-					Nichts gefunden für „{q}“{herkunft !== 'alle' ? ` unter „${HERKUNFT[herkunft]}“` : ''}.
+				{#if sucht && herkunft !== 'alle'}
+					Nothing found for “{q}” in “{HERKUNFT[herkunft]}”.
+				{:else if sucht}
+					Nothing found for “{q}”.
 				{:else}
-					{herkunft === 'ki' ? 'Noch keine Anfragen an KI oder Texterkennung.' : `Keine Aufnahmen ${herkunft === 'hand' ? 'von Hand' : 'per API'}.`}
+					{herkunft === 'ki'
+						? /* @wc-include */ 'No requests to AI or text recognition yet.'
+						: herkunft === 'hand'
+							? /* @wc-include */ 'No recordings made by hand.'
+							: /* @wc-include */ 'No recordings via API.'}
 				{/if}
 				{#if herkunft !== 'alle'}
-					<button class="link" type="button" onclick={() => (herkunft = 'alle')}>Alle zeigen</button>
+					<button class="link" type="button" onclick={() => (herkunft = 'alle')}>Show all</button>
 				{/if}
 			</p>
 		{/if}
@@ -202,14 +209,14 @@
 									/>{/if}
 								<span class="wer">{wer(n)}</span>
 								{#if dienst}<span class="sr">, {DIENSTE[/** @type {import('./stand.svelte.js').Dienst} */ (n.kind)]}</span
-									>{:else if !hand}<span class="sr">, per API</span>{/if}
+									>{:else if !hand}<span class="sr">, via API</span>{/if}
 							</span>
 							{#if !n.ended}
-								<span class="laeuft"><span class="punkt" aria-hidden="true"></span>läuft</span>
+								<span class="laeuft"><span class="punkt" aria-hidden="true"></span>running</span>
 							{:else if n.error}
-								<span class="abbruch">{dienst ? 'Fehler' : 'abgebrochen'}</span>
+								<span class="abbruch">{dienst ? /* @wc-include */ 'Error' : /* @wc-include */ 'cancelled'}</span>
 							{:else if n.transient}
-								<span class="fluechtig">nicht gespeichert</span>
+								<span class="fluechtig">not saved</span>
 							{/if}
 							<span class="uhr">{sucht || sortierung === 'lang' ? `${tag(n.started, live.jetzt)}, ` : ''}{uhrzeit(n.started)}</span>
 						</span>
@@ -218,8 +225,16 @@
 								{#each v as s, i (i)}{#if s.an}<mark>{s.t}</mark>{:else}{s.t}{/if}{/each}
 							{:else}
 								{dienst
-									? n.error || (n.ended ? 'Leere Antwort' : n.partial || 'Läuft …')
-									: n.error ? 'Kein Text' : n.loading ? 'Lädt die Erkennung …' : n.waiting ? WARTET[n.source ?? 'mic'] : !n.ended ? 'Hört zu …' : 'Es wurde nichts erkannt.'}
+									? n.error || (n.ended ? /* @wc-include */ 'Empty response' : n.partial || /* @wc-include */ 'Running…')
+									: n.error
+										? /* @wc-include */ 'No text'
+										: n.loading
+											? /* @wc-include */ 'Loading recognition…'
+											: n.waiting
+												? WARTET[n.source ?? 'mic']
+												: !n.ended
+													? /* @wc-include */ 'Listening …'
+													: /* @wc-include */ 'Nothing was recognised.'}
 							{/if}
 						</span>
 						<span class="fuss">
@@ -231,8 +246,8 @@
 								<span class="dauer">{dauer(laenge(n, live.jetzt))}</span>
 							{/if}
 							{#if n.source}<span>{QUELLEN[n.source]}</span>{/if}
-							{#if n.audio}<span class="gespeichert" title="Aufnahme gespeichert"
-									><IconMaterialSymbolsSaveOutlineRounded aria-hidden="true" /><span class="sr">gespeichert</span></span
+							{#if n.audio}<span class="gespeichert" title="Recording saved"
+									><IconMaterialSymbolsSaveOutlineRounded aria-hidden="true" /><span class="sr">saved</span></span
 								>{/if}
 						</span>
 					</button>
@@ -243,10 +258,12 @@
 
 	<a class="verbinden" href="/settings#programme" data-sveltekit-reload>
 		<IconMaterialSymbolsCableRounded aria-hidden="true" />
-		<span>Programme verbinden</span>
+		<span>Connect apps</span>
 		{#if live.abgelehnt.length}
-			<span class="badge" title="{live.abgelehnt.length} Seiten wollten sich verbinden"
-				>{live.abgelehnt.length}<span class="sr"> Seiten wollten sich verbinden</span></span
+			<span class="badge" title={plural(live.abgelehnt.length, ['# site wanted to connect', '# sites wanted to connect'])}
+				><span aria-hidden="true">{live.abgelehnt.length}</span><span class="sr"
+					>{plural(live.abgelehnt.length, ['# site wanted to connect', '# sites wanted to connect'])}</span
+				></span
 			>
 		{/if}
 		<IconMaterialSymbolsArrowForwardRounded class="pfeil" aria-hidden="true" />

@@ -7,12 +7,29 @@ import { defineConfig } from 'vite';
 import Icons from 'unplugin-icons/vite';
 import IconsResolver from 'unplugin-icons/resolver';
 import AutoImport from 'unplugin-auto-import/vite';
+import { wuchale } from 'wuchale/vite';
+import { wuchaleBuild } from './scripts/wuchale-build.mjs';
 
 // Wohin `pnpm dev` die API weiterreicht: die laufende EXE (Standard-Port 31765).
 const backend = process.env.TRANSCRIBE_URL || 'http://localhost:31765';
 
-export default defineConfig({
+// wuchale (wuchale.config.js) translates the interface texts, as in Moliri. The app is a pure SPA,
+// so the plugin always transforms for the client. A build gets compiled catalogues of its own
+// (scripts/wuchale-build.mjs): next to a running dev server, wuchale's own plugin would bundle the
+// dev server's and shift every text.
+function wuchaleClientOnly(command) {
+	if (command === 'build') return wuchaleBuild({ root: import.meta.dirname });
+	const plugin = wuchale();
+	const handler = plugin.transform.handler;
+	plugin.transform.handler = function (code, id, options) {
+		return handler.call(this, code, id, { ...options, ssr: false });
+	};
+	return plugin;
+}
+
+export default defineConfig(({ command }) => ({
 	plugins: [
+		wuchaleClientOnly(command),
 		sveltekit(),
 		// Icons wie in Moliri: <IconMaterialSymbolsClose /> ohne Import, aus @iconify-json/<sammlung>.
 		AutoImport({
@@ -32,4 +49,4 @@ export default defineConfig({
 			scss: { loadPaths: ['src'] }
 		}
 	}
-});
+}));

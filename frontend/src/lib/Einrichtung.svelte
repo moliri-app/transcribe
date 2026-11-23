@@ -20,6 +20,7 @@
 	import AuftragsOptionen from '$lib/AuftragsOptionen.svelte';
 	import { geaendert } from '$lib/auftraege.svelte.js';
 	import { MEDIA, einreihen, getJSON, post, upload, vorgaben } from '$lib/api.js';
+	import plural from '../locales/plural.js';
 
 	/** @typedef {{ label: string, state: string, done: number, total: number, error?: string }} Teil */
 
@@ -47,7 +48,7 @@
 		if (d.ready) {
 			beobachtet = false;
 			if (stand) {
-				stand = { text: 'Alles bereit.', pct: 100, fehler: false, fertig: true };
+				stand = { text: /* @wc-include */ 'All set.', pct: 100, fehler: false, fertig: true };
 				setTimeout(() => (stand = null), 1500);
 			}
 			return;
@@ -55,23 +56,26 @@
 		if (fehler) {
 			beobachtet = false;
 			stand = {
-				text: `Download fehlgeschlagen (${fehler.label}): ${fehler.error}`,
+				text: /* @wc-include */ `Download failed (${fehler.label}): ${fehler.error}`,
 				pct: 0,
 				fehler: true,
 				fertig: false
 			};
 			return;
 		}
-		let text = `Erste Einrichtung (${fertig}/${items.length})`;
-		let pct = items.length ? (fertig / items.length) * 100 : 0;
+		const n = items.length;
+		let text = /* @wc-include */ `First-time setup (${fertig}/${n})…`;
+		let pct = n ? (fertig / n) * 100 : 0;
 		if (laedt) {
-			text += `: lade ${laedt.label}`;
+			const name = laedt.label;
 			if (laedt.total > 0) {
-				text += ` – ${mb(laedt.done)} / ${mb(laedt.total)}`;
-				pct += (laedt.done / laedt.total) * (100 / items.length);
+				const done = mb(laedt.done);
+				const total = mb(laedt.total);
+				text = /* @wc-include */ `First-time setup (${fertig}/${n}): downloading ${name} – ${done} / ${total}`;
+				pct += (laedt.done / laedt.total) * (100 / n);
+			} else {
+				text = /* @wc-include */ `First-time setup (${fertig}/${n}): downloading ${name}`;
 			}
-		} else {
-			text += ' …';
 		}
 		stand = { text, pct: Math.min(100, pct), fehler: false, fertig: false };
 		setTimeout(beobachten, 800);
@@ -100,11 +104,15 @@
 		try {
 			await post(ja ? '/api/gpu/enable' : '/api/gpu/dismiss');
 			if (ja) {
-				sagen({ text: 'Die GPU-Laufzeit wird geladen. Den Fortschritt siehst du unten und unter', link: { href: '/settings', text: 'Einstellungen' } });
+				sagen({
+					text: /* @wc-include */ 'The GPU runtime is being downloaded. You can follow the progress below and in',
+					link: { href: '/settings', text: /* @wc-include */ 'Settings' }
+				});
 				einrichtung.neu++;
 			}
 		} catch (e) {
-			sagen({ text: 'Fehler: ' + /** @type {Error} */ (e).message });
+			const msg = /** @type {Error} */ (e).message;
+			sagen({ text: /* @wc-include */ `Error: ${msg}` });
 		}
 	}
 
@@ -191,7 +199,7 @@
 		/** @type {File[]} */
 		const dateien = [];
 		const stats = { skipped: 0 };
-		sagen({ text: 'Lese Dateien …' }, true);
+		sagen({ text: /* @wc-include */ 'Reading files…' }, true);
 		for (const w of wurzeln) {
 			if (w.entry) await durchgehen(w.entry, dateien, stats);
 			else if (w.file) {
@@ -199,12 +207,14 @@
 				else stats.skipped++;
 			}
 		}
-		if (!dateien.length) return sagen({ text: 'Keine Audio- oder Videodatei erkannt.' });
+		if (!dateien.length) return sagen({ text: /* @wc-include */ 'No audio or video file found.' });
 		/** @type {string[]} */
 		const namen = [];
 		try {
 			for (const [i, f] of dateien.entries()) {
-				sagen({ text: `Lade hoch (${i + 1}/${dateien.length}): ${f.name} …` }, true);
+				const nr = i + 1;
+				const name = f.name;
+				sagen({ text: /* @wc-include */ `Uploading (${nr}/${dateien.length}): ${name}…` }, true);
 				namen.push(await upload(f));
 			}
 			hinweis = null;
@@ -214,17 +224,20 @@
 			let optionen = o;
 			if (dropMode !== 'auto') {
 				optionen = await nachfragen(namen, o, stats.skipped, erkennung);
-				if (!optionen) return sagen({ text: `${namen.length} Datei(en) hochgeladen. Transkribieren kannst du sie in der Bibliothek.` });
+				if (!optionen) return sagen({ text: /* @wc-include */ `${namen.length} file(s) uploaded. You can transcribe them in the library.` });
 			}
 			const n = await einreihen(namen, optionen);
-			const uebersprungen = stats.skipped ? ` (${stats.skipped} übersprungen)` : '';
+			const skipped = stats.skipped;
 			sagen({
-				text: `${n} Datei(en) werden transkribiert${uebersprungen}.`,
-				link: ['/', '/queue'].includes(page.url.pathname) ? undefined : { href: '/', text: 'Zur Bibliothek' }
+				text: skipped
+					? /* @wc-include */ `${n} file(s) are being transcribed (${skipped} skipped).`
+					: /* @wc-include */ `${n} file(s) are being transcribed.`,
+				link: ['/', '/queue'].includes(page.url.pathname) ? undefined : { href: '/', text: /* @wc-include */ 'Go to library' }
 			});
 			geaendert();
 		} catch (err) {
-			sagen({ text: 'Fehler: ' + /** @type {Error} */ (err).message });
+			const msg = /** @type {Error} */ (err).message;
+			sagen({ text: /* @wc-include */ `Error: ${msg}` });
 		}
 	}
 
@@ -266,8 +279,8 @@
 	<div class="ablage" aria-hidden="true">
 		<div class="rahmen">
 			<IconMaterialSymbolsUploadFileOutlineRounded class="symbol" />
-			<strong>Dateien oder Ordner hier ablegen</strong>
-			<span>Audio oder Video, kommt in die Bibliothek und wird transkribiert</span>
+			<strong>Drop files or folders here</strong>
+			<span>Audio or video; it goes into the library and gets transcribed</span>
 		</div>
 	</div>
 {/if}
@@ -280,18 +293,18 @@
 {/if}
 
 {#if stand}
-	<div class="einrichtung" class:fehler={stand.fehler} role="region" aria-label="Ersteinrichtung" aria-live="polite">
+	<div class="einrichtung" class:fehler={stand.fehler} role="region" aria-label="First-time setup" aria-live="polite">
 		<div class="inhalt">
 			{#if stand.fehler}
 				<IconMaterialSymbolsErrorOutlineRounded class="symbol" aria-hidden="true" />
 				<p>
-					{stand.text} – Programm neu starten oder unter
-					<a href="/settings" data-sveltekit-reload>Einstellungen</a> erneut laden.
+					{stand.text} – Restart the app or download again in
+					<a href="/settings" data-sveltekit-reload>Settings</a>.
 				</p>
 			{:else}
 				<IconMaterialSymbolsDownloadRounded class="symbol" aria-hidden="true" />
 				<p>
-					{stand.text}{#if !stand.fertig}. Du kannst die Oberfläche schon nutzen; Aufträge starten, sobald alles bereit ist.{/if}
+					{#if stand.fertig}{stand.text}{:else}{stand.text}. You can already use the app; jobs start as soon as everything is ready.{/if}
 				</p>
 			{/if}
 		</div>
@@ -302,35 +315,39 @@
 {/if}
 
 {#if gpu}
-	<Modal title="NVIDIA-GPU erkannt" size="medium" onClose={() => (gpu = null)}>
+	<Modal title="NVIDIA GPU detected" size="medium" onClose={() => (gpu = null)}>
 		<div class="dialog">
 			<p>
-				<strong>{gpu.gpu.name}</strong> kann die Erkennung beschleunigen. Dafür lädt die App einmalig die GPU-Laufzeit
-				(CUDA {gpu.gpu.cudaMajor}, etwa 500 MB){#if !gpu.gpu.ready && gpu.gpu.fetch}
-					{' '}und die fehlenden Bibliotheken von NVIDIA (etwa {Math.round(gpu.gpu.fetch / 1048576)} MB){/if}.
+				{#if !gpu.gpu.ready && gpu.gpu.fetch}
+					<strong>{gpu.gpu.name}</strong> can speed up recognition. For this, the app downloads the GPU runtime once
+					(CUDA {gpu.gpu.cudaMajor}, about 500 MB) and the missing libraries from NVIDIA (about {Math.round(gpu.gpu.fetch / 1048576)} MB).
+				{:else}
+					<strong>{gpu.gpu.name}</strong> can speed up recognition. For this, the app downloads the GPU runtime once
+					(CUDA {gpu.gpu.cudaMajor}, about 500 MB).
+				{/if}
 			</p>
 			<p>
-				Wie viel das bringt, hängt vom Modell und der Aufnahme ab. Ohne GPU läuft alles wie bisher auf dem Prozessor,
-				und du kannst das jederzeit in den Einstellungen ändern.
+				How much this helps depends on the model and the recording. Without a GPU, everything runs on the processor as
+				before, and you can change this in the settings at any time.
 			</p>
 			{#if !gpu.gpu.ready && gpu.gpu.fetch}
 				<p class="lizenz">
-					Mit „GPU-Laufzeit laden“ stimmst du den Lizenzbedingungen von NVIDIA zu, für das
-					<a href="https://docs.nvidia.com/cuda/eula/" target="_blank" rel="noreferrer">CUDA Toolkit</a> und für
+					By choosing “Download GPU runtime”, you accept NVIDIA’s license terms for the
+					<a href="https://docs.nvidia.com/cuda/eula/" target="_blank" rel="noreferrer">CUDA Toolkit</a> and for
 					<a href="https://docs.nvidia.com/deeplearning/cudnn/latest/reference/eula.html" target="_blank" rel="noreferrer">cuDNN</a>.
 				</p>
 			{/if}
 		</div>
 		{#snippet actions()}
-			<Button type="secondary" size="large" onclick={() => gpuWahl(false)}>Nur Prozessor nutzen</Button>
-			<Button type="primary" size="large" onclick={() => gpuWahl(true)}>GPU-Laufzeit laden</Button>
+			<Button type="secondary" size="large" onclick={() => gpuWahl(false)}>Use processor only</Button>
+			<Button type="primary" size="large" onclick={() => gpuWahl(true)}>Download GPU runtime</Button>
 		{/snippet}
 	</Modal>
 {/if}
 
 {#if frage}
 	<Modal
-		title={frage.namen.length === 1 ? '1 Datei verarbeiten' : `${frage.namen.length} Dateien verarbeiten`}
+		title={plural(frage.namen.length, ['Process # file', 'Process # files'])}
 		size="medium"
 		onClose={() => beantworten(false)}
 	>
@@ -342,22 +359,25 @@
 			}}
 		>
 			<p>
-				Die Dateien sind hochgeladen.{#if frage.skipped}
-					{' '}{frage.skipped} andere Datei(en) wurden übersprungen.{/if}
+				{#if frage.skipped}
+					The files have been uploaded. {frage.skipped} other file(s) were skipped.
+				{:else}
+					The files have been uploaded.
+				{/if}
 			</p>
 			<ul class="dateien">
 				{#each frage.namen.slice(0, 8) as n (n)}<li>{n}</li>{/each}
-				{#if frage.namen.length > 8}<li>… und {frage.namen.length - 8} weitere</li>{/if}
+				{#if frage.namen.length > 8}<li>… and {frage.namen.length - 8} more</li>{/if}
 			</ul>
 			<AuftragsOptionen bind:optionen={frage.optionen} erkennung={frage.erkennung} />
 			<label class="sofort">
 				<input type="checkbox" bind:checked={frage.sofort} />
-				Künftig sofort starten, ohne Nachfrage
+				From now on, start right away without asking
 			</label>
 		</div>
 		{#snippet actions()}
-			<Button type="secondary" size="large" onclick={() => beantworten(false)}>Später</Button>
-			<Button type="primary" size="large" onclick={() => beantworten(true)}>Transkribieren</Button>
+			<Button type="secondary" size="large" onclick={() => beantworten(false)}>Later</Button>
+			<Button type="primary" size="large" onclick={() => beantworten(true)}>Transcribe</Button>
 		{/snippet}
 	</Modal>
 {/if}

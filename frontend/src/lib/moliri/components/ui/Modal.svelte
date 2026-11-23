@@ -1,8 +1,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/ui/Modal.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/ui/Modal.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <script module lang="ts">
   // Stack of open modals so Escape + the focus trap only act on the top-most
   // one when modals stack.
@@ -13,8 +13,8 @@
   import Portal from 'svelte-portal';
    import { lockscroll } from '@svelte-put/lockscroll';
    import type { Snippet } from 'svelte';
-   import * as m from "$lib/moliri/texte.js";
    import Pager from './Pager.svelte';
+   import { closeOnBack } from '$lib/moliri/history/closeOnBack.svelte.js';
 
   interface Props {
     title?: string;
@@ -71,9 +71,21 @@
   /** Jeder Weg hinaus (✕, Escape) läuft hier durch — mit Rückfrage, wenn Eingaben verloren gingen. */
   function schliessen() {
     if (!onClose) return;
-    if (ungespeichert && !confirm(m.detail_verwerfen_frage())) return;
+    if (ungespeichert && !confirm(/* @wc-include */ 'Discard unsaved changes?')) return;
     onClose();
   }
+
+  // The back button closes the dialog as ✕ does (docs/mobile-companion-plan.md §2.2): with unsaved
+  // input it asks first, and a dialog without a way out stays.
+  closeOnBack({
+    prefix: 'modal',
+    isOpen: () => isOpen,
+    close: () => {
+      if (!onClose) return false;
+      if (ungespeichert && !confirm(/* @wc-include */ 'Discard unsaved changes?')) return false;
+      onClose();
+    }
+  });
 
   function handleBackdropClick(event: MouseEvent) {
     // Mit ungespeicherten Eingaben schließt ein Klick daneben gar nicht: er passiert zu leicht.
@@ -170,6 +182,7 @@
   <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
     class="modal-overlay toc-exclude"
+    data-unsaved={ungespeichert ? "" : undefined}
     onclick={handleBackdropClick}
     role="dialog"
     aria-modal="true"
@@ -181,7 +194,7 @@
         <button 
           class="modal-floating-close-button" 
           onclick={handleCloseClick}
-          aria-label={m.close_modal()}
+          aria-label="Close modal"
         >
           <IconMaterialSymbolsCloseRounded />
         </button>
@@ -203,8 +216,8 @@
               type="button"
               class="modal-close-button modal-icon-button"
               onclick={handleCloseClick}
-              aria-label={m.close_modal()}
-              title={m.close_modal()}
+              aria-label="Close modal"
+              title="Close modal"
             >
               <IconMaterialSymbolsCloseRounded />
             </button>

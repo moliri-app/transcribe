@@ -1,8 +1,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/files/transcript/editor/TranscriptEditor.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/files/transcript/editor/TranscriptEditor.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
@@ -16,7 +16,6 @@
      erkennt eine festgelegte Sprache von selbst neu. Kann der Speicher das nicht (transcribe-go, das
      diesen Editor spiegelt), steht unten „Neu berechnen“. -->
 <script>
-	import * as m from '$lib/moliri/texte.js';
 	import { searchItems } from './model.js';
 	import Zeitleiste from './Zeitleiste.svelte';
 	import Manuskript from './Manuskript.svelte';
@@ -45,9 +44,9 @@
 		ed.compact = eng;
 	});
 	const FORMATS = $derived([
-		['txt', m.te_export_txt(), m.te_export_txt_note()],
-		['vtt', m.te_export_vtt(), m.te_export_vtt_note()],
-		['html', m.te_export_html(), m.te_export_html_note()]
+		['txt', (/* @wc-include */ 'Text (.txt)'), (/* @wc-include */ 'with speakers and time marks')],
+		['vtt', (/* @wc-include */ 'Subtitles (.vtt)'), (/* @wc-include */ 'for video players')],
+		['html', (/* @wc-include */ 'HTML (Word, MAXQDA)'), (/* @wc-include */ 'for further editing')]
 	]);
 
 	// ---- Suche ----
@@ -165,13 +164,13 @@
 {#snippet tools()}
 	<label class="suche">
 		<IconMaterialSymbolsSearch aria-hidden="true" />
-		<input type="search" placeholder={m.transcript_search()} aria-label={m.transcript_search()} bind:value={query} oninput={() => (hitIndex = 0)} onkeydown={searchKey} />
+		<input type="search" placeholder="Search the transcript" aria-label="Search the transcript" bind:value={query} oninput={() => (hitIndex = 0)} onkeydown={searchKey} />
 		{#if query.trim()}
-			<span class="treffer" aria-live="polite">{hits.length ? m.transcript_search_hits({ current: hitIndex + 1, total: hits.length }) : m.transcript_search_none()}</span>
-			<button type="button" class="pfeil" title={m.transcript_search_prev()} aria-label={m.transcript_search_prev()} disabled={!hits.length} onclick={() => moveHit(-1)}
+			<span class="treffer" aria-live="polite">{hits.length ? /* @wc-context: transcript_search_hits */ /* @wc-include */ `${hitIndex + 1} of ${hits.length}` : /* @wc-context: transcript_search_none */ /* @wc-include */ 'no match'}</span>
+			<button type="button" class="pfeil" title={/* @wc-context: transcript_search_prev */ /* @wc-include */ 'Previous match'} aria-label={/* @wc-context: transcript_search_prev */ /* @wc-include */ 'Previous match'} disabled={!hits.length} onclick={() => moveHit(-1)}
 				><IconMaterialSymbolsKeyboardArrowUpRounded /></button
 			>
-			<button type="button" class="pfeil" title={m.transcript_search_next()} aria-label={m.transcript_search_next()} disabled={!hits.length} onclick={() => moveHit(1)}
+			<button type="button" class="pfeil" title="Next match" aria-label="Next match" disabled={!hits.length} onclick={() => moveHit(1)}
 				><IconMaterialSymbolsKeyboardArrowDownRounded /></button
 			>
 		{/if}
@@ -179,31 +178,31 @@
 	{#if ed.canEdit}
 		<button
 			class="hilfe-btn"
-			title={m.te_undo_hint()}
+			title="Take back the last correction (Ctrl+Z)"
 			disabled={!ed.canUndo && !ed.editing}
 			onpointerdown={(e) => e.preventDefault()}
 			onclick={() => ed.undo()}
 		>
-			<IconMaterialSymbolsUndoRounded /><span class="lbl">{m.te_undo()}</span>
+			<IconMaterialSymbolsUndoRounded /><span class="lbl"><!-- @wc-context: te_undo -->Undo</span>
 		</button>
 		{#if ed.recomputes}
 			<!-- Sprache neu erkennen und Zusammenlegen rechnet der Server; alles andere wirkt sofort -->
 			<button
 				class="hilfe-btn rechnen"
 				class:vorgemerkt={ed.pending}
-				title={ed.pending ? m.te_recompute_due_hint() : m.te_recompute_hint()}
+				title={ed.pending ? /* @wc-include */ 'Recognise the noted languages again and merge speakers' : /* @wc-include */ 'Only needed once a language is set or a speaker is merged'}
 				disabled={!ed.pending || ed.computing}
 				aria-busy={ed.computing}
 				onclick={() => ed.recompute()}
 			>
-				{#if ed.computing}<IconEosIconsLoading /><span class="lbl">{m.te_recompute_busy()}</span>{:else}<IconMaterialSymbolsAutorenewRounded /><span class="lbl"
-						>{m.te_recompute()}</span
+				{#if ed.computing}<IconEosIconsLoading /><span class="lbl">computing …</span>{:else}<IconMaterialSymbolsAutorenewRounded /><span class="lbl"
+						>Recompute</span
 					>{/if}
 			</button>
 		{/if}
 		{#if onrerun}
-			<button class="hilfe-btn" title={m.te_rerun_hint()} aria-expanded={rerunOpen} onclick={() => onrerun()}>
-				<IconMaterialSymbolsAutorenewRounded /><span class="lbl">{m.te_rerun()}</span>
+			<button class="hilfe-btn" title="Recognise the recording once more; the corrections stay" aria-expanded={rerunOpen} onclick={() => onrerun()}>
+				<IconMaterialSymbolsAutorenewRounded /><span class="lbl">Transcribe again</span>
 			</button>
 		{/if}
 	{/if}
@@ -211,23 +210,23 @@
 	<div class="meta">
 		{#if ed.canEdit || ed.saveKind !== 'ok'}
 			<span class="stand {ed.languagesBusy ? 'offen' : ed.saveKind}" role="status" aria-live="polite" title={ed.saveText}
-				>{ed.languagesBusy && ed.saveKind === 'ok' ? m.te_languages_running() : ed.saveText}</span
+				>{ed.languagesBusy && ed.saveKind === 'ok' ? /* @wc-include */ 'Passages with a set language are recognised again …' : ed.saveText}</span
 			>
 		{/if}
 	</div>
 	<div class="export" bind:this={exportBox}>
 		<button
 			class="hilfe-btn"
-			aria-label={m.te_export_hint()}
-			title={m.te_export_hint()}
+			aria-label="Download the transcript with all corrections"
+			title="Download the transcript with all corrections"
 			aria-expanded={exportOpen}
 			aria-controls="export-formate"
 			onclick={() => (exportOpen = !exportOpen)}
 		>
-			<IconMaterialSymbolsDownloadRounded /><span class="lbl">{m.transcript_export()}</span>
+			<IconMaterialSymbolsDownloadRounded /><span class="lbl"><!-- @wc-context: transcript_export -->Export</span>
 		</button>
 		{#if exportOpen}
-			<ul class="formate" id="export-formate" aria-label={m.te_formats()}>
+			<ul class="formate" id="export-formate" aria-label="Formats">
 				{#each FORMATS as [f, label, note] (f)}
 					<li>
 						<button
@@ -242,10 +241,10 @@
 			</ul>
 		{/if}
 	</div>
-	<button class="hilfe-btn rund" title={fullscreen ? m.te_fullscreen_exit() : m.te_fullscreen()} aria-label={fullscreen ? m.te_fullscreen_exit() : m.te_fullscreen()} aria-pressed={fullscreen} onclick={toggleFullscreen}>
+	<button class="hilfe-btn rund" title={fullscreen ? /* @wc-include */ 'Leave full screen' : /* @wc-include */ 'Full screen'} aria-label={fullscreen ? /* @wc-include */ 'Leave full screen' : /* @wc-include */ 'Full screen'} aria-pressed={fullscreen} onclick={toggleFullscreen}>
 		{#if fullscreen}<IconMaterialSymbolsCloseFullscreenRounded />{:else}<IconMaterialSymbolsOpenInFullRounded />{/if}
 	</button>
-	<button class="hilfe-btn rund" bind:this={helpBtn} title={m.te_help()} aria-label={m.te_help()} aria-expanded={help} aria-controls="hilfe" onclick={() => (help = !help)}>
+	<button class="hilfe-btn rund" bind:this={helpBtn} title="How it works" aria-label="How it works" aria-expanded={help} aria-controls="hilfe" onclick={() => (help = !help)}>
 		<IconMaterialSymbolsHelpOutlineRounded />
 	</button>
 {/snippet}
@@ -269,35 +268,35 @@
 	<Clip {ed} />
 
 	{#if help}
-		<div class="hilfe" id="hilfe" role="dialog" aria-label={m.te_help()}>
-			<h2>{m.te_help()}</h2>
+		<div class="hilfe" id="hilfe" role="dialog" aria-label="How it works">
+			<h2>How it works</h2>
 			<dl>
 				{#if ed.canEdit}
-					<dt>{m.te_help_text_t()}</dt>
-					<dd>{m.te_help_text()}</dd>
-					<dt>{m.te_help_range_t()}</dt>
-					<dd>{m.te_help_range()}</dd>
-					<dt>{m.te_help_anchor_t()}</dt>
-					<dd>{m.te_help_anchor()}</dd>
-					<dt>{m.te_clips()}</dt>
-					<dd>{m.te_help_clips()}</dd>
+					<dt>Change text</dt>
+					<dd>Click into the text and type; it saves by itself. Esc discards. Changes by people are red.</dd>
+					<dt><!-- @wc-context: te_help_range_t -->Passage</dt>
+					<dd>Mark text or drag in the timeline: play, loop, give it to a speaker or set its language.</dd>
+					<dt>Time anchors</dt>
+					<dd>The small flags before words: drag one to another word, or along the timeline.</dd>
+					<dt>Clips</dt>
+					<dd>Mark a passage and choose “As clip”. The side column plays and exports clips.</dd>
 				{/if}
-				<dt>{m.transcript_export()}</dt>
-				<dd>{m.te_help_export()}</dd>
+				<dt><!-- @wc-context: transcript_export -->Export</dt>
+				<dd>“Export” at the bottom: text, subtitles or HTML for Word and MAXQDA.</dd>
 				{#if ed.canEdit}
-					<dt>{m.te_help_save_t()}</dt>
-					<dd>{ed.recomputes ? m.te_help_save_recompute() : m.te_help_save()}</dd>
+					<dt>Saving</dt>
+					<dd>{ed.recomputes ? /* @wc-include */ 'happens by itself. “Recompute” applies languages and merges. Ctrl + Z undoes the last correction.' : /* @wc-include */ 'happens by itself. Ctrl + Z undoes the last correction.'}</dd>
 				{/if}
-				<dt>{m.te_play()}</dt>
-				<dd>{m.te_help_play()}</dd>
-				<dt>{m.te_wordbar()}</dt>
-				<dd>{m.te_help_wordbar()}</dd>
-				<dt>{m.te_help_timeline_t()}</dt>
-				<dd>{m.te_help_timeline()}</dd>
-				<dt>{m.transcript_speakers()}</dt>
-				<dd>{m.te_help_speakers()}</dd>
-				<dt>{m.te_follow()}</dt>
-				<dd>{m.te_help_follow()}</dd>
+				<dt>Play</dt>
+				<dd>Space starts and stops, the arrow keys jump 5 seconds.</dd>
+				<dt>Place in the text</dt>
+				<dd>Click a word: “From here” plays from there. Ctrl + click plays at once.</dd>
+				<dt><!-- @wc-context: te_help_timeline_t -->Timeline</dt>
+				<dd>Click jumps, the wheel zooms, Shift + wheel moves.</dd>
+				<dt>Speakers</dt>
+				<dd>Click a name: rename, set its language, merge. The eye hides a speaker, the target shows only this one.</dd>
+				<dt>Follow</dt>
+				<dd>Text and timeline follow the playback.</dd>
 			</dl>
 		</div>
 	{/if}

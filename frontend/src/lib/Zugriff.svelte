@@ -11,6 +11,7 @@
 	import { onMount } from 'svelte';
 	import Button from '$lib/moliri/components/ui/Button.svelte';
 	import { post } from '$lib/api.js';
+	import plural from '../locales/plural.js';
 
 	/** @typedef {{ origin: string, client?: string, at: string }} Frage */
 	/** @type {{ blocked: Frage[], program: string, hint: boolean } | null} */
@@ -24,7 +25,7 @@
 
 	const frage = $derived(stand?.blocked[0] ?? null);
 	const weitere = $derived(Math.max(0, (stand?.blocked.length ?? 0) - 1));
-	const name = (/** @type {Frage} */ f) => (f.origin === 'null' ? 'Eine Datei oder eingebettete Seite' : f.origin.replace(/^https?:\/\//, ''));
+	const name = (/** @type {Frage} */ f) => (f.origin === 'null' ? /* @wc-include */ 'A file or embedded page' : f.origin.replace(/^https?:\/\//, ''));
 
 	async function laden() {
 		try {
@@ -82,50 +83,50 @@
 	<section class="zugriff" aria-labelledby="h-zugriff-frage" aria-live="polite">
 		{#if frage}
 			<div class="teil">
-				<h2 id="h-zugriff-frage"><IconMaterialSymbolsCableRounded aria-hidden="true" />Darf {name(frage)} Transcribe nutzen?</h2>
+				<h2 id="h-zugriff-frage"><IconMaterialSymbolsCableRounded aria-hidden="true" />Allow {name(frage)} to use Transcribe?</h2>
 				<p>
-					{#if frage.client && frage.client !== name(frage)}„{frage.client}“ auf dieser Webseite{:else}Diese Webseite{/if}
-					möchte Sprache als Text holen oder Text aus Bildern lesen lassen. Erlaube nur, was du kennst.
+					{#if frage.client && frage.client !== name(frage)}“{frage.client}” on this website{:else}This website{/if}
+					wants to turn speech into text or have text read from images. Only allow what you know.
 				</p>
 				<div class="knoepfe">
-					<Button type="primary" size="large" loading={tut === 'erlauben'} onclick={() => antworten(frage, true)}>Erlauben</Button>
-					<Button type="secondary" size="large" loading={tut === 'ablehnen'} onclick={() => antworten(frage, false)}>Ablehnen</Button>
+					<Button type="primary" size="large" loading={tut === 'erlauben'} onclick={() => antworten(frage, true)}>Allow</Button>
+					<Button type="secondary" size="large" loading={tut === 'ablehnen'} onclick={() => antworten(frage, false)}>Deny</Button>
 				</div>
 				{#if weitere}
 					<p class="klein">
-						{weitere === 1 ? 'Eine weitere Seite fragt' : `${weitere} weitere Seiten fragen`}, danach hier oder unter
-						<a href="/settings#zugriff" data-sveltekit-reload>Einstellungen › Programme</a>.
+						{plural(weitere, ['One more site is asking', '# more sites are asking'])}, next here or under
+						<a href="/settings#zugriff" data-sveltekit-reload>Settings › Apps</a>.
 					</p>
 				{/if}
 			</div>
 		{:else if erlaubt}
 			<div class="teil">
-				<h2 id="h-zugriff-frage"><IconMaterialSymbolsCheckRounded aria-hidden="true" />{name(erlaubt)} darf Transcribe nutzen</h2>
-				<p>Versuche es dort noch einmal. Zurücknehmen lässt es sich unter <a href="/settings#zugriff" data-sveltekit-reload>Einstellungen › Programme</a>.</p>
+				<h2 id="h-zugriff-frage"><IconMaterialSymbolsCheckRounded aria-hidden="true" />{name(erlaubt)} can now use Transcribe</h2>
+				<p>Try again there. You can take this back under <a href="/settings#zugriff" data-sveltekit-reload>Settings › Apps</a>.</p>
 			</div>
 		{/if}
 
 		{#if stand?.hint}
 			<div class="teil" class:darunter={frage || erlaubt}>
 				{#if !frage && !erlaubt}
-					<h2 id="h-zugriff-frage"><IconMaterialSymbolsCableRounded aria-hidden="true" />{stand.program} nutzt Transcribe</h2>
+					<h2 id="h-zugriff-frage"><IconMaterialSymbolsCableRounded aria-hidden="true" />{stand.program} uses Transcribe</h2>
 				{:else}
-					<h3>Damit Programme Transcribe immer erreichen</h3>
+					<h3>So that apps can always reach Transcribe</h3>
 				{/if}
 				<p>
-					Programme erreichen Transcribe nur, solange es läuft. Soll es mit Windows starten und nach dem Schließen im
-					Infobereich der Taskleiste weiterlaufen?
+					Apps can only reach Transcribe while it is running. Should it start with Windows and keep running in the
+					notification area of the taskbar after you close it?
 				</p>
 				<div class="knoepfe">
-					<Button type={frage ? 'secondary' : 'primary'} size="large" loading={tut === 'an'} onclick={() => hintergrund(true)}>Einschalten</Button>
-					<Button type="tertiary" size="large" loading={tut === 'nein'} onclick={() => hintergrund(false)}>Nein, danke</Button>
+					<Button type={frage ? 'secondary' : 'primary'} size="large" loading={tut === 'an'} onclick={() => hintergrund(true)}>Switch on</Button>
+					<Button type="tertiary" size="large" loading={tut === 'nein'} onclick={() => hintergrund(false)}>No, thanks</Button>
 				</div>
 			</div>
 		{:else if eingeschaltet}
 			<div class="teil" class:darunter={frage || erlaubt}>
 				<p role="status">
-					Transcribe startet jetzt mit Windows und läuft im Hintergrund weiter. Ändern lässt es sich unter
-					<a href="/settings#bereit" data-sveltekit-reload>Einstellungen › Programme</a>.
+					Transcribe now starts with Windows and keeps running in the background. You can change this under
+					<a href="/settings#bereit" data-sveltekit-reload>Settings › Apps</a>.
 				</p>
 			</div>
 		{/if}

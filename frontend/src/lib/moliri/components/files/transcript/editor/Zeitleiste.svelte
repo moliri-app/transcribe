@@ -1,8 +1,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/files/transcript/editor/Zeitleiste.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/files/transcript/editor/Zeitleiste.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
@@ -14,7 +14,6 @@
      der Spur „Text“ verschiebt seine Zeit. Über den Spuren zeigt ein Laufband den Text unter der Maus.
      Portiert aus web/editor.html. -->
 <script>
-	import * as m from '$lib/moliri/texte.js';
 	import { untrack } from 'svelte';
 	import { anchorBounds, cueName, fmt, langName, runs, wordLang } from './model.js';
 
@@ -40,14 +39,14 @@
 	/** Beschriftung einer Spur in der Sprache der Oberfläche (die Namen oben sind Schlüssel) */
 	const laneLabel = (/** @type {string} */ n) =>
 		({
-			Welle: m.te_lane_wave,
-			Text: m.te_lane_text,
-			Sprecher: m.te_lane_speakers,
-			Sprache: m.te_lane_language,
-			Regie: m.te_lane_cues,
-			Zweifel: m.te_lane_doubt,
-			Rotstift: m.te_lane_corrections,
-			Clips: m.te_clips
+			Welle: () => /* @wc-include */ 'Wave',
+			Text: () => /* @wc-include */ 'Text',
+			Sprecher: () => /* @wc-include */ 'Speakers',
+			Sprache: () => /* @wc-include */ 'Language',
+			Regie: () => /* @wc-include */ 'Sounds',
+			Zweifel: () => /* @wc-include */ 'Doubt',
+			Rotstift: () => /* @wc-context: te_lane_corrections */ /* @wc-include */ 'Corrections',
+			Clips: () => /* @wc-include */ 'Clips'
 		})[n]?.() ?? n;
 	const LABEL_W = 108;
 	const RULER = 26; // Zeile des Zeitlineals, darin links die Zoomtasten
@@ -220,7 +219,7 @@
 			)) {
 				if (r.lang === 'de' && r.by === 'standard') bar(r.start, r.end, y, h, css('--desk'), langName('de'), { ink: css('--ink-2') });
 				else
-					bar(r.start, r.end, y, h, r.lang === 'de' ? css('--ink-3') : css(`--lang-${['en', 'fr', 'nl', 'it', 'es'].includes(r.lang) ? r.lang : 'x'}`), langName(r.lang) + (r.by === 'maschine' ? ` (${m.te_recognised()})` : ''), {
+					bar(r.start, r.end, y, h, r.lang === 'de' ? css('--ink-3') : css(`--lang-${['en', 'fr', 'nl', 'it', 'es'].includes(r.lang) ? r.lang : 'x'}`), langName(r.lang) + (r.by === 'maschine' ? ` (${/* @wc-include */ 'recognised'})` : ''), {
 						outline: r.by === 'mensch' ? css('--red') : null
 					});
 			}
@@ -457,7 +456,7 @@
 		ctx.fillStyle = css('--ink-2');
 		ctx.font = `600 13px ${css('--font')}`;
 		ctx.textBaseline = 'middle';
-		ctx.fillText(m.te_overview().toLocaleUpperCase(), 14, H / 2);
+		ctx.fillText((/* @wc-include */ 'Overview').toLocaleUpperCase(), 14, H / 2);
 		ovImg = ctx.getImageData(0, 0, ov.width, ov.height);
 	}
 	function drawOverviewView() {
@@ -652,7 +651,7 @@
 		class="ov"
 		class:video={ed.isVideo && ed.thumbs}
 		bind:this={ov}
-		aria-label={m.te_overview_hint()}
+		aria-label="Overview of the whole recording: click moves the view, double-click jumps"
 		onmousedown={(e) => {
 			if (e.clientX - ov.getBoundingClientRect().left < LABEL_W) return;
 			ovDrag = true;
@@ -668,7 +667,7 @@
 			bind:this={lanes}
 			style:height="{lanesH}px"
 			class:anker={hoverAnchor >= 0}
-			aria-label={m.te_lanes_hint()}
+			aria-label="Timeline with lanes: click jumps there, dragging marks a passage"
 			onmousedown={lanesDown}
 			onmousemove={lanesMove}
 			onmouseleave={() => {
@@ -676,10 +675,10 @@
 				hoverAnchor = -1;
 			}}
 		></canvas>
-		<div class="zoom" role="group" aria-label={m.te_zoom()}>
-			<button title="{m.te_zoom_out()} (−)" aria-label={m.te_zoom_out()} onclick={() => ed.zoom(2)}><IconMaterialSymbolsRemoveRounded /></button>
-			<button title="{m.te_zoom_in()} (+)" aria-label={m.te_zoom_in()} onclick={() => ed.zoom(0.5)}><IconMaterialSymbolsAddRounded /></button>
-			<button title={m.te_zoom_all()} aria-label={m.te_zoom_all()} onclick={() => ed.setView(0, ed.duration())}><IconMaterialSymbolsFitScreenOutlineRounded /></button>
+		<div class="zoom" role="group" aria-label="Zoom">
+			<button title="{/* @wc-include */ 'zoom out'} (−)" aria-label={/* @wc-include */ 'zoom out'} onclick={() => ed.zoom(2)}><IconMaterialSymbolsRemoveRounded /></button>
+			<button title="{/* @wc-include */ 'zoom in'} (+)" aria-label={/* @wc-include */ 'zoom in'} onclick={() => ed.zoom(0.5)}><IconMaterialSymbolsAddRounded /></button>
+			<button title={/* @wc-include */ 'whole recording'} aria-label={/* @wc-include */ 'whole recording'} onclick={() => ed.setView(0, ed.duration())}><IconMaterialSymbolsFitScreenOutlineRounded /></button>
 		</div>
 	</div>
 </div>

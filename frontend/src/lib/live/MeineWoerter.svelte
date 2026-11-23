@@ -27,7 +27,7 @@
 </script>
 
 <div class="woerter">
-	<label class="feldname" for={id}>Meine Wörter</label>
+	<label class="feldname" for={id}>My words</label>
 	<!-- ein Klick ins Feld, auch neben die Pillen, geht in die Eingabe -->
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 	<div class="rahmen" onclick={() => feld?.focus()}>
@@ -37,7 +37,7 @@
 				<button
 					type="button"
 					class="weg"
-					aria-label="{w} entfernen"
+					aria-label="Remove {w}"
 					onpointerdown={(e) => e.preventDefault()}
 					onclick={(e) => {
 						e.stopPropagation();
@@ -50,7 +50,7 @@
 			{id}
 			bind:this={feld}
 			bind:value={text}
-			placeholder="+ Wort"
+			placeholder={/* @wc-include */ '+ Word'}
 			maxlength="60"
 			spellcheck="false"
 			autocomplete="off"
@@ -59,7 +59,7 @@
 		/>
 	</div>
 	<span class="satz">
-		Namen und Fachbegriffe, etwa „Moliri“: Der Live-Text schreibt sie so, auch wenn sie ein wenig anders klingen.
+		Names and technical terms, such as “Moliri”: live text writes them like this, even when they sound a little different.
 	</span>
 </div>
 

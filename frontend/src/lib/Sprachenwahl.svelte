@@ -10,7 +10,7 @@
 	import { langName, vorschlaege } from '$lib/moliri/components/files/transcript/editor/sprachen.js';
 
 	/** @type {{ value: string, label?: string, onchange?: () => void }} */
-	let { value = $bindable('auto'), label = 'Sprache', onchange } = $props();
+	let { value = $bindable('auto'), label = /* @wc-include */ 'Language', onchange } = $props();
 
 	const id = 'sp' + Math.random().toString(36).slice(2, 8);
 	const codes = $derived(!value || value === 'auto' ? [] : value.split(','));
@@ -81,7 +81,7 @@
 				<button
 					type="button"
 					class="weg"
-					aria-label="{langName(c)} entfernen"
+					aria-label="Remove {langName(c)}"
 					onpointerdown={(e) => e.preventDefault()}
 					onclick={(e) => {
 						e.stopPropagation();
@@ -99,7 +99,7 @@
 			aria-controls="{id}-liste"
 			aria-activedescendant={offen && liste[aktiv] ? `${id}-${aktiv}` : undefined}
 			bind:value={text}
-			placeholder={codes.length ? 'weitere …' : 'Automatisch'}
+			placeholder={codes.length ? /* @wc-include */ 'more…' : /* @wc-include */ 'Automatic'}
 			spellcheck="false"
 			autocomplete="off"
 			oninput={zeigen}
@@ -127,7 +127,7 @@
 					<span class="code">{s.code}</span>
 				</li>
 			{:else}
-				<li class="nichts" role="presentation">Keine Sprache gefunden, die die Erkennung kennt.</li>
+				<li class="nichts" role="presentation">No language found that the recognition knows.</li>
 			{/each}
 		</ul>
 	{/if}

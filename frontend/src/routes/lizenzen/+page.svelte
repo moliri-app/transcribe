@@ -8,25 +8,29 @@
 	/** @typedef {{ name: string, version?: string, url?: string | null, note?: string }} Entry */
 	/** @type {{ key: 'frontend' | 'backend' | 'icons' | 'fonts', title: string, text: string }[]} */
 	const sections = [
-		{ key: 'frontend', title: 'Oberfläche', text: 'Pakete der Oberfläche mit allem, was sie mitziehen, auch Teile, die nur beim Bauen laufen.' },
-		{ key: 'backend', title: 'Programm', text: 'Go-Module, die in der EXE stecken.' },
-		{ key: 'icons', title: 'Icons', text: 'Icon-Sammlungen; mitgeliefert werden nur die benutzten Icons.' },
-		{ key: 'fonts', title: 'Schriften', text: 'Mitgelieferte Schriften.' }
+		{
+			key: 'frontend',
+			title: /* @wc-include */ 'User interface',
+			text: /* @wc-include */ 'Packages of the interface with everything they pull in, including parts that only run during the build.'
+		},
+		{ key: 'backend', title: /* @wc-include */ 'Program', text: /* @wc-include */ 'Go modules built into the EXE.' },
+		{ key: 'icons', title: /* @wc-include */ 'Icons', text: /* @wc-include */ 'Icon sets; only the icons in use are shipped.' },
+		{ key: 'fonts', title: /* @wc-include */ 'Fonts', text: /* @wc-include */ 'Bundled fonts.' }
 	];
 
 	/** @param {Record<string, Entry[]>} licenses */
 	const count = (licenses) => Object.values(licenses).reduce((n, l) => n + l.length, 0);
 </script>
 
-<svelte:head><title>Lizenzen · Transcribe by Moliri</title></svelte:head>
+<svelte:head><title>Licenses · Transcribe by Moliri</title></svelte:head>
 
 <main>
 	<header>
-		<h1>Lizenzen</h1>
+		<h1>Licenses</h1>
 		<p>
-			Transcribe by Moliri ist freie Software unter der
+			Transcribe by Moliri is free software under the
 			<a href="https://mozilla.org/MPL/2.0/" target="_blank" rel="noreferrer">Mozilla Public License 2.0</a>.
-			Sie baut auf der Arbeit anderer auf; hier steht, was sie mitbringt und unter welcher Lizenz.
+			It builds on the work of others; here you can see what it includes and under which license.
 		</p>
 	</header>
 
@@ -47,19 +51,19 @@
 					{/each}
 				</ul>
 			{:else}
-				<p class="text">Keine Angaben.</p>
+				<p class="text">No details.</p>
 			{/each}
 		</section>
 	{/each}
 
 	<section aria-labelledby="h-notice">
-		<h2 id="h-notice">Hinweise (NOTICE)</h2>
+		<h2 id="h-notice">Notices (NOTICE)</h2>
 		<p class="text">
-			Was die App beim ersten Start herunterlädt (Erkennungsbibliothek, Modelle, FFmpeg), gehört nicht zu ihr und
-			steht mit Lizenz und Namensnennung in der Datei NOTICE.
+			What the app downloads on first start (recognition library, models, FFmpeg) is not part of it and is listed
+			with license and attribution in the NOTICE file.
 		</p>
 		<details>
-			<summary>NOTICE lesen</summary>
+			<summary>Read NOTICE</summary>
 			<pre>{data.notice}</pre>
 		</details>
 	</section>

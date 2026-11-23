@@ -1,10 +1,11 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/ui/KeyboardTooltip.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/ui/KeyboardTooltip.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <script>
 	import Dropdown from '$lib/moliri/components/ui/Dropdown.svelte';
+	import { MediaQuery } from 'svelte/reactivity';
 
 	let {
 		textBefore = '',
@@ -15,9 +16,12 @@
 		disabled = false,
 		children
 	} = $props();
+
+	// Keyboard shortcuts mean nothing on a touch screen, and a tap there leaves the hint standing.
+	const mouse = new MediaQuery('(hover: hover) and (pointer: fine)', true);
 </script>
 
-{#if disabled}
+{#if disabled || !mouse.current}
 	<span class="keyboard-tooltip-trigger">
 		{@render children?.()}
 	</span>

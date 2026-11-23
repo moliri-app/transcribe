@@ -6,6 +6,7 @@
 // Einstellungen fürs Aufnehmen. Den Stand schickt der Server über /api/live/events (internal/live).
 import { einreihen, getJSON, post, vorgaben } from '$lib/api.js';
 import { langName } from '$lib/moliri/components/files/transcript/editor/sprachen.js';
+import { getLocale } from '$lib/moliri/i18n/locale.js';
 
 /** source: woher der Satz kam, wenn die Aufnahme Mikrofon und Systemaudio mischt
  * @typedef {{ text: string, start: number, end: number, source?: 'mic' | 'system' }} Zeile */
@@ -31,44 +32,85 @@ import { langName } from '$lib/moliri/components/files/transcript/editor/sprache
 /** die Sprachen einer Aufnahme mit Namen: „auto“ oder Codes mit Komma wie „de,en“
  * @param {string | undefined} codes */
 export function sprachname(codes) {
-	if (!codes || codes === 'auto') return 'Automatisch';
+	if (!codes || codes === 'auto') return /* @wc-include */ 'Automatic';
 	return codes.split(',').map(langName).join(', ');
 }
 
+// The tables of texts below are getters, so each read takes the text in the interface language.
+
 /** was aufgenommen wird */
-export const QUELLEN = { mic: 'Mikrofon', system: 'Systemaudio', both: 'Mikrofon und Systemaudio' };
+export const QUELLEN = {
+	get mic() {
+		return /* @wc-include */ 'Microphone';
+	},
+	get system() {
+		return /* @wc-include */ 'System audio';
+	},
+	get both() {
+		return /* @wc-include */ 'Microphone and system audio';
+	}
+};
 
 /** solange die Erkennung bereit ist, aber noch kein Ton kam (ein Bluetooth-Headset braucht dafür einige Sekunden) */
 export const WARTET = {
-	mic: 'Wartet aufs Mikrofon …',
-	system: 'Wartet aufs Systemaudio …',
-	both: 'Wartet auf Mikrofon und Systemaudio …'
+	get mic() {
+		return /* @wc-include */ 'Waiting for the microphone…';
+	},
+	get system() {
+		return /* @wc-include */ 'Waiting for system audio…';
+	},
+	get both() {
+		return /* @wc-include */ 'Waiting for microphone and system audio…';
+	}
 };
 
 /** was die Live-Seite sagt, wenn das Mikrofon der Erkennung schadet */
 export const EINGANG = {
-	narrow: 'Dieses Mikrofon liefert nur Telefonqualität, die Erkennung leidet.',
-	quiet: 'Dieses Mikrofon ist sehr leise, die Erkennung leidet.'
+	get narrow() {
+		return /* @wc-include */ 'This microphone only delivers phone quality, so recognition suffers.';
+	},
+	get quiet() {
+		return /* @wc-include */ 'This microphone is very quiet, so recognition suffers.';
+	}
 };
 
 /** wann Anfragen von Programmen gelöscht werden: Stunden nach ihrem Ende, 0 nie */
-export const LOESCHEN = /** @type {const} */ ([
-	[0, 'Nie, sie bleiben, bis du sie löschst'],
-	[1, 'Nach einer Stunde'],
-	[24, 'Nach einem Tag'],
-	[168, 'Nach einer Woche'],
-	[720, 'Nach 30 Tagen']
-]);
+export const LOESCHEN = [
+	wahl(0, () => /* @wc-include */ 'Never, they stay until you delete them'),
+	wahl(1, () => /* @wc-include */ 'After one hour'),
+	wahl(24, () => /* @wc-include */ 'After one day'),
+	wahl(168, () => /* @wc-include */ 'After one week'),
+	wahl(720, () => /* @wc-include */ 'After 30 days')
+];
+
+/** an entry [hours, name] whose name is read in the interface language each time
+ * @param {number} stunden @param {() => string} name @returns {readonly [number, string]} */
+function wahl(stunden, name) {
+	return /** @type {any} */ (Object.defineProperty([stunden], 1, { get: name, enumerable: true }));
+}
 
 /** so heißen die Quellen über den Sätzen einer gemischten Aufnahme */
-export const LINIE = { mic: 'Mikrofon', system: 'Systemaudio' };
+export const LINIE = {
+	get mic() {
+		return /* @wc-include */ 'Microphone';
+	},
+	get system() {
+		return /* @wc-include */ 'System audio';
+	}
+};
 
 /** die Dienste, die Programme außer der Live-Transkription nutzen */
-export const DIENSTE = /** @type {const} */ ({
-	ocr: 'Texterkennung',
-	filter: 'Filter in eigenen Worten',
-	embed: 'Suche nach Bedeutung'
-});
+export const DIENSTE = {
+	get ocr() {
+		return /* @wc-include */ 'Text recognition';
+	},
+	get filter() {
+		return /* @wc-include */ 'Filter in your own words';
+	},
+	get embed() {
+		return /* @wc-include */ 'Search by meaning';
+	}
+};
 
 /** Eine Anfrage an einen Dienst (Texterkennung, Sprachmodell, …), keine Aufnahme.
  * @param {Notiz} n */
@@ -82,9 +124,9 @@ export const vonHand = (n) => n.kind === 'dauer' || n.kind === 'diktat';
 /** wer die Aufnahme angestoßen hat
  * @param {Notiz} n */
 export function wer(n) {
-	if (n.kind === 'diktat') return 'Diktat';
-	if (vonHand(n)) return 'Von Hand';
-	const c = n.client || 'Programm';
+	if (n.kind === 'diktat') return /* @wc-context: live_who */ /* @wc-include */ 'Dictation';
+	if (vonHand(n)) return /* @wc-include */ 'Manual';
+	const c = n.client || /* @wc-include */ 'App';
 	// die Adresse einer Webseite ohne http://
 	return c.replace(/^https?:\/\//, '');
 }
@@ -93,13 +135,13 @@ export function wer(n) {
  * @param {Notiz} n */
 export function art(n) {
 	return {
-		audio: 'hat Audio geschickt',
-		mic: 'hat mithören lassen',
-		dauer: 'auf dieser Seite aufgenommen',
-		diktat: 'per Tastenkürzel diktiert',
-		ocr: 'hat Text in einem Bild lesen lassen',
-		filter: 'hat das Sprachmodell gefragt',
-		embed: 'hat Texte für die Suche nach Bedeutung umwandeln lassen'
+		audio: /* @wc-include */ 'sent audio',
+		mic: /* @wc-include */ 'let the app listen in',
+		dauer: /* @wc-include */ 'recorded on this page',
+		diktat: /* @wc-include */ 'dictated with the keyboard shortcut',
+		ocr: /* @wc-include */ 'had text in an image read',
+		filter: /* @wc-include */ 'asked the language model',
+		embed: /* @wc-include */ 'had texts converted for search by meaning'
 	}[n.kind];
 }
 
@@ -116,9 +158,12 @@ export function worum(n) {
 /** wie lange eine Anfrage dauerte, genauer als die Länge einer Aufnahme: „0,42 s“, „12 s“, „2:05 min“
  * @param {number} s */
 export function sekunden(s) {
-	if (s < 10) return `${s.toLocaleString('de-DE', { minimumFractionDigits: s < 1 ? 2 : 1, maximumFractionDigits: s < 1 ? 2 : 1 })} s`;
-	if (s < 60) return `${Math.round(s)} s`;
-	return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')} min`;
+	const stellen = s < 1 ? 2 : 1;
+	const kurz = s < 10 ? s.toLocaleString(getLocale(), { minimumFractionDigits: stellen, maximumFractionDigits: stellen }) : Math.round(s);
+	if (s < 60) return /* @wc-include */ `${kurz} s`;
+	const min = Math.floor(s / 60);
+	const sek = String(Math.floor(s % 60)).padStart(2, '0');
+	return /* @wc-include */ `${min}:${sek} min`;
 }
 
 /** wie lange die Aufnahme lief, in Sekunden
@@ -130,7 +175,7 @@ export function laenge(n, jetzt) {
 
 /** @param {string} iso */
 export function uhrzeit(iso) {
-	return new Date(iso).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+	return new Date(iso).toLocaleTimeString(getLocale(), { hour: '2-digit', minute: '2-digit' });
 }
 
 /** „Heute“, „Gestern“ oder der Tag mit Wochentag
@@ -143,9 +188,9 @@ export function tag(iso, jetzt) {
 			new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime()) /
 			864e5
 	);
-	if (tage === 0) return 'Heute';
-	if (tage === 1) return 'Gestern';
-	return a.toLocaleDateString('de-DE', {
+	if (tage === 0) return /* @wc-include */ 'Today';
+	if (tage === 1) return /* @wc-include */ 'Yesterday';
+	return a.toLocaleDateString(getLocale(), {
 		weekday: 'long',
 		day: 'numeric',
 		month: 'long',
@@ -395,7 +440,7 @@ class Live {
 
 	async starten() {
 		this.startet = true;
-		this.meldung = this.notizen?.length || this.warm === 'ready' ? '' : 'Lädt die Erkennung, beim ersten Mal dauert das etwas …';
+		this.meldung = this.notizen?.length || this.warm === 'ready' ? '' : /* @wc-include */ 'Loading speech recognition, the first time takes a moment…';
 		try {
 			await post('/api/live/start', { save: this.speichern });
 			this.meldung = '';
@@ -423,7 +468,7 @@ class Live {
 	async #einstellen(url, body) {
 		try {
 			await post(url, body);
-			this.meldung = this.mic.running ? 'Gilt ab der nächsten Aufnahme.' : '';
+			this.meldung = this.mic.running ? /* @wc-include */ 'Applies from the next recording on.' : '';
 		} catch (e) {
 			this.meldung = /** @type {Error} */ (e).message;
 		}
@@ -471,7 +516,9 @@ class Live {
 		try {
 			const { dropMode: _, ...o } = await vorgaben();
 			const k = await einreihen([n.audio], { ...o, language: n.language ?? o.language });
-			return k ? 'Wird transkribiert, danach steht sie in der Bibliothek.' : 'Wird schon transkribiert.';
+			return k
+				? /* @wc-include */ 'Being transcribed, then it will be in the library.'
+				: /* @wc-include */ 'Already being transcribed.';
 		} catch (e) {
 			return /** @type {Error} */ (e).message;
 		}

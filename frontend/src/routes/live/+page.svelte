@@ -83,7 +83,7 @@
 	<div class="haupt">
 		{#if !live.verbunden}
 			<p class="getrennt" role="alert">
-				<IconMaterialSymbolsErrorOutlineRounded aria-hidden="true" />Keine Verbindung zum Programm. Läuft es noch?
+				<IconMaterialSymbolsErrorOutlineRounded aria-hidden="true" />No connection to the app. Is it still running?
 			</p>
 		{/if}
 
@@ -93,15 +93,15 @@
 			<Aufnahme n={notiz} {q} onzurueck={schmal.current ? () => (liste = true) : undefined} />
 		{:else if live.notizen}
 			<div class="willkommen">
-				<h1>Sprache sofort als Text</h1>
+				<h1>Speech as text, instantly</h1>
 				<p>
-					Starte unten eine Aufnahme: übers Mikrofon und auf Wunsch mit dem Ton, den der Rechner abspielt, etwa die
-					anderen in einem Online-Meeting. Der Text erscheint hier, während gesprochen wird.
+					Start a recording below: through the microphone and, if you like, with the sound your computer plays, such
+					as the others in an online meeting. The text appears here while people speak.
 				</p>
 				<p>
-					Oder lass Programme wie Moliri Sprache schicken, über die
-					<a class="link" href="/settings#programme" data-sveltekit-reload>Live-API</a>. Jede Anfrage
-					{live.apiSpeichern ? 'bleibt links als Aufnahme stehen.' : 'steht links, solange sie läuft.'}
+					Or let apps like Moliri send speech through the
+					<a class="link" href="/settings#programme" data-sveltekit-reload>live API</a>. Each request
+					{live.apiSpeichern ? /* @wc-include */ 'stays on the left as a recording.' : /* @wc-include */ 'shows on the left while it runs.'}
 				</p>
 			</div>
 		{/if}

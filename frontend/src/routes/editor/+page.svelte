@@ -24,7 +24,9 @@
 	let beschrifter;
 
 	const file = $derived(files.find((f) => f.stem === stem) ?? null);
-	const title = $derived(file ? `${recordingName(file)} · Editor · Transcribe by Moliri` : 'Editor · Transcribe by Moliri');
+	const title = $derived(
+		file ? /* @wc-include */ `${recordingName(file)} · Editor · Transcribe by Moliri` : /* @wc-include */ 'Editor · Transcribe by Moliri'
+	);
 
 	onMount(async () => {
 		try {
@@ -34,7 +36,7 @@
 			files = idx.filter((f) => f.engines.some((e) => e.final) && (!f.hidden || f.stem === merken.get('stem')));
 		} catch {
 			phase = 'fehler';
-			error = 'Die Liste der Aufnahmen ließ sich nicht laden.';
+			error = /* @wc-include */ 'The list of recordings could not be loaded.';
 			return;
 		}
 		if (!files.length) {
@@ -52,7 +54,7 @@
 		if (!f) return;
 		// erst speichern, was zur bisherigen Aufnahme gehört; schlägt das fehl, bleibt sie offen
 		if (ed && stem !== next && !(await ed.saveNow())) {
-			alert('Die Korrekturen ließen sich nicht speichern. Die Aufnahme wurde nicht gewechselt.');
+			alert(/* @wc-include */ 'The corrections could not be saved. The recording was not switched.');
 			return;
 		}
 		const seq = ++openSeq;
@@ -64,7 +66,7 @@
 		} catch {
 			if (seq !== openSeq) return;
 			phase = 'fehler';
-			error = `„${recordingName(f)}“ ließ sich nicht laden.`;
+			error = /* @wc-include */ `“${recordingName(f)}” could not be loaded.`;
 			ed = null;
 			return;
 		}
@@ -82,7 +84,7 @@
 	<div class="wahlzeile">
 	<select
 		class="datei"
-		aria-label="Aufnahme wählen"
+		aria-label="Choose recording"
 		value={stem ?? ''}
 		disabled={!files.length}
 		onchange={async (e) => {
@@ -97,11 +99,11 @@
 	</select>
 	{#if file}
 		{@const f = file}
-		<button type="button" class="beschriften" title="Name und Schlagworte" aria-label="Name und Schlagworte" onclick={() => beschrifter.open(f)}>
+		<button type="button" class="beschriften" title="Name and tags" aria-label="Name and tags" onclick={() => beschrifter.open(f)}>
 			<IconMaterialSymbolsSellOutline aria-hidden="true" />
-			{#if !f.tags.length}<span>Schlagworte</span>{/if}
+			{#if !f.tags.length}<span>Tags</span>{/if}
 		</button>
-		{#each f.tags as t (t)}<button type="button" class="marke" title="Name und Schlagworte" onclick={() => beschrifter.open(f)}>{t}</button>{/each}
+		{#each f.tags as t (t)}<button type="button" class="marke" title="Name and tags" onclick={() => beschrifter.open(f)}>{t}</button>{/each}
 	{/if}
 	</div>
 {/snippet}
@@ -121,19 +123,19 @@
 		{/key}
 	{:else}
 		<header class="kopf">{@render wahl()}</header>
-		<div class="leer" role="region" aria-label="Transkript">
+		<div class="leer" role="region" aria-label="Transcript">
 			<div class="blatt">
 				{#if phase === 'laden'}
-					<p class="lade">Das Transkript wird geladen …</p>
+					<p class="lade">Loading the transcript…</p>
 				{:else if phase === 'leer'}
-					<h1>Noch kein Transkript</h1>
+					<h1>No transcript yet</h1>
 					<p>
-						Sobald eine Aufnahme transkribiert ist, steht sie hier zum Lesen und Abspielen bereit. Aufnahmen kommen über die
-						<a href="/" data-sveltekit-reload>Bibliothek</a> dazu.
+						As soon as a recording is transcribed, it is ready here to read and play. You add recordings in the
+						<a href="/" data-sveltekit-reload>library</a>.
 					</p>
 				{:else}
-					<h1>Das hat nicht geklappt</h1>
-					<p>{error} Läuft Transcribe noch? Dann die Seite neu laden.</p>
+					<h1>That did not work</h1>
+					<p>{error} Is Transcribe still running? Then reload the page.</p>
 				{/if}
 			</div>
 		</div>

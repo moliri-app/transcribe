@@ -35,11 +35,11 @@
 		try {
 			await navigator.clipboard.writeText(text);
 		} catch {
-			onmeldung('Der Text ist zu lang für eine E-Mail per Klick, und Kopieren ging nicht.');
+			onmeldung(/* @wc-include */ 'The text is too long for an email in one click, and copying did not work.');
 			return;
 		}
 		location.href = 'mailto:';
-		onmeldung('Der Text ist zu lang, um ihn direkt mitzugeben. Er liegt in der Zwischenablage: in der E-Mail mit Strg+V einfügen.');
+		onmeldung(/* @wc-include */ 'The text is too long to pass on directly. It is on the clipboard: paste it into the email with Ctrl+V.');
 	}
 
 	async function andereApp() {
@@ -48,7 +48,7 @@
 			onmeldung('');
 		} catch (e) {
 			// Abbrechen im Teilen-Fenster ist kein Fehler
-			if (/** @type {Error} */ (e).name !== 'AbortError') onmeldung('Teilen ging nicht.');
+			if (/** @type {Error} */ (e).name !== 'AbortError') onmeldung(/* @wc-include */ 'Sharing did not work.');
 		}
 	}
 
@@ -85,7 +85,7 @@
 		<span class="knopf" bind:this={knopf}>
 			<Button type="tertiary" size="large" title={beschreibung} aria-haspopup="menu" aria-expanded={offen}>
 				{#snippet iconLeft()}<IconMaterialSymbolsShareOutline />{/snippet}
-				Teilen
+				Share
 			</Button>
 		</span>
 	{/snippet}
@@ -93,11 +93,11 @@
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div class="eintraege" bind:this={menue} onkeydown={taste} onfocusout={fokusWeg}>
 			<DropdownItem href={emailLink} onselected={emailLink ? () => onmeldung('') : emailLang} tabindex="-1">
-				<IconMaterialSymbolsMailOutlineRounded />Als E-Mail
+				<IconMaterialSymbolsMailOutlineRounded />As email
 			</DropdownItem>
 			{#if systemTeilen}
 				<DropdownItem onselected={andereApp} tabindex="-1">
-					<IconMaterialSymbolsIosShareRounded />An andere App …
+					<IconMaterialSymbolsIosShareRounded />To another app…
 				</DropdownItem>
 			{/if}
 		</div>

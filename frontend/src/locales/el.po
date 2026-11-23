@@ -1,0 +1,4502 @@
+msgid ""
+msgstr ""
+"Source-Language: en\n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2\n"
+"X-Plurals-Order: one, other\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+
+#. 0: r.status
+#. 0: r.status
+#. 0: page.status
+#: src/lib/api.js
+#: src/lib/editor/speicher.js
+#: src/routes/+error.svelte
+msgid "Error {0}"
+msgstr "Σφάλμα {0}"
+
+#: src/lib/api.js
+msgid "On this computer"
+msgstr "Σε αυτόν τον υπολογιστή"
+
+#: src/lib/api.js
+msgid "Via the API"
+msgstr "Μέσω του API"
+
+#: src/lib/api.js
+msgid "# byte"
+msgid_plural "# bytes"
+msgstr[0] "# byte"
+msgstr[1] "# byte"
+
+#: src/lib/editor/speicher.js
+msgid "Transcribe does not answer"
+msgstr "Το Transcribe δεν απαντά"
+
+#: src/lib/live/suche.js
+msgid "All"
+msgstr "Όλα"
+
+#: src/lib/live/stand.svelte.js
+#: src/lib/live/suche.js
+msgid "Manual"
+msgstr "Χειροκίνητα"
+
+#: src/lib/live/suche.js
+msgid "Via API"
+msgstr "Μέσω API"
+
+#: src/lib/live/suche.js
+msgid "AI & OCR"
+msgstr "ΤΝ & OCR"
+
+#: src/lib/live/suche.js
+msgid "Newest first"
+msgstr "Νεότερες πρώτα"
+
+#: src/lib/live/suche.js
+msgid "Oldest first"
+msgstr "Παλαιότερες πρώτα"
+
+#: src/lib/live/suche.js
+msgid "Longest first"
+msgstr "Μεγαλύτερες πρώτα"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Clip"
+msgstr "Κλιπ"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Interview (2 speakers)"
+msgstr "Συνέντευξη (2 ομιλητές)"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Conversation"
+msgstr "Συζήτηση"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Talk (1 speaker)"
+msgstr "Ομιλία (1 ομιλητής)"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Music, stage"
+msgstr "Μουσική, σκηνή"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgctxt "transcript_preset_auto"
+msgid "Automatic"
+msgstr "Αυτόματο"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Music"
+msgstr "Μουσική"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Singing"
+msgstr "Τραγούδι"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Applause"
+msgstr "Χειροκρότημα"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Laughter"
+msgstr "Γέλια"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Cheering"
+msgstr "Επευφημίες"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "background music"
+msgstr "μουσική υπόκρουση"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Time anchor moved in the text"
+msgstr "Η άγκυρα χρόνου μετακινήθηκε στο κείμενο"
+
+#. 0: fmtT(e.start)
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Time anchor {0} →"
+msgstr "Άγκυρα χρόνου {0} →"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "deleted"
+msgstr "διαγράφηκε"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "inserted:"
+msgstr "εισήχθη:"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "replaced:"
+msgstr "αντικαταστάθηκε:"
+
+#: src/lib/AppBar.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Library"
+msgstr "Βιβλιοθήκη"
+
+#: src/lib/AppBar.svelte
+msgid "Editor"
+msgstr "Επεξεργαστής"
+
+#: src/lib/AppBar.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Live"
+msgstr "Live"
+
+#: src/lib/AppBar.svelte
+#: src/lib/Einrichtung.svelte
+#: src/routes/settings/+page.svelte
+msgid "Settings"
+msgstr "Ρυθμίσεις"
+
+#: src/lib/AppBar.svelte
+msgid "Main navigation"
+msgstr "Κύρια πλοήγηση"
+
+#: src/lib/AppBar.svelte
+msgid "Transcribe, home page"
+msgstr "Transcribe, αρχική σελίδα"
+
+#: src/lib/AppBar.svelte
+msgid "Moliri, the museum database: open website"
+msgstr "Moliri, η βάση δεδομένων μουσείων: άνοιγμα ιστότοπου"
+
+#: src/lib/AppBar.svelte
+msgid "by <0/> Moliri<1>(opens Moliri’s website)</1>"
+msgstr "by <0/> Moliri<1>(ανοίγει τον ιστότοπο του Moliri)</1>"
+
+#. 0: versionText(neu)
+#: src/lib/AppBar.svelte
+msgid "Version {0} is available: install it in Settings"
+msgstr "Η έκδοση {0} είναι διαθέσιμη: εγκαταστήστε την στις Ρυθμίσεις"
+
+#: src/lib/AppBar.svelte
+msgid "<0/>Update"
+msgstr "<0/>Ενημέρωση"
+
+#. 0: active
+#: src/lib/AppBar.svelte
+msgid "{0} active jobs"
+msgstr "{0} ενεργές εργασίες"
+
+#: src/lib/AppBar.svelte
+msgid "active jobs"
+msgstr "ενεργές εργασίες"
+
+#: src/lib/AppBar.svelte
+msgid "More<0/>"
+msgstr "Περισσότερα<0/>"
+
+#. 0: (e).message
+#: src/lib/Beschriften.svelte
+msgid "That could not be saved: {0}"
+msgstr "Δεν ήταν δυνατή η αποθήκευση: {0}"
+
+#: src/lib/Beschriften.svelte
+msgid "Separate with commas, e.g. interview, paper mill"
+msgstr "Διαχωρίστε με κόμματα, π.χ. συνέντευξη, χαρτοποιείο"
+
+#: src/lib/Beschriften.svelte
+msgid "Tags in use"
+msgstr "Λέξεις-κλειδιά σε χρήση"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "<0/>Show again"
+msgstr "<0/>Εμφάνιση ξανά"
+
+#: src/lib/Beschriften.svelte
+msgid "<0/>Hide"
+msgstr "<0/>Απόκρυψη"
+
+#: src/lib/Beschriften.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/routes/bausteine/+page.svelte
+#: src/routes/bausteine/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Cancel"
+msgstr "Άκυρο"
+
+#: src/lib/Beschriften.svelte
+#: src/routes/bausteine/+page.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Save"
+msgstr "Αποθήκευση"
+
+#: src/lib/Beschriften.svelte
+#: src/lib/Bibliothek.svelte
+#: src/routes/editor/+page.svelte
+#: src/routes/editor/+page.svelte
+#: src/routes/editor/+page.svelte
+msgid "Name and tags"
+msgstr "Όνομα και λέξεις-κλειδιά"
+
+#: src/lib/Beschriften.svelte
+msgid "Name <0/>"
+msgstr "Όνομα <0/>"
+
+#. 0: a.file
+#: src/lib/Beschriften.svelte
+msgid "Only in Transcribe. The file keeps its name “{0}”."
+msgstr "Μόνο στο Transcribe. Το αρχείο διατηρεί το όνομά του «{0}»."
+
+#: src/lib/Beschriften.svelte
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Tags <0/>"
+msgstr "Λέξεις-κλειδιά <0/>"
+
+#: src/lib/AuftragsOptionen.svelte
+msgid "Detect automatically"
+msgstr "Αυτόματος εντοπισμός"
+
+#: src/lib/AuftragsOptionen.svelte
+msgid "1, e.g. a talk, reading or guided tour"
+msgstr "1, π.χ. διάλεξη, ανάγνωση ή ξενάγηση"
+
+#: src/lib/AuftragsOptionen.svelte
+msgid "2, e.g. an interview"
+msgstr "2, π.χ. συνέντευξη"
+
+#: src/lib/AuftragsOptionen.svelte
+#: src/lib/live/StimmeWahl.svelte
+#: src/routes/settings/+page.svelte
+msgid "Languages"
+msgstr "Γλώσσες"
+
+#: src/lib/AuftragsOptionen.svelte
+msgid "Recognition <0/>"
+msgstr "Αναγνώριση <0/>"
+
+#: src/lib/AuftragsOptionen.svelte
+msgid "Speakers <0/>"
+msgstr "Ομιλητές <0/>"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Mono"
+msgstr "Μονοφωνικό"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Stereo"
+msgstr "Στερεοφωνικό"
+
+#. 0: n
+#: src/lib/Dateiinfo.svelte
+msgid "{0} channels"
+msgstr "{0} κανάλια"
+
+#. 0: zahl
+#: src/lib/Dateiinfo.svelte
+msgid "{0} fps"
+msgstr "{0} fps"
+
+#. 0: wann
+#: src/lib/Dateiinfo.svelte
+msgid "ready since {0}"
+msgstr "έτοιμη από {0}"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Dateiinfo.svelte
+msgid "# speaker"
+msgid_plural "# speakers"
+msgstr[0] "# ομιλητής"
+msgstr[1] "# ομιλητές"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Dateiinfo.svelte
+msgid "# manual correction"
+msgid_plural "# manual corrections"
+msgstr[0] "# διόρθωση με το χέρι"
+msgstr[1] "# διορθώσεις με το χέρι"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Dateiinfo.svelte
+msgid "# clip"
+msgid_plural "# clips"
+msgstr[0] "# κλιπ"
+msgstr[1] "# κλιπ"
+
+#. 0: fehler
+#: src/lib/Dateiinfo.svelte
+msgid "The file details could not be read: {0}"
+msgstr "Δεν ήταν δυνατή η ανάγνωση των στοιχείων του αρχείου: {0}"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Reading the file…"
+msgstr "Ανάγνωση του αρχείου…"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Dateiinfo.svelte
+msgid "Length"
+msgstr "Διάρκεια"
+
+#: src/lib/Dateiinfo.svelte
+msgid "(according to the file)"
+msgstr "(σύμφωνα με το αρχείο)"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Recorded"
+msgstr "Ηχογραφήθηκε"
+
+#: src/lib/Dateiinfo.svelte
+msgid "(copied here)"
+msgstr "(αντιγράφηκε εδώ)"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Created"
+msgstr "Δημιουργήθηκε"
+
+#: src/lib/Dateiinfo.svelte
+msgid "In the file"
+msgstr "Στο αρχείο"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Format"
+msgstr "Μορφή"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Sound"
+msgstr "Ήχος"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Picture"
+msgstr "Εικόνα"
+
+#: src/lib/Dateiinfo.svelte
+msgid "saved as a file next to the recording"
+msgstr "αποθηκεύεται ως αρχείο δίπλα στην ηχογράφηση"
+
+#: src/lib/Dateiinfo.svelte
+msgid "none yet"
+msgstr "καμία ακόμη"
+
+#: src/lib/Dateiinfo.svelte
+msgid "File name"
+msgstr "Όνομα αρχείου"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Location"
+msgstr "Τοποθεσία"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Size"
+msgstr "Μέγεθος"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Modified"
+msgstr "Τροποποιήθηκε"
+
+#: src/lib/Dateiinfo.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/routes/editor/+page.svelte
+msgid "Transcript"
+msgstr "Απομαγνητοφώνηση"
+
+#: src/lib/Dateiinfo.svelte
+msgid "What is in the file (length, format) cannot be read right now."
+msgstr "Το περιεχόμενο του αρχείου (διάρκεια, μορφή) δεν μπορεί να διαβαστεί αυτή τη στιγμή."
+
+#: src/lib/Dateiinfo.svelte
+msgid "<0/>Open in editor"
+msgstr "<0/>Άνοιγμα στον επεξεργαστή"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Dateiinfo.svelte
+#: src/lib/live/Aufnahmeleiste.svelte
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/ui/SimpleModal.svelte
+msgid "Close"
+msgstr "Κλείσιμο"
+
+#: src/lib/Einrichtung.svelte
+msgid "All set."
+msgstr "Όλα έτοιμα."
+
+#. 0: fehler.label; 1: fehler.error
+#: src/lib/Einrichtung.svelte
+msgid "Download failed ({0}): {1}"
+msgstr "Η λήψη απέτυχε ({0}): {1}"
+
+#. 0: fertig; 1: n
+#: src/lib/Einrichtung.svelte
+msgid "First-time setup ({0}/{1})…"
+msgstr "Αρχική ρύθμιση ({0}/{1})…"
+
+#. 0: fertig; 1: n; 2: name; 3: done; 4: total
+#: src/lib/Einrichtung.svelte
+msgid "First-time setup ({0}/{1}): downloading {2} – {3} / {4}"
+msgstr "Αρχική ρύθμιση ({0}/{1}): λήψη {2} – {3} / {4}"
+
+#. 0: fertig; 1: n; 2: name
+#: src/lib/Einrichtung.svelte
+msgid "First-time setup ({0}/{1}): downloading {2}"
+msgstr "Αρχική ρύθμιση ({0}/{1}): λήψη {2}"
+
+#: src/lib/Einrichtung.svelte
+msgid "The GPU runtime is being downloaded. You can follow the progress below and in"
+msgstr "Γίνεται λήψη του περιβάλλοντος εκτέλεσης GPU. Μπορείτε να παρακολουθείτε την πρόοδο παρακάτω και στις"
+
+#. 0: msg
+#. 0: msg
+#: src/lib/Einrichtung.svelte
+#: src/lib/Einrichtung.svelte
+msgid "Error: {0}"
+msgstr "Σφάλμα: {0}"
+
+#: src/lib/Einrichtung.svelte
+msgid "Reading files…"
+msgstr "Ανάγνωση αρχείων…"
+
+#: src/lib/Einrichtung.svelte
+msgid "No audio or video file found."
+msgstr "Δεν βρέθηκε αρχείο ήχου ή βίντεο."
+
+#. 0: nr; 1: dateien.length; 2: name
+#: src/lib/Einrichtung.svelte
+msgid "Uploading ({0}/{1}): {2}…"
+msgstr "Μεταφόρτωση ({0}/{1}): {2}…"
+
+#. 0: namen.length
+#: src/lib/Einrichtung.svelte
+msgid "{0} file(s) uploaded. You can transcribe them in the library."
+msgstr "Μεταφορτώθηκαν {0} αρχείο(α). Μπορείτε να τα απομαγνητοφωνήσετε στη βιβλιοθήκη."
+
+#. 0: n; 1: skipped
+#: src/lib/Einrichtung.svelte
+msgid "{0} file(s) are being transcribed ({1} skipped)."
+msgstr "Απομαγνητοφωνούνται {0} αρχείο(α) ({1} παραλείφθηκαν)."
+
+#. 0: n
+#: src/lib/Einrichtung.svelte
+msgid "{0} file(s) are being transcribed."
+msgstr "Απομαγνητοφωνούνται {0} αρχείο(α)."
+
+#: src/lib/Einrichtung.svelte
+msgid "Go to library"
+msgstr "Στη βιβλιοθήκη"
+
+#: src/lib/Einrichtung.svelte
+msgid "Drop files or folders here"
+msgstr "Αποθέστε εδώ αρχεία ή φακέλους"
+
+#: src/lib/Einrichtung.svelte
+msgid "Audio or video; it goes into the library and gets transcribed"
+msgstr "Ήχος ή βίντεο· μπαίνει στη βιβλιοθήκη και απομαγνητοφωνείται"
+
+#: src/lib/Einrichtung.svelte
+msgid "First-time setup"
+msgstr "Αρχική ρύθμιση"
+
+#. 0: stand.text
+#: src/lib/Einrichtung.svelte
+msgid "{0} – Restart the app or download again in <0>Settings</0>."
+msgstr "{0} – Επανεκκινήστε την εφαρμογή ή κάντε ξανά λήψη στις <0>Ρυθμίσεις</0>."
+
+#. 0: stand.text
+#: src/lib/Einrichtung.svelte
+msgid "{0}. You can already use the app; jobs start as soon as everything is ready."
+msgstr "{0}. Μπορείτε ήδη να χρησιμοποιείτε την εφαρμογή· οι εργασίες ξεκινούν μόλις όλα είναι έτοιμα."
+
+#: src/lib/Einrichtung.svelte
+msgid "NVIDIA GPU detected"
+msgstr "Εντοπίστηκε GPU της NVIDIA"
+
+#. 0: gpu.gpu.cudaMajor; 1: Math.round(gpu.gpu.fetch / 1048576)
+#: src/lib/Einrichtung.svelte
+msgid "<0/> can speed up recognition. For this, the app downloads the GPU runtime once (CUDA {0}, about 500 MB) and the missing libraries from NVIDIA (about {1} MB)."
+msgstr "<0/> μπορεί να επιταχύνει την αναγνώριση. Γι’ αυτό, η εφαρμογή κατεβάζει μία φορά το περιβάλλον εκτέλεσης GPU (CUDA {0}, περίπου 500 MB) και τις βιβλιοθήκες που λείπουν από τη NVIDIA (περίπου {1} MB)."
+
+#. 0: gpu.gpu.cudaMajor
+#: src/lib/Einrichtung.svelte
+msgid "<0/> can speed up recognition. For this, the app downloads the GPU runtime once (CUDA {0}, about 500 MB)."
+msgstr "<0/> μπορεί να επιταχύνει την αναγνώριση. Γι’ αυτό, η εφαρμογή κατεβάζει μία φορά το περιβάλλον εκτέλεσης GPU (CUDA {0}, περίπου 500 MB)."
+
+#: src/lib/Einrichtung.svelte
+msgid "By choosing “Download GPU runtime”, you accept NVIDIA’s license terms for the <0>CUDA Toolkit</0> and for <1>cuDNN</1>."
+msgstr "Επιλέγοντας «Λήψη περιβάλλοντος εκτέλεσης GPU», αποδέχεστε τους όρους άδειας χρήσης της NVIDIA για το <0>CUDA Toolkit</0> και για το <1>cuDNN</1>."
+
+#: src/lib/Einrichtung.svelte
+msgid "How much this helps depends on the model and the recording. Without a GPU, everything runs on the processor as before, and you can change this in the settings at any time."
+msgstr "Το πόσο βοηθά εξαρτάται από το μοντέλο και την ηχογράφηση. Χωρίς GPU, όλα εκτελούνται στον επεξεργαστή (CPU) όπως πριν, και μπορείτε να το αλλάξετε ανά πάσα στιγμή στις ρυθμίσεις."
+
+#: src/lib/Einrichtung.svelte
+msgid "Use processor only"
+msgstr "Μόνο με τον επεξεργαστή (CPU)"
+
+#: src/lib/Einrichtung.svelte
+msgid "Download GPU runtime"
+msgstr "Λήψη περιβάλλοντος εκτέλεσης GPU"
+
+#: src/lib/Einrichtung.svelte
+msgid "Process # file"
+msgid_plural "Process # files"
+msgstr[0] "Επεξεργασία # αρχείου"
+msgstr[1] "Επεξεργασία # αρχείων"
+
+#. 0: frage.skipped
+#: src/lib/Einrichtung.svelte
+msgid "The files have been uploaded. {0} other file(s) were skipped."
+msgstr "Τα αρχεία μεταφορτώθηκαν. Παραλείφθηκαν {0} άλλο(α) αρχείο(α)."
+
+#: src/lib/Einrichtung.svelte
+msgid "The files have been uploaded."
+msgstr "Τα αρχεία μεταφορτώθηκαν."
+
+#. 0: frage.namen.length - 8
+#: src/lib/Einrichtung.svelte
+msgid "… and {0} more"
+msgstr "… και {0} ακόμη"
+
+#: src/lib/Einrichtung.svelte
+msgid "<0/> From now on, start right away without asking"
+msgstr "<0/> Από εδώ και πέρα, έναρξη αμέσως χωρίς ερώτηση"
+
+#: src/lib/Einrichtung.svelte
+msgid "Later"
+msgstr "Αργότερα"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Einrichtung.svelte
+msgid "Transcribe"
+msgstr "Απομαγνητοφώνηση"
+
+#: src/lib/Bibliothek.svelte
+msgid "waiting"
+msgstr "σε αναμονή"
+
+#: src/lib/Bibliothek.svelte
+msgid "running"
+msgstr "σε εξέλιξη"
+
+#: src/lib/Bibliothek.svelte
+msgid "paused"
+msgstr "σε παύση"
+
+#: src/lib/Bibliothek.svelte
+msgid "cancelling"
+msgstr "ακυρώνεται"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Liste.svelte
+#: src/routes/settings/+page.svelte
+msgid "Error"
+msgstr "Σφάλμα"
+
+#: src/lib/Bibliothek.svelte
+msgid "Last edited"
+msgstr "Τελευταία επεξεργασία"
+
+#: src/lib/Bibliothek.svelte
+msgid "Name"
+msgstr "Όνομα"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "All recordings"
+msgstr "Όλες οι ηχογραφήσεις"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Uploaded"
+msgstr "Μεταφορτωμένες"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Live recordings"
+msgstr "Ηχογραφήσεις Live"
+
+#. 0: uhrzeit
+#: src/lib/Bibliothek.svelte
+msgid "today, {0}"
+msgstr "σήμερα, {0}"
+
+#: src/lib/Bibliothek.svelte
+msgid "yesterday"
+msgstr "χθες"
+
+#. 0: am
+#: src/lib/Bibliothek.svelte
+msgid "Recorded on {0}"
+msgstr "Ηχογραφήθηκε στις {0}"
+
+#. 0: am
+#: src/lib/Bibliothek.svelte
+msgid "Created on {0}"
+msgstr "Δημιουργήθηκε στις {0}"
+
+#. 0: am
+#: src/lib/Bibliothek.svelte
+msgid "Modified on {0}"
+msgstr "Τροποποιήθηκε στις {0}"
+
+#. 0: fertigAm; 1: am
+#: src/lib/Bibliothek.svelte
+msgid "Transcribed on {0}, recorded on {1}"
+msgstr "Απομαγνητοφωνήθηκε στις {0}, ηχογραφήθηκε στις {1}"
+
+#. 0: fertigAm; 1: am
+#: src/lib/Bibliothek.svelte
+msgid "Transcribed on {0}, created on {1}"
+msgstr "Απομαγνητοφωνήθηκε στις {0}, δημιουργήθηκε στις {1}"
+
+#. 0: fertigAm; 1: am
+#: src/lib/Bibliothek.svelte
+msgid "Transcribed on {0}, modified on {1}"
+msgstr "Απομαγνητοφωνήθηκε στις {0}, τροποποιήθηκε στις {1}"
+
+#: src/lib/Bibliothek.svelte
+msgid "Speakers: automatic"
+msgstr "Ομιλητές: αυτόματα"
+
+#: src/lib/Bibliothek.svelte
+msgid "via the API"
+msgstr "μέσω του API"
+
+#: src/lib/Bibliothek.svelte
+msgid "Please choose a folder or paste its path."
+msgstr "Επιλέξτε έναν φάκελο ή επικολλήστε τη διαδρομή του."
+
+#: src/lib/Bibliothek.svelte
+msgid "one recording"
+msgid_plural "# recordings"
+msgstr[0] "μία ηχογράφηση"
+msgstr[1] "# ηχογραφήσεις"
+
+#. 0: neuer.name; 1: anzahl
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” is connected: {1}."
+msgstr "Ο φάκελος «{0}» συνδέθηκε: {1}."
+
+#. 0: o.name
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” is disconnected. The recordings and transcripts in it stay where they are."
+msgstr "Ο φάκελος «{0}» αποσυνδέθηκε. Οι ηχογραφήσεις και οι απομαγνητοφωνήσεις του μένουν εκεί που είναι."
+
+#: src/lib/Bibliothek.svelte
+msgid "Please choose at least one recording."
+msgstr "Επιλέξτε τουλάχιστον μία ηχογράφηση."
+
+#: src/lib/Bibliothek.svelte
+msgid "One recording is being transcribed."
+msgid_plural "# recordings are being transcribed."
+msgstr[0] "Μία ηχογράφηση απομαγνητοφωνείται."
+msgstr[1] "# ηχογραφήσεις απομαγνητοφωνούνται."
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Already in progress."
+msgstr "Ήδη σε εξέλιξη."
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” is being transcribed again. Your corrections are kept."
+msgstr "Το «{0}» απομαγνητοφωνείται ξανά. Οι διορθώσεις σας διατηρούνται."
+
+#. 0: f.name
+#: src/lib/Bibliothek.svelte
+msgid "Uploading {0}…"
+msgstr "Μεταφόρτωση {0}…"
+
+#: src/lib/Bibliothek.svelte
+msgid "Uploaded. It is now under “Not transcribed yet”."
+msgstr "Μεταφορτώθηκε. Βρίσκεται τώρα στην ενότητα «Δεν απομαγνητοφωνήθηκαν ακόμη»."
+
+#: src/lib/Bibliothek.svelte
+msgid "Uploaded."
+msgstr "Μεταφορτώθηκε."
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” has been deleted."
+msgstr "Το «{0}» διαγράφηκε."
+
+#. 0: stand.title
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” is saved."
+msgstr "Το «{0}» αποθηκεύτηκε."
+
+#. 0: title
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” is hidden. The file stays where it is; you can show it again under “Hidden” on the left."
+msgstr "Το «{0}» αποκρύφθηκε. Το αρχείο μένει εκεί που είναι· μπορείτε να το εμφανίσετε ξανά αριστερά, στην ενότητα «Κρυφά»."
+
+#. 0: title
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” is shown again."
+msgstr "Το «{0}» εμφανίζεται ξανά."
+
+#. 0: korrekturen; 1: clips
+#: src/lib/Bibliothek.svelte
+msgid "{0} and {1}"
+msgstr "{0} και {1}"
+
+#: src/lib/Bibliothek.svelte
+msgid "Library · Transcribe by Moliri"
+msgstr "Βιβλιοθήκη · Transcribe by Moliri"
+
+#. 0: z.offen
+#: src/lib/Bibliothek.svelte
+msgid "{0} without a transcript"
+msgstr "{0} χωρίς απομαγνητοφώνηση"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/live/Abspielen.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgctxt "te_pause_short"
+msgid "Pause"
+msgstr "Παύση"
+
+#: src/lib/Bibliothek.svelte
+msgid "Listen"
+msgstr "Ακρόαση"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Pause {0}"
+msgstr "Παύση: {0}"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Listen to {0}"
+msgstr "Ακρόαση: {0}"
+
+#: src/lib/Bibliothek.svelte
+msgid "File details"
+msgstr "Στοιχεία αρχείου"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Details for {0}"
+msgstr "Στοιχεία: {0}"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Name and tags of {0}"
+msgstr "Όνομα και λέξεις-κλειδιά: {0}"
+
+#: src/lib/Bibliothek.svelte
+msgid "Show again"
+msgstr "Εμφάνιση ξανά"
+
+#. 0: nm
+#. 0: nm
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Show {0} again"
+msgstr "Εμφάνιση ξανά {0}"
+
+#: src/lib/Bibliothek.svelte
+msgid "Hide; the file stays in the folder"
+msgstr "Απόκρυψη· το αρχείο μένει στον φάκελο"
+
+#. 0: a.title
+#. 0: nm
+#. 0: nm
+#: src/lib/Bibliothek.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Hide {0}"
+msgstr "Απόκρυψη {0}"
+
+#: src/lib/Bibliothek.svelte
+msgid "Being transcribed right now; cancel first, then delete"
+msgstr "Απομαγνητοφωνείται αυτή τη στιγμή· ακυρώστε πρώτα και μετά διαγράψτε"
+
+#: src/lib/Bibliothek.svelte
+#: src/routes/bausteine/+page.svelte
+msgid "Delete"
+msgstr "Διαγραφή"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Delete {0}"
+msgstr "Διαγραφή: {0}"
+
+#: src/lib/Bibliothek.svelte
+msgid "Your recordings and their transcripts. You can also simply drag new files and whole folders into the window."
+msgstr "Οι ηχογραφήσεις σας και οι απομαγνητοφωνήσεις τους. Μπορείτε επίσης απλώς να σύρετε νέα αρχεία και ολόκληρους φακέλους στο παράθυρο."
+
+#: src/lib/Bibliothek.svelte
+msgid "<0/> Add files <1/>"
+msgstr "<0/> Προσθήκη αρχείων <1/>"
+
+#: src/lib/Bibliothek.svelte
+#: src/routes/bausteine/+page.svelte
+msgid "Undo"
+msgstr "Αναίρεση"
+
+#: src/lib/Bibliothek.svelte
+msgid "If it was closed, the transcription has stopped too: after a restart you can start it again with “Retry”."
+msgstr "Αν η εφαρμογή έκλεισε, σταμάτησε και η απομαγνητοφώνηση: μετά από επανεκκίνηση μπορείτε να την ξεκινήσετε ξανά με «Δοκιμή ξανά»."
+
+#: src/lib/Bibliothek.svelte
+msgid "No connection to Transcribe. Is the app still running? <0/>"
+msgstr "Δεν υπάρχει σύνδεση με το Transcribe. Εκτελείται ακόμη η εφαρμογή; <0/>"
+
+#: src/lib/Bibliothek.svelte
+msgid "There are many recordings next to Transcribe"
+msgstr "Δίπλα στο Transcribe υπάρχουν πολλές ηχογραφήσεις"
+
+#: src/lib/Bibliothek.svelte
+msgid "There is one recording next to Transcribe"
+msgid_plural "There are # recordings next to Transcribe"
+msgstr[0] "Δίπλα στο Transcribe υπάρχει μία ηχογράφηση"
+msgstr[1] "Δίπλα στο Transcribe υπάρχουν # ηχογραφήσεις"
+
+#. 0: h.name
+#: src/lib/Bibliothek.svelte
+msgid "In the folder “{0}”. Once connected, it shows up here without being copied, and the transcripts are saved right next to it."
+msgstr "Στον φάκελο «{0}». Μόλις συνδεθεί, εμφανίζεται εδώ χωρίς να αντιγραφεί, και οι απομαγνητοφωνήσεις αποθηκεύονται ακριβώς δίπλα της."
+
+#. 0: h.name
+#: src/lib/Bibliothek.svelte
+msgid "In the folder “{0}” and its subfolders. Once connected, everything shows up here without being copied, and the transcripts are saved right next to it."
+msgstr "Στον φάκελο «{0}» και στους υποφακέλους του. Μόλις συνδεθεί, όλα εμφανίζονται εδώ χωρίς να αντιγραφούν, και οι απομαγνητοφωνήσεις αποθηκεύονται ακριβώς δίπλα τους."
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Connect folder"
+msgstr "Σύνδεση φακέλου"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Zugriff.svelte
+msgid "No, thanks"
+msgstr "Όχι, ευχαριστώ"
+
+#: src/lib/Bibliothek.svelte
+msgid "Library sections"
+msgstr "Ενότητες της βιβλιοθήκης"
+
+#: src/lib/Bibliothek.svelte
+msgid "Dragged into the window or added; stored in Transcribe’s data folder"
+msgstr "Σύρθηκαν στο παράθυρο ή προστέθηκαν· αποθηκεύονται στον φάκελο δεδομένων του Transcribe"
+
+#: src/lib/Bibliothek.svelte
+msgid "Recordings saved on the Live page"
+msgstr "Ηχογραφήσεις που αποθηκεύτηκαν στη σελίδα Live"
+
+#: src/lib/Bibliothek.svelte
+#: src/routes/editor/+page.svelte
+msgid "Tags"
+msgstr "Λέξεις-κλειδιά"
+
+#. 0: o.path
+#. 0: f.path
+#: src/lib/Bibliothek.svelte
+#: src/routes/settings/+page.svelte
+msgid "{0} (not reachable)"
+msgstr "{0} (μη προσβάσιμο)"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Hidden"
+msgstr "Κρυφά"
+
+#: src/lib/Bibliothek.svelte
+msgid "Recordings you have hidden; nothing has been deleted"
+msgstr "Ηχογραφήσεις που αποκρύψατε· τίποτα δεν διαγράφηκε"
+
+#: src/lib/Bibliothek.svelte
+msgid "Folders"
+msgstr "Φάκελοι"
+
+#: src/lib/Bibliothek.svelte
+msgid "The folder can’t be reached right now."
+msgstr "Ο φάκελος δεν είναι προσβάσιμος αυτή τη στιγμή."
+
+#: src/lib/Bibliothek.svelte
+msgid "<0/> Transcripts are saved as files next to the recordings, for everyone who shares the folder."
+msgstr "<0/> Οι απομαγνητοφωνήσεις αποθηκεύονται ως αρχεία δίπλα στις ηχογραφήσεις, για όλους όσοι μοιράζονται τον φάκελο."
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcripts stay in Transcribe only (Settings, Folders)."
+msgstr "Οι απομαγνητοφωνήσεις μένουν μόνο στο Transcribe (Ρυθμίσεις › Συνδεδεμένοι φάκελοι)."
+
+#: src/lib/Bibliothek.svelte
+msgid "Disconnect folder"
+msgstr "Αποσύνδεση φακέλου"
+
+#: src/lib/Bibliothek.svelte
+msgid "These recordings don’t appear in any other section. Nothing has been deleted, not even their transcripts."
+msgstr "Αυτές οι ηχογραφήσεις δεν εμφανίζονται σε καμία άλλη ενότητα. Τίποτα δεν διαγράφηκε, ούτε καν οι απομαγνητοφωνήσεις τους."
+
+#: src/lib/Bibliothek.svelte
+msgid "All recordings with this tag."
+msgstr "Όλες οι ηχογραφήσεις με αυτή τη λέξη-κλειδί."
+
+#: src/lib/Bibliothek.svelte
+msgid "Resume"
+msgstr "Συνέχιση"
+
+#: src/lib/Bibliothek.svelte
+msgid "Pause"
+msgstr "Παύση"
+
+#: src/lib/Bibliothek.svelte
+msgid "Cancel all"
+msgstr "Ακύρωση όλων"
+
+#: src/lib/Bibliothek.svelte
+msgid "In progress"
+msgstr "Σε εξέλιξη"
+
+#: src/lib/Bibliothek.svelte
+msgid "Paused until you resume, even across a restart. The running transcription stays where it is; a live transcription is also running right now."
+msgstr "Σε παύση μέχρι να συνεχίσετε, ακόμη και μετά από επανεκκίνηση. Η τρέχουσα απομαγνητοφώνηση μένει στο σημείο όπου βρίσκεται· αυτή τη στιγμή εκτελείται επίσης μια ζωντανή απομαγνητοφώνηση."
+
+#: src/lib/Bibliothek.svelte
+msgid "Paused until you resume, even across a restart. The running transcription stays where it is."
+msgstr "Σε παύση μέχρι να συνεχίσετε, ακόμη και μετά από επανεκκίνηση. Η τρέχουσα απομαγνητοφώνηση μένει στο σημείο όπου βρίσκεται."
+
+#: src/lib/Bibliothek.svelte
+msgid "Paused while a live transcription is running. Afterwards it continues on its own from the same point."
+msgstr "Σε παύση όσο εκτελείται μια ζωντανή απομαγνητοφώνηση. Έπειτα συνεχίζει αυτόματα από το ίδιο σημείο."
+
+#: src/lib/Bibliothek.svelte
+msgid "Jobs"
+msgstr "Εργασίες"
+
+#: src/lib/Bibliothek.svelte
+msgid "unknown"
+msgstr "άγνωστο"
+
+#: src/lib/Bibliothek.svelte
+msgid "Retry"
+msgstr "Δοκιμή ξανά"
+
+#: src/lib/Bibliothek.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Remove"
+msgstr "Αφαίρεση"
+
+#. 0: titel(j.audio)
+#: src/lib/Bibliothek.svelte
+msgid "Progress of {0}"
+msgstr "Πρόοδος: {0}"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "starting…"
+msgstr "ξεκινά…"
+
+#: src/lib/Bibliothek.svelte
+#: src/routes/settings/+page.svelte
+msgid "Log"
+msgstr "Αρχείο καταγραφής"
+
+#: src/lib/Bibliothek.svelte
+msgid "Not transcribed yet"
+msgstr "Δεν απομαγνητοφωνήθηκαν ακόμη"
+
+#: src/lib/Bibliothek.svelte
+msgid "Recordings without a transcript"
+msgstr "Ηχογραφήσεις χωρίς απομαγνητοφώνηση"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Video"
+msgstr "Βίντεο"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcribe # recording"
+msgid_plural "Transcribe # recordings"
+msgstr[0] "Απομαγνητοφώνηση # ηχογράφησης"
+msgstr[1] "Απομαγνητοφώνηση # ηχογραφήσεων"
+
+#: src/lib/Bibliothek.svelte
+msgid "Select none"
+msgstr "Αποεπιλογή όλων"
+
+#: src/lib/Bibliothek.svelte
+msgid "Select all"
+msgstr "Επιλογή όλων"
+
+#: src/lib/Bibliothek.svelte
+msgid "Name, speaker or text"
+msgstr "Όνομα, ομιλητής ή κείμενο"
+
+#: src/lib/Bibliothek.svelte
+msgid "Search transcripts"
+msgstr "Αναζήτηση στις απομαγνητοφωνήσεις"
+
+#: src/lib/Bibliothek.svelte
+msgid "Sort by"
+msgstr "Ταξινόμηση κατά"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcribed"
+msgstr "Απομαγνητοφωνημένες"
+
+#: src/lib/Bibliothek.svelte
+msgid "Loading the library…"
+msgstr "Φόρτωση της βιβλιοθήκης…"
+
+#: src/lib/Bibliothek.svelte
+msgid "Choose files <0/>"
+msgstr "Επιλογή αρχείων <0/>"
+
+#: src/lib/Bibliothek.svelte
+msgid "No recordings yet"
+msgstr "Δεν υπάρχουν ακόμη ηχογραφήσεις"
+
+#: src/lib/Bibliothek.svelte
+msgid "Drag audio or video files into this window, choose them, or connect a folder they are in. Transcribe writes down who says what."
+msgstr "Σύρετε αρχεία ήχου ή βίντεο σε αυτό το παράθυρο, επιλέξτε τα ή συνδέστε έναν φάκελο στον οποίο βρίσκονται. Το Transcribe καταγράφει ποιος λέει τι."
+
+#: src/lib/Bibliothek.svelte
+msgid "Read the manual"
+msgstr "Διαβάστε το εγχειρίδιο"
+
+#: src/lib/Bibliothek.svelte
+msgid "Connect to Moliri"
+msgstr "Σύνδεση με το Moliri"
+
+#: src/lib/Bibliothek.svelte
+msgid "Get to know Moliri"
+msgstr "Γνωρίστε το Moliri"
+
+#: src/lib/Bibliothek.svelte
+#: src/routes/+error.svelte
+msgid "Transcribe by Moliri"
+msgstr "Transcribe by Moliri"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcribe runs on its own on your computer, without an account, and your recordings stay here. It is also the companion app to the museum database Moliri: once connected, you dictate into Moliri’s text fields, and Transcribe reads the text from scans."
+msgstr "Το Transcribe λειτουργεί αυτόνομα στον υπολογιστή σας, χωρίς λογαριασμό, και οι ηχογραφήσεις σας μένουν εδώ. Είναι επίσης η συνοδευτική εφαρμογή της βάσης δεδομένων μουσείων Moliri: όταν συνδεθεί, υπαγορεύετε στα πεδία κειμένου του Moliri, και το Transcribe διαβάζει το κείμενο από σαρώσεις."
+
+#: src/lib/Bibliothek.svelte
+msgid "No transcript is ready here yet. What you transcribe above will show up here afterwards."
+msgstr "Δεν υπάρχει ακόμη έτοιμη απομαγνητοφώνηση εδώ. Ό,τι απομαγνητοφωνήσετε παραπάνω θα εμφανιστεί στη συνέχεια εδώ."
+
+#: src/lib/Bibliothek.svelte
+msgid "There are no recordings here."
+msgstr "Δεν υπάρχουν ηχογραφήσεις εδώ."
+
+#. 0: q
+#: src/lib/live/Liste.svelte
+msgid "Nothing found for “{0}”."
+msgstr "Δεν βρέθηκε τίποτα για «{0}»."
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcribed recordings"
+msgstr "Απομαγνητοφωνημένες ηχογραφήσεις"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Open {0} in the editor"
+msgstr "Άνοιγμα του {0} στον επεξεργαστή"
+
+#: src/lib/Bibliothek.svelte
+msgid "All with this tag"
+msgstr "Όλες με αυτή τη λέξη-κλειδί"
+
+#: src/lib/Bibliothek.svelte
+msgid "The transcript is saved as a file next to the recording"
+msgstr "Η απομαγνητοφώνηση αποθηκεύεται ως αρχείο δίπλα στην ηχογράφηση"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcript next to the recording"
+msgstr "Απομαγνητοφώνηση δίπλα στην ηχογράφηση"
+
+#: src/lib/Bibliothek.svelte
+msgid "being transcribed again"
+msgstr "απομαγνητοφωνείται ξανά"
+
+#: src/lib/Bibliothek.svelte
+msgid "new"
+msgstr "νέο"
+
+#: src/lib/Bibliothek.svelte
+msgid "No text recognised."
+msgstr "Δεν αναγνωρίστηκε κείμενο."
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+#: src/routes/settings/+page.svelte
+msgid "Speakers"
+msgstr "Ομιλητές"
+
+#: src/lib/Bibliothek.svelte
+msgid "Corrected by hand"
+msgstr "Διορθώθηκε με το χέρι"
+
+#: src/lib/Bibliothek.svelte
+msgid "# correction"
+msgid_plural "# corrections"
+msgstr[0] "# διόρθωση"
+msgstr[1] "# διορθώσεις"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+#: src/routes/bausteine/+page.svelte
+msgid "Clips"
+msgstr "Κλιπ"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcribe again; corrections made by hand are kept"
+msgstr "Νέα απομαγνητοφώνηση· οι διορθώσεις με το χέρι διατηρούνται"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Transcribe {0} again"
+msgstr "Νέα απομαγνητοφώνηση: {0}"
+
+#: src/lib/Bibliothek.svelte
+msgid "Playback"
+msgstr "Αναπαραγωγή"
+
+#: src/lib/Bibliothek.svelte
+msgid "Close playback"
+msgstr "Κλείσιμο αναπαραγωγής"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcribe saves each transcript as a file next to its recording (“Interview.mp3.transcribe.json”): anyone who shares the folder with you, for example via Nextcloud, sees the same transcripts and corrections."
+msgstr "Το Transcribe αποθηκεύει κάθε απομαγνητοφώνηση ως αρχείο δίπλα στην ηχογράφησή της («Interview.mp3.transcribe.json»): όποιος μοιράζεται τον φάκελο μαζί σας, για παράδειγμα μέσω Nextcloud, βλέπει τις ίδιες απομαγνητοφωνήσεις και διορθώσεις."
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcripts stay in Transcribe only; you can have them saved next to the recordings in the settings."
+msgstr "Οι απομαγνητοφωνήσεις μένουν μόνο στο Transcribe· στις ρυθμίσεις μπορείτε να ορίσετε να αποθηκεύονται δίπλα στις ηχογραφήσεις."
+
+#: src/lib/Bibliothek.svelte
+msgid "Choose folder…"
+msgstr "Επιλογή φακέλου…"
+
+#: src/lib/Bibliothek.svelte
+msgid "or"
+msgstr "ή"
+
+#: src/lib/Bibliothek.svelte
+msgid "Paste a path, e.g. C:\\Nextcloud\\Interviews"
+msgstr "Επικολλήστε μια διαδρομή, π.χ. C:\\Nextcloud\\Interviews"
+
+#: src/lib/Bibliothek.svelte
+msgid "Folder path"
+msgstr "Διαδρομή φακέλου"
+
+#: src/lib/Bibliothek.svelte
+msgid "Connect"
+msgstr "Σύνδεση"
+
+#: src/lib/Bibliothek.svelte
+msgid "All recordings in the folder and its subfolders then show up here, without being copied. New ones are added on their own. <0/>"
+msgstr "Όλες οι ηχογραφήσεις στον φάκελο και στους υποφακέλους του εμφανίζονται τότε εδώ, χωρίς να αντιγραφούν. Οι νέες προστίθενται αυτόματα. <0/>"
+
+#. 0: arbeitInWorten(s)
+#: src/lib/Bibliothek.svelte
+msgid "It contains {0}."
+msgstr "Περιέχει {0}."
+
+#: src/lib/Bibliothek.svelte
+msgid "The recording will be deleted from this computer, and with it the transcript including all corrections, speaker names and clips."
+msgstr "Η ηχογράφηση θα διαγραφεί από αυτόν τον υπολογιστή, και μαζί της η απομαγνητοφώνηση με όλες τις διορθώσεις, τα ονόματα ομιλητών και τα κλιπ."
+
+#: src/lib/Bibliothek.svelte
+msgid "The file will be deleted from the library and from this computer."
+msgstr "Το αρχείο θα διαγραφεί από τη βιβλιοθήκη και από αυτόν τον υπολογιστή."
+
+#: src/lib/Bibliothek.svelte
+msgid "It is currently waiting to be transcribed; the job will be cancelled."
+msgstr "Αυτή τη στιγμή περιμένει να απομαγνητοφωνηθεί· η εργασία θα ακυρωθεί."
+
+#: src/lib/Bibliothek.svelte
+msgid "This cannot be undone."
+msgstr "Αυτό δεν μπορεί να αναιρεθεί."
+
+#: src/lib/Bibliothek.svelte
+msgid "Delete recording and transcript"
+msgstr "Διαγραφή ηχογράφησης και απομαγνητοφώνησης"
+
+#: src/lib/Bibliothek.svelte
+msgid "Delete recording"
+msgstr "Διαγραφή ηχογράφησης"
+
+#. 0: loeschen.title
+#: src/lib/Bibliothek.svelte
+msgid "Delete “{0}”?"
+msgstr "Διαγραφή του «{0}»;"
+
+#: src/lib/Sprachenwahl.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Sprachwahl.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Language"
+msgstr "Γλώσσα"
+
+#. 0: langName(c)
+#. 0: w
+#: src/lib/Sprachenwahl.svelte
+#: src/lib/live/MeineWoerter.svelte
+msgid "Remove {0}"
+msgstr "Αφαίρεση {0}"
+
+#: src/lib/Sprachenwahl.svelte
+msgid "more…"
+msgstr "περισσότερες…"
+
+#: src/lib/Sprachenwahl.svelte
+#: src/lib/live/stand.svelte.js
+#: src/routes/settings/+page.svelte
+msgid "Automatic"
+msgstr "Αυτόματο"
+
+#: src/lib/Sprachenwahl.svelte
+msgid "No language found that the recognition knows."
+msgstr "Δεν βρέθηκε γλώσσα που να γνωρίζει η αναγνώριση."
+
+#: src/lib/Teilen.svelte
+msgid "The text is too long for an email in one click, and copying did not work."
+msgstr "Το κείμενο είναι πολύ μεγάλο για email με ένα κλικ, και η αντιγραφή δεν λειτούργησε."
+
+#: src/lib/Teilen.svelte
+msgid "The text is too long to pass on directly. It is on the clipboard: paste it into the email with Ctrl+V."
+msgstr "Το κείμενο είναι πολύ μεγάλο για να μεταβιβαστεί απευθείας. Βρίσκεται στο πρόχειρο: επικολλήστε το στο email με Ctrl+V."
+
+#: src/lib/Teilen.svelte
+msgid "Sharing did not work."
+msgstr "Η κοινοποίηση δεν λειτούργησε."
+
+#: src/lib/Teilen.svelte
+msgid "Share"
+msgstr "Κοινοποίηση"
+
+#: src/lib/Teilen.svelte
+msgid "<0/>To another app…"
+msgstr "<0/>Σε άλλη εφαρμογή…"
+
+#: src/lib/Teilen.svelte
+msgid "<0/>As email"
+msgstr "<0/>Ως email"
+
+#: src/lib/update.svelte.js
+msgid "Developer version"
+msgstr "Έκδοση για προγραμματιστές"
+
+#: src/lib/Zugriff.svelte
+#: src/routes/settings/+page.svelte
+msgid "A file or embedded page"
+msgstr "Ένα αρχείο ή μια ενσωματωμένη σελίδα"
+
+#. 0: frage.client
+#: src/lib/Zugriff.svelte
+msgid "“{0}” on this website"
+msgstr "«{0}» σε αυτόν τον ιστότοπο"
+
+#: src/lib/Zugriff.svelte
+msgid "This website"
+msgstr "Αυτός ο ιστότοπος"
+
+#: src/lib/Zugriff.svelte
+#: src/routes/settings/+page.svelte
+msgid "Allow"
+msgstr "Να επιτρέπεται"
+
+#: src/lib/Zugriff.svelte
+#: src/routes/settings/+page.svelte
+msgid "Deny"
+msgstr "Απόρριψη"
+
+#: src/lib/Zugriff.svelte
+msgid "One more site is asking"
+msgid_plural "# more sites are asking"
+msgstr[0] "Ρωτά άλλος ένας ιστότοπος"
+msgstr[1] "Ρωτούν άλλοι # ιστότοποι"
+
+#. 0: plural(weitere, ['One more site is asking', '# more sites are asking'])
+#: src/lib/Zugriff.svelte
+msgid "{0}, next here or under <0>Settings › Apps</0>."
+msgstr "{0}, στη συνέχεια εδώ ή στις <0>Ρυθμίσεις › Εφαρμογές</0>."
+
+#. 0: name(frage)
+#: src/lib/Zugriff.svelte
+msgid "<0/>Allow {0} to use Transcribe?"
+msgstr "<0/>Να επιτραπεί στο {0} να χρησιμοποιεί το Transcribe;"
+
+#: src/lib/Zugriff.svelte
+msgid "<0/> wants to turn speech into text or have text read from images. Only allow what you know."
+msgstr "<0/> θέλει να μετατρέψει ομιλία σε κείμενο ή να διαβάσει κείμενο από εικόνες. Επιτρέψτε μόνο ό,τι γνωρίζετε."
+
+#. 0: name(erlaubt)
+#: src/lib/Zugriff.svelte
+msgid "<0/>{0} can now use Transcribe"
+msgstr "<0/>Το {0} μπορεί πλέον να χρησιμοποιεί το Transcribe"
+
+#: src/lib/Zugriff.svelte
+msgid "Try again there. You can take this back under <0>Settings › Apps</0>."
+msgstr "Δοκιμάστε ξανά εκεί. Μπορείτε να το ανακαλέσετε στις <0>Ρυθμίσεις › Εφαρμογές</0>."
+
+#. 0: stand.program
+#: src/lib/Zugriff.svelte
+msgid "<0/>{0} uses Transcribe"
+msgstr "<0/>Το {0} χρησιμοποιεί το Transcribe"
+
+#: src/lib/Zugriff.svelte
+msgid "So that apps can always reach Transcribe"
+msgstr "Ώστε οι εφαρμογές να έχουν πάντα πρόσβαση στο Transcribe"
+
+#: src/lib/Zugriff.svelte
+msgid "Switch on"
+msgstr "Ενεργοποίηση"
+
+#: src/lib/Zugriff.svelte
+msgid "Apps can only reach Transcribe while it is running. Should it start with Windows and keep running in the notification area of the taskbar after you close it?"
+msgstr "Οι εφαρμογές έχουν πρόσβαση στο Transcribe μόνο όσο εκτελείται. Να ξεκινά μαζί με τα Windows και να συνεχίζει να εκτελείται στην περιοχή ειδοποιήσεων της γραμμής εργασιών αφού το κλείσετε;"
+
+#: src/lib/Zugriff.svelte
+msgid "Transcribe now starts with Windows and keeps running in the background. You can change this under <0>Settings › Apps</0>."
+msgstr "Το Transcribe ξεκινά πλέον μαζί με τα Windows και συνεχίζει να εκτελείται στο παρασκήνιο. Μπορείτε να το αλλάξετε στις <0>Ρυθμίσεις › Εφαρμογές</0>."
+
+#: src/routes/+error.svelte
+msgid "This page does not exist"
+msgstr "Αυτή η σελίδα δεν υπάρχει"
+
+#: src/routes/+error.svelte
+msgid "There is nothing at this address. <0>Go to the editor</0>"
+msgstr "Δεν υπάρχει τίποτα σε αυτή τη διεύθυνση. <0>Μετάβαση στον επεξεργαστή</0>"
+
+#: src/routes/+error.svelte
+msgid "Something went wrong"
+msgstr "Κάτι πήγε στραβά"
+
+#. 0: titel
+#: src/lib/live/Abspielen.svelte
+msgid "<0/>“{0}” can't be played here: the window can't play this format. You can still transcribe it."
+msgstr "<0/>Το «{0}» δεν μπορεί να αναπαραχθεί εδώ: το παράθυρο δεν υποστηρίζει αυτή τη μορφή. Μπορείτε όμως να το απομαγνητοφωνήσετε."
+
+#. 0: titel
+#: src/lib/live/Abspielen.svelte
+msgid "<0/>“{0}” can't be played. Was the file moved or deleted?"
+msgstr "<0/>Το «{0}» δεν μπορεί να αναπαραχθεί. Μήπως το αρχείο μετακινήθηκε ή διαγράφηκε;"
+
+#: src/lib/live/Abspielen.svelte
+msgid "Play recording"
+msgstr "Αναπαραγωγή ηχογράφησης"
+
+#: src/lib/live/Abspielen.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/routes/bausteine/+page.svelte
+msgid "Play"
+msgstr "Αναπαραγωγή"
+
+#: src/lib/live/Abspielen.svelte
+msgid "Position in the recording"
+msgstr "Θέση στην ηχογράφηση"
+
+#. 0: dauer(zeit); 1: dauer(laenge)
+#: src/lib/live/Abspielen.svelte
+msgid "{0} of {1}"
+msgstr "{0} από {1}"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Copying did not work."
+msgstr "Η αντιγραφή δεν λειτούργησε."
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>All recordings"
+msgstr "<0/>Όλες οι ηχογραφήσεις"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Aufnahme.svelte
+#: src/lib/live/Liste.svelte
+msgid "<0/>running"
+msgstr "<0/>σε εξέλιξη"
+
+#. 0: art(n)
+#. 0: art(n)
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Aufnahme.svelte
+msgid "Via API: <0/> {0}"
+msgstr "Μέσω API: <0/> {0}"
+
+#: src/lib/live/Anfrage.svelte
+msgid "AI <0/>"
+msgstr "ΤΝ <0/>"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Aufnahme.svelte
+msgid "Won't be saved"
+msgstr "Δεν θα αποθηκευτεί"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Duration <0/>"
+msgstr "Διάρκεια <0/>"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>Copied"
+msgstr "<0/>Αντιγράφηκε"
+
+#: src/lib/live/Anfrage.svelte
+msgid "<0/>Copy response"
+msgstr "<0/>Αντιγραφή απάντησης"
+
+#. 0: tag(n.started, live.jetzt); 1: uhrzeit(n.started)
+#: src/lib/live/Anfrage.svelte
+msgid "Delete request {0}, {1}"
+msgstr "Διαγραφή αιτήματος {0}, {1}"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>Delete"
+msgstr "<0/>Διαγραφή"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Request and response"
+msgstr "Αίτημα και απάντηση"
+
+#: src/lib/live/Anfrage.svelte
+#: src/routes/settings/+page.svelte
+msgid "Copied"
+msgstr "Αντιγράφηκε"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Copy"
+msgstr "Αντιγραφή"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Request"
+msgstr "Αίτημα"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Open image at full size"
+msgstr "Άνοιγμα εικόνας σε πλήρες μέγεθος"
+
+#: src/lib/live/Anfrage.svelte
+msgid "The image that was read"
+msgstr "Η εικόνα που διαβάστηκε"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Response"
+msgstr "Απάντηση"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Liste.svelte
+msgid "Running…"
+msgstr "Σε εξέλιξη…"
+
+#: src/lib/live/Anfrage.svelte
+msgid "No response."
+msgstr "Καμία απάντηση."
+
+#: src/lib/live/Anfrage.svelte
+msgid "Empty response."
+msgstr "Κενή απάντηση."
+
+#: src/lib/live/Anfrage.svelte
+msgid "Details"
+msgstr "Λεπτομέρειες"
+
+#: src/lib/live/Anfrage.svelte
+msgid "AI"
+msgstr "ΤΝ"
+
+#: src/lib/live/Anfrage.svelte
+msgid "unnamed"
+msgstr "χωρίς όνομα"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Finished"
+msgstr "Ολοκληρώθηκε"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Service"
+msgstr "Υπηρεσία"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/stand.svelte.js
+msgid "App"
+msgstr "Εφαρμογή"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Started"
+msgstr "Ξεκίνησε"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Duration"
+msgstr "Διάρκεια"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "saving audio"
+msgstr "αποθήκευση ήχου"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "text only"
+msgstr "μόνο κείμενο"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "off"
+msgstr "ανενεργό"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "on, ready at once"
+msgstr "ενεργό, άμεσα έτοιμο"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "loading recognition…"
+msgstr "φόρτωση αναγνώρισης…"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "on"
+msgstr "ενεργό"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "the microphone"
+msgstr "το μικρόφωνο"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Record"
+msgstr "Ηχογράφηση"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "<0/>Stopping…"
+msgstr "<0/>Διακοπή…"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "<0/>Stop"
+msgstr "<0/>Διακοπή"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Starting…"
+msgstr "Έναρξη…"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Start recording"
+msgstr "Έναρξη ηχογράφησης"
+
+#. 0: mikrofon
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "No sound is coming from {0} yet. Is it switched on and connected? <0>Choose a different microphone?</0>"
+msgstr "Δεν έρχεται ακόμη ήχος από {0}. Είναι ενεργοποιημένο και συνδεδεμένο; <0>Επιλογή άλλου μικροφώνου;</0>"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Choose a different microphone?"
+msgstr "Επιλογή άλλου μικροφώνου;"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "One app is listening in."
+msgid_plural "# apps are listening in."
+msgstr[0] "Μία εφαρμογή ακούει."
+msgstr[1] "# εφαρμογές ακούν."
+
+#: src/lib/live/AufnahmeWahl.svelte
+#: src/lib/live/Aufnahmeleiste.svelte
+#: src/lib/live/stand.svelte.js
+#: src/lib/live/stand.svelte.js
+msgid "Microphone"
+msgstr "Μικρόφωνο"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "System"
+msgstr "Σύστημα"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+#: src/lib/live/Aufnahmeleiste.svelte
+#: src/routes/settings/+page.svelte
+msgid "Ready in the background"
+msgstr "Έτοιμο στο παρασκήνιο"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "On: Other apps like Moliri may have Transcribe record from the microphone, and the recognition stays loaded so everything starts at once. This takes about 1 GB of memory. Transcribe always processes audio and images that an app sends."
+msgstr "Ενεργό: Άλλες εφαρμογές όπως το Moliri μπορούν να ζητούν από το Transcribe να ηχογραφεί από το μικρόφωνο, και η αναγνώριση μένει φορτωμένη ώστε όλα να ξεκινούν αμέσως. Αυτό καταλαμβάνει περίπου 1 GB μνήμης. Το Transcribe επεξεργάζεται πάντα τον ήχο και τις εικόνες που στέλνει μια εφαρμογή."
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Off: Other apps may not have Transcribe record from the microphone, and nothing stays loaded. Transcribe still processes audio and images that an app sends. Recording by hand works too, it just starts a little more slowly."
+msgstr "Ανενεργό: Άλλες εφαρμογές δεν μπορούν να ζητούν από το Transcribe να ηχογραφεί από το μικρόφωνο, και τίποτα δεν μένει φορτωμένο. Το Transcribe εξακολουθεί να επεξεργάζεται τον ήχο και τις εικόνες που στέλνει μια εφαρμογή. Η χειροκίνητη ηχογράφηση λειτουργεί επίσης, απλώς ξεκινά λίγο πιο αργά."
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Set up"
+msgstr "Ρύθμιση"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Set up recording"
+msgstr "Ρύθμιση ηχογράφησης"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Changes apply from the next recording on."
+msgstr "Οι αλλαγές ισχύουν από την επόμενη ηχογράφηση."
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Custom words, punctuation and dictation: all settings for Live <0/>"
+msgstr "Οι λέξεις μου, στίξη και υπαγόρευση: όλες οι ρυθμίσεις για το Live <0/>"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Copying didn't work."
+msgstr "Η αντιγραφή δεν λειτούργησε."
+
+#: src/lib/live/Aufnahme.svelte
+#: src/lib/live/Liste.svelte
+msgid "cancelled"
+msgstr "ακυρώθηκε"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>Dictated with a keyboard shortcut"
+msgstr "<0/>Υπαγορεύτηκε με συντόμευση πληκτρολογίου"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>By hand, on this page"
+msgstr "<0/>Χειροκίνητα, σε αυτή τη σελίδα"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Source <0/>"
+msgstr "Πηγή <0/>"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "# sentence"
+msgid_plural "# sentences"
+msgstr[0] "# πρόταση"
+msgstr[1] "# προτάσεις"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "no sentences"
+msgstr "καμία πρόταση"
+
+#. 0: treffer ? plural(treffer, ['# sentence', '# sentences']) \\: /* @wc-include */ 'no sentences'; 1: suche
+#: src/lib/live/Aufnahme.svelte
+msgid "{0} with “{1}”"
+msgstr "{0} με «{1}»"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Length <0/>"
+msgstr "Διάρκεια <0/>"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Language <0/>"
+msgstr "Γλώσσα <0/>"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>Transcribe in full"
+msgstr "<0/>Πλήρης απομαγνητοφώνηση"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>Copy text"
+msgstr "<0/>Αντιγραφή κειμένου"
+
+#. 0: uhrzeit(n.started)
+#: src/lib/live/Aufnahme.svelte
+msgid "Share recording {0}"
+msgstr "Κοινοποίηση ηχογράφησης {0}"
+
+#. 0: tag(n.started, live.jetzt); 1: uhrzeit(n.started)
+#: src/lib/live/Aufnahme.svelte
+msgid "Delete recording {0}, {1}"
+msgstr "Διαγραφή ηχογράφησης {0}, {1}"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Recording text"
+msgstr "Κείμενο ηχογράφησης"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Play from here"
+msgstr "Αναπαραγωγή από εδώ"
+
+#: src/lib/live/Aufnahme.svelte
+#: src/lib/live/Liste.svelte
+msgid "Loading recognition…"
+msgstr "Φόρτωση αναγνώρισης…"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Listening… just start speaking."
+msgstr "Ακούει… απλώς αρχίστε να μιλάτε."
+
+#: src/lib/live/Aufnahme.svelte
+#: src/lib/live/Liste.svelte
+msgid "Nothing was recognised."
+msgstr "Δεν αναγνωρίστηκε τίποτα."
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Once fully transcribed, it gets speakers and can be corrected in the editor."
+msgstr "Μετά την πλήρη απομαγνητοφώνηση αποκτά ομιλητές και μπορεί να διορθωθεί στον επεξεργαστή."
+
+#. 0: n.audio
+#: src/lib/live/Aufnahme.svelte
+msgid "Recording saved as “{0}”."
+msgstr "Η ηχογράφηση αποθηκεύτηκε ως «{0}»."
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "What is said into the microphone."
+msgstr "Ό,τι λέγεται στο μικρόφωνο."
+
+#: src/lib/live/AufnahmeWahl.svelte
+#: src/lib/live/stand.svelte.js
+#: src/lib/live/stand.svelte.js
+msgid "System audio"
+msgstr "Ήχος συστήματος"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "What the computer plays, such as the others in an online meeting."
+msgstr "Ό,τι αναπαράγει ο υπολογιστής, όπως οι άλλοι σε μια διαδικτυακή σύσκεψη."
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Both mixed"
+msgstr "Και τα δύο μαζί"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Best with headphones, otherwise the others are heard twice."
+msgstr "Καλύτερα με ακουστικά, αλλιώς οι άλλοι ακούγονται δύο φορές."
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Not possible on this computer."
+msgstr "Δεν είναι δυνατό σε αυτόν τον υπολογιστή."
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "What gets recorded"
+msgstr "Τι ηχογραφείται"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "searching…"
+msgstr "αναζήτηση…"
+
+#. 0: live.standard
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "System default: {0}"
+msgstr "Προεπιλογή συστήματος: {0}"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "System default"
+msgstr "Προεπιλογή συστήματος"
+
+#. 0: live.geraet
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "{0} (not connected)"
+msgstr "{0} (δεν είναι συνδεδεμένο)"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "This microphone is not connected right now."
+msgstr "Αυτό το μικρόφωνο δεν είναι συνδεδεμένο αυτή τη στιγμή."
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Stays with this microphone, even when another one is connected."
+msgstr "Παραμένει σε αυτό το μικρόφωνο, ακόμη κι αν συνδεθεί άλλο."
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Uses the microphone set as default in Windows. If another one becomes the default, such as a newly connected headset, the recording switches along."
+msgstr "Χρησιμοποιεί το μικρόφωνο που έχει οριστεί ως προεπιλογή στα Windows. Αν γίνει προεπιλογή κάποιο άλλο, όπως ένα headset που μόλις συνδέθηκε, η ηχογράφηση αλλάζει μαζί του."
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Uses the microphone set as default in the system."
+msgstr "Χρησιμοποιεί το μικρόφωνο που έχει οριστεί ως προεπιλογή στο σύστημα."
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Microphone <0/> <1/>"
+msgstr "Μικρόφωνο <0/> <1/>"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Save recording"
+msgstr "Αποθήκευση ηχογράφησης"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "It goes to your recordings and can be fully transcribed afterwards, with speakers."
+msgstr "Πηγαίνει στις ηχογραφήσεις σας και μπορεί αργότερα να απομαγνητοφωνηθεί πλήρως, με ομιλητές."
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Off: only the text is kept."
+msgstr "Ανενεργό: διατηρείται μόνο το κείμενο."
+
+#: src/lib/live/MeineWoerter.svelte
+msgid "+ Word"
+msgstr "+ Λέξη"
+
+#: src/lib/live/MeineWoerter.svelte
+msgid "My words"
+msgstr "Οι λέξεις μου"
+
+#: src/lib/live/MeineWoerter.svelte
+msgid "Names and technical terms, such as “Moliri”: live text writes them like this, even when they sound a little different."
+msgstr "Ονόματα και ειδικοί όροι, όπως «Moliri»: το ζωντανό κείμενο τα γράφει έτσι, ακόμη κι αν ακούγονται λίγο διαφορετικά."
+
+#: src/lib/live/Liste.svelte
+#: src/lib/live/Liste.svelte
+#: src/routes/settings/+page.svelte
+msgid "Recordings"
+msgstr "Ηχογραφήσεις"
+
+#: src/lib/live/Liste.svelte
+#: src/lib/live/Liste.svelte
+msgid "Search all recordings"
+msgstr "Αναζήτηση σε όλες τις ηχογραφήσεις"
+
+#: src/lib/live/Liste.svelte
+#: src/lib/live/Liste.svelte
+msgid "Clear search"
+msgstr "Καθαρισμός αναζήτησης"
+
+#: src/lib/live/Liste.svelte
+msgid "Origin"
+msgstr "Προέλευση"
+
+#: src/lib/live/Liste.svelte
+msgid "# match"
+msgid_plural "# matches"
+msgstr[0] "# αποτέλεσμα"
+msgstr[1] "# αποτελέσματα"
+
+#: src/lib/live/Liste.svelte
+msgid "no matches"
+msgstr "κανένα αποτέλεσμα"
+
+#: src/lib/live/Liste.svelte
+msgid "# request"
+msgid_plural "# requests"
+msgstr[0] "# αίτημα"
+msgstr[1] "# αιτήματα"
+
+#: src/lib/live/Liste.svelte
+msgid "# recording"
+msgid_plural "# recordings"
+msgstr[0] "# ηχογράφηση"
+msgstr[1] "# ηχογραφήσεις"
+
+#: src/lib/live/Liste.svelte
+msgid "When searching, the best matches come first"
+msgstr "Κατά την αναζήτηση, τα καλύτερα αποτελέσματα εμφανίζονται πρώτα"
+
+#: src/lib/live/Liste.svelte
+msgid "Best matches"
+msgstr "Καλύτερα αποτελέσματα"
+
+#: src/lib/live/Liste.svelte
+msgid "Sorting"
+msgstr "Ταξινόμηση"
+
+#: src/lib/live/Liste.svelte
+msgid "No recordings yet. Start one below, or have an app send speech through the API."
+msgstr "Δεν υπάρχουν ακόμη ηχογραφήσεις. Ξεκινήστε μία παρακάτω ή αφήστε μια εφαρμογή να στείλει ομιλία μέσω του API."
+
+#. 0: q; 1: HERKUNFT[herkunft]
+#: src/lib/live/Liste.svelte
+msgid "Nothing found for “{0}” in “{1}”."
+msgstr "Δεν βρέθηκε τίποτα για «{0}» στο «{1}»."
+
+#: src/lib/live/Liste.svelte
+msgid "No requests to AI or text recognition yet."
+msgstr "Δεν υπάρχουν ακόμη αιτήματα προς ΤΝ ή αναγνώριση κειμένου."
+
+#: src/lib/live/Liste.svelte
+msgid "No recordings made by hand."
+msgstr "Δεν υπάρχουν χειροκίνητες ηχογραφήσεις."
+
+#: src/lib/live/Liste.svelte
+msgid "No recordings via API."
+msgstr "Δεν υπάρχουν ηχογραφήσεις μέσω API."
+
+#: src/lib/live/Liste.svelte
+msgid "Show all"
+msgstr "Εμφάνιση όλων"
+
+#: src/lib/live/Liste.svelte
+msgid ", via API"
+msgstr ", μέσω API"
+
+#: src/lib/live/Liste.svelte
+msgid "not saved"
+msgstr "δεν αποθηκεύτηκε"
+
+#: src/lib/live/Liste.svelte
+msgid "Empty response"
+msgstr "Κενή απάντηση"
+
+#: src/lib/live/Liste.svelte
+msgid "No text"
+msgstr "Χωρίς κείμενο"
+
+#: src/lib/live/Liste.svelte
+msgid "Listening …"
+msgstr "Ακρόαση …"
+
+#: src/lib/live/Liste.svelte
+msgid "Recording saved"
+msgstr "Η ηχογράφηση αποθηκεύτηκε"
+
+#: src/lib/live/Liste.svelte
+msgid "saved"
+msgstr "αποθηκεύτηκε"
+
+#: src/lib/live/Liste.svelte
+#: src/lib/live/Liste.svelte
+msgid "# site wanted to connect"
+msgid_plural "# sites wanted to connect"
+msgstr[0] "# ιστότοπος ήθελε να συνδεθεί"
+msgstr[1] "# ιστότοποι ήθελαν να συνδεθούν"
+
+#: src/lib/live/Liste.svelte
+msgid "Connect apps"
+msgstr "Σύνδεση εφαρμογών"
+
+#: src/lib/live/stand.svelte.js
+msgid "Microphone and system audio"
+msgstr "Μικρόφωνο και ήχος συστήματος"
+
+#: src/lib/live/stand.svelte.js
+msgid "Waiting for the microphone…"
+msgstr "Αναμονή για το μικρόφωνο…"
+
+#: src/lib/live/stand.svelte.js
+msgid "Waiting for system audio…"
+msgstr "Αναμονή για τον ήχο συστήματος…"
+
+#: src/lib/live/stand.svelte.js
+msgid "Waiting for microphone and system audio…"
+msgstr "Αναμονή για μικρόφωνο και ήχο συστήματος…"
+
+#: src/lib/live/stand.svelte.js
+msgid "This microphone only delivers phone quality, so recognition suffers."
+msgstr "Αυτό το μικρόφωνο δίνει μόνο τηλεφωνική ποιότητα, οπότε η αναγνώριση χειροτερεύει."
+
+#: src/lib/live/stand.svelte.js
+msgid "This microphone is very quiet, so recognition suffers."
+msgstr "Αυτό το μικρόφωνο είναι πολύ σιγανό, οπότε η αναγνώριση χειροτερεύει."
+
+#: src/lib/live/stand.svelte.js
+msgid "Never, they stay until you delete them"
+msgstr "Ποτέ, μένουν μέχρι να τα διαγράψετε"
+
+#: src/lib/live/stand.svelte.js
+msgid "After one hour"
+msgstr "Μετά από μία ώρα"
+
+#: src/lib/live/stand.svelte.js
+msgid "After one day"
+msgstr "Μετά από μία ημέρα"
+
+#: src/lib/live/stand.svelte.js
+msgid "After one week"
+msgstr "Μετά από μία εβδομάδα"
+
+#: src/lib/live/stand.svelte.js
+msgid "After 30 days"
+msgstr "Μετά από 30 ημέρες"
+
+#: src/lib/live/stand.svelte.js
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Text recognition"
+msgstr "Αναγνώριση κειμένου"
+
+#: src/lib/live/stand.svelte.js
+msgid "Filter in your own words"
+msgstr "Φίλτρο με δικά σας λόγια"
+
+#: src/lib/live/stand.svelte.js
+msgid "Search by meaning"
+msgstr "Αναζήτηση κατά νόημα"
+
+#: src/lib/live/stand.svelte.js
+msgctxt "live_who"
+msgid "Dictation"
+msgstr "Υπαγόρευση"
+
+#: src/lib/live/stand.svelte.js
+msgid "sent audio"
+msgstr "έστειλε ήχο"
+
+#: src/lib/live/stand.svelte.js
+msgid "let the app listen in"
+msgstr "άφησε το Transcribe να ακούει"
+
+#: src/lib/live/stand.svelte.js
+msgid "recorded on this page"
+msgstr "ηχογραφήθηκε σε αυτή τη σελίδα"
+
+#: src/lib/live/stand.svelte.js
+msgid "dictated with the keyboard shortcut"
+msgstr "υπαγορεύτηκε με τη συντόμευση πληκτρολογίου"
+
+#: src/lib/live/stand.svelte.js
+msgid "had text in an image read"
+msgstr "ζήτησε ανάγνωση κειμένου από εικόνα"
+
+#: src/lib/live/stand.svelte.js
+msgid "asked the language model"
+msgstr "ρώτησε το γλωσσικό μοντέλο"
+
+#: src/lib/live/stand.svelte.js
+msgid "had texts converted for search by meaning"
+msgstr "ζήτησε μετατροπή κειμένων για αναζήτηση κατά νόημα"
+
+#. 0: kurz
+#: src/lib/live/stand.svelte.js
+msgid "{0} s"
+msgstr "{0} δευτ."
+
+#. 0: min; 1: sek
+#: src/lib/live/stand.svelte.js
+msgid "{0}:{1} min"
+msgstr "{0}:{1} λεπ."
+
+#: src/lib/live/stand.svelte.js
+msgid "Today"
+msgstr "Σήμερα"
+
+#: src/lib/live/stand.svelte.js
+msgid "Yesterday"
+msgstr "Χθες"
+
+#: src/lib/live/stand.svelte.js
+msgid "Loading speech recognition, the first time takes a moment…"
+msgstr "Φόρτωση της αναγνώρισης ομιλίας, την πρώτη φορά διαρκεί λίγο…"
+
+#: src/lib/live/stand.svelte.js
+msgid "Applies from the next recording on."
+msgstr "Ισχύει από την επόμενη ηχογράφηση."
+
+#: src/lib/live/stand.svelte.js
+msgid "Being transcribed, then it will be in the library."
+msgstr "Απομαγνητοφωνείται και μετά θα βρίσκεται στη βιβλιοθήκη."
+
+#: src/lib/live/stand.svelte.js
+msgid "Already being transcribed."
+msgstr "Απομαγνητοφωνείται ήδη."
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "While you speak, the fast German model Kroko shows the text; then the more accurate Parakeet writes each sentence."
+msgstr "Ενώ μιλάτε, το γρήγορο γερμανικό μοντέλο Kroko δείχνει το κείμενο· έπειτα το ακριβέστερο Parakeet γράφει κάθε πρόταση."
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "Live text detects the language by itself."
+msgstr "Το ζωντανό κείμενο αναγνωρίζει μόνο του τη γλώσσα."
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "Live text detects the language by itself. When fully transcribed, each section gets one of these languages."
+msgstr "Το ζωντανό κείμενο αναγνωρίζει μόνο του τη γλώσσα. Μετά την πλήρη απομαγνητοφώνηση, κάθε ενότητα παίρνει μία από αυτές τις γλώσσες."
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "Live text detects the language by itself; the choice applies to full transcription."
+msgstr "Το ζωντανό κείμενο αναγνωρίζει μόνο του τη γλώσσα· η επιλογή ισχύει για την πλήρη απομαγνητοφώνηση."
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "Dictate punctuation"
+msgstr "Υπαγόρευση σημείων στίξης"
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "Say “comma”, “period”, “question mark” or “new paragraph”, and the mark appears. Otherwise the app sets them itself."
+msgstr "Πείτε «comma», «period», «question mark» ή «new paragraph» και το σημείο εμφανίζεται. Αλλιώς η εφαρμογή τα βάζει μόνη της."
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "Off: the app sets all punctuation itself, “comma” stays a word."
+msgstr "Ανενεργό: η εφαρμογή βάζει μόνη της όλα τα σημεία στίξης, το «comma» μένει λέξη."
+
+#: src/routes/bausteine/+page.svelte
+msgid "Fast"
+msgstr "Γρήγορο"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Balanced"
+msgstr "Ισορροπημένο"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Accurate"
+msgstr "Ακριβές"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Mr Berger tells how he started as an apprentice at the paper mill in 1958: “We washed the felts by hand, every Saturday.”"
+msgstr "Ο κ. Berger διηγείται πώς ξεκίνησε το 1958 ως μαθητευόμενος στο χαρτοποιείο: «Τις τσόχες τις πλέναμε με το χέρι, κάθε Σάββατο.»"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Components · Transcribe by Moliri"
+msgstr "Δομικά στοιχεία · Transcribe by Moliri"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Components"
+msgstr "Δομικά στοιχεία"
+
+#: src/routes/bausteine/+page.svelte
+msgid "The components Transcribe takes over from Moliri. They are mirrored under <0/> and are only changed in Moliri."
+msgstr "Τα στοιχεία που παίρνει το Transcribe από το Moliri. Βρίσκονται ως αντίγραφο στο <0/> και αλλάζουν μόνο στο Moliri."
+
+#: src/routes/bausteine/+page.svelte
+msgid "Start transcription"
+msgstr "Απομαγνητοφώνηση"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Show loading"
+msgstr "Εμφάνιση φόρτωσης"
+
+#: src/routes/bausteine/+page.svelte
+msgid "On ink"
+msgstr "Σε μελάνι"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Paper on ink"
+msgstr "Χαρτί σε μελάνι"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Buttons"
+msgstr "Κουμπιά"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Follow along"
+msgstr "Παρακολούθηση κειμένου"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Highlights the spoken word during playback."
+msgstr "Επισημαίνει την ομιλούμενη λέξη κατά την αναπαραγωγή."
+
+#: src/routes/bausteine/+page.svelte
+#: src/routes/bausteine/+page.svelte
+msgid "Skip speakers"
+msgstr "Παράλειψη ομιλητών"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Hidden speakers are skipped during playback."
+msgstr "Οι ομιλητές σε απόκρυψη παραλείπονται κατά την αναπαραγωγή."
+
+#: src/routes/bausteine/+page.svelte
+msgid "Only affects speakers hidden in the editor."
+msgstr "Επηρεάζει μόνο ομιλητές που είναι σε απόκρυψη στον επεξεργαστή."
+
+#: src/routes/bausteine/+page.svelte
+msgid "Switches"
+msgstr "Διακόπτες"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Read"
+msgstr "Ανάγνωση"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Correct"
+msgstr "Διόρθωση"
+
+#. 0: id
+#: src/routes/bausteine/+page.svelte
+msgid "Tab “{0}” is open."
+msgstr "Η καρτέλα «{0}» είναι ανοιχτή."
+
+#: src/routes/bausteine/+page.svelte
+msgid "Tabs"
+msgstr "Καρτέλες"
+
+#. 0: QUALITAETEN.find((q) => q.id === qualitaet)?.name
+#: src/routes/bausteine/+page.svelte
+msgid "Quality: {0} <0/>"
+msgstr "Ποιότητα: {0} <0/>"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Spacebar"
+msgstr "Πλήκτρο διαστήματος"
+
+#: src/routes/bausteine/+page.svelte
+msgid "With shortcut"
+msgstr "Με συντόμευση"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Open dialog"
+msgstr "Άνοιγμα διαλόγου"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Loading …"
+msgstr "Φόρτωση …"
+
+#: src/routes/bausteine/+page.svelte
+msgid "This box shows “Loading” while “Show loading” is running."
+msgstr "Αυτό το πλαίσιο δείχνει «Φόρτωση» όσο εκτελείται το «Εμφάνιση φόρτωσης»."
+
+#: src/routes/bausteine/+page.svelte
+msgid "Selection, dialog, hint"
+msgstr "Επιλογή, διάλογος, υπόδειξη"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Atkinson Hyperlegible Next (--font-ui)"
+msgstr "Atkinson Hyperlegible Next (--font-ui)"
+
+#: src/routes/bausteine/+page.svelte
+#: src/routes/bausteine/+page.svelte
+msgid "Name speaker · Create clip · 00:12:48 · Il1 0O"
+msgstr "Ονομασία ομιλητή · Δημιουργία κλιπ · 00:12:48 · Il1 0O"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Atkinson Hyperlegible Mono (--font-mono)"
+msgstr "Atkinson Hyperlegible Mono (--font-mono)"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Type sample"
+msgstr "Δείγμα γραμματοσειράς"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Body text in the editor (20px) and controls (15px): on the left the interface font, on the right its mono sister for code."
+msgstr "Κείμενο ανάγνωσης στον επεξεργαστή (20px) και χειριστήρια (15px): αριστερά η γραμματοσειρά της διεπαφής, δεξιά η mono αδελφή της για κώδικα."
+
+#: src/routes/bausteine/+page.svelte
+msgid "Merge speakers"
+msgstr "Συγχώνευση ομιλητών"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Merge"
+msgstr "Συγχώνευση"
+
+#: src/routes/bausteine/+page.svelte
+msgid "“Speaker 2” and “Mr Berger” are the same person. Merge?"
+msgstr "Ο «Ομιλητής 2» και ο «κ. Berger» είναι το ίδιο πρόσωπο. Συγχώνευση;"
+
+#. 0: recordingName(file)
+#: src/routes/editor/+page.svelte
+msgid "{0} · Editor · Transcribe by Moliri"
+msgstr "{0} · Επεξεργαστής · Transcribe by Moliri"
+
+#: src/routes/editor/+page.svelte
+msgid "Editor · Transcribe by Moliri"
+msgstr "Επεξεργαστής · Transcribe by Moliri"
+
+#: src/routes/editor/+page.svelte
+msgid "The list of recordings could not be loaded."
+msgstr "Δεν ήταν δυνατή η φόρτωση της λίστας ηχογραφήσεων."
+
+#: src/routes/editor/+page.svelte
+msgid "The corrections could not be saved. The recording was not switched."
+msgstr "Δεν ήταν δυνατή η αποθήκευση των διορθώσεων. Η ηχογράφηση δεν άλλαξε."
+
+#. 0: recordingName(f)
+#: src/routes/editor/+page.svelte
+msgid "“{0}” could not be loaded."
+msgstr "Δεν ήταν δυνατή η φόρτωση του «{0}»."
+
+#: src/routes/editor/+page.svelte
+msgid "Choose recording"
+msgstr "Επιλογή ηχογράφησης"
+
+#: src/routes/editor/+page.svelte
+msgid "Loading the transcript…"
+msgstr "Φόρτωση της απομαγνητοφώνησης…"
+
+#: src/routes/editor/+page.svelte
+msgid "No transcript yet"
+msgstr "Δεν υπάρχει ακόμη απομαγνητοφώνηση"
+
+#: src/routes/editor/+page.svelte
+msgid "As soon as a recording is transcribed, it is ready here to read and play. You add recordings in the <0>library</0>."
+msgstr "Μόλις απομαγνητοφωνηθεί μια ηχογράφηση, είναι διαθέσιμη εδώ για ανάγνωση και αναπαραγωγή. Προσθέτετε ηχογραφήσεις στη <0>βιβλιοθήκη</0>."
+
+#: src/routes/editor/+page.svelte
+msgid "That did not work"
+msgstr "Αυτό δεν πέτυχε"
+
+#. 0: error
+#: src/routes/editor/+page.svelte
+msgid "{0} Is Transcribe still running? Then reload the page."
+msgstr "{0} Εκτελείται ακόμη το Transcribe; Τότε φορτώστε ξανά τη σελίδα."
+
+#: src/routes/live/+page.svelte
+msgid "Live · Transcribe by Moliri"
+msgstr "Live · Transcribe by Moliri"
+
+#: src/routes/live/+page.svelte
+msgid "<0/>No connection to the app. Is it still running?"
+msgstr "<0/>Δεν υπάρχει σύνδεση με την εφαρμογή. Εκτελείται ακόμη;"
+
+#: src/routes/live/+page.svelte
+msgid "stays on the left as a recording."
+msgstr "παραμένει αριστερά ως ηχογράφηση."
+
+#: src/routes/live/+page.svelte
+msgid "shows on the left while it runs."
+msgstr "εμφανίζεται αριστερά όσο εκτελείται."
+
+#: src/routes/live/+page.svelte
+msgid "Speech as text, instantly"
+msgstr "Η ομιλία αμέσως σε κείμενο"
+
+#: src/routes/live/+page.svelte
+msgid "Start a recording below: through the microphone and, if you like, with the sound your computer plays, such as the others in an online meeting. The text appears here while people speak."
+msgstr "Ξεκινήστε παρακάτω μια ηχογράφηση: μέσω του μικροφώνου και, αν θέλετε, με τον ήχο που αναπαράγει ο υπολογιστής σας, όπως οι άλλοι σε μια διαδικτυακή σύσκεψη. Το κείμενο εμφανίζεται εδώ όσο μιλούν."
+
+#. 0: live.apiSpeichern ? /* @wc-include */ 'stays on the left as a recording.' \\: /* @wc-include */ 'shows on the left while it runs.'
+#: src/routes/live/+page.svelte
+msgid "Or let apps like Moliri send speech through the <0>live API</0>. Each request {0}"
+msgstr "Ή αφήστε εφαρμογές όπως το Moliri να στέλνουν ομιλία μέσω του <0>live API</0>. Κάθε αίτημα {0}"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "User interface"
+msgstr "Διεπαφή"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Packages of the interface with everything they pull in, including parts that only run during the build."
+msgstr "Πακέτα της διεπαφής με όλα όσα φέρνουν μαζί τους, ακόμη και μέρη που εκτελούνται μόνο κατά τη μεταγλώττιση."
+
+#: src/routes/lizenzen/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Program"
+msgstr "Πρόγραμμα"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Go modules built into the EXE."
+msgstr "Αρθρώματα Go που περιέχονται στο EXE."
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Icons"
+msgstr "Εικονίδια"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Icon sets; only the icons in use are shipped."
+msgstr "Συλλογές εικονιδίων· περιλαμβάνονται μόνο τα εικονίδια που χρησιμοποιούνται."
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Fonts"
+msgstr "Γραμματοσειρές"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Bundled fonts."
+msgstr "Ενσωματωμένες γραμματοσειρές."
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Licenses · Transcribe by Moliri"
+msgstr "Άδειες χρήσης · Transcribe by Moliri"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Licenses"
+msgstr "Άδειες χρήσης"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Transcribe by Moliri is free software under the <0>Mozilla Public License 2.0</0>. It builds on the work of others; here you can see what it includes and under which license."
+msgstr "Το Transcribe by Moliri είναι ελεύθερο λογισμικό με την άδεια <0>Mozilla Public License 2.0</0>. Βασίζεται στη δουλειά άλλων· εδώ βλέπετε τι περιλαμβάνει και με ποια άδεια."
+
+#: src/routes/lizenzen/+page.svelte
+msgid "No details."
+msgstr "Χωρίς στοιχεία."
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Read NOTICE"
+msgstr "Ανάγνωση NOTICE"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Notices (NOTICE)"
+msgstr "Σημειώσεις (NOTICE)"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "What the app downloads on first start (recognition library, models, FFmpeg) is not part of it and is listed with license and attribution in the NOTICE file."
+msgstr "Ό,τι κατεβάζει η εφαρμογή στην πρώτη εκκίνηση (βιβλιοθήκη αναγνώρισης, μοντέλα, FFmpeg) δεν αποτελεί μέρος της και αναφέρεται με άδεια και απόδοση στο αρχείο NOTICE."
+
+#: src/routes/settings/+page.svelte
+msgid "Data folder"
+msgstr "Φάκελος δεδομένων"
+
+#: src/routes/settings/+page.svelte
+msgid "Results"
+msgstr "Αποτελέσματα"
+
+#: src/routes/settings/+page.svelte
+msgid "Models"
+msgstr "Μοντέλα"
+
+#: src/routes/settings/+page.svelte
+msgid "Recognition runtime"
+msgstr "Περιβάλλον εκτέλεσης αναγνώρισης"
+
+#: src/routes/settings/+page.svelte
+msgid "Only on this computer"
+msgstr "Μόνο σε αυτόν τον υπολογιστή"
+
+#: src/routes/settings/+page.svelte
+msgid "The models run here. No recording leaves the computer."
+msgstr "Τα μοντέλα εκτελούνται εδώ. Καμία ηχογράφηση δεν φεύγει από τον υπολογιστή."
+
+#: src/routes/settings/+page.svelte
+msgid "Only through an API"
+msgstr "Μόνο μέσω API"
+
+#: src/routes/settings/+page.svelte
+msgid "Recordings go to a service for recognition, on the internet or on your own network. The app downloads no models for this."
+msgstr "Οι ηχογραφήσεις πηγαίνουν για αναγνώριση σε μια υπηρεσία, στο διαδίκτυο ή στο δικό σας δίκτυο. Η εφαρμογή δεν κατεβάζει μοντέλα γι’ αυτό."
+
+#: src/routes/settings/+page.svelte
+msgid "Both"
+msgstr "Και τα δύο"
+
+#: src/routes/settings/+page.svelte
+msgid "You decide what Live and whole recordings use, and can choose again for each job if you like."
+msgstr "Εσείς ορίζετε τι χρησιμοποιούν το Live και οι ολόκληρες ηχογραφήσεις, και μπορείτε να επιλέγετε ξανά σε κάθε εργασία, αν θέλετε."
+
+#. 0: (e).message
+#. 0: (e).message
+#. 0: (e).message
+#. 0: (e).message
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Not saved: {0}"
+msgstr "Δεν αποθηκεύτηκε: {0}"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Key saved."
+msgstr "Το κλειδί αποθηκεύτηκε."
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Key removed."
+msgstr "Το κλειδί αφαιρέθηκε."
+
+#: src/routes/settings/+page.svelte
+msgid "Disconnected. The recordings and transcripts in the folder stay where they are."
+msgstr "Αποσυνδέθηκε. Οι ηχογραφήσεις και οι απομαγνητοφωνήσεις στον φάκελο μένουν εκεί όπου είναι."
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Saved."
+msgstr "Αποθηκεύτηκε."
+
+#: src/routes/settings/+page.svelte
+msgid "Fraktur (frk)"
+msgstr "Fraktur (frk)"
+
+#: src/routes/settings/+page.svelte
+msgid "Fraktur script"
+msgstr "Γραφή Fraktur"
+
+#: src/routes/settings/+page.svelte
+msgid "Fraktur (frak2021)"
+msgstr "Fraktur (frak2021)"
+
+#: src/routes/settings/+page.svelte
+msgid "Latin script (German, English, …)"
+msgstr "Λατινική γραφή (Γερμανικά, Αγγλικά, …)"
+
+#: src/routes/settings/+page.svelte
+msgid "Reads print and typewriting, with its own models for Fraktur."
+msgstr "Διαβάζει έντυπα και δακτυλογραφημένα κείμενα, με δικά του μοντέλα για Fraktur."
+
+#: src/routes/settings/+page.svelte
+msgid "Reads printed Latin script very accurately, including index cards and lists, and knows where each word is; fast on the graphics card. For Fraktur, Tesseract is better."
+msgstr "Διαβάζει με μεγάλη ακρίβεια έντυπη λατινική γραφή, ακόμη και καρτέλες ευρετηρίου και λίστες, και γνωρίζει τη θέση κάθε λέξης· γρήγορο στην κάρτα γραφικών. Για Fraktur, το Tesseract είναι καλύτερο."
+
+#: src/routes/settings/+page.svelte
+msgid "The text recognition built into Windows: available at once and very fast, with the position of each word, but without Fraktur or handwriting. Its languages come from Windows; you add more under Settings › Time & language › Language."
+msgstr "Η αναγνώριση κειμένου που είναι ενσωματωμένη στα Windows: διαθέσιμη αμέσως και πολύ γρήγορη, με τη θέση κάθε λέξης, αλλά χωρίς Fraktur ή χειρόγραφα. Οι γλώσσες της προέρχονται από τα Windows· προσθέτετε κι άλλες στις Ρυθμίσεις › Ώρα και γλώσσα › Γλώσσα."
+
+#: src/routes/settings/+page.svelte
+msgid "An AI model reads the image, in any language and script, including handwriting and Kurrent. It finds the lines, but not the position of each word. For this, the image goes to the service, billed through your key."
+msgstr "Ένα μοντέλο ΤΝ διαβάζει την εικόνα, σε οποιαδήποτε γλώσσα και γραφή, ακόμη και χειρόγραφα και Kurrent. Βρίσκει τις γραμμές, αλλά όχι τη θέση κάθε λέξης. Για τον σκοπό αυτό, η εικόνα πηγαίνει στην υπηρεσία, με χρέωση μέσω του κλειδιού σας."
+
+#: src/routes/settings/+page.svelte
+msgid "Page with columns (automatic)"
+msgstr "Σελίδα με στήλες (αυτόματα)"
+
+#: src/routes/settings/+page.svelte
+msgid "Lines, such as an index card or form"
+msgstr "Γραμμές, όπως καρτέλα ευρετηρίου ή έντυπο"
+
+#: src/routes/settings/+page.svelte
+msgid "A single block of text, such as a label"
+msgstr "Ένα ενιαίο μπλοκ κειμένου, όπως μια ετικέτα"
+
+#: src/routes/settings/+page.svelte
+msgid "Scattered, such as lettering on objects"
+msgstr "Διάσπαρτο, όπως γράμματα πάνω σε αντικείμενα"
+
+#: src/routes/settings/+page.svelte
+msgid "Copying didn’t work."
+msgstr "Η αντιγραφή δεν πέτυχε."
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribing"
+msgstr "Απομαγνητοφώνηση"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Recognition"
+msgstr "Αναγνώριση"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "New recordings"
+msgstr "Νέες ηχογραφήσεις"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Connected folders"
+msgstr "Συνδεδεμένοι φάκελοι"
+
+#: src/routes/settings/+page.svelte
+msgid "Live and dictation"
+msgstr "Live και υπαγόρευση"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Recording"
+msgstr "Ηχογράφηση"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "My voice"
+msgstr "Η φωνή μου"
+
+#: src/routes/settings/+page.svelte
+msgid "Dictation"
+msgstr "Υπαγόρευση"
+
+#: src/routes/settings/+page.svelte
+msgid "Apps"
+msgstr "Εφαρμογές"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Access"
+msgstr "Πρόσβαση"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "In the background"
+msgstr "Στο παρασκήνιο"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Address"
+msgstr "Διεύθυνση"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Saved requests"
+msgstr "Αποθηκευμένα αιτήματα"
+
+#: src/routes/settings/+page.svelte
+msgid "Engines"
+msgstr "Μηχανές αναγνώρισης"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "AI service"
+msgstr "Υπηρεσία ΤΝ"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Try it"
+msgstr "Δοκιμή"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Graphics card"
+msgstr "Κάρτα γραφικών"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Storage and models"
+msgstr "Αποθήκευση και μοντέλα"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "About Transcribe"
+msgstr "Σχετικά με το Transcribe"
+
+#. 0: uhr
+#: src/routes/settings/+page.svelte
+msgid "today at {0}"
+msgstr "σήμερα στις {0}"
+
+#. 0: d.toLocaleDateString(getLocale()); 1: uhr
+#: src/routes/settings/+page.svelte
+msgid "on {0} at {1}"
+msgstr "στις {0}, ώρα {1}"
+
+#: src/routes/settings/+page.svelte
+msgid "The defaults could not be loaded."
+msgstr "Δεν ήταν δυνατή η φόρτωση των προεπιλογών."
+
+#: src/routes/settings/+page.svelte
+msgid "Settings · Transcribe by Moliri"
+msgstr "Ρυθμίσεις · Transcribe by Moliri"
+
+#: src/routes/settings/+page.svelte
+msgid "Changes apply at once; there is nothing to save."
+msgstr "Οι αλλαγές ισχύουν αμέσως· δεν χρειάζεται αποθήκευση."
+
+#: src/routes/settings/+page.svelte
+msgid "Settings categories"
+msgstr "Κατηγορίες ρυθμίσεων"
+
+#: src/routes/settings/+page.svelte
+msgid "Sections"
+msgstr "Ενότητες"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Loading…"
+msgstr "Φόρτωση…"
+
+#: src/routes/settings/+page.svelte
+msgid "Where speech is recognized"
+msgstr "Πού αναγνωρίζεται η ομιλία"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Service <0/>"
+msgstr "Υπηρεσία <0/>"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Address <0/>"
+msgstr "Διεύθυνση <0/>"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Model <0/>"
+msgstr "Μοντέλο <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Speaks the OpenAI-compatible interface, like OpenAI, Groq, Mistral or a server of your own (such as Speaches or LocalAI). It does not tell speakers apart, and Live only shows the text after each pause."
+msgstr "Χρησιμοποιεί τη διεπαφή που είναι συμβατή με OpenAI, όπως OpenAI, Groq, Mistral ή δικός σας διακομιστής (π.χ. Speaches ή LocalAI). Δεν ξεχωρίζει ομιλητές, και το Live δείχνει το κείμενο μόνο μετά από κάθε παύση."
+
+#: src/routes/settings/+page.svelte
+msgid "Tells speakers apart and recognizes sounds such as laughter or applause; Live shows the text while you speak."
+msgstr "Ξεχωρίζει ομιλητές και αναγνωρίζει ήχους όπως γέλια ή χειροκροτήματα· το Live δείχνει το κείμενο ενώ μιλάτε."
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "API key (if the server requires one)"
+msgstr "Κλειδί API (αν το απαιτεί ο διακομιστής)"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "API key"
+msgstr "Κλειδί API"
+
+#. 0: a.keyHint
+#. 0: a.keyHint
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "stored (ends in {0})"
+msgstr "αποθηκευμένο (τελειώνει σε {0})"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "stored"
+msgstr "αποθηκευμένο"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Key"
+msgstr "Κλειδί"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Replace"
+msgstr "Αντικατάσταση"
+
+#. 0: dienst.label
+#. 0: dienst.label
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Without a key, the app can’t use {0}."
+msgstr "Χωρίς κλειδί, η εφαρμογή δεν μπορεί να χρησιμοποιήσει το {0}."
+
+#: src/routes/settings/+page.svelte
+msgid "You create the key in your account at <0/>. Billing is usually per minute of audio."
+msgstr "Δημιουργείτε το κλειδί στον λογαριασμό σας στο <0/>. Η χρέωση γίνεται συνήθως ανά λεπτό ήχου."
+
+#: src/routes/settings/+page.svelte
+msgid "<0/> The key stays in the settings on this computer."
+msgstr "<0/> Το κλειδί μένει στις ρυθμίσεις σε αυτόν τον υπολογιστή."
+
+#: src/routes/settings/+page.svelte
+msgid "Live and dictation <0/>"
+msgstr "Live και υπαγόρευση <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Whole recordings <0/>"
+msgstr "Ολόκληρες ηχογραφήσεις <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "For whole recordings this is the default: in the library and when you drop files, you choose for each recording what should recognize it."
+msgstr "Για ολόκληρες ηχογραφήσεις αυτή είναι η προεπιλογή: στη βιβλιοθήκη και όταν αποθέτετε αρχεία, επιλέγετε για κάθε ηχογράφηση τι θα την αναγνωρίσει."
+
+#: src/routes/settings/+page.svelte
+msgid "Speech in your recordings is recognized by the models on this computer or by a service through its API, on the internet or on your own network."
+msgstr "Η ομιλία στις ηχογραφήσεις σας αναγνωρίζεται από τα μοντέλα σε αυτόν τον υπολογιστή ή από μια υπηρεσία μέσω του API της, στο διαδίκτυο ή στο δικό σας δίκτυο."
+
+#: src/routes/settings/+page.svelte
+msgid "Usually the app detects by itself how many people are speaking. A fixed number helps when voices sound alike or someone speaks only briefly."
+msgstr "Συνήθως η εφαρμογή αναγνωρίζει μόνη της πόσα άτομα μιλούν. Ένας σταθερός αριθμός βοηθά όταν οι φωνές μοιάζουν ή κάποιος μιλά μόνο για λίγο."
+
+#: src/routes/settings/+page.svelte
+msgid "On automatic, the app recognizes any language. If you name the languages that occur, it chooses only among them; this helps with dialect and short passages in other languages."
+msgstr "Στο αυτόματο, η εφαρμογή αναγνωρίζει οποιαδήποτε γλώσσα. Αν ορίσετε τις γλώσσες που εμφανίζονται, επιλέγει μόνο ανάμεσα σε αυτές· αυτό βοηθά με διαλέκτους και σύντομα αποσπάσματα σε άλλες γλώσσες."
+
+#: src/routes/settings/+page.svelte
+msgid "Start right away with these defaults"
+msgstr "Άμεση έναρξη με αυτές τις προεπιλογές"
+
+#: src/routes/settings/+page.svelte
+msgid "The recordings are transcribed right away."
+msgstr "Οι ηχογραφήσεις απομαγνητοφωνούνται αμέσως."
+
+#: src/routes/settings/+page.svelte
+msgid "Off: the app first asks about speakers and languages and starts when you confirm."
+msgstr "Ανενεργό: η εφαρμογή ρωτά πρώτα για ομιλητές και γλώσσες και ξεκινά όταν επιβεβαιώσετε."
+
+#: src/routes/settings/+page.svelte
+msgid "When you drag files or folders into the window"
+msgstr "Όταν σύρετε αρχεία ή φακέλους στο παράθυρο"
+
+#: src/routes/settings/+page.svelte
+msgid "Every recording you drag into the window or transcribe in the library starts with these. You can change them there for individual recordings."
+msgstr "Κάθε ηχογράφηση που σύρετε στο παράθυρο ή απομαγνητοφωνείτε στη βιβλιοθήκη ξεκινά με αυτές. Εκεί μπορείτε να τις αλλάξετε για μεμονωμένες ηχογραφήσεις."
+
+#. 0: f.name
+#: src/routes/settings/+page.svelte
+msgid "Disconnect {0}"
+msgstr "Αποσύνδεση {0}"
+
+#: src/routes/settings/+page.svelte
+msgid "Disconnect"
+msgstr "Αποσύνδεση"
+
+#: src/routes/settings/+page.svelte
+msgid "Save transcripts next to the recordings"
+msgstr "Αποθήκευση απομαγνητοφωνήσεων δίπλα στις ηχογραφήσεις"
+
+#: src/routes/settings/+page.svelte
+msgid "Every transcript is also saved as a file next to its recording (“Interview.mp3.transcribe.json”), with corrections and clips. Anyone you share the folder with, for example via Nextcloud, sees and edits the same transcripts."
+msgstr "Κάθε απομαγνητοφώνηση αποθηκεύεται και ως αρχείο δίπλα στην ηχογράφησή της («Interview.mp3.transcribe.json»), με διορθώσεις και κλιπ. Όποιος μοιράζεται τον φάκελο μαζί σας, για παράδειγμα μέσω Nextcloud, βλέπει και επεξεργάζεται τις ίδιες απομαγνητοφωνήσεις."
+
+#: src/routes/settings/+page.svelte
+msgid "Off: transcripts stay in Transcribe only. If there is already one next to a recording, the app reads it anyway."
+msgstr "Ανενεργό: οι απομαγνητοφωνήσεις μένουν μόνο στο Transcribe. Αν υπάρχει ήδη μία δίπλα σε μια ηχογράφηση, η εφαρμογή τη διαβάζει ούτως ή άλλως."
+
+#: src/routes/settings/+page.svelte
+msgid "The recordings in a connected folder appear in the library without being copied, including those in its subfolders. You can connect a folder in the <0>library</0>. Transcribe never deletes anything in it."
+msgstr "Οι ηχογραφήσεις ενός συνδεδεμένου φακέλου εμφανίζονται στη βιβλιοθήκη χωρίς να αντιγραφούν, και εκείνες στους υποφακέλους του. Μπορείτε να συνδέσετε έναν φάκελο στη <0>βιβλιοθήκη</0>. Το Transcribe δεν διαγράφει ποτέ τίποτα σε αυτόν."
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Want to use Transcribe"
+msgstr "Θέλουν να χρησιμοποιήσουν το Transcribe"
+
+#. 0: z.client && !z.origin.endsWith(`//${z.client}`) && z.client !== z.origin ? `${z.client}, ` \\: ''; 1: uhrzeit(z.at)
+#: src/routes/settings/+page.svelte
+msgid "{0}asked at {1}"
+msgstr "{0}ρώτησε στις {1}"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Allowed websites"
+msgstr "Επιτρεπόμενοι ιστότοποι"
+
+#: src/routes/settings/+page.svelte
+msgid "Stop allowing"
+msgstr "Ανάκληση άδειας"
+
+#: src/routes/settings/+page.svelte
+msgid "No website allowed yet."
+msgstr "Δεν έχει επιτραπεί ακόμη κανένας ιστότοπος."
+
+#: src/routes/settings/+page.svelte
+msgid "Apps like Moliri get speech as text from Transcribe and have it read text from images. Apps on this computer may always do so, websites from other addresses only once you allow them. When one tries, Transcribe asks wherever you are, and with a notification if the window is closed."
+msgstr "Εφαρμογές όπως το Moliri λαμβάνουν από το Transcribe ομιλία ως κείμενο και του ζητούν να διαβάσει κείμενο από εικόνες. Οι εφαρμογές σε αυτόν τον υπολογιστή μπορούν πάντα να το κάνουν, οι ιστότοποι από άλλες διευθύνσεις μόνο αφού τους το επιτρέψετε. Όταν κάποιος το επιχειρήσει, το Transcribe ρωτά όπου κι αν βρίσκεστε, και με ειδοποίηση αν το παράθυρο είναι κλειστό."
+
+#: src/routes/settings/+page.svelte
+msgid "The permission applies to live transcription and text recognition."
+msgstr "Η άδεια ισχύει για τη ζωντανή απομαγνητοφώνηση και την αναγνώριση κειμένου."
+
+#: src/routes/settings/+page.svelte
+msgid "Apps may have Transcribe record from the microphone, and recognition stays loaded so that everything starts at once. This takes about 1 GB of memory. Transcribe always processes audio and images that an app sends."
+msgstr "Οι εφαρμογές μπορούν να ζητούν από το Transcribe να ηχογραφεί από το μικρόφωνο, και η αναγνώριση μένει φορτωμένη ώστε όλα να ξεκινούν αμέσως. Αυτό καταλαμβάνει περίπου 1 GB μνήμης. Το Transcribe επεξεργάζεται πάντα τον ήχο και τις εικόνες που στέλνει μια εφαρμογή."
+
+#: src/routes/settings/+page.svelte
+msgid "Off: apps may not have Transcribe record from the microphone, and nothing stays loaded. Transcribe still processes audio and images that an app sends. Recording and dictating by hand work too; they just start a little more slowly."
+msgstr "Ανενεργό: οι εφαρμογές δεν μπορούν να ζητούν από το Transcribe να ηχογραφεί από το μικρόφωνο, και τίποτα δεν μένει φορτωμένο. Το Transcribe εξακολουθεί να επεξεργάζεται τον ήχο και τις εικόνες που στέλνει μια εφαρμογή. Η χειροκίνητη ηχογράφηση και υπαγόρευση λειτουργούν επίσης· απλώς ξεκινούν λίγο πιο αργά."
+
+#: src/routes/settings/+page.svelte
+msgid "Start with Windows"
+msgstr "Εκκίνηση με τα Windows"
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribe starts without a window when you sign in and waits in the notification area."
+msgstr "Το Transcribe ξεκινά χωρίς παράθυρο όταν συνδέεστε και περιμένει στην περιοχή ειδοποιήσεων."
+
+#: src/routes/settings/+page.svelte
+msgid "Off: Transcribe only starts when you open it."
+msgstr "Ανενεργό: το Transcribe ξεκινά μόνο όταν το ανοίξετε."
+
+#: src/routes/settings/+page.svelte
+msgid "Keep running after closing"
+msgstr "Συνέχιση λειτουργίας μετά το κλείσιμο"
+
+#: src/routes/settings/+page.svelte
+msgid "Always on while Transcribe starts with Windows."
+msgstr "Πάντα ενεργό όσο το Transcribe ξεκινά με τα Windows."
+
+#: src/routes/settings/+page.svelte
+msgid "When you close the window, Transcribe stays in the notification area: click it to open it, right-click it to quit."
+msgstr "Όταν κλείνετε το παράθυρο, το Transcribe μένει στην περιοχή ειδοποιήσεων: κάντε κλικ για να το ανοίξετε, δεξί κλικ για να το τερματίσετε."
+
+#: src/routes/settings/+page.svelte
+msgid "Off: when you close the window, Transcribe quits as soon as there is nothing left to do."
+msgstr "Ανενεργό: όταν κλείνετε το παράθυρο, το Transcribe τερματίζεται μόλις δεν έχει τίποτα άλλο να κάνει."
+
+#: src/routes/settings/+page.svelte
+msgid "Apps can only reach Transcribe while it is running; if you like, also without an open window, as an icon in the notification area of the taskbar."
+msgstr "Οι εφαρμογές έχουν πρόσβαση στο Transcribe μόνο όσο εκτελείται· αν θέλετε, και χωρίς ανοιχτό παράθυρο, ως εικονίδιο στην περιοχή ειδοποιήσεων της γραμμής εργασιών."
+
+#: src/routes/settings/+page.svelte
+msgid "Copy address"
+msgstr "Αντιγραφή διεύθυνσης"
+
+#: src/routes/settings/+page.svelte
+msgid "This only works while “Ready in the background” is on."
+msgstr "Αυτό λειτουργεί μόνο όσο είναι ενεργό το «Έτοιμο στο παρασκήνιο»."
+
+#: src/routes/settings/+page.svelte
+msgid "Send audio"
+msgstr "Αποστολή ήχου"
+
+#: src/routes/settings/+page.svelte
+msgid "The app records by itself and sends the sound; the text comes back right away."
+msgstr "Η εφαρμογή ηχογραφεί μόνη της και στέλνει τον ήχο· το κείμενο επιστρέφει αμέσως."
+
+#: src/routes/settings/+page.svelte
+msgid "Let Transcribe listen in <0/>"
+msgstr "Το Transcribe ακούει <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "The app only says “from now on” and “up to now”. In between, Transcribe records what is selected under <0>Live and dictation › Recording</0> and keeps sending the text to the app. <1/>"
+msgstr "Η εφαρμογή λέει μόνο «από τώρα» και «ως τώρα». Στο ενδιάμεσο, το Transcribe ηχογραφεί ό,τι έχει επιλεγεί στο <0>Live και υπαγόρευση › Ηχογράφηση</0> και στέλνει συνεχώς το κείμενο στην εφαρμογή. <1/>"
+
+#: src/routes/settings/+page.svelte
+msgid "For developers: how to talk to Transcribe"
+msgstr "Για προγραμματιστές: πώς επικοινωνείτε με το Transcribe"
+
+#: src/routes/settings/+page.svelte
+msgid "WebSocket at <0/>. Parameters: <1/> (default) or <2/>, <3/> what the recording should be called, for audio <4/> and <5/> or <6/> (mono)."
+msgstr "WebSocket στο <0/>. Παράμετροι: <1/> (προεπιλογή) ή <2/>, <3/> πώς θα ονομάζεται η ηχογράφηση, για ήχο <4/> και <5/> ή <6/> (μονοφωνικό)."
+
+#: src/routes/settings/+page.svelte
+msgid "Audio goes in as binary messages. JSON messages come back: <0/>, continuously <1/> (the sentence being spoken), <2/> (finished sentence, with <3/> and <4/> in seconds), at the end <5/>, on problems <6/>. <7/> ends it: Transcribe still sends what has been said so far, then <8/>."
+msgstr "Ο ήχος αποστέλλεται ως δυαδικά μηνύματα. Επιστρέφουν μηνύματα JSON: <0/>, συνεχώς <1/> (η πρόταση που λέγεται αυτή τη στιγμή), <2/> (ολοκληρωμένη πρόταση, με <3/> και <4/> σε δευτερόλεπτα), στο τέλος <5/>, σε προβλήματα <6/>. Το <7/> τερματίζει: το Transcribe στέλνει ακόμη ό,τι έχει ειπωθεί ως τώρα, και μετά <8/>."
+
+#: src/routes/settings/+page.svelte
+msgid "Apps reach Transcribe at this address. In Moliri, you enter it in your profile:"
+msgstr "Σε αυτή τη διεύθυνση οι εφαρμογές βρίσκουν το Transcribe. Στο Moliri, την καταχωρίζετε στο προφίλ σας:"
+
+#: src/routes/settings/+page.svelte
+msgid "Every request appears on the <0>Live</0> page as a recording “Via API”; what apps have read, ask the language model or convert for search by meaning appears there under “AI & OCR”. As long as Transcribe is delivering text to an app, it does not quit."
+msgstr "Κάθε αίτημα εμφανίζεται στη σελίδα <0>Live</0> ως ηχογράφηση «Μέσω API»· ό,τι ζητούν οι εφαρμογές να διαβαστεί, να ρωτηθεί το γλωσσικό μοντέλο ή να μετατραπεί για αναζήτηση κατά νόημα εμφανίζεται εκεί στο «ΤΝ & OCR». Όσο το Transcribe παραδίδει κείμενο σε μια εφαρμογή, δεν τερματίζεται."
+
+#: src/routes/settings/+page.svelte
+msgid "Save requests as recordings"
+msgstr "Αποθήκευση αιτημάτων ως ηχογραφήσεις"
+
+#: src/routes/settings/+page.svelte
+msgid "Every request stays on the Live page, with its text, even after a restart."
+msgstr "Κάθε αίτημα παραμένει στη σελίδα Live, με το κείμενό του, ακόμη και μετά από επανεκκίνηση."
+
+#: src/routes/settings/+page.svelte
+msgid "Off: a request only appears on the Live page while it runs and for a few minutes afterwards. Nothing of it stays on the computer."
+msgstr "Ανενεργό: ένα αίτημα εμφανίζεται στη σελίδα Live μόνο όσο εκτελείται και για λίγα λεπτά μετά. Τίποτα από αυτό δεν μένει στον υπολογιστή."
+
+#. 0: live.apiLoeschen
+#: src/routes/settings/+page.svelte
+msgid "After {0} hours"
+msgstr "Μετά από {0} ώρες"
+
+#: src/routes/settings/+page.svelte
+msgid "Delete automatically <0/>"
+msgstr "Αυτόματη διαγραφή <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Counted from the end of a request; this also applies to those already saved. Recordings you start on the Live page and dictations are kept."
+msgstr "Μετράει από το τέλος ενός αιτήματος· ισχύει και για όσα έχουν ήδη αποθηκευτεί. Οι ηχογραφήσεις που ξεκινάτε στη σελίδα Live και οι υπαγορεύσεις διατηρούνται."
+
+#. 0: l.version
+#: src/routes/settings/+page.svelte
+msgid "Model {0}"
+msgstr "Μοντέλο {0}"
+
+#. 0: l.version
+#. 0: versionText(u.version)
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Version {0}"
+msgstr "Έκδοση {0}"
+
+#: src/routes/settings/+page.svelte
+msgid "on the graphics card"
+msgstr "στην κάρτα γραφικών"
+
+#: src/routes/settings/+page.svelte
+msgid "<0/>ready"
+msgstr "<0/>έτοιμο"
+
+#: src/routes/settings/+page.svelte
+msgid "downloads on first read"
+msgstr "λήψη στην πρώτη ανάγνωση"
+
+#: src/routes/settings/+page.svelte
+msgid "not set up"
+msgstr "δεν έχει ρυθμιστεί"
+
+#: src/routes/settings/+page.svelte
+msgid "not installed"
+msgstr "δεν έχει εγκατασταθεί"
+
+#. 0: ocrReihe(l.languages).map(ocrName).join(', ')
+#: src/routes/settings/+page.svelte
+msgid "Installed: {0}."
+msgstr "Εγκατεστημένες: {0}."
+
+#. 0: ocrReihe(l.download).map(ocrName).join(', ')
+#: src/routes/settings/+page.svelte
+msgid "Downloaded on first read: {0}."
+msgstr "Λήψη στην πρώτη ανάγνωση: {0}."
+
+#: src/routes/settings/+page.svelte
+msgid "On Linux and macOS, the installed program <0/> does the reading; install it with its languages, then reload this page."
+msgstr "Σε Linux και macOS, την ανάγνωση κάνει το εγκατεστημένο πρόγραμμα <0/>· εγκαταστήστε το με τις γλώσσες του και μετά φορτώστε ξανά αυτή τη σελίδα."
+
+#: src/routes/settings/+page.svelte
+msgid "For Moliri and other apps <0/>"
+msgstr "Για το Moliri και άλλες εφαρμογές <0/>"
+
+#. 0: vorgabe.name
+#: src/routes/settings/+page.svelte
+msgid "{0} can’t read yet; until then, Transcribe chooses automatically."
+msgstr "Το {0} δεν μπορεί ακόμη να διαβάσει· ως τότε, το Transcribe επιλέγει αυτόματα."
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribe reads with this when an app names no engine, as Moliri does. Automatic takes the first one that can read, never the AI service."
+msgstr "Με αυτό διαβάζει το Transcribe όταν μια εφαρμογή δεν ορίζει μηχανή αναγνώρισης, όπως το Moliri. Το αυτόματο παίρνει την πρώτη που μπορεί να διαβάσει, ποτέ την υπηρεσία ΤΝ."
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribe also reads text from images, such as index cards, labels or Fraktur print, for apps like Moliri. The image does not leave the computer unless you let an AI service read it."
+msgstr "Το Transcribe διαβάζει επίσης κείμενο από εικόνες, όπως καρτέλες ευρετηρίου, ετικέτες ή έντυπα σε Fraktur, για εφαρμογές όπως το Moliri. Η εικόνα δεν φεύγει από τον υπολογιστή, εκτός αν αφήσετε μια υπηρεσία ΤΝ να τη διαβάσει."
+
+#: src/routes/settings/+page.svelte
+msgid "Speaks the OpenAI-compatible interface, like OpenAI, Mistral or a server of your own (such as Ollama). The model must be able to read images, such as qwen2.5vl."
+msgstr "Χρησιμοποιεί τη διεπαφή που είναι συμβατή με OpenAI, όπως OpenAI, Mistral ή δικός σας διακομιστής (π.χ. Ollama). Το μοντέλο πρέπει να μπορεί να διαβάζει εικόνες, όπως το qwen2.5vl."
+
+#: src/routes/settings/+page.svelte
+msgid "You create the key in your account at <0/>. Billing is per token, for each image and for the text the model writes."
+msgstr "Δημιουργείτε το κλειδί στον λογαριασμό σας στο <0/>. Η χρέωση γίνεται ανά token, για κάθε εικόνα και για το κείμενο που γράφει το μοντέλο."
+
+#: src/routes/settings/+page.svelte
+msgid "<0/> The key stays in the settings on this computer; Moliri does not get it."
+msgstr "<0/> Το κλειδί μένει στις ρυθμίσεις σε αυτόν τον υπολογιστή· το Moliri δεν το λαμβάνει."
+
+#: src/routes/settings/+page.svelte
+msgid "With your own key, an AI model on the internet or on your own network does the reading. This is a different service from the one for speech under <0>Transcribing › Recognition</0>, with its own model and key."
+msgstr "Με το δικό σας κλειδί, την ανάγνωση κάνει ένα μοντέλο ΤΝ στο διαδίκτυο ή στο δικό σας δίκτυο. Πρόκειται για διαφορετική υπηρεσία από εκείνη για την ομιλία στο <0>Απομαγνητοφώνηση › Αναγνώριση</0>, με δικό της μοντέλο και κλειδί."
+
+#: src/routes/settings/+page.svelte
+msgid "No engine can read yet."
+msgstr "Καμία μηχανή αναγνώρισης δεν μπορεί ακόμη να διαβάσει."
+
+#: src/routes/settings/+page.svelte
+msgid "Engine <0/>"
+msgstr "Μηχανή αναγνώρισης <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "German and Fraktur"
+msgstr "Γερμανικά και Fraktur"
+
+#: src/routes/settings/+page.svelte
+msgid "German and English"
+msgstr "Γερμανικά και Αγγλικά"
+
+#: src/routes/settings/+page.svelte
+msgid "What the image shows <0/>"
+msgstr "Τι δείχνει η εικόνα <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Language and script <0/>"
+msgstr "Γλώσσα και γραφή <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Reading…"
+msgstr "Ανάγνωση…"
+
+#: src/routes/settings/+page.svelte
+msgid "Read image"
+msgstr "Ανάγνωση εικόνας"
+
+#: src/routes/settings/+page.svelte
+msgid "The image is with the AI service. Large models think about a full page for a while."
+msgstr "Η εικόνα βρίσκεται στην υπηρεσία ΤΝ. Τα μεγάλα μοντέλα χρειάζονται λίγη ώρα για μια ολόκληρη σελίδα."
+
+#: src/routes/settings/+page.svelte
+msgid "The first time, Transcribe downloads the PP-OCRv5 models (13 MB); this takes a moment."
+msgstr "Την πρώτη φορά, το Transcribe κατεβάζει τα μοντέλα PP-OCRv5 (13 MB)· αυτό διαρκεί λίγο."
+
+#: src/routes/settings/+page.svelte
+msgid "The first time, Transcribe downloads Tesseract and the language; this takes a moment."
+msgstr "Την πρώτη φορά, το Transcribe κατεβάζει το Tesseract και τη γλώσσα· αυτό διαρκεί λίγο."
+
+#: src/routes/settings/+page.svelte
+msgid "The image that was read, with the words found outlined"
+msgstr "Η εικόνα που διαβάστηκε, με πλαίσιο γύρω από τις λέξεις που βρέθηκαν"
+
+#: src/routes/settings/+page.svelte
+msgid "# line"
+msgid_plural "# lines"
+msgstr[0] "# γραμμή"
+msgstr[1] "# γραμμές"
+
+#: src/routes/settings/+page.svelte
+msgid "No text found."
+msgstr "Δεν βρέθηκε κείμενο."
+
+#. 0: plural(gelesen.zeilen, ['# line', '# lines']); 1: gelesen.sekunden.toLocaleString(getLocale(), { minimumFractionDigits\\: 1, maximumFractionDigits\\: 1 }); 2: gelesen.leser ? `, ${gelesen.leser}` \\: ''
+#: src/routes/settings/+page.svelte
+msgid "{0} in {1} s{2}"
+msgstr "{0} σε {1} δευτ.{2}"
+
+#: src/routes/settings/+page.svelte
+msgid "Read an image of your own, with the engine, language and kind of text you choose."
+msgstr "Διαβάστε μια δική σας εικόνα, με τη μηχανή αναγνώρισης, τη γλώσσα και το είδος κειμένου που επιλέγετε."
+
+#: src/routes/settings/+page.svelte
+msgid "This is how Transcribe records on the <0>Live</0> page, when dictating and for apps that let it listen in. You can also reach source, microphone and languages there under “Set up”."
+msgstr "Έτσι ηχογραφεί το Transcribe στη σελίδα <0>Live</0>, κατά την υπαγόρευση και για εφαρμογές που το αφήνουν να ακούει. Την πηγή, το μικρόφωνο και τις γλώσσες τα βρίσκετε επίσης εκεί, στο «Ρύθμιση»."
+
+#: src/routes/settings/+page.svelte
+msgid "What is spoken and how the live text writes it, also when dictating."
+msgstr "Τι λέγεται και πώς το γράφει το ζωντανό κείμενο, και κατά την υπαγόρευση."
+
+#: src/routes/settings/+page.svelte
+msgid "Press <0/> in any app and speak, then press it again. <1/> cancels. A small window above the taskbar shows that Transcribe is listening and what it has understood, like a subtitle. Clicking it opens the dictation on the Live page."
+msgstr "Πατήστε <0/> σε οποιαδήποτε εφαρμογή και μιλήστε, έπειτα πατήστε το ξανά. Το <1/> ακυρώνει. Ένα μικρό παράθυρο πάνω από τη γραμμή εργασιών δείχνει ότι το Transcribe ακούει και τι έχει καταλάβει, σαν υπότιτλος. Με κλικ σε αυτό ανοίγει η υπαγόρευση στη σελίδα Live."
+
+#: src/routes/settings/+page.svelte
+msgid "With a keyboard shortcut you dictate into any app: text that appears where the cursor is."
+msgstr "Με μια συντόμευση πληκτρολογίου υπαγορεύετε σε οποιαδήποτε εφαρμογή: το κείμενο εμφανίζεται εκεί όπου βρίσκεται ο κέρσορας."
+
+#: src/routes/settings/+page.svelte
+msgid "Off"
+msgstr "Ανενεργό"
+
+#: src/routes/settings/+page.svelte
+msgid "Insert at the cursor"
+msgstr "Εισαγωγή στη θέση του κέρσορα"
+
+#: src/routes/settings/+page.svelte
+msgid "The text appears where the cursor is."
+msgstr "Το κείμενο εμφανίζεται εκεί όπου βρίσκεται ο κέρσορας."
+
+#: src/routes/settings/+page.svelte
+msgid "Off: the text is not inserted anywhere."
+msgstr "Ανενεργό: το κείμενο δεν εισάγεται πουθενά."
+
+#: src/routes/settings/+page.svelte
+msgid "Copy to clipboard"
+msgstr "Αντιγραφή στο πρόχειρο"
+
+#: src/routes/settings/+page.svelte
+msgid "The text is then on the clipboard, for Ctrl + V."
+msgstr "Το κείμενο βρίσκεται έπειτα στο πρόχειρο, για Ctrl + V."
+
+#: src/routes/settings/+page.svelte
+msgid "Off: the clipboard stays as it was."
+msgstr "Ανενεργό: το πρόχειρο μένει όπως ήταν."
+
+#: src/routes/settings/+page.svelte
+msgid "Keyboard shortcut <0/>"
+msgstr "Συντόμευση πληκτρολογίου <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Both off: the dictation only appears in the small window and stays on the Live page, as a note or for copying by hand."
+msgstr "Και τα δύο ανενεργά: η υπαγόρευση εμφανίζεται μόνο στο μικρό παράθυρο και παραμένει στη σελίδα Live, ως σημείωση ή για χειροκίνητη αντιγραφή."
+
+#: src/routes/settings/+page.svelte
+msgid "Dictate into any app"
+msgstr "Υπαγόρευση σε οποιαδήποτε εφαρμογή"
+
+#: src/routes/settings/+page.svelte
+msgid "Dictation uses the microphone and language set on the <0>Live</0> page. Every dictation then appears there too."
+msgstr "Η υπαγόρευση χρησιμοποιεί το μικρόφωνο και τη γλώσσα που έχουν οριστεί στη σελίδα <0>Live</0>. Κάθε υπαγόρευση εμφανίζεται έπειτα και εκεί."
+
+#: src/routes/settings/+page.svelte
+msgid "Checking the graphics card…"
+msgstr "Έλεγχος της κάρτας γραφικών…"
+
+#: src/routes/settings/+page.svelte
+msgid "No NVIDIA GPU detected. Recognition runs on the processor (CPU)."
+msgstr "Δεν εντοπίστηκε GPU της NVIDIA. Η αναγνώριση εκτελείται στον επεξεργαστή (CPU)."
+
+#: src/routes/settings/+page.svelte
+msgid "GPU acceleration is only available with NVIDIA graphics cards (CUDA) on Windows and Linux."
+msgstr "Η επιτάχυνση GPU είναι διαθέσιμη μόνο με κάρτες γραφικών NVIDIA (CUDA) σε Windows και Linux."
+
+#. 0: Math.round(g.memoryMB / 1024); 1: g.driver
+#: src/routes/settings/+page.svelte
+msgid "{0} GB · Driver {1}"
+msgstr "{0} GB · Πρόγραμμα οδήγησης {1}"
+
+#: src/routes/settings/+page.svelte
+msgid "There is no suitable GPU runtime for this graphics card or system."
+msgstr "Δεν υπάρχει κατάλληλο περιβάλλον εκτέλεσης GPU για αυτή την κάρτα γραφικών ή αυτό το σύστημα."
+
+#: src/routes/settings/+page.svelte
+msgid "Downloading libraries from NVIDIA"
+msgstr "Γίνεται λήψη βιβλιοθηκών από τη NVIDIA"
+
+#: src/routes/settings/+page.svelte
+msgid "Downloading the GPU runtime"
+msgstr "Γίνεται λήψη του περιβάλλοντος εκτέλεσης GPU"
+
+#. 0: was; 1: schon; 2: groesse(laedt.total)
+#: src/routes/settings/+page.svelte
+msgid "{0} – {1} of {2}"
+msgstr "{0} – {1} από {2}"
+
+#. 0: was
+#: src/routes/settings/+page.svelte
+msgid "{0}…"
+msgstr "{0}…"
+
+#: src/routes/settings/+page.svelte
+msgid "The GPU runtime follows after that."
+msgstr "Έπειτα ακολουθεί το περιβάλλον εκτέλεσης GPU."
+
+#: src/routes/settings/+page.svelte
+msgid ", plus the GPU runtime of about 500 MB"
+msgstr ", συν το περιβάλλον εκτέλεσης GPU, περίπου 500 MB"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Download libraries"
+msgstr "Λήψη βιβλιοθηκών"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Set up GPU"
+msgstr "Ρύθμιση GPU"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Check again"
+msgstr "Νέος έλεγχος"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Technical details"
+msgstr "Τεχνικές λεπτομέρειες"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Download failed. Is the computer connected to the internet?"
+msgstr "Η λήψη απέτυχε. Είναι ο υπολογιστής συνδεδεμένος στο διαδίκτυο;"
+
+#. 0: groesse(g.fetch); 1: gpu.installed ? /* @wc-include */ 'Download libraries' \\: /* @wc-include */ 'Set up GPU'
+#: src/routes/settings/+page.svelte
+msgid "The app can download them from NVIDIA itself, about {0}<0/>. This happens once. By choosing “{1}”, you accept NVIDIA’s license terms for the <1>CUDA Toolkit</1> and for <2>cuDNN</2>."
+msgstr "Η εφαρμογή μπορεί να τις κατεβάσει η ίδια από τη NVIDIA, περίπου {0}<0/>. Αυτό γίνεται μία φορά. Επιλέγοντας «{1}», αποδέχεστε τους όρους άδειας χρήσης της NVIDIA για το <1>CUDA Toolkit</1> και για το <2>cuDNN</2>."
+
+#. 0.0: g.cudaMajor
+#: src/routes/settings/+page.svelte
+msgid "Rather install them yourself? The <0>CUDA Toolkit {0}</0> and <1>cuDNN 9</1> are available from NVIDIA; afterwards, choose “Check again” here."
+msgstr "Προτιμάτε να τις εγκαταστήσετε μόνοι σας; Το <0>CUDA Toolkit {0}</0> και το <1>cuDNN 9</1> διατίθενται από τη NVIDIA· έπειτα επιλέξτε εδώ «Νέος έλεγχος»."
+
+#. 0.0: g.cudaMajor
+#: src/routes/settings/+page.svelte
+msgid "Install the <0>CUDA Toolkit {0}</0> and <1>cuDNN 9</1> from NVIDIA, then check again here."
+msgstr "Εγκαταστήστε το <0>CUDA Toolkit {0}</0> και το <1>cuDNN 9</1> από τη NVIDIA και μετά ελέγξτε ξανά εδώ."
+
+#. 0: g.missing.join(', ')
+#: src/routes/settings/+page.svelte
+msgid "The GPU is missing libraries from NVIDIA: {0}."
+msgstr "Λείπουν βιβλιοθήκες της NVIDIA για τη GPU: {0}."
+
+#: src/routes/settings/+page.svelte
+msgid "Download the GPU runtime"
+msgstr "Λήψη του περιβάλλοντος εκτέλεσης GPU"
+
+#. 0: g.cudaMajor
+#: src/routes/settings/+page.svelte
+msgid "The GPU runtime (CUDA {0}) is about 500 MB and is downloaded once. Without it, everything runs on the processor."
+msgstr "Το περιβάλλον εκτέλεσης GPU (CUDA {0}) έχει μέγεθος περίπου 500 MB και κατεβαίνει μία φορά. Χωρίς αυτό, όλα εκτελούνται στον επεξεργαστή."
+
+#: src/routes/settings/+page.svelte
+msgid "Compute on the GPU (CUDA)"
+msgstr "Υπολογισμοί στη GPU (CUDA)"
+
+#: src/routes/settings/+page.svelte
+msgid "Off: recognition runs on the processor."
+msgstr "Ανενεργό: η αναγνώριση εκτελείται στον επεξεργαστή."
+
+#: src/routes/settings/+page.svelte
+msgid "Processor (CPU)"
+msgstr "Επεξεργαστής (CPU)"
+
+#: src/routes/settings/+page.svelte
+msgid "The change takes effect when you restart the app."
+msgstr "Η αλλαγή ισχύει όταν επανεκκινήσετε την εφαρμογή."
+
+#: src/routes/settings/+page.svelte
+msgid "Currently in use: <0/>. <1/>"
+msgstr "Σε χρήση αυτή τη στιγμή: <0/>. <1/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Default"
+msgstr "Προεπιλογή"
+
+#: src/routes/settings/+page.svelte
+msgid "Set at startup with <0/> or <1/>, so it can’t be changed here."
+msgstr "Ορίστηκε κατά την εκκίνηση με <0/> ή <1/>, γι’ αυτό δεν μπορεί να αλλάξει εδώ."
+
+#: src/routes/settings/+page.svelte
+msgid "The data has moved. Transcribe is restarting…"
+msgstr "Τα δεδομένα μεταφέρθηκαν. Το Transcribe επανεκκινείται…"
+
+#: src/routes/settings/+page.svelte
+msgid "Moving the data folder"
+msgstr "Μεταφορά του φακέλου δεδομένων"
+
+#. 0: groesse(umzug.done); 1: groesse(umzug.total)
+#: src/routes/settings/+page.svelte
+msgid "Moving the data to <0/>: {0} of {1}"
+msgstr "Μεταφορά των δεδομένων στο <0/>: {0} από {1}"
+
+#: src/routes/settings/+page.svelte
+msgid "Move"
+msgstr "Μεταφορά"
+
+#: src/routes/settings/+page.svelte
+msgid "Move the data folder?"
+msgstr "Μεταφορά του φακέλου δεδομένων;"
+
+#. 0: groesse(ortZiel.size)
+#: src/routes/settings/+page.svelte
+msgid "The data ({0}) moves to <0/>. Then Transcribe restarts and deletes the old folder."
+msgstr "Τα δεδομένα ({0}) μεταφέρονται στο <0/>. Έπειτα το Transcribe επανεκκινείται και διαγράφει τον παλιό φάκελο."
+
+#: src/routes/settings/+page.svelte
+msgid "New location, e.g. /mnt/data/transcribe"
+msgstr "Νέα θέση, π.χ. /mnt/data/transcribe"
+
+#: src/routes/settings/+page.svelte
+msgid "New location of the data folder"
+msgstr "Νέα θέση του φακέλου δεδομένων"
+
+#: src/routes/settings/+page.svelte
+msgid "Back to the default location"
+msgstr "Επιστροφή στην προεπιλεγμένη θέση"
+
+#: src/routes/settings/+page.svelte
+msgid "Choose another location…"
+msgstr "Επιλογή άλλης θέσης…"
+
+#: src/routes/settings/+page.svelte
+msgid "The data is now in <0/>."
+msgstr "Τα δεδομένα βρίσκονται τώρα στο <0/>."
+
+#: src/routes/settings/+page.svelte
+msgid "Location of the data folder"
+msgstr "Θέση του φακέλου δεδομένων"
+
+#: src/routes/settings/+page.svelte
+msgid "No connection to Transcribe. Is the app still running?"
+msgstr "Δεν υπάρχει σύνδεση με το Transcribe. Εκτελείται ακόμη η εφαρμογή;"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Storage locations"
+msgstr "Θέσεις αποθήκευσης"
+
+#. 0: name
+#: src/routes/settings/+page.svelte
+msgid "Open {0}"
+msgstr "Άνοιγμα {0}"
+
+#: src/routes/settings/+page.svelte
+msgid "Open"
+msgstr "Άνοιγμα"
+
+#: src/routes/settings/+page.svelte
+msgid "Recognition runs through the API, so the app downloads no models, only ffmpeg for the waveform and export. Whatever is already there stays."
+msgstr "Η αναγνώριση γίνεται μέσω του API, γι’ αυτό η εφαρμογή δεν κατεβάζει μοντέλα, μόνο το ffmpeg για την κυματομορφή και την εξαγωγή. Ό,τι υπάρχει ήδη παραμένει."
+
+#: src/routes/settings/+page.svelte
+msgid "The app downloads them on first start. Anything marked “on demand” is only added when it is needed, such as Whisper turbo for other languages."
+msgstr "Η εφαρμογή τα κατεβάζει στην πρώτη εκκίνηση. Ό,τι επισημαίνεται «κατά απαίτηση» προστίθεται μόνο όταν χρειαστεί, όπως το Whisper turbo για άλλες γλώσσες."
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Models and components"
+msgstr "Μοντέλα και στοιχεία"
+
+#. 0: c.device
+#: src/routes/settings/+page.svelte
+msgid "runs on the graphics card: {0}"
+msgstr "εκτελείται στην κάρτα γραφικών: {0}"
+
+#. 0: c.total ? `${prozent(c)} %` \\: '…'
+#: src/routes/settings/+page.svelte
+msgid "downloading {0}"
+msgstr "λήψη {0}"
+
+#: src/routes/settings/+page.svelte
+msgid "<0/>installed"
+msgstr "<0/>εγκατεστημένο"
+
+#: src/routes/settings/+page.svelte
+msgid "on demand"
+msgstr "κατά απαίτηση"
+
+#: src/routes/settings/+page.svelte
+msgid "missing"
+msgstr "λείπει"
+
+#. 0: c.label || c.name
+#: src/routes/settings/+page.svelte
+msgid "Download {0} again"
+msgstr "Νέα λήψη του {0}"
+
+#. 0: c.label || c.name
+#: src/routes/settings/+page.svelte
+msgid "Download {0}"
+msgstr "Λήψη του {0}"
+
+#: src/routes/settings/+page.svelte
+msgid "Download again"
+msgstr "Νέα λήψη"
+
+#: src/routes/settings/+page.svelte
+msgid "Download"
+msgstr "Λήψη"
+
+#. 0: c.label || c.name
+#: src/routes/settings/+page.svelte
+msgid "Downloading {0}"
+msgstr "Γίνεται λήψη του {0}"
+
+#: src/routes/settings/+page.svelte
+msgid "Everything is in the data folder: recordings, results, models and settings. To back up, copying this folder is enough. Where the EXE is doesn’t matter."
+msgstr "Όλα βρίσκονται στον φάκελο δεδομένων: ηχογραφήσεις, αποτελέσματα, μοντέλα και ρυθμίσεις. Για αντίγραφο ασφαλείας αρκεί να αντιγράψετε αυτόν τον φάκελο. Το πού βρίσκεται το EXE δεν έχει σημασία."
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribe by Moliri is free and runs on its own. It is also the companion app to the museum database <0>Moliri</0>. How everything works is explained in the <1>manual</1>."
+msgstr "Το Transcribe by Moliri είναι δωρεάν και λειτουργεί αυτόνομα. Είναι επίσης η συνοδευτική εφαρμογή της βάσης δεδομένων μουσείων <0>Moliri</0>. Το πώς λειτουργούν όλα εξηγείται στο <1>εγχειρίδιο</1>."
+
+#. 0: wann(u.checked)
+#: src/routes/settings/+page.svelte
+msgid "the latest, last checked {0}"
+msgstr "η πιο πρόσφατη, τελευταίος έλεγχος {0}"
+
+#: src/routes/settings/+page.svelte
+msgid "the latest"
+msgstr "η πιο πρόσφατη"
+
+#. 0: versionText(vorher); 1: versionText(u.version)
+#: src/routes/settings/+page.svelte
+msgid "Updated from version {0} to {1}."
+msgstr "Ενημερώθηκε από την έκδοση {0} στην {1}."
+
+#: src/routes/settings/+page.svelte
+msgid "On Linux and macOS, Transcribe does not update itself. New versions are available under <0>Releases</0>."
+msgstr "Σε Linux και macOS, το Transcribe δεν ενημερώνεται αυτόματα. Οι νέες εκδόσεις είναι διαθέσιμες στα <0>Releases</0>."
+
+#: src/routes/settings/+page.svelte
+msgid "A development version does not check for updates. Finished versions are available under <0>Releases</0>."
+msgstr "Μια έκδοση ανάπτυξης δεν ελέγχει για ενημερώσεις. Οι τελικές εκδόσεις είναι διαθέσιμες στα <0>Releases</0>."
+
+#: src/routes/settings/+page.svelte
+msgid "What’s new?"
+msgstr "Τι νέο υπάρχει;"
+
+#: src/routes/settings/+page.svelte
+msgid "Try again"
+msgstr "Δοκιμάστε ξανά"
+
+#: src/routes/settings/+page.svelte
+msgid "Update now"
+msgstr "Ενημέρωση τώρα"
+
+#. 0: neu
+#: src/routes/settings/+page.svelte
+msgid "Version {0} is available"
+msgstr "Η έκδοση {0} είναι διαθέσιμη"
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribe downloads it, replaces the program and restarts. Running jobs and recordings finish first; your recordings and settings stay as they are. <0/>"
+msgstr "Το Transcribe την κατεβάζει, αντικαθιστά το πρόγραμμα και επανεκκινείται. Οι εργασίες και οι ηχογραφήσεις σε εξέλιξη ολοκληρώνονται πρώτα· οι ηχογραφήσεις και οι ρυθμίσεις σας μένουν ως έχουν. <0/>"
+
+#. 0: neu
+#: src/routes/settings/+page.svelte
+msgid "Downloading version {0}"
+msgstr "Λήψη της έκδοσης {0}"
+
+#. 0: neu
+#: src/routes/settings/+page.svelte
+msgid "Downloading version {0}…"
+msgstr "Λήψη της έκδοσης {0}…"
+
+#. 0: neu
+#: src/routes/settings/+page.svelte
+msgid "Version {0} is installed. Transcribe restarts as soon as running jobs and recordings are finished."
+msgstr "Η έκδοση {0} εγκαταστάθηκε. Το Transcribe θα επανεκκινηθεί μόλις ολοκληρωθούν οι εργασίες και οι ηχογραφήσεις σε εξέλιξη."
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribe is restarting…"
+msgstr "Το Transcribe επανεκκινείται…"
+
+#: src/routes/settings/+page.svelte
+msgid "Check for updates"
+msgstr "Έλεγχος για ενημερώσεις"
+
+#: src/routes/settings/+page.svelte
+msgid "sherpa-onnx"
+msgstr "sherpa-onnx"
+
+#: src/routes/settings/+page.svelte
+msgid "Licenses and third-party components <0/>"
+msgstr "Άδειες χρήσης και στοιχεία τρίτων <0/>"
+
+#: src/lib/moliri/components/ui/Dropdown.svelte
+#: src/lib/moliri/components/ui/Dropdown.svelte
+#: src/lib/moliri/components/ui/Dropdown.svelte
+msgid "Close dropdown"
+msgstr "Κλείσιμο αναπτυσσόμενου μενού"
+
+#: src/lib/moliri/components/ui/Modal.svelte
+#: src/lib/moliri/components/ui/Modal.svelte
+msgid "Discard unsaved changes?"
+msgstr "Απόρριψη των μη αποθηκευμένων αλλαγών;"
+
+#: src/lib/moliri/components/ui/Modal.svelte
+#: src/lib/moliri/components/ui/Modal.svelte
+#: src/lib/moliri/components/ui/Modal.svelte
+#: src/lib/moliri/components/ui/SimpleModal.svelte
+msgid "Close modal"
+msgstr "Κλείσιμο παραθύρου"
+
+#: src/lib/moliri/components/ui/Pager.svelte
+msgid "Browse"
+msgstr "Περιήγηση"
+
+#: src/lib/moliri/components/ui/Pager.svelte
+#: src/lib/moliri/components/ui/Pager.svelte
+#: src/lib/moliri/components/ui/Pager.svelte
+msgid "Previous entry"
+msgstr "Προηγούμενη εγγραφή"
+
+#: src/lib/moliri/components/ui/Pager.svelte
+#: src/lib/moliri/components/ui/Pager.svelte
+#: src/lib/moliri/components/ui/Pager.svelte
+msgid "Next entry"
+msgstr "Επόμενη εγγραφή"
+
+#. 0: fmt(r.a); 1: fmt(r.b)
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "Passage {0} – {1}"
+msgstr "Απόσπασμα {0} – {1}"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "Play the passage again and again"
+msgstr "Επαναλαμβανόμενη αναπαραγωγή του αποσπάσματος"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "Keep the passage as a clip with title and tags"
+msgstr "Αποθήκευση του αποσπάσματος ως κλιπ με τίτλο και λέξεις-κλειδιά"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "<0/>As clip"
+msgstr "<0/>Ως κλιπ"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "<0/>Play"
+msgstr "<0/>Αναπαραγωγή"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "<0/>Loop"
+msgstr "<0/>Επανάληψη"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "New speaker"
+msgstr "Νέος ομιλητής"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "unchanged"
+msgstr "αμετάβλητο"
+
+#. 0: langName(language)
+#. 0: langName(language)
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "Recompute recognises it again in {0}."
+msgstr "Ο νέος υπολογισμός το αναγνωρίζει ξανά στα {0}."
+
+#. 0: langName(language)
+#. 0: langName(language)
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "The machine recognises it again in {0} by itself."
+msgstr "Το σύστημα την αναγνωρίζει ξανά αυτόματα στα {0}."
+
+#. 0: ' '; 1: langName(language)
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "{0}{1} is noted; the machine cannot recognise it again, the words stay."
+msgstr "{0}Η γλώσσα {1} καταγράφεται· το σύστημα δεν μπορεί να την αναγνωρίσει ξανά, οι λέξεις παραμένουν."
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgctxt "te_apply"
+msgid "Apply"
+msgstr "Εφαρμογή"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "Applies to all words in this passage and is noted as a correction.<0/>"
+msgstr "Ισχύει για όλες τις λέξεις αυτού του αποσπάσματος και καταγράφεται ως διόρθωση.<0/>"
+
+#. 0: fmt(r.a)
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "Insert text at {0}"
+msgstr "Εισαγωγή κειμένου στο {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "There is no word in this pause. What is said here?"
+msgstr "Σε αυτή την παύση δεν υπάρχει λέξη. Τι λέγεται εδώ;"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "Insert"
+msgstr "Εισαγωγή"
+
+#. 0: ed.spkName(m.k)
+#. 0: +k + 1
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Speaker {0}"
+msgstr "Ομιλητής {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "all corrections saved"
+msgstr "όλες οι διορθώσεις αποθηκεύτηκαν"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "no corrections yet"
+msgstr "δεν υπάρχουν ακόμη διορθώσεις"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Recomputing works only once the corrections are saved."
+msgstr "Ο νέος υπολογισμός είναι δυνατός μόνο αφού αποθηκευτούν οι διορθώσεις."
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "recomputing …"
+msgstr "γίνεται νέος υπολογισμός …"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "unknown error"
+msgstr "άγνωστο σφάλμα"
+
+#. 0: r.error || /* @wc-include */ 'unknown error'
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Recomputing did not work ({0})."
+msgstr "Ο νέος υπολογισμός δεν πέτυχε ({0})."
+
+#. 0: clock()
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "recomputed {0}"
+msgstr "νέος υπολογισμός {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "saving …"
+msgstr "αποθήκευση …"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "saved; the text follows once the service answers"
+msgstr "αποθηκεύτηκε· το κείμενο θα ακολουθήσει μόλις ανταποκριθεί η υπηρεσία"
+
+#. 0: clock()
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "saved {0}"
+msgstr "αποθηκεύτηκε {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Someone else corrected meanwhile: their state is loaded, the last change here was not saved."
+msgstr "Στο μεταξύ κάποιος άλλος έκανε διορθώσεις: φορτώθηκε η δική του εκδοχή, η τελευταία αλλαγή εδώ δεν αποθηκεύτηκε."
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "not saved: no permission or no transcript"
+msgstr "δεν αποθηκεύτηκε: δεν υπάρχει δικαίωμα ή απομαγνητοφώνηση"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "not saved, trying again …"
+msgstr "δεν αποθηκεύτηκε, νέα προσπάθεια …"
+
+#. 0: this.spkName(this.focused)
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Only {0}"
+msgstr "Μόνο {0}"
+
+#. 0: this.spkName(off[0])
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgctxt "te_filter_hidden_one"
+msgid "{0} hidden"
+msgstr "{0} σε απόκρυψη"
+
+#. 0: off.length
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "{0} speakers hidden"
+msgstr "{0} ομιλητές σε απόκρυψη"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Clips not saved, the export was cancelled."
+msgstr "Τα κλιπ δεν αποθηκεύτηκαν, η εξαγωγή ακυρώθηκε."
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Building the text …"
+msgstr "Δημιουργία του κειμένου …"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Cutting the compilation …"
+msgstr "Κοπή του μοντάζ …"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Cutting the clip …"
+msgstr "Κοπή του κλιπ …"
+
+#. 0: error
+#. 0: error
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Export failed ({0})."
+msgstr "Η εξαγωγή απέτυχε ({0})."
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "exported"
+msgstr "εξήχθη"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Not saved: the export would lack the latest corrections."
+msgstr "Δεν αποθηκεύτηκε: στην εξαγωγή θα έλειπαν οι τελευταίες διορθώσεις."
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Enter times such as 1:02.5; the end must come after the start."
+msgstr "Εισαγάγετε χρόνους όπως 1:02.5. Το τέλος πρέπει να έπεται της αρχής."
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "New clip"
+msgstr "Νέο κλιπ"
+
+#. 0: c.title ?? ''
+#. 0: c.title
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Clip {0}"
+msgstr "Κλιπ {0}"
+
+#. 0: list.length
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Export a compilation of {0} clips"
+msgstr "Εξαγωγή μοντάζ από {0} κλιπ"
+
+#. 0: list[0]?.title ?? ''
+#. 0: c.title
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Export {0}"
+msgstr "Εξαγωγή {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "There is no word in this passage."
+msgstr "Σε αυτό το απόσπασμα δεν υπάρχει λέξη."
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "transcript_export"
+msgid "Export"
+msgstr "Εξαγωγή"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgctxt "te_clip_title"
+msgid "Title"
+msgstr "Τίτλος"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "separate with commas"
+msgstr "διαχωρίστε με κόμματα"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Suggestions from other clips"
+msgstr "Προτάσεις από άλλα κλιπ"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgctxt "te_clip_start"
+msgid "Start"
+msgstr "Αρχή"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgctxt "te_clip_end"
+msgid "End"
+msgstr "Τέλος"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgctxt "delete_btn"
+msgid "Delete"
+msgstr "Διαγραφή"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgctxt "te_cancel"
+msgid "Cancel"
+msgstr "Άκυρο"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Create clip"
+msgstr "Δημιουργία κλιπ"
+
+#. 0: list.length
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Compilation of {0} clips"
+msgstr "Μοντάζ από {0} κλιπ"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "The clips are joined in time order."
+msgstr "Τα κλιπ ενώνονται με χρονολογική σειρά."
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Audio (MP3)"
+msgstr "Ήχος (MP3)"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Video (MP4)"
+msgstr "Βίντεο (MP4)"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Text with title and tags (.txt)"
+msgstr "Κείμενο με τίτλο και λέξεις-κλειδιά (.txt)"
+
+#. 0: Math.round(it.p * 100)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "confidence {0} %"
+msgstr "βεβαιότητα {0} %"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "corrected by hand"
+msgstr "διορθώθηκε με το χέρι"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "filled in"
+msgstr "συμπληρώθηκε"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "recognised again"
+msgstr "αναγνωρίστηκε ξανά"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "no change"
+msgstr "καμία αλλαγή"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "input discarded"
+msgstr "η εισαγωγή απορρίφθηκε"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "input open: applied in a moment, Esc discards"
+msgstr "εισαγωγή σε εξέλιξη: θα εφαρμοστεί σε λίγο, το Esc την απορρίπτει"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgctxt "te_by_hand"
+msgid "by hand"
+msgstr "με το χέρι"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "recognised"
+msgstr "αναγνωρίστηκε"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "by the machine"
+msgstr "από το σύστημα"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgctxt "te_confidence_label"
+msgid "Confidence"
+msgstr "Βεβαιότητα"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "unsure"
+msgstr "αβέβαιο"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Time anchor"
+msgstr "Άγκυρα χρόνου"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "fold again"
+msgstr "νέα σύμπτυξη"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "unfold: show the text and play it along"
+msgstr "ανάπτυξη: εμφάνιση του κειμένου και αναπαραγωγή του"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "unfolded"
+msgstr "αναπτυγμένο"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "folded"
+msgstr "συμπτυγμένο"
+
+#. 0: b.open ? /* @wc-include */ 'unfolded' \\: /* @wc-include */ 'folded'; 1: b.n
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "<0/> {0} · <1/> · {1} words"
+msgstr "<0/> {0} · <1/> · {1} λέξεις"
+
+#. 0: fmt(b.start)
+#. 0: fmt(b.start)
+#. 0: fmt(c.t)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "play from {0}"
+msgstr "αναπαραγωγή από {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Edit speaker: name, language, merge, view"
+msgstr "Επεξεργασία ομιλητή: όνομα, γλώσσα, συγχώνευση, προβολή"
+
+#. 0: fmt(b.start)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Still at {0}, play from here"
+msgstr "Παγωμένο καρέ στο {0}, αναπαραγωγή από εδώ"
+
+#. 0: fmt(c.start); 1: fmt(c.end)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Clip {0} – {1}: click to play, edit or export"
+msgstr "Κλιπ {0} – {1}: κάντε κλικ για αναπαραγωγή, επεξεργασία ή εξαγωγή"
+
+#. 0: fmtT(it.start)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Time anchor {0}, set by hand: drag to give the time to another word"
+msgstr "Άγκυρα χρόνου {0}, ορισμένη με το χέρι: σύρετε για να δώσετε τον χρόνο σε άλλη λέξη"
+
+#. 0: fmtT(it.start)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Time anchor {0}: drag to give the time to another word"
+msgstr "Άγκυρα χρόνου {0}: σύρετε για να δώσετε τον χρόνο σε άλλη λέξη"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Place in the text"
+msgstr "Θέση στο κείμενο"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "pause"
+msgstr "παύση"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "play from this word"
+msgstr "αναπαραγωγή από αυτή τη λέξη"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "From here"
+msgstr "Από εδώ"
+
+#. 0: fmt(c.start); 1: fmt(c.end)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Clip {0} – {1}: edit, play, export"
+msgstr "Κλιπ {0} – {1}: επεξεργασία, αναπαραγωγή, εξαγωγή"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "Player"
+msgstr "Αναπαραγωγή"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "5 seconds back"
+msgstr "5 δευτερόλεπτα πίσω"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "Pause (space)"
+msgstr "Παύση (πλήκτρο διαστήματος)"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "Play (space)"
+msgstr "Αναπαραγωγή (πλήκτρο διαστήματος)"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "5 seconds forward"
+msgstr "5 δευτερόλεπτα μπροστά"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "End the loop"
+msgstr "Τερματισμός επανάληψης"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "Loop <0/>"
+msgstr "Επανάληψη <0/>"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "<0/>end"
+msgstr "<0/>τέλος"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Show all speakers again"
+msgstr "Εμφάνιση ξανά όλων των ομιλητών"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "<0/>show all"
+msgstr "<0/>εμφάνιση όλων"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "Speed"
+msgstr "Ταχύτητα"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "Text and timeline follow the playback"
+msgstr "Το κείμενο και η χρονογραμμή ακολουθούν την αναπαραγωγή"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Follow"
+msgstr "Παρακολούθηση"
+
+#. 0: fmt(s.end)
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "until {0}"
+msgstr "έως {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Speakers, clips, corrections and signs"
+msgstr "Ομιλητές, κλιπ, διορθώσεις και σημάνσεις"
+
+#. 0: ed.spkName(sp.merge_into)
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "merged with {0}"
+msgstr "συγχωνεύεται με {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "One speaker always stays visible"
+msgstr "Ένας ομιλητής παραμένει πάντα ορατός"
+
+#. 0: nm
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "show and play only {0}"
+msgstr "εμφάνιση και αναπαραγωγή μόνο του {0}"
+
+#. 0: nm
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "show only {0}"
+msgstr "εμφάνιση μόνο του {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "No speakers recognised."
+msgstr "Δεν αναγνωρίστηκαν ομιλητές."
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "A click on the name: rename, set the language, merge."
+msgstr "Κάντε κλικ στο όνομα: μετονομασία, ορισμός γλώσσας, συγχώνευση."
+
+#. 0: ed.canEdit ? /* @wc-include */ 'A click on the name\\: rename, set the language, merge.' \\: ''
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "{0} The eye hides a speaker, the target shows only this one. What is hidden is folded in the text and skipped when playing."
+msgstr "{0} Το μάτι κρύβει έναν ομιλητή, ο στόχος εμφανίζει μόνο αυτόν. Ό,τι είναι κρυμμένο εμφανίζεται συμπτυγμένο στο κείμενο και παραλείπεται κατά την αναπαραγωγή."
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "filter by tag"
+msgstr "φιλτράρισμα κατά λέξη-κλειδί"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "show all clips again"
+msgstr "εμφάνιση ξανά όλων των κλιπ"
+
+#. 0: t
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "show only clips with “{0}”"
+msgstr "εμφάνιση μόνο των κλιπ με «{0}»"
+
+#. 0: c.title
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Select {0}"
+msgstr "Επιλογή {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "select: play in turn or export as a compilation"
+msgstr "επιλογή: διαδοχική αναπαραγωγή ή εξαγωγή ως μοντάζ"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "jump to the clip"
+msgstr "μετάβαση στο κλιπ"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "play only this clip"
+msgstr "αναπαραγωγή μόνο αυτού του κλιπ"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "export: audio, video or text"
+msgstr "εξαγωγή: ήχος, βίντεο ή κείμενο"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "export: audio or text"
+msgstr "εξαγωγή: ήχος ή κείμενο"
+
+#. 0: c.title
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgctxt "te_edit_named"
+msgid "Edit {0}"
+msgstr "Επεξεργασία {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Change title, tags, times"
+msgstr "Αλλαγή τίτλου, λέξεων-κλειδιών, χρόνων"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "No clip with this tag."
+msgstr "Κανένα κλιπ με αυτή τη λέξη-κλειδί."
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "None yet. Mark a passage in the text or the timeline and choose “As clip”."
+msgstr "Κανένα ακόμη. Επισημάνετε ένα απόσπασμα στο κείμενο ή στη χρονογραμμή και επιλέξτε «Ως κλιπ»."
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "None yet."
+msgstr "Κανένα ακόμη."
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "select all"
+msgstr "επιλογή όλων"
+
+#. 0: chosen.length; 1: fmtDur(chosen.reduce((t, c) => t + c.end - c.start, 0))
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "{0} selected · {1}"
+msgstr "{0} επιλεγμένα · {1}"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Export compilation"
+msgstr "Εξαγωγή μοντάζ"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>Play in turn"
+msgstr "<0/>Διαδοχική αναπαραγωγή"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgctxt "te_corrections"
+msgid "Corrections"
+msgstr "Διορθώσεις"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Remove correction"
+msgstr "Αφαίρεση διόρθωσης"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "None yet. Just click into the text and type."
+msgstr "Καμία ακόμη. Απλώς κάντε κλικ στο κείμενο και πληκτρολογήστε."
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>corrected by hand"
+msgstr "<0/>διορθώθηκε με το χέρι"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>machine unsure"
+msgstr "<0/>αβέβαιο αποτέλεσμα του συστήματος"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>recognised again (language set)"
+msgstr "<0/>αναγνωρίστηκε ξανά (ορισμένη γλώσσα)"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>filled in, italic in brackets"
+msgstr "<0/>συμπληρώθηκε, πλάγια μέσα σε αγκύλες"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>time anchor, red = set by hand"
+msgstr "<0/>άγκυρα χρόνου, κόκκινο = ορίστηκε με το χέρι"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>being spoken now"
+msgstr "<0/>ακούγεται τώρα"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>part of a clip"
+msgstr "<0/>μέρος κλιπ"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Signs in the text"
+msgstr "Σημάνσεις στο κείμενο"
+
+#: src/lib/moliri/components/files/transcript/editor/Sprachwahl.svelte
+msgid "Show languages"
+msgstr "Εμφάνιση γλωσσών"
+
+#. 0: s.code
+#: src/lib/moliri/components/files/transcript/editor/Sprachwahl.svelte
+msgid "Code “{0}”"
+msgstr "Κωδικός «{0}»"
+
+#: src/lib/moliri/components/files/transcript/editor/Sprachwahl.svelte
+msgid "noted, not recognised again"
+msgstr "καταγράφεται, χωρίς νέα αναγνώριση"
+
+#: src/lib/moliri/components/files/transcript/editor/Sprachwahl.svelte
+msgid "No language found. A code has two or three letters, such as “pt”."
+msgstr "Δεν βρέθηκε γλώσσα. Ένας κωδικός έχει δύο ή τρία γράμματα, για παράδειγμα «pt»."
+
+#. 0: fmt(dur)
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "speaks {0}"
+msgstr "μιλά {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgctxt "te_show_all"
+msgid "Show all"
+msgstr "Εμφάνιση όλων"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "Show only this one"
+msgstr "Εμφάνιση μόνο αυτού"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "fold in the text and skip when playing"
+msgstr "σύμπτυξη στο κείμενο και παράλειψη κατά την αναπαραγωγή"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgctxt "te_hide"
+msgid "Hide"
+msgstr "Απόκρυψη"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgctxt "te_name"
+msgid "Name"
+msgstr "Όνομα"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "recognise automatically"
+msgstr "αυτόματη αναγνώριση"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "do not merge"
+msgstr "χωρίς συγχώνευση"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "Merge with <0/>"
+msgstr "Συγχώνευση με <0/>"
+
+#. 0: ed.spkName(m.k); 1: target
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "Everything from {0} goes into {1} once recomputed."
+msgstr "Όλα από {0} περνούν στο {1} μόλις γίνει νέος υπολογισμός."
+
+#. 0: ed.spkName(m.k); 1: target
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "Everything of {0} goes into {1}."
+msgstr "Όλα όσα ανήκουν στον/στην {0} περνούν στον/στην {1}."
+
+#. 0: langName(language)
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "{0} is noted; the machine cannot recognise it again, the words stay."
+msgstr "Η γλώσσα {0} καταγράφεται· το σύστημα δεν μπορεί να την αναγνωρίσει ξανά, οι λέξεις παραμένουν."
+
+#. 0: ed.spkName(m.k)
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "Applies to everything {0} says. <0/>"
+msgstr "Ισχύει για όλα όσα λέει ο/η {0}. <0/>"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Text (.txt)"
+msgstr "Κείμενο (.txt)"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "with speakers and time marks"
+msgstr "με ομιλητές και χρονικές ενδείξεις"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Subtitles (.vtt)"
+msgstr "Υπότιτλοι (.vtt)"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "for video players"
+msgstr "για προγράμματα αναπαραγωγής βίντεο"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "HTML (Word, MAXQDA)"
+msgstr "HTML (Word, MAXQDA)"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "for further editing"
+msgstr "για περαιτέρω επεξεργασία"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Search the transcript"
+msgstr "Αναζήτηση στην απομαγνητοφώνηση"
+
+#. 0: hitIndex + 1; 1: hits.length
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "transcript_search_hits"
+msgid "{0} of {1}"
+msgstr "{0} από {1}"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "transcript_search_none"
+msgid "no match"
+msgstr "κανένα αποτέλεσμα"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "transcript_search_prev"
+msgid "Previous match"
+msgstr "Προηγούμενο αποτέλεσμα"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Next match"
+msgstr "Επόμενο αποτέλεσμα"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Take back the last correction (Ctrl+Z)"
+msgstr "Αναίρεση της τελευταίας διόρθωσης (Ctrl+Z)"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "te_undo"
+msgid "Undo"
+msgstr "Αναίρεση"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Recognise the noted languages again and merge speakers"
+msgstr "Νέα αναγνώριση των καταγεγραμμένων γλωσσών και συγχώνευση ομιλητών"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Only needed once a language is set or a speaker is merged"
+msgstr "Χρειάζεται μόνο όταν έχει οριστεί γλώσσα ή έχει συγχωνευτεί ομιλητής"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "computing …"
+msgstr "υπολογισμός …"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Recompute"
+msgstr "Νέος υπολογισμός"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Recognise the recording once more; the corrections stay"
+msgstr "Νέα αναγνώριση της ηχογράφησης· οι διορθώσεις διατηρούνται"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Transcribe again"
+msgstr "Νέα απομαγνητοφώνηση"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Passages with a set language are recognised again …"
+msgstr "Τα αποσπάσματα με ορισμένη γλώσσα αναγνωρίζονται ξανά …"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Download the transcript with all corrections"
+msgstr "Λήψη της απομαγνητοφώνησης με όλες τις διορθώσεις"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Formats"
+msgstr "Μορφές"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Leave full screen"
+msgstr "Έξοδος από την πλήρη οθόνη"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Full screen"
+msgstr "Πλήρης οθόνη"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "How it works"
+msgstr "Οδηγίες χρήσης"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "te_help_range_t"
+msgid "Passage"
+msgstr "Απόσπασμα"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Change text"
+msgstr "Αλλαγή κειμένου"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Click into the text and type; it saves by itself. Esc discards. Changes by people are red."
+msgstr "Κάντε κλικ στο κείμενο και πληκτρολογήστε· αποθηκεύεται αυτόματα. Το Esc απορρίπτει. Ό,τι άλλαξε άνθρωπος είναι κόκκινο."
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Mark text or drag in the timeline: play, loop, give it to a speaker or set its language."
+msgstr "Επισημάνετε κείμενο ή σύρετε στο χρονολόγιο: αναπαραγωγή, επανάληψη, ανάθεση σε ομιλητή ή ορισμός γλώσσας."
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Time anchors"
+msgstr "Άγκυρες χρόνου"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "The small flags before words: drag one to another word, or along the timeline."
+msgstr "Τα μικρά σημαιάκια πριν από τις λέξεις: σύρετε ένα μπροστά από άλλη λέξη ή κατά μήκος του χρονολογίου."
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Mark a passage and choose “As clip”. The side column plays and exports clips."
+msgstr "Επισημάνετε ένα απόσπασμα και επιλέξτε «Ως κλιπ». Στην πλαϊνή στήλη τα κλιπ αναπαράγονται και εξάγονται."
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "happens by itself. “Recompute” applies languages and merges. Ctrl + Z undoes the last correction."
+msgstr "γίνεται αυτόματα. Ο «Νέος υπολογισμός» εφαρμόζει γλώσσες και συγχωνεύσεις. Το Ctrl + Z αναιρεί την τελευταία διόρθωση."
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "happens by itself. Ctrl + Z undoes the last correction."
+msgstr "γίνεται αυτόματα. Το Ctrl + Z αναιρεί την τελευταία διόρθωση."
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Saving"
+msgstr "Αποθήκευση"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "te_help_timeline_t"
+msgid "Timeline"
+msgstr "Χρονογραμμή"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "“Export” at the bottom: text, subtitles or HTML for Word and MAXQDA."
+msgstr "«Εξαγωγή» κάτω: ως κείμενο, υπότιτλοι ή HTML για Word και MAXQDA."
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Space starts and stops, the arrow keys jump 5 seconds."
+msgstr "Το διάστημα ξεκινά και σταματά, τα βέλη μεταπηδούν 5 δευτερόλεπτα."
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Click a word: “From here” plays from there. Ctrl + click plays at once."
+msgstr "Κάντε κλικ σε μια λέξη: το «Από εδώ» αναπαράγει από εκεί. Ctrl + κλικ αναπαράγει αμέσως."
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Click jumps, the wheel zooms, Shift + wheel moves."
+msgstr "Το κλικ μεταπηδά, ο τροχός κάνει ζουμ, Shift + τροχός μετακινεί."
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Click a name: rename, set its language, merge. The eye hides a speaker, the target shows only this one."
+msgstr "Κάντε κλικ σε ένα όνομα: μετονομασία, ορισμός γλώσσας, συγχώνευση. Το μάτι αποκρύπτει έναν ομιλητή, ο στόχος δείχνει μόνο αυτόν."
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Text and timeline follow the playback."
+msgstr "Κείμενο και χρονολόγιο ακολουθούν την αναπαραγωγή."
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Wave"
+msgstr "Κυματομορφή"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Text"
+msgstr "Κείμενο"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Sounds"
+msgstr "Ήχοι"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Doubt"
+msgstr "Αμφιβολία"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgctxt "te_lane_corrections"
+msgid "Corrections"
+msgstr "Διορθώσεις"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Overview"
+msgstr "Επισκόπηση"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Overview of the whole recording: click moves the view, double-click jumps"
+msgstr "Επισκόπηση ολόκληρης της ηχογράφησης: το κλικ μετακινεί την προβολή, το διπλό κλικ μεταβαίνει στη θέση"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Timeline with lanes: click jumps there, dragging marks a passage"
+msgstr "Χρονογραμμή με κανάλια: το κλικ μεταβαίνει στη θέση, η μεταφορά επισημαίνει ένα απόσπασμα"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Zoom"
+msgstr "Ζουμ"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "zoom out"
+msgstr "σμίκρυνση"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "zoom in"
+msgstr "μεγέθυνση"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "whole recording"
+msgstr "ολόκληρη η ηχογράφηση"
+
+#. 0: suche
+#: src/lib/Bibliothek.svelte
+msgctxt "library_search"
+msgid "Nothing found for “{0}”."
+msgstr "Δεν βρέθηκε τίποτα για «{0}»."
+
+#: src/routes/settings/+page.svelte
+msgid "Language of the interface"
+msgstr "Γλώσσα διεπαφής"
+
+#: src/routes/settings/+page.svelte
+msgid "Until you choose one, Transcribe follows the language of Windows."
+msgstr "Μέχρι να επιλέξετε, το Transcribe ακολουθεί τη γλώσσα των Windows."
+
+#: src/lib/Beschriften.svelte
+msgctxt "library_hide"
+msgid "Show again"
+msgstr "Εμφάνιση ξανά"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgctxt "library_hide"
+msgid "Show {0} again"
+msgstr "Εμφάνιση ξανά {0}"
+

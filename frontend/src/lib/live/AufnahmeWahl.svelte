@@ -12,21 +12,25 @@
 	const fehlt = $derived(!!live.geraet && !!live.geraete && !live.geraete.includes(live.geraet));
 
 	const QUELLWAHL = /** @type {const} */ ([
-		['mic', 'Mikrofon', 'Was am Mikrofon gesagt wird.'],
-		['system', 'Systemaudio', 'Was der Rechner abspielt, etwa die anderen in einem Online-Meeting.'],
-		['both', 'Beides gemischt', 'Am besten mit Kopfhörern, sonst sind die anderen doppelt zu hören.']
+		{ wert: 'mic', name: /* @wc-include */ 'Microphone', satz: /* @wc-include */ 'What is said into the microphone.' },
+		{
+			wert: 'system',
+			name: /* @wc-include */ 'System audio',
+			satz: /* @wc-include */ 'What the computer plays, such as the others in an online meeting.'
+		},
+		{ wert: 'both', name: /* @wc-include */ 'Both mixed', satz: /* @wc-include */ 'Best with headphones, otherwise the others are heard twice.' }
 	]);
 </script>
 
 <fieldset class="quellen">
-	<legend class="feldname">Was aufgenommen wird</legend>
-	{#each QUELLWAHL as [wert, name, satz] (wert)}
+	<legend class="feldname">What gets recorded</legend>
+	{#each QUELLWAHL as { wert, name, satz } (wert)}
 		{@const aus = wert !== 'mic' && !live.systemMoeglich}
 		<label class="quelle" class:an={live.quelle === wert} class:aus>
 			<input type="radio" name="quelle" value={wert} disabled={aus} bind:group={live.quelle} onchange={live.quelleWaehlen} />
 			<span>
 				<b>{name}</b>
-				<span class="satz">{aus ? 'Auf diesem Rechner nicht möglich.' : satz}</span>
+				<span class="satz">{aus ? /* @wc-include */ 'Not possible on this computer.' : satz}</span>
 			</span>
 		</label>
 	{/each}
@@ -34,26 +38,30 @@
 
 {#if live.quelle !== 'system'}
 	<label class="feldname">
-		Mikrofon
+		Microphone
 		<select class="feld" bind:value={live.geraet} onchange={live.geraetWaehlen} disabled={live.geraete === null}>
 			<option value="">
-				{live.geraete === null ? 'wird gesucht …' : live.standard ? `Systemstandard: ${live.standard}` : 'Systemstandard'}
+				{live.geraete === null
+					? /* @wc-include */ 'searching…'
+					: live.standard
+						? /* @wc-include */ `System default: ${live.standard}`
+						: /* @wc-include */ 'System default'}
 			</option>
 			{#if fehlt}
-				<option value={live.geraet}>{live.geraet} (nicht angeschlossen)</option>
+				<option value={live.geraet}>{/* @wc-include */ `${live.geraet} (not connected)`}</option>
 			{/if}
 			{#each live.geraete ?? [] as g (g)}<option value={g}>{g}</option>{/each}
 		</select>
 		<span class="satz">
 			{#if fehlt}
-				Dieses Mikrofon ist gerade nicht angeschlossen.
+				This microphone is not connected right now.
 			{:else if live.geraet}
-				Bleibt bei diesem Mikrofon, auch wenn ein anderes angeschlossen wird.
+				Stays with this microphone, even when another one is connected.
 			{:else if live.standard}
-				Nimmt das Mikrofon, das in Windows als Standard eingestellt ist. Wird ein anderes zum Standard, etwa ein
-				angeschlossenes Headset, wechselt die Aufnahme mit.
+				Uses the microphone set as default in Windows. If another one becomes the default, such as a newly
+				connected headset, the recording switches along.
 			{:else}
-				Nimmt das Mikrofon, das im System als Standard eingestellt ist.
+				Uses the microphone set as default in the system.
 			{/if}
 		</span>
 	</label>
@@ -62,10 +70,10 @@
 <Toggle
 	bind:checked={() => live.speichern, (v) => live.speichernSetzen(v)}
 	disabled={!!live.laufend}
-	title="Aufnahme speichern"
+	title="Save recording"
 	description={live.speichern
-		? 'Sie kommt zu deinen Aufnahmen und lässt sich danach vollständig transkribieren, mit Sprechern.'
-		: 'Aus: Es bleibt nur der Text.'}
+		? /* @wc-include */ 'It goes to your recordings and can be fully transcribed afterwards, with speakers.'
+		: /* @wc-include */ 'Off: only the text is kept.'}
 />
 
 <style>

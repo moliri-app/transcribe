@@ -10,11 +10,11 @@
 
 <main class="sheet">
 	{#if page.status === 404}
-		<h1>Diese Seite gibt es nicht</h1>
-		<p>Unter dieser Adresse ist nichts. <a href="/editor" data-sveltekit-reload>Zum Editor</a></p>
+		<h1>This page does not exist</h1>
+		<p>There is nothing at this address. <a href="/editor" data-sveltekit-reload>Go to the editor</a></p>
 	{:else}
-		<h1>Etwas ist schiefgegangen</h1>
-		<p>{page.error?.message ?? `Fehler ${page.status}`}</p>
+		<h1>Something went wrong</h1>
+		<p>{page.error?.message ?? /* @wc-include */ `Error ${page.status}`}</p>
 	{/if}
 </main>
 

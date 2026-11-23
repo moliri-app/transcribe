@@ -1,0 +1,4484 @@
+msgid ""
+msgstr ""
+"Source-Language: en\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1\n"
+"X-Plurals-Order: other\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+
+#. 0: r.status
+#. 0: r.status
+#. 0: page.status
+#: src/lib/api.js
+#: src/lib/editor/speicher.js
+#: src/routes/+error.svelte
+msgid "Error {0}"
+msgstr "エラー {0}"
+
+#: src/lib/api.js
+msgid "On this computer"
+msgstr "このコンピューターで"
+
+#: src/lib/api.js
+msgid "Via the API"
+msgstr "API 経由"
+
+#: src/lib/api.js
+msgid "# byte"
+msgid_plural "# bytes"
+msgstr[0] "# バイト"
+
+#: src/lib/editor/speicher.js
+msgid "Transcribe does not answer"
+msgstr "Transcribe が応答しません"
+
+#: src/lib/live/suche.js
+msgid "All"
+msgstr "すべて"
+
+#: src/lib/live/stand.svelte.js
+#: src/lib/live/suche.js
+msgid "Manual"
+msgstr "手動"
+
+#: src/lib/live/suche.js
+msgid "Via API"
+msgstr "API 経由"
+
+#: src/lib/live/suche.js
+msgid "AI & OCR"
+msgstr "AI と OCR"
+
+#: src/lib/live/suche.js
+msgid "Newest first"
+msgstr "新しい順"
+
+#: src/lib/live/suche.js
+msgid "Oldest first"
+msgstr "古い順"
+
+#: src/lib/live/suche.js
+msgid "Longest first"
+msgstr "長い順"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Clip"
+msgstr "クリップ"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Interview (2 speakers)"
+msgstr "インタビュー（話者 2 人）"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Conversation"
+msgstr "会話"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Talk (1 speaker)"
+msgstr "講演（話者 1 人）"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Music, stage"
+msgstr "音楽、ステージ"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgctxt "transcript_preset_auto"
+msgid "Automatic"
+msgstr "自動"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Music"
+msgstr "音楽"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Singing"
+msgstr "歌唱"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Applause"
+msgstr "拍手"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Laughter"
+msgstr "笑い声"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Cheering"
+msgstr "歓声"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "background music"
+msgstr "BGM"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Time anchor moved in the text"
+msgstr "テキスト内のタイムアンカーを移動"
+
+#. 0: fmtT(e.start)
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "Time anchor {0} →"
+msgstr "タイムアンカー {0} →"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "deleted"
+msgstr "削除済み"
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "inserted:"
+msgstr "挿入："
+
+#: src/lib/moliri/components/files/transcript/editor/model.js
+msgid "replaced:"
+msgstr "置換："
+
+#: src/lib/AppBar.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Library"
+msgstr "ライブラリ"
+
+#: src/lib/AppBar.svelte
+msgid "Editor"
+msgstr "エディター"
+
+#: src/lib/AppBar.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Live"
+msgstr "Live"
+
+#: src/lib/AppBar.svelte
+#: src/lib/Einrichtung.svelte
+#: src/routes/settings/+page.svelte
+msgid "Settings"
+msgstr "設定"
+
+#: src/lib/AppBar.svelte
+msgid "Main navigation"
+msgstr "メインナビゲーション"
+
+#: src/lib/AppBar.svelte
+msgid "Transcribe, home page"
+msgstr "Transcribe、ホーム"
+
+#: src/lib/AppBar.svelte
+msgid "Moliri, the museum database: open website"
+msgstr "Moliri（ミュージアムデータベース）：ウェブサイトを開く"
+
+#: src/lib/AppBar.svelte
+msgid "by <0/> Moliri<1>(opens Moliri’s website)</1>"
+msgstr "by <0/> Moliri<1>（Moliri のウェブサイトを開きます）</1>"
+
+#. 0: versionText(neu)
+#: src/lib/AppBar.svelte
+msgid "Version {0} is available: install it in Settings"
+msgstr "バージョン {0} が利用できます：設定からインストールしてください"
+
+#: src/lib/AppBar.svelte
+msgid "<0/>Update"
+msgstr "<0/>アップデート"
+
+#. 0: active
+#: src/lib/AppBar.svelte
+msgid "{0} active jobs"
+msgstr "実行中のジョブ {0} 件"
+
+#: src/lib/AppBar.svelte
+msgid "active jobs"
+msgstr "実行中のジョブ"
+
+#: src/lib/AppBar.svelte
+msgid "More<0/>"
+msgstr "その他<0/>"
+
+#. 0: (e).message
+#: src/lib/Beschriften.svelte
+msgid "That could not be saved: {0}"
+msgstr "保存できませんでした：{0}"
+
+#: src/lib/Beschriften.svelte
+msgid "Separate with commas, e.g. interview, paper mill"
+msgstr "カンマで区切ります。例：インタビュー, 製紙工場"
+
+#: src/lib/Beschriften.svelte
+msgid "Tags in use"
+msgstr "使用中のタグ"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "<0/>Show again"
+msgstr "<0/>再表示"
+
+#: src/lib/Beschriften.svelte
+msgid "<0/>Hide"
+msgstr "<0/>非表示"
+
+#: src/lib/Beschriften.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/routes/bausteine/+page.svelte
+#: src/routes/bausteine/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/lib/Beschriften.svelte
+#: src/routes/bausteine/+page.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Save"
+msgstr "保存"
+
+#: src/lib/Beschriften.svelte
+#: src/lib/Bibliothek.svelte
+#: src/routes/editor/+page.svelte
+#: src/routes/editor/+page.svelte
+#: src/routes/editor/+page.svelte
+msgid "Name and tags"
+msgstr "名前とタグ"
+
+#: src/lib/Beschriften.svelte
+msgid "Name <0/>"
+msgstr "名前 <0/>"
+
+#. 0: a.file
+#: src/lib/Beschriften.svelte
+msgid "Only in Transcribe. The file keeps its name “{0}”."
+msgstr "Transcribe 内だけの名前です。ファイル名は「{0}」のままです。"
+
+#: src/lib/Beschriften.svelte
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Tags <0/>"
+msgstr "タグ <0/>"
+
+#: src/lib/AuftragsOptionen.svelte
+msgid "Detect automatically"
+msgstr "自動検出"
+
+#: src/lib/AuftragsOptionen.svelte
+msgid "1, e.g. a talk, reading or guided tour"
+msgstr "1 人（講演、朗読、ガイドツアーなど）"
+
+#: src/lib/AuftragsOptionen.svelte
+msgid "2, e.g. an interview"
+msgstr "2 人（インタビューなど）"
+
+#: src/lib/AuftragsOptionen.svelte
+#: src/lib/live/StimmeWahl.svelte
+#: src/routes/settings/+page.svelte
+msgid "Languages"
+msgstr "言語"
+
+#: src/lib/AuftragsOptionen.svelte
+msgid "Recognition <0/>"
+msgstr "認識 <0/>"
+
+#: src/lib/AuftragsOptionen.svelte
+msgid "Speakers <0/>"
+msgstr "話者 <0/>"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Mono"
+msgstr "モノラル"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Stereo"
+msgstr "ステレオ"
+
+#. 0: n
+#: src/lib/Dateiinfo.svelte
+msgid "{0} channels"
+msgstr "{0} チャンネル"
+
+#. 0: zahl
+#: src/lib/Dateiinfo.svelte
+msgid "{0} fps"
+msgstr "{0} fps"
+
+#. 0: wann
+#: src/lib/Dateiinfo.svelte
+msgid "ready since {0}"
+msgstr "{0} に完了"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Dateiinfo.svelte
+msgid "# speaker"
+msgid_plural "# speakers"
+msgstr[0] "話者 # 人"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Dateiinfo.svelte
+msgid "# manual correction"
+msgid_plural "# manual corrections"
+msgstr[0] "手動修正 # 件"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Dateiinfo.svelte
+msgid "# clip"
+msgid_plural "# clips"
+msgstr[0] "クリップ # 件"
+
+#. 0: fehler
+#: src/lib/Dateiinfo.svelte
+msgid "The file details could not be read: {0}"
+msgstr "ファイルの詳細を読み取れませんでした：{0}"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Reading the file…"
+msgstr "ファイルを読み取り中…"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Dateiinfo.svelte
+msgid "Length"
+msgstr "長さ"
+
+#: src/lib/Dateiinfo.svelte
+msgid "(according to the file)"
+msgstr "（ファイルの情報による）"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Recorded"
+msgstr "録音日時"
+
+#: src/lib/Dateiinfo.svelte
+msgid "(copied here)"
+msgstr "（ここにコピー済み）"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Created"
+msgstr "作成日時"
+
+#: src/lib/Dateiinfo.svelte
+msgid "In the file"
+msgstr "ファイルの内容"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Format"
+msgstr "形式"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Sound"
+msgstr "音声"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Picture"
+msgstr "映像"
+
+#: src/lib/Dateiinfo.svelte
+msgid "saved as a file next to the recording"
+msgstr "録音の隣にファイルとして保存されています"
+
+#: src/lib/Dateiinfo.svelte
+msgid "none yet"
+msgstr "まだありません"
+
+#: src/lib/Dateiinfo.svelte
+msgid "File name"
+msgstr "ファイル名"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Location"
+msgstr "場所"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Size"
+msgstr "サイズ"
+
+#: src/lib/Dateiinfo.svelte
+msgid "Modified"
+msgstr "更新日時"
+
+#: src/lib/Dateiinfo.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/routes/editor/+page.svelte
+msgid "Transcript"
+msgstr "文字起こし"
+
+#: src/lib/Dateiinfo.svelte
+msgid "What is in the file (length, format) cannot be read right now."
+msgstr "ファイルの内容（長さ、形式）を現在読み取れません。"
+
+#: src/lib/Dateiinfo.svelte
+msgid "<0/>Open in editor"
+msgstr "<0/>エディターで開く"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Dateiinfo.svelte
+#: src/lib/live/Aufnahmeleiste.svelte
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/ui/SimpleModal.svelte
+msgid "Close"
+msgstr "閉じる"
+
+#: src/lib/Einrichtung.svelte
+msgid "All set."
+msgstr "準備ができました。"
+
+#. 0: fehler.label; 1: fehler.error
+#: src/lib/Einrichtung.svelte
+msgid "Download failed ({0}): {1}"
+msgstr "ダウンロードに失敗しました（{0}）：{1}"
+
+#. 0: fertig; 1: n
+#: src/lib/Einrichtung.svelte
+msgid "First-time setup ({0}/{1})…"
+msgstr "初期設定（{0}/{1}）…"
+
+#. 0: fertig; 1: n; 2: name; 3: done; 4: total
+#: src/lib/Einrichtung.svelte
+msgid "First-time setup ({0}/{1}): downloading {2} – {3} / {4}"
+msgstr "初期設定（{0}/{1}）：{2} をダウンロード中 – {3} / {4}"
+
+#. 0: fertig; 1: n; 2: name
+#: src/lib/Einrichtung.svelte
+msgid "First-time setup ({0}/{1}): downloading {2}"
+msgstr "初期設定（{0}/{1}）：{2} をダウンロード中"
+
+#: src/lib/Einrichtung.svelte
+msgid "The GPU runtime is being downloaded. You can follow the progress below and in"
+msgstr "GPU ランタイムをダウンロードしています。進行状況はこの下と次の場所で確認できます："
+
+#. 0: msg
+#. 0: msg
+#: src/lib/Einrichtung.svelte
+#: src/lib/Einrichtung.svelte
+msgid "Error: {0}"
+msgstr "エラー：{0}"
+
+#: src/lib/Einrichtung.svelte
+msgid "Reading files…"
+msgstr "ファイルを読み取り中…"
+
+#: src/lib/Einrichtung.svelte
+msgid "No audio or video file found."
+msgstr "音声ファイルや動画ファイルが見つかりません。"
+
+#. 0: nr; 1: dateien.length; 2: name
+#: src/lib/Einrichtung.svelte
+msgid "Uploading ({0}/{1}): {2}…"
+msgstr "アップロード中（{0}/{1}）：{2}…"
+
+#. 0: namen.length
+#: src/lib/Einrichtung.svelte
+msgid "{0} file(s) uploaded. You can transcribe them in the library."
+msgstr "{0} 件のファイルをアップロードしました。ライブラリで文字起こしできます。"
+
+#. 0: n; 1: skipped
+#: src/lib/Einrichtung.svelte
+msgid "{0} file(s) are being transcribed ({1} skipped)."
+msgstr "{0} 件のファイルを文字起こししています（{1} 件はスキップ）。"
+
+#. 0: n
+#: src/lib/Einrichtung.svelte
+msgid "{0} file(s) are being transcribed."
+msgstr "{0} 件のファイルを文字起こししています。"
+
+#: src/lib/Einrichtung.svelte
+msgid "Go to library"
+msgstr "ライブラリへ"
+
+#: src/lib/Einrichtung.svelte
+msgid "Drop files or folders here"
+msgstr "ここにファイルやフォルダーをドロップ"
+
+#: src/lib/Einrichtung.svelte
+msgid "Audio or video; it goes into the library and gets transcribed"
+msgstr "音声または動画。ライブラリに追加され、文字起こしされます"
+
+#: src/lib/Einrichtung.svelte
+msgid "First-time setup"
+msgstr "初期設定"
+
+#. 0: stand.text
+#: src/lib/Einrichtung.svelte
+msgid "{0} – Restart the app or download again in <0>Settings</0>."
+msgstr "{0} – アプリを再起動するか、<0>設定</0>でもう一度ダウンロードしてください。"
+
+#. 0: stand.text
+#: src/lib/Einrichtung.svelte
+msgid "{0}. You can already use the app; jobs start as soon as everything is ready."
+msgstr "{0}。アプリはすでに使えます。準備が整いしだいジョブが始まります。"
+
+#: src/lib/Einrichtung.svelte
+msgid "NVIDIA GPU detected"
+msgstr "NVIDIA GPU を検出しました"
+
+#. 0: gpu.gpu.cudaMajor; 1: Math.round(gpu.gpu.fetch / 1048576)
+#: src/lib/Einrichtung.svelte
+msgid "<0/> can speed up recognition. For this, the app downloads the GPU runtime once (CUDA {0}, about 500 MB) and the missing libraries from NVIDIA (about {1} MB)."
+msgstr "<0/> で認識を高速化できます。そのため、アプリは GPU ランタイム（CUDA {0}、約 500 MB）と、不足しているライブラリを NVIDIA から（約 {1} MB）一度だけダウンロードします。"
+
+#. 0: gpu.gpu.cudaMajor
+#: src/lib/Einrichtung.svelte
+msgid "<0/> can speed up recognition. For this, the app downloads the GPU runtime once (CUDA {0}, about 500 MB)."
+msgstr "<0/> で認識を高速化できます。そのため、アプリは GPU ランタイム（CUDA {0}、約 500 MB）を一度だけダウンロードします。"
+
+#: src/lib/Einrichtung.svelte
+msgid "By choosing “Download GPU runtime”, you accept NVIDIA’s license terms for the <0>CUDA Toolkit</0> and for <1>cuDNN</1>."
+msgstr "「GPU ランタイムをダウンロード」を選ぶと、<0>CUDA Toolkit</0> と <1>cuDNN</1> に関する NVIDIA のライセンス条項に同意したことになります。"
+
+#: src/lib/Einrichtung.svelte
+msgid "How much this helps depends on the model and the recording. Without a GPU, everything runs on the processor as before, and you can change this in the settings at any time."
+msgstr "どれだけ効果があるかは、モデルと録音によって異なります。GPU を使わない場合は、これまでどおりすべてプロセッサーで動作します。設定はいつでも変更できます。"
+
+#: src/lib/Einrichtung.svelte
+msgid "Use processor only"
+msgstr "プロセッサーのみ使用"
+
+#: src/lib/Einrichtung.svelte
+msgid "Download GPU runtime"
+msgstr "GPU ランタイムをダウンロード"
+
+#: src/lib/Einrichtung.svelte
+msgid "Process # file"
+msgid_plural "Process # files"
+msgstr[0] "# 件のファイルを処理"
+
+#. 0: frage.skipped
+#: src/lib/Einrichtung.svelte
+msgid "The files have been uploaded. {0} other file(s) were skipped."
+msgstr "ファイルをアップロードしました。ほかの {0} 件のファイルはスキップしました。"
+
+#: src/lib/Einrichtung.svelte
+msgid "The files have been uploaded."
+msgstr "ファイルをアップロードしました。"
+
+#. 0: frage.namen.length - 8
+#: src/lib/Einrichtung.svelte
+msgid "… and {0} more"
+msgstr "…ほか {0} 件"
+
+#: src/lib/Einrichtung.svelte
+msgid "<0/> From now on, start right away without asking"
+msgstr "<0/> 次回からは確認せずにすぐ開始する"
+
+#: src/lib/Einrichtung.svelte
+msgid "Later"
+msgstr "後で"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Einrichtung.svelte
+msgid "Transcribe"
+msgstr "文字起こし"
+
+#: src/lib/Bibliothek.svelte
+msgid "waiting"
+msgstr "待機中"
+
+#: src/lib/Bibliothek.svelte
+msgid "running"
+msgstr "実行中"
+
+#: src/lib/Bibliothek.svelte
+msgid "paused"
+msgstr "一時停止中"
+
+#: src/lib/Bibliothek.svelte
+msgid "cancelling"
+msgstr "キャンセル中"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Liste.svelte
+#: src/routes/settings/+page.svelte
+msgid "Error"
+msgstr "エラー"
+
+#: src/lib/Bibliothek.svelte
+msgid "Last edited"
+msgstr "最終編集"
+
+#: src/lib/Bibliothek.svelte
+msgid "Name"
+msgstr "名前"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "All recordings"
+msgstr "すべての録音"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Uploaded"
+msgstr "アップロード済み"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Live recordings"
+msgstr "Live 録音"
+
+#. 0: uhrzeit
+#: src/lib/Bibliothek.svelte
+msgid "today, {0}"
+msgstr "今日 {0}"
+
+#: src/lib/Bibliothek.svelte
+msgid "yesterday"
+msgstr "昨日"
+
+#. 0: am
+#: src/lib/Bibliothek.svelte
+msgid "Recorded on {0}"
+msgstr "{0} に録音"
+
+#. 0: am
+#: src/lib/Bibliothek.svelte
+msgid "Created on {0}"
+msgstr "{0} に作成"
+
+#. 0: am
+#: src/lib/Bibliothek.svelte
+msgid "Modified on {0}"
+msgstr "{0} に更新"
+
+#. 0: fertigAm; 1: am
+#: src/lib/Bibliothek.svelte
+msgid "Transcribed on {0}, recorded on {1}"
+msgstr "{0} に文字起こし、{1} に録音"
+
+#. 0: fertigAm; 1: am
+#: src/lib/Bibliothek.svelte
+msgid "Transcribed on {0}, created on {1}"
+msgstr "{0} に文字起こし、{1} に作成"
+
+#. 0: fertigAm; 1: am
+#: src/lib/Bibliothek.svelte
+msgid "Transcribed on {0}, modified on {1}"
+msgstr "{0} に文字起こし、{1} に更新"
+
+#: src/lib/Bibliothek.svelte
+msgid "Speakers: automatic"
+msgstr "話者：自動"
+
+#: src/lib/Bibliothek.svelte
+msgid "via the API"
+msgstr "API 経由"
+
+#: src/lib/Bibliothek.svelte
+msgid "Please choose a folder or paste its path."
+msgstr "フォルダーを選ぶか、パスを貼り付けてください。"
+
+#: src/lib/Bibliothek.svelte
+msgid "one recording"
+msgid_plural "# recordings"
+msgstr[0] "# 件の録音"
+
+#. 0: neuer.name; 1: anzahl
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” is connected: {1}."
+msgstr "「{0}」を接続しました：{1}。"
+
+#. 0: o.name
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” is disconnected. The recordings and transcripts in it stay where they are."
+msgstr "「{0}」の接続を解除しました。中の録音と文字起こしはそのまま残ります。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Please choose at least one recording."
+msgstr "録音を 1 件以上選んでください。"
+
+#: src/lib/Bibliothek.svelte
+msgid "One recording is being transcribed."
+msgid_plural "# recordings are being transcribed."
+msgstr[0] "# 件の録音を文字起こししています。"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Already in progress."
+msgstr "すでに処理中です。"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” is being transcribed again. Your corrections are kept."
+msgstr "「{0}」をもう一度文字起こししています。修正内容は保持されます。"
+
+#. 0: f.name
+#: src/lib/Bibliothek.svelte
+msgid "Uploading {0}…"
+msgstr "{0} をアップロード中…"
+
+#: src/lib/Bibliothek.svelte
+msgid "Uploaded. It is now under “Not transcribed yet”."
+msgstr "アップロードしました。「未文字起こし」に表示されています。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Uploaded."
+msgstr "アップロードしました。"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” has been deleted."
+msgstr "「{0}」を削除しました。"
+
+#. 0: stand.title
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” is saved."
+msgstr "「{0}」を保存しました。"
+
+#. 0: title
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” is hidden. The file stays where it is; you can show it again under “Hidden” on the left."
+msgstr "「{0}」を非表示にしました。ファイルはそのまま残ります。左側の「非表示」から再表示できます。"
+
+#. 0: title
+#: src/lib/Bibliothek.svelte
+msgid "“{0}” is shown again."
+msgstr "「{0}」を再表示しました。"
+
+#. 0: korrekturen; 1: clips
+#: src/lib/Bibliothek.svelte
+msgid "{0} and {1}"
+msgstr "{0} と {1}"
+
+#: src/lib/Bibliothek.svelte
+msgid "Library · Transcribe by Moliri"
+msgstr "ライブラリ · Transcribe by Moliri"
+
+#. 0: z.offen
+#: src/lib/Bibliothek.svelte
+msgid "{0} without a transcript"
+msgstr "文字起こしなし：{0} 件"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/live/Abspielen.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgctxt "te_pause_short"
+msgid "Pause"
+msgstr "一時停止"
+
+#: src/lib/Bibliothek.svelte
+msgid "Listen"
+msgstr "再生"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Pause {0}"
+msgstr "{0} を一時停止"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Listen to {0}"
+msgstr "{0} を再生"
+
+#: src/lib/Bibliothek.svelte
+msgid "File details"
+msgstr "ファイルの詳細"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Details for {0}"
+msgstr "{0} の詳細"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Name and tags of {0}"
+msgstr "{0} の名前とタグ"
+
+#: src/lib/Bibliothek.svelte
+msgid "Show again"
+msgstr "再表示"
+
+#. 0: nm
+#. 0: nm
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Show {0} again"
+msgstr "{0} を再表示"
+
+#: src/lib/Bibliothek.svelte
+msgid "Hide; the file stays in the folder"
+msgstr "非表示にします。ファイルはフォルダーに残ります"
+
+#. 0: a.title
+#. 0: nm
+#. 0: nm
+#: src/lib/Bibliothek.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Hide {0}"
+msgstr "{0} を非表示"
+
+#: src/lib/Bibliothek.svelte
+msgid "Being transcribed right now; cancel first, then delete"
+msgstr "現在文字起こし中です。先にキャンセルしてから削除してください"
+
+#: src/lib/Bibliothek.svelte
+#: src/routes/bausteine/+page.svelte
+msgid "Delete"
+msgstr "削除"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Delete {0}"
+msgstr "{0} を削除"
+
+#: src/lib/Bibliothek.svelte
+msgid "Your recordings and their transcripts. You can also simply drag new files and whole folders into the window."
+msgstr "録音とその文字起こしです。新しいファイルやフォルダーを、ウィンドウにそのままドラッグして追加することもできます。"
+
+#: src/lib/Bibliothek.svelte
+msgid "<0/> Add files <1/>"
+msgstr "<0/> ファイルを追加 <1/>"
+
+#: src/lib/Bibliothek.svelte
+#: src/routes/bausteine/+page.svelte
+msgid "Undo"
+msgstr "元に戻す"
+
+#: src/lib/Bibliothek.svelte
+msgid "If it was closed, the transcription has stopped too: after a restart you can start it again with “Retry”."
+msgstr "アプリが終了していた場合は、文字起こしも止まっています。再起動後に「再試行」でもう一度開始できます。"
+
+#: src/lib/Bibliothek.svelte
+msgid "No connection to Transcribe. Is the app still running? <0/>"
+msgstr "Transcribe に接続できません。アプリはまだ起動していますか？ <0/>"
+
+#: src/lib/Bibliothek.svelte
+msgid "There are many recordings next to Transcribe"
+msgstr "Transcribe と同じ場所に多数の録音があります"
+
+#: src/lib/Bibliothek.svelte
+msgid "There is one recording next to Transcribe"
+msgid_plural "There are # recordings next to Transcribe"
+msgstr[0] "Transcribe と同じ場所に # 件の録音があります"
+
+#. 0: h.name
+#: src/lib/Bibliothek.svelte
+msgid "In the folder “{0}”. Once connected, it shows up here without being copied, and the transcripts are saved right next to it."
+msgstr "フォルダー「{0}」内にあります。接続すると、コピーせずにここに表示され、文字起こしはそのすぐ隣に保存されます。"
+
+#. 0: h.name
+#: src/lib/Bibliothek.svelte
+msgid "In the folder “{0}” and its subfolders. Once connected, everything shows up here without being copied, and the transcripts are saved right next to it."
+msgstr "フォルダー「{0}」とそのサブフォルダー内にあります。接続すると、すべてコピーせずにここに表示され、文字起こしはそのすぐ隣に保存されます。"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Connect folder"
+msgstr "フォルダーを接続"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Zugriff.svelte
+msgid "No, thanks"
+msgstr "いいえ"
+
+#: src/lib/Bibliothek.svelte
+msgid "Library sections"
+msgstr "ライブラリの区分"
+
+#: src/lib/Bibliothek.svelte
+msgid "Dragged into the window or added; stored in Transcribe’s data folder"
+msgstr "ウィンドウにドラッグまたは追加したもの。Transcribe のデータフォルダーに保存されます"
+
+#: src/lib/Bibliothek.svelte
+msgid "Recordings saved on the Live page"
+msgstr "Live ページで保存した録音"
+
+#: src/lib/Bibliothek.svelte
+#: src/routes/editor/+page.svelte
+msgid "Tags"
+msgstr "タグ"
+
+#. 0: o.path
+#. 0: f.path
+#: src/lib/Bibliothek.svelte
+#: src/routes/settings/+page.svelte
+msgid "{0} (not reachable)"
+msgstr "{0}（アクセスできません）"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Hidden"
+msgstr "非表示"
+
+#: src/lib/Bibliothek.svelte
+msgid "Recordings you have hidden; nothing has been deleted"
+msgstr "非表示にした録音。何も削除されていません"
+
+#: src/lib/Bibliothek.svelte
+msgid "Folders"
+msgstr "フォルダー"
+
+#: src/lib/Bibliothek.svelte
+msgid "The folder can’t be reached right now."
+msgstr "現在このフォルダーにアクセスできません。"
+
+#: src/lib/Bibliothek.svelte
+msgid "<0/> Transcripts are saved as files next to the recordings, for everyone who shares the folder."
+msgstr "<0/> 文字起こしは録音の隣にファイルとして保存され、フォルダーを共有する全員が利用できます。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcripts stay in Transcribe only (Settings, Folders)."
+msgstr "文字起こしは Transcribe 内にだけ保存されます（設定 › 接続したフォルダー）。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Disconnect folder"
+msgstr "フォルダーの接続を解除"
+
+#: src/lib/Bibliothek.svelte
+msgid "These recordings don’t appear in any other section. Nothing has been deleted, not even their transcripts."
+msgstr "これらの録音はほかのどの区分にも表示されません。何も削除されておらず、文字起こしも残っています。"
+
+#: src/lib/Bibliothek.svelte
+msgid "All recordings with this tag."
+msgstr "このタグが付いたすべての録音。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Resume"
+msgstr "再開"
+
+#: src/lib/Bibliothek.svelte
+msgid "Pause"
+msgstr "一時停止"
+
+#: src/lib/Bibliothek.svelte
+msgid "Cancel all"
+msgstr "すべてキャンセル"
+
+#: src/lib/Bibliothek.svelte
+msgid "In progress"
+msgstr "処理中"
+
+#: src/lib/Bibliothek.svelte
+msgid "Paused until you resume, even across a restart. The running transcription stays where it is; a live transcription is also running right now."
+msgstr "再開するまで、再起動後も一時停止したままです。実行中の文字起こしはその位置で止まります。現在ライブ文字起こしも実行中です。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Paused until you resume, even across a restart. The running transcription stays where it is."
+msgstr "再開するまで、再起動後も一時停止したままです。実行中の文字起こしはその位置で止まります。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Paused while a live transcription is running. Afterwards it continues on its own from the same point."
+msgstr "ライブ文字起こしの実行中は一時停止します。終了後、同じ位置から自動的に再開します。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Jobs"
+msgstr "ジョブ"
+
+#: src/lib/Bibliothek.svelte
+msgid "unknown"
+msgstr "不明"
+
+#: src/lib/Bibliothek.svelte
+msgid "Retry"
+msgstr "再試行"
+
+#: src/lib/Bibliothek.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Remove"
+msgstr "削除"
+
+#. 0: titel(j.audio)
+#: src/lib/Bibliothek.svelte
+msgid "Progress of {0}"
+msgstr "{0} の進行状況"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "starting…"
+msgstr "開始中…"
+
+#: src/lib/Bibliothek.svelte
+#: src/routes/settings/+page.svelte
+msgid "Log"
+msgstr "履歴"
+
+#: src/lib/Bibliothek.svelte
+msgid "Not transcribed yet"
+msgstr "未文字起こし"
+
+#: src/lib/Bibliothek.svelte
+msgid "Recordings without a transcript"
+msgstr "文字起こしのない録音"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+#: src/lib/Bibliothek.svelte
+msgid "Video"
+msgstr "動画"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcribe # recording"
+msgid_plural "Transcribe # recordings"
+msgstr[0] "# 件の録音を文字起こし"
+
+#: src/lib/Bibliothek.svelte
+msgid "Select none"
+msgstr "選択を解除"
+
+#: src/lib/Bibliothek.svelte
+msgid "Select all"
+msgstr "すべて選択"
+
+#: src/lib/Bibliothek.svelte
+msgid "Name, speaker or text"
+msgstr "名前、話者、テキスト"
+
+#: src/lib/Bibliothek.svelte
+msgid "Search transcripts"
+msgstr "文字起こしを検索"
+
+#: src/lib/Bibliothek.svelte
+msgid "Sort by"
+msgstr "並べ替え"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcribed"
+msgstr "文字起こし済み"
+
+#: src/lib/Bibliothek.svelte
+msgid "Loading the library…"
+msgstr "ライブラリを読み込み中…"
+
+#: src/lib/Bibliothek.svelte
+msgid "Choose files <0/>"
+msgstr "ファイルを選択 <0/>"
+
+#: src/lib/Bibliothek.svelte
+msgid "No recordings yet"
+msgstr "まだ録音はありません"
+
+#: src/lib/Bibliothek.svelte
+msgid "Drag audio or video files into this window, choose them, or connect a folder they are in. Transcribe writes down who says what."
+msgstr "音声ファイルや動画ファイルをこのウィンドウにドラッグするか、選択するか、それらがあるフォルダーを接続してください。誰が何を話したかを Transcribe が書き起こします。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Read the manual"
+msgstr "マニュアルを読む"
+
+#: src/lib/Bibliothek.svelte
+msgid "Connect to Moliri"
+msgstr "Moliri に接続"
+
+#: src/lib/Bibliothek.svelte
+msgid "Get to know Moliri"
+msgstr "Moliri について知る"
+
+#: src/lib/Bibliothek.svelte
+#: src/routes/+error.svelte
+msgid "Transcribe by Moliri"
+msgstr "Transcribe by Moliri"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcribe runs on its own on your computer, without an account, and your recordings stay here. It is also the companion app to the museum database Moliri: once connected, you dictate into Moliri’s text fields, and Transcribe reads the text from scans."
+msgstr "Transcribe はアカウント不要で、お使いのコンピューター上で単独で動作し、録音はここに保存されたままです。また、ミュージアムデータベース Moliri のコンパニオンアプリでもあります。接続すると Moliri のテキスト欄に音声入力でき、スキャン画像の文字を Transcribe が読み取ります。"
+
+#: src/lib/Bibliothek.svelte
+msgid "No transcript is ready here yet. What you transcribe above will show up here afterwards."
+msgstr "ここにはまだ完了した文字起こしはありません。上で文字起こししたものが、完了後ここに表示されます。"
+
+#: src/lib/Bibliothek.svelte
+msgid "There are no recordings here."
+msgstr "ここには録音がありません。"
+
+#. 0: q
+#: src/lib/live/Liste.svelte
+msgid "Nothing found for “{0}”."
+msgstr "「{0}」に一致するものは見つかりませんでした。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcribed recordings"
+msgstr "文字起こし済みの録音"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Open {0} in the editor"
+msgstr "{0} をエディターで開く"
+
+#: src/lib/Bibliothek.svelte
+msgid "All with this tag"
+msgstr "このタグのものをすべて表示"
+
+#: src/lib/Bibliothek.svelte
+msgid "The transcript is saved as a file next to the recording"
+msgstr "文字起こしは録音の隣にファイルとして保存されています"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcript next to the recording"
+msgstr "録音の隣に文字起こしあり"
+
+#: src/lib/Bibliothek.svelte
+msgid "being transcribed again"
+msgstr "再文字起こし中"
+
+#: src/lib/Bibliothek.svelte
+msgid "new"
+msgstr "新規"
+
+#: src/lib/Bibliothek.svelte
+msgid "No text recognised."
+msgstr "テキストは認識されませんでした。"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+#: src/routes/settings/+page.svelte
+msgid "Speakers"
+msgstr "話者"
+
+#: src/lib/Bibliothek.svelte
+msgid "Corrected by hand"
+msgstr "手動で修正済み"
+
+#: src/lib/Bibliothek.svelte
+msgid "# correction"
+msgid_plural "# corrections"
+msgstr[0] "修正 # 件"
+
+#: src/lib/Bibliothek.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+#: src/routes/bausteine/+page.svelte
+msgid "Clips"
+msgstr "クリップ"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcribe again; corrections made by hand are kept"
+msgstr "もう一度文字起こしします。手動の修正は保持されます"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgid "Transcribe {0} again"
+msgstr "{0} をもう一度文字起こし"
+
+#: src/lib/Bibliothek.svelte
+msgid "Playback"
+msgstr "再生"
+
+#: src/lib/Bibliothek.svelte
+msgid "Close playback"
+msgstr "再生を閉じる"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcribe saves each transcript as a file next to its recording (“Interview.mp3.transcribe.json”): anyone who shares the folder with you, for example via Nextcloud, sees the same transcripts and corrections."
+msgstr "Transcribe は各文字起こしを、録音の隣にファイルとして保存します（「Interview.mp3.transcribe.json」）。Nextcloud などでフォルダーを共有している人は、同じ文字起こしと修正を見ることができます。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Transcripts stay in Transcribe only; you can have them saved next to the recordings in the settings."
+msgstr "文字起こしは Transcribe 内にだけ保存されます。設定で、録音の隣に保存するように変更できます。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Choose folder…"
+msgstr "フォルダーを選択…"
+
+#: src/lib/Bibliothek.svelte
+msgid "or"
+msgstr "または"
+
+#: src/lib/Bibliothek.svelte
+msgid "Paste a path, e.g. C:\\Nextcloud\\Interviews"
+msgstr "パスを貼り付け（例：C:\\Nextcloud\\Interviews）"
+
+#: src/lib/Bibliothek.svelte
+msgid "Folder path"
+msgstr "フォルダーのパス"
+
+#: src/lib/Bibliothek.svelte
+msgid "Connect"
+msgstr "接続"
+
+#: src/lib/Bibliothek.svelte
+msgid "All recordings in the folder and its subfolders then show up here, without being copied. New ones are added on their own. <0/>"
+msgstr "フォルダーとそのサブフォルダー内のすべての録音が、コピーされずにここに表示されます。新しい録音は自動的に追加されます。<0/>"
+
+#. 0: arbeitInWorten(s)
+#: src/lib/Bibliothek.svelte
+msgid "It contains {0}."
+msgstr "{0} が含まれています。"
+
+#: src/lib/Bibliothek.svelte
+msgid "The recording will be deleted from this computer, and with it the transcript including all corrections, speaker names and clips."
+msgstr "録音がこのコンピューターから削除され、それとともに、すべての修正、話者名、クリップを含む文字起こしも削除されます。"
+
+#: src/lib/Bibliothek.svelte
+msgid "The file will be deleted from the library and from this computer."
+msgstr "ファイルがライブラリとこのコンピューターから削除されます。"
+
+#: src/lib/Bibliothek.svelte
+msgid "It is currently waiting to be transcribed; the job will be cancelled."
+msgstr "現在、文字起こしの順番を待っています。このジョブはキャンセルされます。"
+
+#: src/lib/Bibliothek.svelte
+msgid "This cannot be undone."
+msgstr "この操作は元に戻せません。"
+
+#: src/lib/Bibliothek.svelte
+msgid "Delete recording and transcript"
+msgstr "録音と文字起こしを削除"
+
+#: src/lib/Bibliothek.svelte
+msgid "Delete recording"
+msgstr "録音を削除"
+
+#. 0: loeschen.title
+#: src/lib/Bibliothek.svelte
+msgid "Delete “{0}”?"
+msgstr "「{0}」を削除しますか？"
+
+#: src/lib/Sprachenwahl.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Sprachwahl.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Language"
+msgstr "言語"
+
+#. 0: langName(c)
+#. 0: w
+#: src/lib/Sprachenwahl.svelte
+#: src/lib/live/MeineWoerter.svelte
+msgid "Remove {0}"
+msgstr "{0} を削除"
+
+#: src/lib/Sprachenwahl.svelte
+msgid "more…"
+msgstr "その他…"
+
+#: src/lib/Sprachenwahl.svelte
+#: src/lib/live/stand.svelte.js
+#: src/routes/settings/+page.svelte
+msgid "Automatic"
+msgstr "自動"
+
+#: src/lib/Sprachenwahl.svelte
+msgid "No language found that the recognition knows."
+msgstr "認識が対応している言語は見つかりませんでした。"
+
+#: src/lib/Teilen.svelte
+msgid "The text is too long for an email in one click, and copying did not work."
+msgstr "テキストが長すぎてワンクリックでメールにできず、コピーもできませんでした。"
+
+#: src/lib/Teilen.svelte
+msgid "The text is too long to pass on directly. It is on the clipboard: paste it into the email with Ctrl+V."
+msgstr "テキストが長すぎて直接渡せません。クリップボードにコピーしたので、メールに Ctrl+V で貼り付けてください。"
+
+#: src/lib/Teilen.svelte
+msgid "Sharing did not work."
+msgstr "共有できませんでした。"
+
+#: src/lib/Teilen.svelte
+msgid "Share"
+msgstr "共有"
+
+#: src/lib/Teilen.svelte
+msgid "<0/>To another app…"
+msgstr "<0/>ほかのアプリへ…"
+
+#: src/lib/Teilen.svelte
+msgid "<0/>As email"
+msgstr "<0/>メールで送る"
+
+#: src/lib/update.svelte.js
+msgid "Developer version"
+msgstr "開発版"
+
+#: src/lib/Zugriff.svelte
+#: src/routes/settings/+page.svelte
+msgid "A file or embedded page"
+msgstr "ファイルまたは埋め込みページ"
+
+#. 0: frage.client
+#: src/lib/Zugriff.svelte
+msgid "“{0}” on this website"
+msgstr "このウェブサイトの「{0}」"
+
+#: src/lib/Zugriff.svelte
+msgid "This website"
+msgstr "このウェブサイト"
+
+#: src/lib/Zugriff.svelte
+#: src/routes/settings/+page.svelte
+msgid "Allow"
+msgstr "許可"
+
+#: src/lib/Zugriff.svelte
+#: src/routes/settings/+page.svelte
+msgid "Deny"
+msgstr "拒否"
+
+#: src/lib/Zugriff.svelte
+msgid "One more site is asking"
+msgid_plural "# more sites are asking"
+msgstr[0] "ほかに # 件のサイトが確認を求めています"
+
+#. 0: plural(weitere, ['One more site is asking', '# more sites are asking'])
+#: src/lib/Zugriff.svelte
+msgid "{0}, next here or under <0>Settings › Apps</0>."
+msgstr "{0}。続けてここか、<0>設定 › アプリ</0>で確認できます。"
+
+#. 0: name(frage)
+#: src/lib/Zugriff.svelte
+msgid "<0/>Allow {0} to use Transcribe?"
+msgstr "<0/>{0} に Transcribe の使用を許可しますか？"
+
+#: src/lib/Zugriff.svelte
+msgid "<0/> wants to turn speech into text or have text read from images. Only allow what you know."
+msgstr "<0/> が、音声をテキストに変換したり、画像から文字を読み取ったりしようとしています。心当たりのあるものだけを許可してください。"
+
+#. 0: name(erlaubt)
+#: src/lib/Zugriff.svelte
+msgid "<0/>{0} can now use Transcribe"
+msgstr "<0/>{0} が Transcribe を使えるようになりました"
+
+#: src/lib/Zugriff.svelte
+msgid "Try again there. You can take this back under <0>Settings › Apps</0>."
+msgstr "そちらでもう一度お試しください。<0>設定 › アプリ</0>で取り消せます。"
+
+#. 0: stand.program
+#: src/lib/Zugriff.svelte
+msgid "<0/>{0} uses Transcribe"
+msgstr "<0/>{0} が Transcribe を使用中"
+
+#: src/lib/Zugriff.svelte
+msgid "So that apps can always reach Transcribe"
+msgstr "アプリがいつでも Transcribe に接続できるように"
+
+#: src/lib/Zugriff.svelte
+msgid "Switch on"
+msgstr "オンにする"
+
+#: src/lib/Zugriff.svelte
+msgid "Apps can only reach Transcribe while it is running. Should it start with Windows and keep running in the notification area of the taskbar after you close it?"
+msgstr "アプリが Transcribe に接続できるのは、Transcribe の起動中だけです。Windows と一緒に起動し、閉じた後もタスクバーの通知領域で動作し続けるようにしますか？"
+
+#: src/lib/Zugriff.svelte
+msgid "Transcribe now starts with Windows and keeps running in the background. You can change this under <0>Settings › Apps</0>."
+msgstr "Transcribe は Windows と一緒に起動し、バックグラウンドで動作し続けるようになりました。<0>設定 › アプリ</0>で変更できます。"
+
+#: src/routes/+error.svelte
+msgid "This page does not exist"
+msgstr "このページは存在しません"
+
+#: src/routes/+error.svelte
+msgid "There is nothing at this address. <0>Go to the editor</0>"
+msgstr "このアドレスには何もありません。<0>エディターへ</0>"
+
+#: src/routes/+error.svelte
+msgid "Something went wrong"
+msgstr "問題が発生しました"
+
+#. 0: titel
+#: src/lib/live/Abspielen.svelte
+msgid "<0/>“{0}” can't be played here: the window can't play this format. You can still transcribe it."
+msgstr "<0/>「{0}」はここでは再生できません。このウィンドウはこの形式に対応していません。文字起こしはできます。"
+
+#. 0: titel
+#: src/lib/live/Abspielen.svelte
+msgid "<0/>“{0}” can't be played. Was the file moved or deleted?"
+msgstr "<0/>「{0}」を再生できません。ファイルが移動または削除されましたか？"
+
+#: src/lib/live/Abspielen.svelte
+msgid "Play recording"
+msgstr "録音を再生"
+
+#: src/lib/live/Abspielen.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/routes/bausteine/+page.svelte
+msgid "Play"
+msgstr "再生"
+
+#: src/lib/live/Abspielen.svelte
+msgid "Position in the recording"
+msgstr "録音内の位置"
+
+#. 0: dauer(zeit); 1: dauer(laenge)
+#: src/lib/live/Abspielen.svelte
+msgid "{0} of {1}"
+msgstr "{0} / {1}"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Copying did not work."
+msgstr "コピーできませんでした。"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>All recordings"
+msgstr "<0/>すべての録音"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Aufnahme.svelte
+#: src/lib/live/Liste.svelte
+msgid "<0/>running"
+msgstr "<0/>実行中"
+
+#. 0: art(n)
+#. 0: art(n)
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Aufnahme.svelte
+msgid "Via API: <0/> {0}"
+msgstr "API 経由：<0/> {0}"
+
+#: src/lib/live/Anfrage.svelte
+msgid "AI <0/>"
+msgstr "AI <0/>"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Aufnahme.svelte
+msgid "Won't be saved"
+msgstr "保存されません"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Duration <0/>"
+msgstr "所要時間 <0/>"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>Copied"
+msgstr "<0/>コピーしました"
+
+#: src/lib/live/Anfrage.svelte
+msgid "<0/>Copy response"
+msgstr "<0/>応答をコピー"
+
+#. 0: tag(n.started, live.jetzt); 1: uhrzeit(n.started)
+#: src/lib/live/Anfrage.svelte
+msgid "Delete request {0}, {1}"
+msgstr "{0} {1} のリクエストを削除"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>Delete"
+msgstr "<0/>削除"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Request and response"
+msgstr "リクエストと応答"
+
+#: src/lib/live/Anfrage.svelte
+#: src/routes/settings/+page.svelte
+msgid "Copied"
+msgstr "コピーしました"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Copy"
+msgstr "コピー"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Request"
+msgstr "リクエスト"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Open image at full size"
+msgstr "画像を実寸で開く"
+
+#: src/lib/live/Anfrage.svelte
+msgid "The image that was read"
+msgstr "読み取った画像"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Response"
+msgstr "応答"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/Liste.svelte
+msgid "Running…"
+msgstr "実行中…"
+
+#: src/lib/live/Anfrage.svelte
+msgid "No response."
+msgstr "応答なし。"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Empty response."
+msgstr "空の応答。"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Details"
+msgstr "詳細"
+
+#: src/lib/live/Anfrage.svelte
+msgid "AI"
+msgstr "AI"
+
+#: src/lib/live/Anfrage.svelte
+msgid "unnamed"
+msgstr "名前なし"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Finished"
+msgstr "完了"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Service"
+msgstr "サービス"
+
+#: src/lib/live/Anfrage.svelte
+#: src/lib/live/stand.svelte.js
+msgid "App"
+msgstr "アプリ"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Started"
+msgstr "開始"
+
+#: src/lib/live/Anfrage.svelte
+msgid "Duration"
+msgstr "所要時間"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "saving audio"
+msgstr "保存中"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "text only"
+msgstr "テキストのみ"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "off"
+msgstr "オフ"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "on, ready at once"
+msgstr "オン、すぐに使用可能"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "loading recognition…"
+msgstr "認識を読み込み中…"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "on"
+msgstr "オン"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "the microphone"
+msgstr "マイク"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Record"
+msgstr "録音"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "<0/>Stopping…"
+msgstr "<0/>停止中…"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "<0/>Stop"
+msgstr "<0/>停止"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Starting…"
+msgstr "開始中…"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Start recording"
+msgstr "録音を開始"
+
+#. 0: mikrofon
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "No sound is coming from {0} yet. Is it switched on and connected? <0>Choose a different microphone?</0>"
+msgstr "{0} からまだ音が届いていません。電源が入っていて、接続されていますか？ <0>別のマイクを選びますか？</0>"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Choose a different microphone?"
+msgstr "別のマイクを選びますか？"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "One app is listening in."
+msgid_plural "# apps are listening in."
+msgstr[0] "# 個のアプリが聞き取っています。"
+
+#: src/lib/live/AufnahmeWahl.svelte
+#: src/lib/live/Aufnahmeleiste.svelte
+#: src/lib/live/stand.svelte.js
+#: src/lib/live/stand.svelte.js
+msgid "Microphone"
+msgstr "マイク"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "System"
+msgstr "システム"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+#: src/lib/live/Aufnahmeleiste.svelte
+#: src/routes/settings/+page.svelte
+msgid "Ready in the background"
+msgstr "バックグラウンドで待機"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "On: Other apps like Moliri may have Transcribe record from the microphone, and the recognition stays loaded so everything starts at once. This takes about 1 GB of memory. Transcribe always processes audio and images that an app sends."
+msgstr "オン：Moliri などのほかのアプリが Transcribe を通じてマイクで録音でき、認識が読み込まれたままになるので、すべてすぐに始まります。約 1 GB のメモリを使用します。アプリから送られた音声や画像は、Transcribe が常に処理します。"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Off: Other apps may not have Transcribe record from the microphone, and nothing stays loaded. Transcribe still processes audio and images that an app sends. Recording by hand works too, it just starts a little more slowly."
+msgstr "オフ：ほかのアプリは Transcribe を通じてマイクで録音できず、何も読み込まれたままになりません。アプリから送られた音声や画像は、引き続き Transcribe が処理します。手動での録音もできますが、開始が少し遅くなります。"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Set up"
+msgstr "セットアップ"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Set up recording"
+msgstr "録音のセットアップ"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Changes apply from the next recording on."
+msgstr "変更は次の録音から適用されます。"
+
+#: src/lib/live/Aufnahmeleiste.svelte
+msgid "Custom words, punctuation and dictation: all settings for Live <0/>"
+msgstr "自分の単語、句読点、音声入力：Live のすべての設定 <0/>"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Copying didn't work."
+msgstr "コピーできませんでした。"
+
+#: src/lib/live/Aufnahme.svelte
+#: src/lib/live/Liste.svelte
+msgid "cancelled"
+msgstr "キャンセル済み"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>Dictated with a keyboard shortcut"
+msgstr "<0/>ショートカットキーで音声入力"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>By hand, on this page"
+msgstr "<0/>手動、このページで"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Source <0/>"
+msgstr "入力元 <0/>"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "# sentence"
+msgid_plural "# sentences"
+msgstr[0] "# 文"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "no sentences"
+msgstr "0 文"
+
+#. 0: treffer ? plural(treffer, ['# sentence', '# sentences']) \\: /* @wc-include */ 'no sentences'; 1: suche
+#: src/lib/live/Aufnahme.svelte
+msgid "{0} with “{1}”"
+msgstr "「{1}」を含む {0}"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Length <0/>"
+msgstr "長さ <0/>"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Language <0/>"
+msgstr "言語 <0/>"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>Transcribe in full"
+msgstr "<0/>完全に文字起こし"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "<0/>Copy text"
+msgstr "<0/>テキストをコピー"
+
+#. 0: uhrzeit(n.started)
+#: src/lib/live/Aufnahme.svelte
+msgid "Share recording {0}"
+msgstr "録音 {0} を共有"
+
+#. 0: tag(n.started, live.jetzt); 1: uhrzeit(n.started)
+#: src/lib/live/Aufnahme.svelte
+msgid "Delete recording {0}, {1}"
+msgstr "{0} {1} の録音を削除"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Recording text"
+msgstr "録音のテキスト"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Play from here"
+msgstr "ここから再生"
+
+#: src/lib/live/Aufnahme.svelte
+#: src/lib/live/Liste.svelte
+msgid "Loading recognition…"
+msgstr "認識を読み込み中…"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Listening… just start speaking."
+msgstr "聞き取り中…そのまま話し始めてください。"
+
+#: src/lib/live/Aufnahme.svelte
+#: src/lib/live/Liste.svelte
+msgid "Nothing was recognised."
+msgstr "何も認識されませんでした。"
+
+#: src/lib/live/Aufnahme.svelte
+msgid "Once fully transcribed, it gets speakers and can be corrected in the editor."
+msgstr "完全に文字起こしすると、話者が割り当てられ、エディターで修正できるようになります。"
+
+#. 0: n.audio
+#: src/lib/live/Aufnahme.svelte
+msgid "Recording saved as “{0}”."
+msgstr "録音を「{0}」として保存しました。"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "What is said into the microphone."
+msgstr "マイクに向かって話した内容。"
+
+#: src/lib/live/AufnahmeWahl.svelte
+#: src/lib/live/stand.svelte.js
+#: src/lib/live/stand.svelte.js
+msgid "System audio"
+msgstr "システム音声"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "What the computer plays, such as the others in an online meeting."
+msgstr "コンピューターで再生される音。オンライン会議の相手の声など。"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Both mixed"
+msgstr "両方をミックス"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Best with headphones, otherwise the others are heard twice."
+msgstr "ヘッドホンの使用をおすすめします。そうしないと相手の声が二重に聞こえます。"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Not possible on this computer."
+msgstr "このコンピューターでは使用できません。"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "What gets recorded"
+msgstr "録音する音声"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "searching…"
+msgstr "検索中…"
+
+#. 0: live.standard
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "System default: {0}"
+msgstr "システムの既定：{0}"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "System default"
+msgstr "システムの既定"
+
+#. 0: live.geraet
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "{0} (not connected)"
+msgstr "{0}（未接続）"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "This microphone is not connected right now."
+msgstr "このマイクは現在接続されていません。"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Stays with this microphone, even when another one is connected."
+msgstr "ほかのマイクが接続されても、このマイクを使い続けます。"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Uses the microphone set as default in Windows. If another one becomes the default, such as a newly connected headset, the recording switches along."
+msgstr "Windows で既定に設定されているマイクを使います。新しく接続したヘッドセットなど、別のマイクが既定になると、録音もそちらに切り替わります。"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Uses the microphone set as default in the system."
+msgstr "システムで既定に設定されているマイクを使います。"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Microphone <0/> <1/>"
+msgstr "マイク <0/> <1/>"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Save recording"
+msgstr "録音を保存"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "It goes to your recordings and can be fully transcribed afterwards, with speakers."
+msgstr "録音一覧に追加され、後から話者付きで完全に文字起こしできます。"
+
+#: src/lib/live/AufnahmeWahl.svelte
+msgid "Off: only the text is kept."
+msgstr "オフ：テキストだけが残ります。"
+
+#: src/lib/live/MeineWoerter.svelte
+msgid "+ Word"
+msgstr "+ 単語"
+
+#: src/lib/live/MeineWoerter.svelte
+msgid "My words"
+msgstr "自分の単語"
+
+#: src/lib/live/MeineWoerter.svelte
+msgid "Names and technical terms, such as “Moliri”: live text writes them like this, even when they sound a little different."
+msgstr "「Moliri」のような名前や専門用語。少し違って聞こえても、ライブテキストはこの表記で書きます。"
+
+#: src/lib/live/Liste.svelte
+#: src/lib/live/Liste.svelte
+#: src/routes/settings/+page.svelte
+msgid "Recordings"
+msgstr "録音"
+
+#: src/lib/live/Liste.svelte
+#: src/lib/live/Liste.svelte
+msgid "Search all recordings"
+msgstr "すべての録音を検索"
+
+#: src/lib/live/Liste.svelte
+#: src/lib/live/Liste.svelte
+msgid "Clear search"
+msgstr "検索をクリア"
+
+#: src/lib/live/Liste.svelte
+msgid "Origin"
+msgstr "入力元"
+
+#: src/lib/live/Liste.svelte
+msgid "# match"
+msgid_plural "# matches"
+msgstr[0] "# 件の一致"
+
+#: src/lib/live/Liste.svelte
+msgid "no matches"
+msgstr "一致なし"
+
+#: src/lib/live/Liste.svelte
+msgid "# request"
+msgid_plural "# requests"
+msgstr[0] "# 件のリクエスト"
+
+#: src/lib/live/Liste.svelte
+msgid "# recording"
+msgid_plural "# recordings"
+msgstr[0] "# 件の録音"
+
+#: src/lib/live/Liste.svelte
+msgid "When searching, the best matches come first"
+msgstr "検索時は、関連度の高いものが上に表示されます"
+
+#: src/lib/live/Liste.svelte
+msgid "Best matches"
+msgstr "関連度順"
+
+#: src/lib/live/Liste.svelte
+msgid "Sorting"
+msgstr "並べ替え"
+
+#: src/lib/live/Liste.svelte
+msgid "No recordings yet. Start one below, or have an app send speech through the API."
+msgstr "まだ録音はありません。下から録音を開始するか、アプリから API で音声を送ってください。"
+
+#. 0: q; 1: HERKUNFT[herkunft]
+#: src/lib/live/Liste.svelte
+msgid "Nothing found for “{0}” in “{1}”."
+msgstr "「{1}」で「{0}」に一致するものは見つかりませんでした。"
+
+#: src/lib/live/Liste.svelte
+msgid "No requests to AI or text recognition yet."
+msgstr "AI や文字認識へのリクエストはまだありません。"
+
+#: src/lib/live/Liste.svelte
+msgid "No recordings made by hand."
+msgstr "手動の録音はありません。"
+
+#: src/lib/live/Liste.svelte
+msgid "No recordings via API."
+msgstr "API 経由の録音はありません。"
+
+#: src/lib/live/Liste.svelte
+msgid "Show all"
+msgstr "すべて表示"
+
+#: src/lib/live/Liste.svelte
+msgid ", via API"
+msgstr "、API 経由"
+
+#: src/lib/live/Liste.svelte
+msgid "not saved"
+msgstr "未保存"
+
+#: src/lib/live/Liste.svelte
+msgid "Empty response"
+msgstr "空の応答"
+
+#: src/lib/live/Liste.svelte
+msgid "No text"
+msgstr "テキストなし"
+
+#: src/lib/live/Liste.svelte
+msgid "Listening …"
+msgstr "聞き取り中…"
+
+#: src/lib/live/Liste.svelte
+msgid "Recording saved"
+msgstr "録音を保存しました"
+
+#: src/lib/live/Liste.svelte
+msgid "saved"
+msgstr "保存済み"
+
+#: src/lib/live/Liste.svelte
+#: src/lib/live/Liste.svelte
+msgid "# site wanted to connect"
+msgid_plural "# sites wanted to connect"
+msgstr[0] "# 件のサイトが接続を求めました"
+
+#: src/lib/live/Liste.svelte
+msgid "Connect apps"
+msgstr "アプリを接続"
+
+#: src/lib/live/stand.svelte.js
+msgid "Microphone and system audio"
+msgstr "マイクとシステム音声"
+
+#: src/lib/live/stand.svelte.js
+msgid "Waiting for the microphone…"
+msgstr "マイクを待機中…"
+
+#: src/lib/live/stand.svelte.js
+msgid "Waiting for system audio…"
+msgstr "システム音声を待機中…"
+
+#: src/lib/live/stand.svelte.js
+msgid "Waiting for microphone and system audio…"
+msgstr "マイクとシステム音声を待機中…"
+
+#: src/lib/live/stand.svelte.js
+msgid "This microphone only delivers phone quality, so recognition suffers."
+msgstr "このマイクは電話並みの音質しか出ないため、認識精度が下がります。"
+
+#: src/lib/live/stand.svelte.js
+msgid "This microphone is very quiet, so recognition suffers."
+msgstr "このマイクは音がとても小さいため、認識精度が下がります。"
+
+#: src/lib/live/stand.svelte.js
+msgid "Never, they stay until you delete them"
+msgstr "削除しない（自分で削除するまで残ります）"
+
+#: src/lib/live/stand.svelte.js
+msgid "After one hour"
+msgstr "1 時間後"
+
+#: src/lib/live/stand.svelte.js
+msgid "After one day"
+msgstr "1 日後"
+
+#: src/lib/live/stand.svelte.js
+msgid "After one week"
+msgstr "1 週間後"
+
+#: src/lib/live/stand.svelte.js
+msgid "After 30 days"
+msgstr "30 日後"
+
+#: src/lib/live/stand.svelte.js
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Text recognition"
+msgstr "文字認識"
+
+#: src/lib/live/stand.svelte.js
+msgid "Filter in your own words"
+msgstr "自分の言葉でフィルター"
+
+#: src/lib/live/stand.svelte.js
+msgid "Search by meaning"
+msgstr "意味で検索"
+
+#: src/lib/live/stand.svelte.js
+msgctxt "live_who"
+msgid "Dictation"
+msgstr "音声入力"
+
+#: src/lib/live/stand.svelte.js
+msgid "sent audio"
+msgstr "音声を送信"
+
+#: src/lib/live/stand.svelte.js
+msgid "let the app listen in"
+msgstr "アプリに聞き取りを許可"
+
+#: src/lib/live/stand.svelte.js
+msgid "recorded on this page"
+msgstr "このページで録音"
+
+#: src/lib/live/stand.svelte.js
+msgid "dictated with the keyboard shortcut"
+msgstr "ショートカットキーで音声入力"
+
+#: src/lib/live/stand.svelte.js
+msgid "had text in an image read"
+msgstr "画像内の文字を読み取り"
+
+#: src/lib/live/stand.svelte.js
+msgid "asked the language model"
+msgstr "言語モデルに質問"
+
+#: src/lib/live/stand.svelte.js
+msgid "had texts converted for search by meaning"
+msgstr "意味で検索するためにテキストを変換"
+
+#. 0: kurz
+#: src/lib/live/stand.svelte.js
+msgid "{0} s"
+msgstr "{0} 秒"
+
+#. 0: min; 1: sek
+#: src/lib/live/stand.svelte.js
+msgid "{0}:{1} min"
+msgstr "{0}:{1} 分"
+
+#: src/lib/live/stand.svelte.js
+msgid "Today"
+msgstr "今日"
+
+#: src/lib/live/stand.svelte.js
+msgid "Yesterday"
+msgstr "昨日"
+
+#: src/lib/live/stand.svelte.js
+msgid "Loading speech recognition, the first time takes a moment…"
+msgstr "音声認識を読み込み中です。初回は少し時間がかかります…"
+
+#: src/lib/live/stand.svelte.js
+msgid "Applies from the next recording on."
+msgstr "次の録音から適用されます。"
+
+#: src/lib/live/stand.svelte.js
+msgid "Being transcribed, then it will be in the library."
+msgstr "文字起こし中です。完了後にライブラリに表示されます。"
+
+#: src/lib/live/stand.svelte.js
+msgid "Already being transcribed."
+msgstr "すでに文字起こし中です。"
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "While you speak, the fast German model Kroko shows the text; then the more accurate Parakeet writes each sentence."
+msgstr "話している間は高速なドイツ語モデル Kroko がテキストを表示し、その後、より正確な Parakeet が各文を書き起こします。"
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "Live text detects the language by itself."
+msgstr "ライブテキストは言語を自動で判別します。"
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "Live text detects the language by itself. When fully transcribed, each section gets one of these languages."
+msgstr "ライブテキストは言語を自動で判別します。完全に文字起こしすると、各セクションにこれらの言語のいずれかが割り当てられます。"
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "Live text detects the language by itself; the choice applies to full transcription."
+msgstr "ライブテキストは言語を自動で判別します。この選択は完全な文字起こしに適用されます。"
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "Dictate punctuation"
+msgstr "句読点を音声で入力"
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "Say “comma”, “period”, “question mark” or “new paragraph”, and the mark appears. Otherwise the app sets them itself."
+msgstr "「comma」「period」「question mark」「new paragraph」と言うと、その記号が入力されます。それ以外の場合は、アプリが自動で句読点を付けます。"
+
+#: src/lib/live/StimmeWahl.svelte
+msgid "Off: the app sets all punctuation itself, “comma” stays a word."
+msgstr "オフ：句読点はすべてアプリが自動で付け、「comma」はそのまま単語として扱われます。"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Fast"
+msgstr "高速"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Balanced"
+msgstr "バランス"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Accurate"
+msgstr "高精度"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Mr Berger tells how he started as an apprentice at the paper mill in 1958: “We washed the felts by hand, every Saturday.”"
+msgstr "ベルガーさんは、1958 年に製紙工場で見習いとして働き始めた頃のことを語ります。「フェルトは毎週土曜日に手で洗っていました。」"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Components · Transcribe by Moliri"
+msgstr "コンポーネント · Transcribe by Moliri"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Components"
+msgstr "コンポーネント"
+
+#: src/routes/bausteine/+page.svelte
+msgid "The components Transcribe takes over from Moliri. They are mirrored under <0/> and are only changed in Moliri."
+msgstr "Transcribe が Moliri から取り込んでいるコンポーネントです。<0/> にミラーされており、変更は Moliri 側でのみ行います。"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Start transcription"
+msgstr "文字起こしを開始"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Show loading"
+msgstr "読み込みを表示"
+
+#: src/routes/bausteine/+page.svelte
+msgid "On ink"
+msgstr "インク地"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Paper on ink"
+msgstr "インク地に紙色"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Buttons"
+msgstr "ボタン"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Follow along"
+msgstr "再生箇所を追う"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Highlights the spoken word during playback."
+msgstr "再生中に話されている単語を強調表示します。"
+
+#: src/routes/bausteine/+page.svelte
+#: src/routes/bausteine/+page.svelte
+msgid "Skip speakers"
+msgstr "話者をスキップ"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Hidden speakers are skipped during playback."
+msgstr "非表示の話者は再生時にスキップされます。"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Only affects speakers hidden in the editor."
+msgstr "エディターで非表示にした話者にのみ適用されます。"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Switches"
+msgstr "スイッチ"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Read"
+msgstr "読み取り"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Correct"
+msgstr "修正"
+
+#. 0: id
+#: src/routes/bausteine/+page.svelte
+msgid "Tab “{0}” is open."
+msgstr "タブ「{0}」が開いています。"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Tabs"
+msgstr "タブ"
+
+#. 0: QUALITAETEN.find((q) => q.id === qualitaet)?.name
+#: src/routes/bausteine/+page.svelte
+msgid "Quality: {0} <0/>"
+msgstr "品質：{0} <0/>"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Spacebar"
+msgstr "スペースキー"
+
+#: src/routes/bausteine/+page.svelte
+msgid "With shortcut"
+msgstr "ショートカットキー付き"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Open dialog"
+msgstr "ダイアログを開く"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Loading …"
+msgstr "読み込み中…"
+
+#: src/routes/bausteine/+page.svelte
+msgid "This box shows “Loading” while “Show loading” is running."
+msgstr "「読み込みを表示」の実行中、このボックスには「読み込み中」と表示されます。"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Selection, dialog, hint"
+msgstr "選択、ダイアログ、ヒント"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Atkinson Hyperlegible Next (--font-ui)"
+msgstr "Atkinson Hyperlegible Next (--font-ui)"
+
+#: src/routes/bausteine/+page.svelte
+#: src/routes/bausteine/+page.svelte
+msgid "Name speaker · Create clip · 00:12:48 · Il1 0O"
+msgstr "話者に名前を付ける · クリップを作成 · 00:12:48 · Il1 0O"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Atkinson Hyperlegible Mono (--font-mono)"
+msgstr "Atkinson Hyperlegible Mono (--font-mono)"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Type sample"
+msgstr "書体見本"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Body text in the editor (20px) and controls (15px): on the left the interface font, on the right its mono sister for code."
+msgstr "エディターの本文（20px）と操作部（15px）：左がインターフェースのフォント、右がコード用の等幅の姉妹フォントです。"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Merge speakers"
+msgstr "話者を統合"
+
+#: src/routes/bausteine/+page.svelte
+msgid "Merge"
+msgstr "統合"
+
+#: src/routes/bausteine/+page.svelte
+msgid "“Speaker 2” and “Mr Berger” are the same person. Merge?"
+msgstr "「話者 2」と「ベルガーさん」は同一人物です。統合しますか？"
+
+#. 0: recordingName(file)
+#: src/routes/editor/+page.svelte
+msgid "{0} · Editor · Transcribe by Moliri"
+msgstr "{0} · エディター · Transcribe by Moliri"
+
+#: src/routes/editor/+page.svelte
+msgid "Editor · Transcribe by Moliri"
+msgstr "エディター · Transcribe by Moliri"
+
+#: src/routes/editor/+page.svelte
+msgid "The list of recordings could not be loaded."
+msgstr "録音の一覧を読み込めませんでした。"
+
+#: src/routes/editor/+page.svelte
+msgid "The corrections could not be saved. The recording was not switched."
+msgstr "修正を保存できませんでした。録音は切り替えていません。"
+
+#. 0: recordingName(f)
+#: src/routes/editor/+page.svelte
+msgid "“{0}” could not be loaded."
+msgstr "「{0}」を読み込めませんでした。"
+
+#: src/routes/editor/+page.svelte
+msgid "Choose recording"
+msgstr "録音を選択"
+
+#: src/routes/editor/+page.svelte
+msgid "Loading the transcript…"
+msgstr "文字起こしを読み込んでいます…"
+
+#: src/routes/editor/+page.svelte
+msgid "No transcript yet"
+msgstr "まだ文字起こしがありません"
+
+#: src/routes/editor/+page.svelte
+msgid "As soon as a recording is transcribed, it is ready here to read and play. You add recordings in the <0>library</0>."
+msgstr "録音の文字起こしが終わると、ここで読んだり再生したりできます。録音は<0>ライブラリ</0>から追加します。"
+
+#: src/routes/editor/+page.svelte
+msgid "That did not work"
+msgstr "うまくいきませんでした"
+
+#. 0: error
+#: src/routes/editor/+page.svelte
+msgid "{0} Is Transcribe still running? Then reload the page."
+msgstr "{0} Transcribe はまだ動いていますか？動いていればページを再読み込みしてください。"
+
+#: src/routes/live/+page.svelte
+msgid "Live · Transcribe by Moliri"
+msgstr "Live · Transcribe by Moliri"
+
+#: src/routes/live/+page.svelte
+msgid "<0/>No connection to the app. Is it still running?"
+msgstr "<0/>アプリに接続できません。まだ動いていますか？"
+
+#: src/routes/live/+page.svelte
+msgid "stays on the left as a recording."
+msgstr "録音として左側に残ります。"
+
+#: src/routes/live/+page.svelte
+msgid "shows on the left while it runs."
+msgstr "実行中は左側に表示されます。"
+
+#: src/routes/live/+page.svelte
+msgid "Speech as text, instantly"
+msgstr "話した言葉をすぐテキストに"
+
+#: src/routes/live/+page.svelte
+msgid "Start a recording below: through the microphone and, if you like, with the sound your computer plays, such as the others in an online meeting. The text appears here while people speak."
+msgstr "下で録音を開始してください。マイクから録音し、必要ならコンピューターで再生している音声（オンライン会議の相手の声など）も一緒に録音できます。話している間に、ここにテキストが表示されます。"
+
+#. 0: live.apiSpeichern ? /* @wc-include */ 'stays on the left as a recording.' \\: /* @wc-include */ 'shows on the left while it runs.'
+#: src/routes/live/+page.svelte
+msgid "Or let apps like Moliri send speech through the <0>live API</0>. Each request {0}"
+msgstr "または、Moliri などのアプリから<0>Live API</0>で音声を送ることもできます。各リクエストは{0}"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "User interface"
+msgstr "ユーザーインターフェース"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Packages of the interface with everything they pull in, including parts that only run during the build."
+msgstr "インターフェースのパッケージと、それらが取り込むすべてのもの（ビルド時にのみ動作する部分も含む）。"
+
+#: src/routes/lizenzen/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Program"
+msgstr "プログラム"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Go modules built into the EXE."
+msgstr "EXE に組み込まれた Go モジュール。"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Icons"
+msgstr "アイコン"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Icon sets; only the icons in use are shipped."
+msgstr "アイコンセット。同梱しているのは使用中のアイコンだけです。"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Fonts"
+msgstr "フォント"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Bundled fonts."
+msgstr "同梱フォント。"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Licenses · Transcribe by Moliri"
+msgstr "ライセンス · Transcribe by Moliri"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Licenses"
+msgstr "ライセンス一覧"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Transcribe by Moliri is free software under the <0>Mozilla Public License 2.0</0>. It builds on the work of others; here you can see what it includes and under which license."
+msgstr "Transcribe by Moliri は <0>Mozilla Public License 2.0</0> のもとで提供されるフリーソフトウェアです。他の人々の成果の上に成り立っています。ここでは、何が含まれ、どのライセンスで提供されているかを確認できます。"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "No details."
+msgstr "情報なし。"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Read NOTICE"
+msgstr "NOTICE を読む"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "Notices (NOTICE)"
+msgstr "権利表記（NOTICE）"
+
+#: src/routes/lizenzen/+page.svelte
+msgid "What the app downloads on first start (recognition library, models, FFmpeg) is not part of it and is listed with license and attribution in the NOTICE file."
+msgstr "アプリが初回起動時にダウンロードするもの（認識ライブラリ、モデル、FFmpeg）はアプリには含まれず、ライセンスと帰属表示とともに NOTICE ファイルに記載されています。"
+
+#: src/routes/settings/+page.svelte
+msgid "Data folder"
+msgstr "データフォルダー"
+
+#: src/routes/settings/+page.svelte
+msgid "Results"
+msgstr "結果"
+
+#: src/routes/settings/+page.svelte
+msgid "Models"
+msgstr "モデル"
+
+#: src/routes/settings/+page.svelte
+msgid "Recognition runtime"
+msgstr "認識ランタイム"
+
+#: src/routes/settings/+page.svelte
+msgid "Only on this computer"
+msgstr "このコンピューターのみ"
+
+#: src/routes/settings/+page.svelte
+msgid "The models run here. No recording leaves the computer."
+msgstr "モデルはここで動作します。録音がこのコンピューターの外に出ることはありません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Only through an API"
+msgstr "API 経由のみ"
+
+#: src/routes/settings/+page.svelte
+msgid "Recordings go to a service for recognition, on the internet or on your own network. The app downloads no models for this."
+msgstr "録音は認識のため、インターネット上または自分のネットワーク内のサービスに送られます。このためにアプリがモデルをダウンロードすることはありません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Both"
+msgstr "両方"
+
+#: src/routes/settings/+page.svelte
+msgid "You decide what Live and whole recordings use, and can choose again for each job if you like."
+msgstr "Live と録音全体に何を使うかを決められます。必要ならジョブごとに選び直すこともできます。"
+
+#. 0: (e).message
+#. 0: (e).message
+#. 0: (e).message
+#. 0: (e).message
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Not saved: {0}"
+msgstr "保存されませんでした：{0}"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Key saved."
+msgstr "キーを保存しました。"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Key removed."
+msgstr "キーを削除しました。"
+
+#: src/routes/settings/+page.svelte
+msgid "Disconnected. The recordings and transcripts in the folder stay where they are."
+msgstr "接続を解除しました。フォルダー内の録音と文字起こしはそのまま残ります。"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Saved."
+msgstr "保存しました。"
+
+#: src/routes/settings/+page.svelte
+msgid "Fraktur (frk)"
+msgstr "Fraktur (frk)"
+
+#: src/routes/settings/+page.svelte
+msgid "Fraktur script"
+msgstr "フラクトゥール体"
+
+#: src/routes/settings/+page.svelte
+msgid "Fraktur (frak2021)"
+msgstr "Fraktur (frak2021)"
+
+#: src/routes/settings/+page.svelte
+msgid "Latin script (German, English, …)"
+msgstr "ラテン文字（ドイツ語、英語、…）"
+
+#: src/routes/settings/+page.svelte
+msgid "Reads print and typewriting, with its own models for Fraktur."
+msgstr "印刷物やタイプライターの文字を読み取ります。フラクトゥール用の専用モデルもあります。"
+
+#: src/routes/settings/+page.svelte
+msgid "Reads printed Latin script very accurately, including index cards and lists, and knows where each word is; fast on the graphics card. For Fraktur, Tesseract is better."
+msgstr "印刷されたラテン文字を非常に正確に読み取ります。インデックスカードやリストも読め、各単語の位置もわかります。グラフィックカードでは高速です。フラクトゥールには Tesseract のほうが適しています。"
+
+#: src/routes/settings/+page.svelte
+msgid "The text recognition built into Windows: available at once and very fast, with the position of each word, but without Fraktur or handwriting. Its languages come from Windows; you add more under Settings › Time & language › Language."
+msgstr "Windows に組み込まれた文字認識です。すぐに使えて非常に高速で、各単語の位置もわかりますが、フラクトゥールと手書きには対応していません。言語は Windows のものを使います。言語は「設定 › 時刻と言語 › 言語と地域」で追加できます。"
+
+#: src/routes/settings/+page.svelte
+msgid "An AI model reads the image, in any language and script, including handwriting and Kurrent. It finds the lines, but not the position of each word. For this, the image goes to the service, billed through your key."
+msgstr "AI モデルが画像を読み取ります。どの言語や文字にも対応し、手書きやクレント体（Kurrent）も読めます。行は検出しますが、各単語の位置はわかりません。このため画像はサービスに送られ、料金は自分のキーで請求されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Page with columns (automatic)"
+msgstr "段組みのあるページ（自動）"
+
+#: src/routes/settings/+page.svelte
+msgid "Lines, such as an index card or form"
+msgstr "行（インデックスカードや書式など）"
+
+#: src/routes/settings/+page.svelte
+msgid "A single block of text, such as a label"
+msgstr "1 つのテキストブロック（ラベルなど）"
+
+#: src/routes/settings/+page.svelte
+msgid "Scattered, such as lettering on objects"
+msgstr "散在する文字（物に書かれた文字など）"
+
+#: src/routes/settings/+page.svelte
+msgid "Copying didn’t work."
+msgstr "コピーできませんでした。"
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribing"
+msgstr "文字起こし"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Recognition"
+msgstr "認識"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "New recordings"
+msgstr "新しい録音"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Connected folders"
+msgstr "接続したフォルダー"
+
+#: src/routes/settings/+page.svelte
+msgid "Live and dictation"
+msgstr "Live と音声入力"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Recording"
+msgstr "録音"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "My voice"
+msgstr "自分の声"
+
+#: src/routes/settings/+page.svelte
+msgid "Dictation"
+msgstr "音声入力"
+
+#: src/routes/settings/+page.svelte
+msgid "Apps"
+msgstr "アプリ"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Access"
+msgstr "アクセス"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "In the background"
+msgstr "バックグラウンド"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Address"
+msgstr "アドレス"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Saved requests"
+msgstr "保存したリクエスト"
+
+#: src/routes/settings/+page.svelte
+msgid "Engines"
+msgstr "認識エンジン"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "AI service"
+msgstr "AI サービス"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Try it"
+msgstr "試してみる"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Graphics card"
+msgstr "グラフィックカード"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Storage and models"
+msgstr "ストレージとモデル"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "About Transcribe"
+msgstr "Transcribe について"
+
+#. 0: uhr
+#: src/routes/settings/+page.svelte
+msgid "today at {0}"
+msgstr "今日 {0}"
+
+#. 0: d.toLocaleDateString(getLocale()); 1: uhr
+#: src/routes/settings/+page.svelte
+msgid "on {0} at {1}"
+msgstr "{0} {1}"
+
+#: src/routes/settings/+page.svelte
+msgid "The defaults could not be loaded."
+msgstr "既定値を読み込めませんでした。"
+
+#: src/routes/settings/+page.svelte
+msgid "Settings · Transcribe by Moliri"
+msgstr "設定 · Transcribe by Moliri"
+
+#: src/routes/settings/+page.svelte
+msgid "Changes apply at once; there is nothing to save."
+msgstr "変更はすぐに反映されます。保存の必要はありません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Settings categories"
+msgstr "設定のカテゴリー"
+
+#: src/routes/settings/+page.svelte
+msgid "Sections"
+msgstr "セクション"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Loading…"
+msgstr "読み込み中…"
+
+#: src/routes/settings/+page.svelte
+msgid "Where speech is recognized"
+msgstr "音声を認識する場所"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Service <0/>"
+msgstr "サービス <0/>"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Address <0/>"
+msgstr "アドレス <0/>"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Model <0/>"
+msgstr "モデル <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Speaks the OpenAI-compatible interface, like OpenAI, Groq, Mistral or a server of your own (such as Speaches or LocalAI). It does not tell speakers apart, and Live only shows the text after each pause."
+msgstr "OpenAI 互換のインターフェースに対応したサービスです。OpenAI、Groq、Mistral や自前のサーバー（Speaches や LocalAI など）が使えます。話者は区別せず、Live では発話の区切りごとにテキストが表示されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Tells speakers apart and recognizes sounds such as laughter or applause; Live shows the text while you speak."
+msgstr "話者を区別し、笑い声や拍手などの音も認識します。Live では話している間にテキストが表示されます。"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "API key (if the server requires one)"
+msgstr "API キー（サーバーが必要とする場合）"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "API key"
+msgstr "API キー"
+
+#. 0: a.keyHint
+#. 0: a.keyHint
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "stored (ends in {0})"
+msgstr "保存済み（末尾 {0}）"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "stored"
+msgstr "保存済み"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Key"
+msgstr "キー"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Replace"
+msgstr "置き換え"
+
+#. 0: dienst.label
+#. 0: dienst.label
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Without a key, the app can’t use {0}."
+msgstr "キーがないと、アプリは {0} を使えません。"
+
+#: src/routes/settings/+page.svelte
+msgid "You create the key in your account at <0/>. Billing is usually per minute of audio."
+msgstr "キーは <0/> の自分のアカウントで作成します。料金は通常、音声の分数に応じて請求されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "<0/> The key stays in the settings on this computer."
+msgstr "<0/> キーはこのコンピューターの設定内に保存されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Live and dictation <0/>"
+msgstr "Live と音声入力 <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Whole recordings <0/>"
+msgstr "録音全体 <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "For whole recordings this is the default: in the library and when you drop files, you choose for each recording what should recognize it."
+msgstr "録音全体ではこれが既定値です。ライブラリやファイルをドロップしたときに、録音ごとに何で認識するかを選べます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Speech in your recordings is recognized by the models on this computer or by a service through its API, on the internet or on your own network."
+msgstr "録音の音声は、このコンピューター上のモデル、またはインターネット上や自分のネットワーク内のサービスが API 経由で認識します。"
+
+#: src/routes/settings/+page.svelte
+msgid "Usually the app detects by itself how many people are speaking. A fixed number helps when voices sound alike or someone speaks only briefly."
+msgstr "通常、何人が話しているかはアプリが自動で判断します。声が似ている場合や、短時間しか話さない人がいる場合は、人数を指定すると精度が上がります。"
+
+#: src/routes/settings/+page.svelte
+msgid "On automatic, the app recognizes any language. If you name the languages that occur, it chooses only among them; this helps with dialect and short passages in other languages."
+msgstr "自動では、アプリはあらゆる言語を認識します。登場する言語を指定すると、その中からだけ選ぶようになり、方言や他言語の短い箇所に効果があります。"
+
+#: src/routes/settings/+page.svelte
+msgid "Start right away with these defaults"
+msgstr "これらの既定値ですぐに開始"
+
+#: src/routes/settings/+page.svelte
+msgid "The recordings are transcribed right away."
+msgstr "録音はすぐに文字起こしされます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Off: the app first asks about speakers and languages and starts when you confirm."
+msgstr "オフ：アプリはまず話者と言語について確認し、確定すると開始します。"
+
+#: src/routes/settings/+page.svelte
+msgid "When you drag files or folders into the window"
+msgstr "ファイルやフォルダーをウィンドウにドラッグしたとき"
+
+#: src/routes/settings/+page.svelte
+msgid "Every recording you drag into the window or transcribe in the library starts with these. You can change them there for individual recordings."
+msgstr "ウィンドウにドラッグした録音や、ライブラリで文字起こしする録音は、すべてこの設定で始まります。個々の録音についてはそこで変更できます。"
+
+#. 0: f.name
+#: src/routes/settings/+page.svelte
+msgid "Disconnect {0}"
+msgstr "{0} の接続を解除"
+
+#: src/routes/settings/+page.svelte
+msgid "Disconnect"
+msgstr "接続を解除"
+
+#: src/routes/settings/+page.svelte
+msgid "Save transcripts next to the recordings"
+msgstr "文字起こしを録音の隣に保存"
+
+#: src/routes/settings/+page.svelte
+msgid "Every transcript is also saved as a file next to its recording (“Interview.mp3.transcribe.json”), with corrections and clips. Anyone you share the folder with, for example via Nextcloud, sees and edits the same transcripts."
+msgstr "各文字起こしは、修正やクリップも含めて、録音の隣にファイル（「Interview.mp3.transcribe.json」）としても保存されます。フォルダーを共有している人（Nextcloud 経由など）は、同じ文字起こしを見て編集できます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Off: transcripts stay in Transcribe only. If there is already one next to a recording, the app reads it anyway."
+msgstr "オフ：文字起こしは Transcribe 内にのみ保存されます。録音の隣にすでにファイルがある場合は、それも読み込みます。"
+
+#: src/routes/settings/+page.svelte
+msgid "The recordings in a connected folder appear in the library without being copied, including those in its subfolders. You can connect a folder in the <0>library</0>. Transcribe never deletes anything in it."
+msgstr "接続したフォルダー内の録音は、コピーされずにライブラリに表示されます。サブフォルダー内の録音も含みます。フォルダーは<0>ライブラリ</0>で接続できます。Transcribe がその中のものを削除することはありません。"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Want to use Transcribe"
+msgstr "Transcribe の利用を希望しています"
+
+#. 0: z.client && !z.origin.endsWith(`//${z.client}`) && z.client !== z.origin ? `${z.client}, ` \\: ''; 1: uhrzeit(z.at)
+#: src/routes/settings/+page.svelte
+msgid "{0}asked at {1}"
+msgstr "{0}{1} に要求"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Allowed websites"
+msgstr "許可したウェブサイト"
+
+#: src/routes/settings/+page.svelte
+msgid "Stop allowing"
+msgstr "許可を取り消す"
+
+#: src/routes/settings/+page.svelte
+msgid "No website allowed yet."
+msgstr "許可したウェブサイトはまだありません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Apps like Moliri get speech as text from Transcribe and have it read text from images. Apps on this computer may always do so, websites from other addresses only once you allow them. When one tries, Transcribe asks wherever you are, and with a notification if the window is closed."
+msgstr "Moliri などのアプリは、Transcribe から音声をテキストとして受け取ったり、画像の文字を読み取らせたりします。このコンピューター上のアプリはいつでも利用でき、他のアドレスのウェブサイトは許可した場合にのみ利用できます。アクセスがあると、Transcribe は今開いている画面で確認を求めます。ウィンドウを閉じている場合は通知で確認します。"
+
+#: src/routes/settings/+page.svelte
+msgid "The permission applies to live transcription and text recognition."
+msgstr "この許可はライブ文字起こしと文字認識に適用されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Apps may have Transcribe record from the microphone, and recognition stays loaded so that everything starts at once. This takes about 1 GB of memory. Transcribe always processes audio and images that an app sends."
+msgstr "アプリが Transcribe を通じてマイクから録音でき、すべてがすぐに始まるよう認識が読み込まれたままになります。メモリを約 1 GB 使用します。アプリが送ってくる音声や画像は、Transcribe が常に処理します。"
+
+#: src/routes/settings/+page.svelte
+msgid "Off: apps may not have Transcribe record from the microphone, and nothing stays loaded. Transcribe still processes audio and images that an app sends. Recording and dictating by hand work too; they just start a little more slowly."
+msgstr "オフ：アプリは Transcribe を通じてマイクから録音できず、何も読み込まれたままになりません。アプリが送ってくる音声や画像は引き続き処理します。手動での録音や音声入力も使えますが、開始が少し遅くなります。"
+
+#: src/routes/settings/+page.svelte
+msgid "Start with Windows"
+msgstr "Windows の起動時に開始"
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribe starts without a window when you sign in and waits in the notification area."
+msgstr "サインイン時に Transcribe がウィンドウなしで起動し、通知領域で待機します。"
+
+#: src/routes/settings/+page.svelte
+msgid "Off: Transcribe only starts when you open it."
+msgstr "オフ：Transcribe は開いたときだけ起動します。"
+
+#: src/routes/settings/+page.svelte
+msgid "Keep running after closing"
+msgstr "閉じた後も実行を続ける"
+
+#: src/routes/settings/+page.svelte
+msgid "Always on while Transcribe starts with Windows."
+msgstr "Transcribe が Windows とともに起動する間は常にオンです。"
+
+#: src/routes/settings/+page.svelte
+msgid "When you close the window, Transcribe stays in the notification area: click it to open it, right-click it to quit."
+msgstr "ウィンドウを閉じても、Transcribe は通知領域に残ります。クリックすると開き、右クリックで終了できます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Off: when you close the window, Transcribe quits as soon as there is nothing left to do."
+msgstr "オフ：ウィンドウを閉じると、処理がなくなり次第 Transcribe は終了します。"
+
+#: src/routes/settings/+page.svelte
+msgid "Apps can only reach Transcribe while it is running; if you like, also without an open window, as an icon in the notification area of the taskbar."
+msgstr "アプリが Transcribe にアクセスできるのは、Transcribe の実行中だけです。必要なら、ウィンドウを開かずにタスクバーの通知領域のアイコンとして実行しておくこともできます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Copy address"
+msgstr "アドレスをコピー"
+
+#: src/routes/settings/+page.svelte
+msgid "This only works while “Ready in the background” is on."
+msgstr "これは「バックグラウンドで待機」がオンの間だけ使えます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Send audio"
+msgstr "音声を送信"
+
+#: src/routes/settings/+page.svelte
+msgid "The app records by itself and sends the sound; the text comes back right away."
+msgstr "アプリが自分で録音して音声を送り、テキストがすぐに返ってきます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Let Transcribe listen in <0/>"
+msgstr "Transcribe に聞き取らせる <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "The app only says “from now on” and “up to now”. In between, Transcribe records what is selected under <0>Live and dictation › Recording</0> and keeps sending the text to the app. <1/>"
+msgstr "アプリは「今から」と「ここまで」を伝えるだけです。その間、Transcribe は<0>Live と音声入力 › 録音</0>で選択したものを録音し、テキストを随時アプリに送ります。<1/>"
+
+#: src/routes/settings/+page.svelte
+msgid "For developers: how to talk to Transcribe"
+msgstr "開発者向け：Transcribe との通信方法"
+
+#: src/routes/settings/+page.svelte
+msgid "WebSocket at <0/>. Parameters: <1/> (default) or <2/>, <3/> what the recording should be called, for audio <4/> and <5/> or <6/> (mono)."
+msgstr "WebSocket：<0/>。パラメーター：<1/>（既定）または <2/>、<3/> 録音の名前、音声の場合は <4/> と <5/> または <6/>（モノラル）。"
+
+#: src/routes/settings/+page.svelte
+msgid "Audio goes in as binary messages. JSON messages come back: <0/>, continuously <1/> (the sentence being spoken), <2/> (finished sentence, with <3/> and <4/> in seconds), at the end <5/>, on problems <6/>. <7/> ends it: Transcribe still sends what has been said so far, then <8/>."
+msgstr "音声はバイナリメッセージとして送ります。返ってくるのは JSON メッセージです：<0/>、随時 <1/>（話されている途中の文）、<2/>（完成した文、<3/> と <4/> は秒単位）、最後に <5/>、問題があれば <6/>。<7/> で終了します。Transcribe はそれまでに話された内容を送り、その後 <8/> を送ります。"
+
+#: src/routes/settings/+page.svelte
+msgid "Apps reach Transcribe at this address. In Moliri, you enter it in your profile:"
+msgstr "アプリはこのアドレスで Transcribe にアクセスします。Moliri では、プロフィールに入力します："
+
+#: src/routes/settings/+page.svelte
+msgid "Every request appears on the <0>Live</0> page as a recording “Via API”; what apps have read, ask the language model or convert for search by meaning appears there under “AI & OCR”. As long as Transcribe is delivering text to an app, it does not quit."
+msgstr "各リクエストは<0>Live</0> ページに録音「API 経由」として表示されます。アプリによる読み取り、言語モデルへの質問、意味検索用の変換は、そこの「AI と OCR」に表示されます。Transcribe がアプリにテキストを送っている間は終了しません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Save requests as recordings"
+msgstr "リクエストを録音として保存"
+
+#: src/routes/settings/+page.svelte
+msgid "Every request stays on the Live page, with its text, even after a restart."
+msgstr "各リクエストはテキストとともに Live ページに残ります。再起動後も残ります。"
+
+#: src/routes/settings/+page.svelte
+msgid "Off: a request only appears on the Live page while it runs and for a few minutes afterwards. Nothing of it stays on the computer."
+msgstr "オフ：リクエストが Live ページに表示されるのは、実行中とその後の数分間だけです。コンピューターには何も残りません。"
+
+#. 0: live.apiLoeschen
+#: src/routes/settings/+page.svelte
+msgid "After {0} hours"
+msgstr "{0} 時間後"
+
+#: src/routes/settings/+page.svelte
+msgid "Delete automatically <0/>"
+msgstr "自動的に削除 <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Counted from the end of a request; this also applies to those already saved. Recordings you start on the Live page and dictations are kept."
+msgstr "リクエストの終了時から数えます。すでに保存されているものにも適用されます。Live ページで開始した録音と音声入力は残ります。"
+
+#. 0: l.version
+#: src/routes/settings/+page.svelte
+msgid "Model {0}"
+msgstr "モデル {0}"
+
+#. 0: l.version
+#. 0: versionText(u.version)
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Version {0}"
+msgstr "バージョン {0}"
+
+#: src/routes/settings/+page.svelte
+msgid "on the graphics card"
+msgstr "グラフィックカード上"
+
+#: src/routes/settings/+page.svelte
+msgid "<0/>ready"
+msgstr "<0/>準備完了"
+
+#: src/routes/settings/+page.svelte
+msgid "downloads on first read"
+msgstr "初回読み取り時にダウンロード"
+
+#: src/routes/settings/+page.svelte
+msgid "not set up"
+msgstr "未設定"
+
+#: src/routes/settings/+page.svelte
+msgid "not installed"
+msgstr "未インストール"
+
+#. 0: ocrReihe(l.languages).map(ocrName).join(', ')
+#: src/routes/settings/+page.svelte
+msgid "Installed: {0}."
+msgstr "インストール済み：{0}。"
+
+#. 0: ocrReihe(l.download).map(ocrName).join(', ')
+#: src/routes/settings/+page.svelte
+msgid "Downloaded on first read: {0}."
+msgstr "初回読み取り時にダウンロード：{0}。"
+
+#: src/routes/settings/+page.svelte
+msgid "On Linux and macOS, the installed program <0/> does the reading; install it with its languages, then reload this page."
+msgstr "Linux と macOS では、インストール済みのプログラム <0/> が読み取りを行います。言語とともにインストールしてから、このページを再読み込みしてください。"
+
+#: src/routes/settings/+page.svelte
+msgid "For Moliri and other apps <0/>"
+msgstr "Moliri と他のアプリ向け <0/>"
+
+#. 0: vorgabe.name
+#: src/routes/settings/+page.svelte
+msgid "{0} can’t read yet; until then, Transcribe chooses automatically."
+msgstr "{0} はまだ読み取りできません。それまでは Transcribe が自動で選択します。"
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribe reads with this when an app names no engine, as Moliri does. Automatic takes the first one that can read, never the AI service."
+msgstr "アプリがエンジンを指定しない場合（Moliri など）、Transcribe はこれで読み取ります。自動では、読み取り可能な最初のエンジンを使い、AI サービスは使いません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribe also reads text from images, such as index cards, labels or Fraktur print, for apps like Moliri. The image does not leave the computer unless you let an AI service read it."
+msgstr "Transcribe は Moliri などのアプリのために、インデックスカード、ラベル、フラクトゥールの印刷物など、画像から文字も読み取ります。AI サービスに読み取らせない限り、画像がこのコンピューターの外に出ることはありません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Speaks the OpenAI-compatible interface, like OpenAI, Mistral or a server of your own (such as Ollama). The model must be able to read images, such as qwen2.5vl."
+msgstr "OpenAI 互換のインターフェースに対応したサービスです。OpenAI、Mistral や自前のサーバー（Ollama など）が使えます。モデルは画像を読める必要があります（qwen2.5vl など）。"
+
+#: src/routes/settings/+page.svelte
+msgid "You create the key in your account at <0/>. Billing is per token, for each image and for the text the model writes."
+msgstr "キーは <0/> の自分のアカウントで作成します。料金はトークン単位で、画像ごと、およびモデルが書き出すテキストに対して請求されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "<0/> The key stays in the settings on this computer; Moliri does not get it."
+msgstr "<0/> キーはこのコンピューターの設定内に保存され、Moliri には渡りません。"
+
+#: src/routes/settings/+page.svelte
+msgid "With your own key, an AI model on the internet or on your own network does the reading. This is a different service from the one for speech under <0>Transcribing › Recognition</0>, with its own model and key."
+msgstr "自分のキーを使い、インターネット上や自分のネットワーク内の AI モデルが読み取ります。これは<0>文字起こし › 認識</0>の音声用サービスとは別のサービスで、モデルとキーも別です。"
+
+#: src/routes/settings/+page.svelte
+msgid "No engine can read yet."
+msgstr "読み取りできるエンジンはまだありません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Engine <0/>"
+msgstr "エンジン <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "German and Fraktur"
+msgstr "ドイツ語とフラクトゥール"
+
+#: src/routes/settings/+page.svelte
+msgid "German and English"
+msgstr "ドイツ語と英語"
+
+#: src/routes/settings/+page.svelte
+msgid "What the image shows <0/>"
+msgstr "画像の内容 <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Language and script <0/>"
+msgstr "言語と文字 <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Reading…"
+msgstr "読み取り中…"
+
+#: src/routes/settings/+page.svelte
+msgid "Read image"
+msgstr "画像を読み取る"
+
+#: src/routes/settings/+page.svelte
+msgid "The image is with the AI service. Large models think about a full page for a while."
+msgstr "画像は AI サービスで処理中です。大きなモデルでは、1 ページ全体の処理にしばらく時間がかかります。"
+
+#: src/routes/settings/+page.svelte
+msgid "The first time, Transcribe downloads the PP-OCRv5 models (13 MB); this takes a moment."
+msgstr "初回は Transcribe が PP-OCRv5 のモデル（13 MB）をダウンロードするため、少し時間がかかります。"
+
+#: src/routes/settings/+page.svelte
+msgid "The first time, Transcribe downloads Tesseract and the language; this takes a moment."
+msgstr "初回は Transcribe が Tesseract と言語をダウンロードするため、少し時間がかかります。"
+
+#: src/routes/settings/+page.svelte
+msgid "The image that was read, with the words found outlined"
+msgstr "読み取った画像（検出した単語を枠で囲んで表示）"
+
+#: src/routes/settings/+page.svelte
+msgid "# line"
+msgid_plural "# lines"
+msgstr[0] "# 行"
+
+#: src/routes/settings/+page.svelte
+msgid "No text found."
+msgstr "テキストが見つかりませんでした。"
+
+#. 0: plural(gelesen.zeilen, ['# line', '# lines']); 1: gelesen.sekunden.toLocaleString(getLocale(), { minimumFractionDigits\\: 1, maximumFractionDigits\\: 1 }); 2: gelesen.leser ? `, ${gelesen.leser}` \\: ''
+#: src/routes/settings/+page.svelte
+msgid "{0} in {1} s{2}"
+msgstr "{0}（{1} 秒{2}）"
+
+#: src/routes/settings/+page.svelte
+msgid "Read an image of your own, with the engine, language and kind of text you choose."
+msgstr "エンジン、言語、テキストの種類を選んで、自分の画像を読み取ってみましょう。"
+
+#: src/routes/settings/+page.svelte
+msgid "This is how Transcribe records on the <0>Live</0> page, when dictating and for apps that let it listen in. You can also reach source, microphone and languages there under “Set up”."
+msgstr "<0>Live</0> ページ、音声入力、聞き取りを任せるアプリでは、Transcribe はこの設定で録音します。音源、マイク、言語はそこの「セットアップ」からも設定できます。"
+
+#: src/routes/settings/+page.svelte
+msgid "What is spoken and how the live text writes it, also when dictating."
+msgstr "話される言語と、ライブテキストの書き方（音声入力時も含む）。"
+
+#: src/routes/settings/+page.svelte
+msgid "Press <0/> in any app and speak, then press it again. <1/> cancels. A small window above the taskbar shows that Transcribe is listening and what it has understood, like a subtitle. Clicking it opens the dictation on the Live page."
+msgstr "任意のアプリで <0/> を押して話し、もう一度押します。<1/> でキャンセルします。タスクバーの上に小さなウィンドウが表示され、Transcribe が聞き取っていることと、認識した内容が字幕のように表示されます。クリックすると、Live ページでその音声入力が開きます。"
+
+#: src/routes/settings/+page.svelte
+msgid "With a keyboard shortcut you dictate into any app: text that appears where the cursor is."
+msgstr "ショートカットキーで、どのアプリにも音声入力できます。テキストはカーソルの位置に表示されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Off"
+msgstr "オフ"
+
+#: src/routes/settings/+page.svelte
+msgid "Insert at the cursor"
+msgstr "カーソル位置に挿入"
+
+#: src/routes/settings/+page.svelte
+msgid "The text appears where the cursor is."
+msgstr "テキストがカーソルの位置に表示されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Off: the text is not inserted anywhere."
+msgstr "オフ：テキストはどこにも挿入されません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Copy to clipboard"
+msgstr "クリップボードにコピー"
+
+#: src/routes/settings/+page.svelte
+msgid "The text is then on the clipboard, for Ctrl + V."
+msgstr "テキストがクリップボードに入り、Ctrl + V で貼り付けられます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Off: the clipboard stays as it was."
+msgstr "オフ：クリップボードは変更されません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Keyboard shortcut <0/>"
+msgstr "ショートカットキー <0/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Both off: the dictation only appears in the small window and stays on the Live page, as a note or for copying by hand."
+msgstr "両方オフ：音声入力は小さなウィンドウにのみ表示され、メモとして、または手動でコピーできるように Live ページに残ります。"
+
+#: src/routes/settings/+page.svelte
+msgid "Dictate into any app"
+msgstr "どのアプリにも音声入力"
+
+#: src/routes/settings/+page.svelte
+msgid "Dictation uses the microphone and language set on the <0>Live</0> page. Every dictation then appears there too."
+msgstr "音声入力には、<0>Live</0> ページで設定したマイクと言語が使われます。各音声入力はそこにも表示されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Checking the graphics card…"
+msgstr "グラフィックカードを確認しています…"
+
+#: src/routes/settings/+page.svelte
+msgid "No NVIDIA GPU detected. Recognition runs on the processor (CPU)."
+msgstr "NVIDIA GPU が見つかりません。認識はプロセッサー（CPU）で実行されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "GPU acceleration is only available with NVIDIA graphics cards (CUDA) on Windows and Linux."
+msgstr "GPU アクセラレーションは、Windows と Linux の NVIDIA グラフィックカード（CUDA）でのみ利用できます。"
+
+#. 0: Math.round(g.memoryMB / 1024); 1: g.driver
+#: src/routes/settings/+page.svelte
+msgid "{0} GB · Driver {1}"
+msgstr "{0} GB · ドライバー {1}"
+
+#: src/routes/settings/+page.svelte
+msgid "There is no suitable GPU runtime for this graphics card or system."
+msgstr "このグラフィックカードまたはシステムに適した GPU ランタイムがありません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Downloading libraries from NVIDIA"
+msgstr "NVIDIA からライブラリをダウンロードしています"
+
+#: src/routes/settings/+page.svelte
+msgid "Downloading the GPU runtime"
+msgstr "GPU ランタイムをダウンロードしています"
+
+#. 0: was; 1: schon; 2: groesse(laedt.total)
+#: src/routes/settings/+page.svelte
+msgid "{0} – {1} of {2}"
+msgstr "{0} – {1} / {2}"
+
+#. 0: was
+#: src/routes/settings/+page.svelte
+msgid "{0}…"
+msgstr "{0}…"
+
+#: src/routes/settings/+page.svelte
+msgid "The GPU runtime follows after that."
+msgstr "続いて GPU ランタイムをダウンロードします。"
+
+#: src/routes/settings/+page.svelte
+msgid ", plus the GPU runtime of about 500 MB"
+msgstr "、さらに約 500 MB の GPU ランタイム"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Download libraries"
+msgstr "ライブラリをダウンロード"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Set up GPU"
+msgstr "GPU をセットアップ"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Check again"
+msgstr "再確認"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Technical details"
+msgstr "詳細情報"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Download failed. Is the computer connected to the internet?"
+msgstr "ダウンロードに失敗しました。コンピューターはインターネットに接続されていますか？"
+
+#. 0: groesse(g.fetch); 1: gpu.installed ? /* @wc-include */ 'Download libraries' \\: /* @wc-include */ 'Set up GPU'
+#: src/routes/settings/+page.svelte
+msgid "The app can download them from NVIDIA itself, about {0}<0/>. This happens once. By choosing “{1}”, you accept NVIDIA’s license terms for the <1>CUDA Toolkit</1> and for <2>cuDNN</2>."
+msgstr "アプリが NVIDIA から直接ダウンロードできます（約 {0}<0/>）。ダウンロードは 1 回だけです。「{1}」を選ぶと、<1>CUDA Toolkit</1> と <2>cuDNN</2> に関する NVIDIA のライセンス条項に同意したことになります。"
+
+#. 0.0: g.cudaMajor
+#: src/routes/settings/+page.svelte
+msgid "Rather install them yourself? The <0>CUDA Toolkit {0}</0> and <1>cuDNN 9</1> are available from NVIDIA; afterwards, choose “Check again” here."
+msgstr "自分でインストールしますか？<0>CUDA Toolkit {0}</0> と <1>cuDNN 9</1> は NVIDIA から入手できます。インストール後、ここで「再確認」を選んでください。"
+
+#. 0.0: g.cudaMajor
+#: src/routes/settings/+page.svelte
+msgid "Install the <0>CUDA Toolkit {0}</0> and <1>cuDNN 9</1> from NVIDIA, then check again here."
+msgstr "NVIDIA から <0>CUDA Toolkit {0}</0> と <1>cuDNN 9</1> をインストールしてから、ここで再確認してください。"
+
+#. 0: g.missing.join(', ')
+#: src/routes/settings/+page.svelte
+msgid "The GPU is missing libraries from NVIDIA: {0}."
+msgstr "GPU に必要な NVIDIA のライブラリが不足しています：{0}。"
+
+#: src/routes/settings/+page.svelte
+msgid "Download the GPU runtime"
+msgstr "GPU ランタイムをダウンロード"
+
+#. 0: g.cudaMajor
+#: src/routes/settings/+page.svelte
+msgid "The GPU runtime (CUDA {0}) is about 500 MB and is downloaded once. Without it, everything runs on the processor."
+msgstr "GPU ランタイム（CUDA {0}）は約 500 MB で、ダウンロードは 1 回だけです。これがない場合、すべてプロセッサーで実行されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Compute on the GPU (CUDA)"
+msgstr "GPU で計算（CUDA）"
+
+#: src/routes/settings/+page.svelte
+msgid "Off: recognition runs on the processor."
+msgstr "オフ：認識はプロセッサーで実行されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Processor (CPU)"
+msgstr "プロセッサー（CPU）"
+
+#: src/routes/settings/+page.svelte
+msgid "The change takes effect when you restart the app."
+msgstr "変更はアプリの再起動後に反映されます。"
+
+#: src/routes/settings/+page.svelte
+msgid "Currently in use: <0/>. <1/>"
+msgstr "現在使用中：<0/>。<1/>"
+
+#: src/routes/settings/+page.svelte
+msgid "Default"
+msgstr "既定"
+
+#: src/routes/settings/+page.svelte
+msgid "Set at startup with <0/> or <1/>, so it can’t be changed here."
+msgstr "起動時に <0/> または <1/> で指定されているため、ここでは変更できません。"
+
+#: src/routes/settings/+page.svelte
+msgid "The data has moved. Transcribe is restarting…"
+msgstr "データを移動しました。Transcribe を再起動しています…"
+
+#: src/routes/settings/+page.svelte
+msgid "Moving the data folder"
+msgstr "データフォルダーの移動"
+
+#. 0: groesse(umzug.done); 1: groesse(umzug.total)
+#: src/routes/settings/+page.svelte
+msgid "Moving the data to <0/>: {0} of {1}"
+msgstr "データを <0/> に移動しています：{0} / {1}"
+
+#: src/routes/settings/+page.svelte
+msgid "Move"
+msgstr "移動"
+
+#: src/routes/settings/+page.svelte
+msgid "Move the data folder?"
+msgstr "データフォルダーを移動しますか？"
+
+#. 0: groesse(ortZiel.size)
+#: src/routes/settings/+page.svelte
+msgid "The data ({0}) moves to <0/>. Then Transcribe restarts and deletes the old folder."
+msgstr "データ（{0}）を <0/> に移動します。その後 Transcribe が再起動し、古いフォルダーを削除します。"
+
+#: src/routes/settings/+page.svelte
+msgid "New location, e.g. /mnt/data/transcribe"
+msgstr "新しい場所（例：/mnt/data/transcribe）"
+
+#: src/routes/settings/+page.svelte
+msgid "New location of the data folder"
+msgstr "データフォルダーの新しい場所"
+
+#: src/routes/settings/+page.svelte
+msgid "Back to the default location"
+msgstr "既定の場所に戻す"
+
+#: src/routes/settings/+page.svelte
+msgid "Choose another location…"
+msgstr "別の場所を選択…"
+
+#: src/routes/settings/+page.svelte
+msgid "The data is now in <0/>."
+msgstr "データは現在 <0/> にあります。"
+
+#: src/routes/settings/+page.svelte
+msgid "Location of the data folder"
+msgstr "データフォルダーの場所"
+
+#: src/routes/settings/+page.svelte
+msgid "No connection to Transcribe. Is the app still running?"
+msgstr "Transcribe に接続できません。アプリはまだ動いていますか？"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Storage locations"
+msgstr "保存場所"
+
+#. 0: name
+#: src/routes/settings/+page.svelte
+msgid "Open {0}"
+msgstr "{0} を開く"
+
+#: src/routes/settings/+page.svelte
+msgid "Open"
+msgstr "開く"
+
+#: src/routes/settings/+page.svelte
+msgid "Recognition runs through the API, so the app downloads no models, only ffmpeg for the waveform and export. Whatever is already there stays."
+msgstr "認識は API 経由で行われるため、アプリはモデルをダウンロードせず、波形とエクスポート用の ffmpeg だけをダウンロードします。すでにあるものはそのまま残ります。"
+
+#: src/routes/settings/+page.svelte
+msgid "The app downloads them on first start. Anything marked “on demand” is only added when it is needed, such as Whisper turbo for other languages."
+msgstr "アプリは初回起動時にこれらをダウンロードします。「必要時」と表示されたものは、必要になったときに追加されます（他言語用の Whisper turbo など）。"
+
+#: src/routes/settings/+page.svelte
+#: src/routes/settings/+page.svelte
+msgid "Models and components"
+msgstr "モデルとコンポーネント"
+
+#. 0: c.device
+#: src/routes/settings/+page.svelte
+msgid "runs on the graphics card: {0}"
+msgstr "グラフィックカードで実行：{0}"
+
+#. 0: c.total ? `${prozent(c)} %` \\: '…'
+#: src/routes/settings/+page.svelte
+msgid "downloading {0}"
+msgstr "ダウンロード中 {0}"
+
+#: src/routes/settings/+page.svelte
+msgid "<0/>installed"
+msgstr "<0/>インストール済み"
+
+#: src/routes/settings/+page.svelte
+msgid "on demand"
+msgstr "必要時"
+
+#: src/routes/settings/+page.svelte
+msgid "missing"
+msgstr "なし"
+
+#. 0: c.label || c.name
+#: src/routes/settings/+page.svelte
+msgid "Download {0} again"
+msgstr "{0} を再ダウンロード"
+
+#. 0: c.label || c.name
+#: src/routes/settings/+page.svelte
+msgid "Download {0}"
+msgstr "{0} をダウンロード"
+
+#: src/routes/settings/+page.svelte
+msgid "Download again"
+msgstr "再ダウンロード"
+
+#: src/routes/settings/+page.svelte
+msgid "Download"
+msgstr "ダウンロード"
+
+#. 0: c.label || c.name
+#: src/routes/settings/+page.svelte
+msgid "Downloading {0}"
+msgstr "{0} をダウンロード中"
+
+#: src/routes/settings/+page.svelte
+msgid "Everything is in the data folder: recordings, results, models and settings. To back up, copying this folder is enough. Where the EXE is doesn’t matter."
+msgstr "録音、結果、モデル、設定など、すべてがデータフォルダーにあります。バックアップするには、このフォルダーをコピーするだけで十分です。EXE の場所は関係ありません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribe by Moliri is free and runs on its own. It is also the companion app to the museum database <0>Moliri</0>. How everything works is explained in the <1>manual</1>."
+msgstr "Transcribe by Moliri は無料で、単独で動作します。また、ミュージアムデータベース <0>Moliri</0> のコンパニオンアプリでもあります。使い方は<1>マニュアル</1>で説明しています。"
+
+#. 0: wann(u.checked)
+#: src/routes/settings/+page.svelte
+msgid "the latest, last checked {0}"
+msgstr "最新版（最終確認 {0}）"
+
+#: src/routes/settings/+page.svelte
+msgid "the latest"
+msgstr "最新版"
+
+#. 0: versionText(vorher); 1: versionText(u.version)
+#: src/routes/settings/+page.svelte
+msgid "Updated from version {0} to {1}."
+msgstr "バージョン {0} から {1} に更新しました。"
+
+#: src/routes/settings/+page.svelte
+msgid "On Linux and macOS, Transcribe does not update itself. New versions are available under <0>Releases</0>."
+msgstr "Linux と macOS では、Transcribe は自動更新されません。新しいバージョンは <0>Releases</0> から入手できます。"
+
+#: src/routes/settings/+page.svelte
+msgid "A development version does not check for updates. Finished versions are available under <0>Releases</0>."
+msgstr "開発版はアップデートを確認しません。正式版は <0>Releases</0> から入手できます。"
+
+#: src/routes/settings/+page.svelte
+msgid "What’s new?"
+msgstr "新機能"
+
+#: src/routes/settings/+page.svelte
+msgid "Try again"
+msgstr "再試行"
+
+#: src/routes/settings/+page.svelte
+msgid "Update now"
+msgstr "今すぐ更新"
+
+#. 0: neu
+#: src/routes/settings/+page.svelte
+msgid "Version {0} is available"
+msgstr "バージョン {0} が利用可能です"
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribe downloads it, replaces the program and restarts. Running jobs and recordings finish first; your recordings and settings stay as they are. <0/>"
+msgstr "Transcribe がダウンロードし、プログラムを置き換えて再起動します。実行中のジョブと録音は先に完了します。録音と設定はそのまま残ります。<0/>"
+
+#. 0: neu
+#: src/routes/settings/+page.svelte
+msgid "Downloading version {0}"
+msgstr "バージョン {0} をダウンロードしています"
+
+#. 0: neu
+#: src/routes/settings/+page.svelte
+msgid "Downloading version {0}…"
+msgstr "バージョン {0} をダウンロードしています…"
+
+#. 0: neu
+#: src/routes/settings/+page.svelte
+msgid "Version {0} is installed. Transcribe restarts as soon as running jobs and recordings are finished."
+msgstr "バージョン {0} をインストールしました。実行中のジョブと録音が終わり次第、Transcribe が再起動します。"
+
+#: src/routes/settings/+page.svelte
+msgid "Transcribe is restarting…"
+msgstr "Transcribe を再起動しています…"
+
+#: src/routes/settings/+page.svelte
+msgid "Check for updates"
+msgstr "アップデートを確認"
+
+#: src/routes/settings/+page.svelte
+msgid "sherpa-onnx"
+msgstr "sherpa-onnx"
+
+#: src/routes/settings/+page.svelte
+msgid "Licenses and third-party components <0/>"
+msgstr "ライセンスとサードパーティーのコンポーネント <0/>"
+
+#: src/lib/moliri/components/ui/Dropdown.svelte
+#: src/lib/moliri/components/ui/Dropdown.svelte
+#: src/lib/moliri/components/ui/Dropdown.svelte
+msgid "Close dropdown"
+msgstr "ドロップダウンを閉じる"
+
+#: src/lib/moliri/components/ui/Modal.svelte
+#: src/lib/moliri/components/ui/Modal.svelte
+msgid "Discard unsaved changes?"
+msgstr "保存されていない変更を破棄しますか？"
+
+#: src/lib/moliri/components/ui/Modal.svelte
+#: src/lib/moliri/components/ui/Modal.svelte
+#: src/lib/moliri/components/ui/Modal.svelte
+#: src/lib/moliri/components/ui/SimpleModal.svelte
+msgid "Close modal"
+msgstr "モーダルを閉じる"
+
+#: src/lib/moliri/components/ui/Pager.svelte
+msgid "Browse"
+msgstr "前後に移動"
+
+#: src/lib/moliri/components/ui/Pager.svelte
+#: src/lib/moliri/components/ui/Pager.svelte
+#: src/lib/moliri/components/ui/Pager.svelte
+msgid "Previous entry"
+msgstr "前の項目"
+
+#: src/lib/moliri/components/ui/Pager.svelte
+#: src/lib/moliri/components/ui/Pager.svelte
+#: src/lib/moliri/components/ui/Pager.svelte
+msgid "Next entry"
+msgstr "次の項目"
+
+#. 0: fmt(r.a); 1: fmt(r.b)
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "Passage {0} – {1}"
+msgstr "箇所 {0} – {1}"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "Play the passage again and again"
+msgstr "箇所を繰り返し再生"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "Keep the passage as a clip with title and tags"
+msgstr "箇所をタイトルとタグ付きのクリップとして保存"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "<0/>As clip"
+msgstr "<0/>クリップとして"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "<0/>Play"
+msgstr "<0/>再生"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "<0/>Loop"
+msgstr "<0/>ループ"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "New speaker"
+msgstr "新しい話者"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "unchanged"
+msgstr "変更なし"
+
+#. 0: langName(language)
+#. 0: langName(language)
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "Recompute recognises it again in {0}."
+msgstr "再計算すると {0} として再認識されます。"
+
+#. 0: langName(language)
+#. 0: langName(language)
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "The machine recognises it again in {0} by itself."
+msgstr "機械が自動的に {0} として再認識します。"
+
+#. 0: ' '; 1: langName(language)
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "{0}{1} is noted; the machine cannot recognise it again, the words stay."
+msgstr "{0}{1} として記録されます。機械は再認識できないため、単語はそのまま残ります。"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgctxt "te_apply"
+msgid "Apply"
+msgstr "適用"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "Applies to all words in this passage and is noted as a correction.<0/>"
+msgstr "この箇所のすべての単語に適用され、修正として記録されます。<0/>"
+
+#. 0: fmt(r.a)
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "Insert text at {0}"
+msgstr "{0} にテキストを挿入"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "There is no word in this pause. What is said here?"
+msgstr "この間（ま）には単語がありません。ここでは何と言っていますか？"
+
+#: src/lib/moliri/components/files/transcript/editor/Bereich.svelte
+msgid "Insert"
+msgstr "挿入"
+
+#. 0: ed.spkName(m.k)
+#. 0: +k + 1
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Speaker {0}"
+msgstr "話者 {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "all corrections saved"
+msgstr "すべての修正を保存しました"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "no corrections yet"
+msgstr "修正はまだありません"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Recomputing works only once the corrections are saved."
+msgstr "再計算は修正を保存してから行えます。"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "recomputing …"
+msgstr "再計算中…"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "unknown error"
+msgstr "不明なエラー"
+
+#. 0: r.error || /* @wc-include */ 'unknown error'
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Recomputing did not work ({0})."
+msgstr "再計算できませんでした（{0}）。"
+
+#. 0: clock()
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "recomputed {0}"
+msgstr "再計算しました {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "saving …"
+msgstr "保存中…"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "saved; the text follows once the service answers"
+msgstr "保存しました。サービスが応答するとテキストが表示されます"
+
+#. 0: clock()
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "saved {0}"
+msgstr "保存しました {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Someone else corrected meanwhile: their state is loaded, the last change here was not saved."
+msgstr "その間に他の人が修正しました。その人の状態を読み込みました。ここでの最後の変更は保存されていません。"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "not saved: no permission or no transcript"
+msgstr "保存されませんでした：権限がないか、文字起こしがありません"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "not saved, trying again …"
+msgstr "保存されませんでした。再試行しています…"
+
+#. 0: this.spkName(this.focused)
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Only {0}"
+msgstr "{0} のみ"
+
+#. 0: this.spkName(off[0])
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgctxt "te_filter_hidden_one"
+msgid "{0} hidden"
+msgstr "{0} を非表示"
+
+#. 0: off.length
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "{0} speakers hidden"
+msgstr "{0} 人の話者を非表示"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Clips not saved, the export was cancelled."
+msgstr "クリップが保存されなかったため、エクスポートを中止しました。"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Building the text …"
+msgstr "テキストを作成しています…"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Cutting the compilation …"
+msgstr "つなぎ合わせを作成しています…"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Cutting the clip …"
+msgstr "クリップを切り出しています…"
+
+#. 0: error
+#. 0: error
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Export failed ({0})."
+msgstr "エクスポートに失敗しました（{0}）。"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "exported"
+msgstr "エクスポートしました"
+
+#: src/lib/moliri/components/files/transcript/editor/editor.svelte.js
+msgid "Not saved: the export would lack the latest corrections."
+msgstr "保存されませんでした：エクスポートに最新の修正が含まれなくなります。"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Enter times such as 1:02.5; the end must come after the start."
+msgstr "1:02.5 のように時間を入力してください。終了は開始より後にする必要があります。"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "New clip"
+msgstr "新しいクリップ"
+
+#. 0: c.title ?? ''
+#. 0: c.title
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Clip {0}"
+msgstr "クリップ {0}"
+
+#. 0: list.length
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Export a compilation of {0} clips"
+msgstr "{0} 個のクリップをつなぎ合わせてエクスポート"
+
+#. 0: list[0]?.title ?? ''
+#. 0: c.title
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Export {0}"
+msgstr "{0} をエクスポート"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "There is no word in this passage."
+msgstr "この箇所には単語がありません。"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "transcript_export"
+msgid "Export"
+msgstr "エクスポート"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgctxt "te_clip_title"
+msgid "Title"
+msgstr "タイトル"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "separate with commas"
+msgstr "カンマで区切る"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Suggestions from other clips"
+msgstr "他のクリップからの候補"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgctxt "te_clip_start"
+msgid "Start"
+msgstr "開始"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgctxt "te_clip_end"
+msgid "End"
+msgstr "終了"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgctxt "delete_btn"
+msgid "Delete"
+msgstr "削除"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgctxt "te_cancel"
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Create clip"
+msgstr "クリップを作成"
+
+#. 0: list.length
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Compilation of {0} clips"
+msgstr "{0} 個のクリップのつなぎ合わせ"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "The clips are joined in time order."
+msgstr "クリップは時間順につなぎ合わされます。"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Audio (MP3)"
+msgstr "音声（MP3）"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Video (MP4)"
+msgstr "動画（MP4）"
+
+#: src/lib/moliri/components/files/transcript/editor/Clip.svelte
+msgid "Text with title and tags (.txt)"
+msgstr "タイトルとタグ付きのテキスト（.txt）"
+
+#. 0: Math.round(it.p * 100)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "confidence {0} %"
+msgstr "信頼度 {0} %"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "corrected by hand"
+msgstr "手動で修正"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "filled in"
+msgstr "補完"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "recognised again"
+msgstr "再認識"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "no change"
+msgstr "変更なし"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "input discarded"
+msgstr "入力を破棄しました"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "input open: applied in a moment, Esc discards"
+msgstr "入力中：まもなく適用されます。Esc で破棄"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgctxt "te_by_hand"
+msgid "by hand"
+msgstr "手動"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "recognised"
+msgstr "認識"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "by the machine"
+msgstr "機械による"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgctxt "te_confidence_label"
+msgid "Confidence"
+msgstr "信頼度"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "unsure"
+msgstr "不確か"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Time anchor"
+msgstr "タイムアンカー"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "fold again"
+msgstr "折りたたむ"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "unfold: show the text and play it along"
+msgstr "展開：テキストを表示し、再生時に一緒に再生"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "unfolded"
+msgstr "展開中"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "folded"
+msgstr "折りたたみ中"
+
+#. 0: b.open ? /* @wc-include */ 'unfolded' \\: /* @wc-include */ 'folded'; 1: b.n
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "<0/> {0} · <1/> · {1} words"
+msgstr "<0/> {0} · <1/> · {1} 語"
+
+#. 0: fmt(b.start)
+#. 0: fmt(b.start)
+#. 0: fmt(c.t)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "play from {0}"
+msgstr "{0} から再生"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Edit speaker: name, language, merge, view"
+msgstr "話者を編集：名前、言語、統合、表示"
+
+#. 0: fmt(b.start)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Still at {0}, play from here"
+msgstr "{0} の静止画、ここから再生"
+
+#. 0: fmt(c.start); 1: fmt(c.end)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Clip {0} – {1}: click to play, edit or export"
+msgstr "クリップ {0} – {1}：クリックで再生、編集、エクスポート"
+
+#. 0: fmtT(it.start)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Time anchor {0}, set by hand: drag to give the time to another word"
+msgstr "タイムアンカー {0}（手動で設定）：ドラッグして時間を別の単語に移す"
+
+#. 0: fmtT(it.start)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Time anchor {0}: drag to give the time to another word"
+msgstr "タイムアンカー {0}：ドラッグして時間を別の単語に移す"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Place in the text"
+msgstr "テキスト内の位置"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "pause"
+msgstr "一時停止"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "play from this word"
+msgstr "この単語から再生"
+
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "From here"
+msgstr "ここから"
+
+#. 0: fmt(c.start); 1: fmt(c.end)
+#: src/lib/moliri/components/files/transcript/editor/Manuskript.svelte
+msgid "Clip {0} – {1}: edit, play, export"
+msgstr "クリップ {0} – {1}：編集、再生、エクスポート"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "Player"
+msgstr "プレーヤー"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "5 seconds back"
+msgstr "5 秒戻る"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "Pause (space)"
+msgstr "一時停止（スペース）"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "Play (space)"
+msgstr "再生（スペース）"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "5 seconds forward"
+msgstr "5 秒進む"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "End the loop"
+msgstr "ループを終了"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "Loop <0/>"
+msgstr "ループ <0/>"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "<0/>end"
+msgstr "<0/>終了"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Show all speakers again"
+msgstr "すべての話者を再表示"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "<0/>show all"
+msgstr "<0/>すべて表示"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "Speed"
+msgstr "速度"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+msgid "Text and timeline follow the playback"
+msgstr "再生に合わせてテキストとタイムラインが移動します"
+
+#: src/lib/moliri/components/files/transcript/editor/Player.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Follow"
+msgstr "追従"
+
+#. 0: fmt(s.end)
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "until {0}"
+msgstr "{0} まで"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Speakers, clips, corrections and signs"
+msgstr "話者、クリップ、修正、記号"
+
+#. 0: ed.spkName(sp.merge_into)
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "merged with {0}"
+msgstr "{0} に統合予定"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "One speaker always stays visible"
+msgstr "少なくとも 1 人の話者は常に表示されます"
+
+#. 0: nm
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "show and play only {0}"
+msgstr "{0} のみ表示・再生"
+
+#. 0: nm
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "show only {0}"
+msgstr "{0} のみ表示"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "No speakers recognised."
+msgstr "話者が認識されませんでした。"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "A click on the name: rename, set the language, merge."
+msgstr "名前をクリック：名前の変更、言語の設定、統合。"
+
+#. 0: ed.canEdit ? /* @wc-include */ 'A click on the name\\: rename, set the language, merge.' \\: ''
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "{0} The eye hides a speaker, the target shows only this one. What is hidden is folded in the text and skipped when playing."
+msgstr "{0}目のアイコンで話者を非表示にし、ターゲットでその話者だけを表示します。非表示の部分はテキスト内で折りたたまれ、再生時にはスキップされます。"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "filter by tag"
+msgstr "タグで絞り込む"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "show all clips again"
+msgstr "すべてのクリップを再表示"
+
+#. 0: t
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "show only clips with “{0}”"
+msgstr "「{0}」のクリップのみ表示"
+
+#. 0: c.title
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Select {0}"
+msgstr "{0} を選択"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "select: play in turn or export as a compilation"
+msgstr "選択：順番に再生、またはつなぎ合わせてエクスポート"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "jump to the clip"
+msgstr "クリップへ移動"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "play only this clip"
+msgstr "このクリップのみ再生"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "export: audio, video or text"
+msgstr "エクスポート：音声、動画、テキスト"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "export: audio or text"
+msgstr "エクスポート：音声、テキスト"
+
+#. 0: c.title
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgctxt "te_edit_named"
+msgid "Edit {0}"
+msgstr "{0} を編集"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Change title, tags, times"
+msgstr "タイトル、タグ、時間を変更"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "No clip with this tag."
+msgstr "このタグのクリップはありません。"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "None yet. Mark a passage in the text or the timeline and choose “As clip”."
+msgstr "まだありません。テキストまたはタイムラインで箇所を選択し、「クリップとして」を選んでください。"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "None yet."
+msgstr "まだありません。"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "select all"
+msgstr "すべて選択"
+
+#. 0: chosen.length; 1: fmtDur(chosen.reduce((t, c) => t + c.end - c.start, 0))
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "{0} selected · {1}"
+msgstr "{0} 件選択 · {1}"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Export compilation"
+msgstr "つなぎ合わせてエクスポート"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>Play in turn"
+msgstr "<0/>順番に再生"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgctxt "te_corrections"
+msgid "Corrections"
+msgstr "修正"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Remove correction"
+msgstr "修正を削除"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "None yet. Just click into the text and type."
+msgstr "まだありません。テキストをクリックして入力するだけです。"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>corrected by hand"
+msgstr "<0/>手動で修正"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>machine unsure"
+msgstr "<0/>機械の認識が不確か"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>recognised again (language set)"
+msgstr "<0/>再認識（言語を指定）"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>filled in, italic in brackets"
+msgstr "<0/>補完（括弧内の斜体）"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>time anchor, red = set by hand"
+msgstr "<0/>タイムアンカー、赤 = 手動で設定"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>being spoken now"
+msgstr "<0/>現在話されている箇所"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "<0/>part of a clip"
+msgstr "<0/>クリップの一部"
+
+#: src/lib/moliri/components/files/transcript/editor/Seitenspalte.svelte
+msgid "Signs in the text"
+msgstr "テキスト内の記号"
+
+#: src/lib/moliri/components/files/transcript/editor/Sprachwahl.svelte
+msgid "Show languages"
+msgstr "言語を表示"
+
+#. 0: s.code
+#: src/lib/moliri/components/files/transcript/editor/Sprachwahl.svelte
+msgid "Code “{0}”"
+msgstr "コード「{0}」"
+
+#: src/lib/moliri/components/files/transcript/editor/Sprachwahl.svelte
+msgid "noted, not recognised again"
+msgstr "記録のみ、再認識なし"
+
+#: src/lib/moliri/components/files/transcript/editor/Sprachwahl.svelte
+msgid "No language found. A code has two or three letters, such as “pt”."
+msgstr "言語が見つかりません。コードは「pt」のように 2～3 文字です。"
+
+#. 0: fmt(dur)
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "speaks {0}"
+msgstr "発話時間 {0}"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgctxt "te_show_all"
+msgid "Show all"
+msgstr "すべて表示"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "Show only this one"
+msgstr "この話者のみ表示"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "fold in the text and skip when playing"
+msgstr "テキスト内で折りたたみ、再生時にスキップ"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgctxt "te_hide"
+msgid "Hide"
+msgstr "非表示"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgctxt "te_name"
+msgid "Name"
+msgstr "名前"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "recognise automatically"
+msgstr "自動で認識"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "do not merge"
+msgstr "統合しない"
+
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "Merge with <0/>"
+msgstr "<0/> と統合"
+
+#. 0: ed.spkName(m.k); 1: target
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "Everything from {0} goes into {1} once recomputed."
+msgstr "再計算すると、{0} のすべてが {1} に統合されます。"
+
+#. 0: ed.spkName(m.k); 1: target
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "Everything of {0} goes into {1}."
+msgstr "{0} のすべてが {1} に統合されます。"
+
+#. 0: langName(language)
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "{0} is noted; the machine cannot recognise it again, the words stay."
+msgstr "{0} として記録されます。機械は再認識できないため、単語はそのまま残ります。"
+
+#. 0: ed.spkName(m.k)
+#: src/lib/moliri/components/files/transcript/editor/SprecherMenue.svelte
+msgid "Applies to everything {0} says. <0/>"
+msgstr "{0} の発言すべてに適用されます。<0/>"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Text (.txt)"
+msgstr "テキスト（.txt）"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "with speakers and time marks"
+msgstr "話者とタイムスタンプ付き"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Subtitles (.vtt)"
+msgstr "字幕（.vtt）"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "for video players"
+msgstr "動画プレーヤー用"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "HTML (Word, MAXQDA)"
+msgstr "HTML（Word、MAXQDA）"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "for further editing"
+msgstr "さらに編集する場合に"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Search the transcript"
+msgstr "文字起こしを検索"
+
+#. 0: hitIndex + 1; 1: hits.length
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "transcript_search_hits"
+msgid "{0} of {1}"
+msgstr "{0} / {1}"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "transcript_search_none"
+msgid "no match"
+msgstr "該当なし"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "transcript_search_prev"
+msgid "Previous match"
+msgstr "前の一致"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Next match"
+msgstr "次の一致"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Take back the last correction (Ctrl+Z)"
+msgstr "最後の修正を元に戻す（Ctrl+Z）"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "te_undo"
+msgid "Undo"
+msgstr "元に戻す"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Recognise the noted languages again and merge speakers"
+msgstr "指定した言語を再認識し、話者を統合"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Only needed once a language is set or a speaker is merged"
+msgstr "言語を指定したか、話者を統合した場合にのみ必要"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "computing …"
+msgstr "計算中…"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Recompute"
+msgstr "再計算"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Recognise the recording once more; the corrections stay"
+msgstr "録音をもう一度認識します。修正は残ります"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Transcribe again"
+msgstr "もう一度文字起こし"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Passages with a set language are recognised again …"
+msgstr "言語を指定した箇所を再認識しています…"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Download the transcript with all corrections"
+msgstr "すべての修正を含む文字起こしをダウンロード"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Formats"
+msgstr "形式"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Leave full screen"
+msgstr "全画面表示を終了"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Full screen"
+msgstr "全画面"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "How it works"
+msgstr "使い方"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "te_help_range_t"
+msgid "Passage"
+msgstr "箇所"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Change text"
+msgstr "テキストの変更"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Click into the text and type; it saves by itself. Esc discards. Changes by people are red."
+msgstr "テキストをクリックして入力します。自動で保存されます。Esc で破棄します。人が変更した箇所は赤で表示されます。"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Mark text or drag in the timeline: play, loop, give it to a speaker or set its language."
+msgstr "テキストを選択するか、タイムラインでドラッグします：再生、ループ再生、話者への割り当て、言語の設定。"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Time anchors"
+msgstr "タイムアンカー"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "The small flags before words: drag one to another word, or along the timeline."
+msgstr "単語の前の小さな旗：別の単語の前へ、またはタイムラインに沿ってドラッグします。"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Mark a passage and choose “As clip”. The side column plays and exports clips."
+msgstr "箇所を選択して「クリップとして」を選びます。サイドカラムでクリップを再生・エクスポートできます。"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "happens by itself. “Recompute” applies languages and merges. Ctrl + Z undoes the last correction."
+msgstr "自動で行われます。「再計算」で言語と統合が反映されます。Ctrl + Z で直前の修正を取り消します。"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "happens by itself. Ctrl + Z undoes the last correction."
+msgstr "自動で行われます。Ctrl + Z で直前の修正を取り消します。"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Saving"
+msgstr "保存"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgctxt "te_help_timeline_t"
+msgid "Timeline"
+msgstr "タイムライン"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "“Export” at the bottom: text, subtitles or HTML for Word and MAXQDA."
+msgstr "下部の「エクスポート」：テキスト、字幕、または Word と MAXQDA 用の HTML。"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Space starts and stops, the arrow keys jump 5 seconds."
+msgstr "スペースキーで再生・停止、矢印キーで 5 秒移動します。"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Click a word: “From here” plays from there. Ctrl + click plays at once."
+msgstr "単語をクリック：「ここから」でそこから再生します。Ctrl + クリックですぐに再生します。"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Click jumps, the wheel zooms, Shift + wheel moves."
+msgstr "クリックで移動、ホイールでズーム、Shift + ホイールでスクロールします。"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Click a name: rename, set its language, merge. The eye hides a speaker, the target shows only this one."
+msgstr "名前をクリック：名前の変更、言語の設定、統合。目のアイコンで話者を非表示にし、ターゲットでその話者だけを表示します。"
+
+#: src/lib/moliri/components/files/transcript/editor/TranscriptEditor.svelte
+msgid "Text and timeline follow the playback."
+msgstr "テキストとタイムラインが再生に追従します。"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Wave"
+msgstr "波形"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Text"
+msgstr "テキスト"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Sounds"
+msgstr "音響"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Doubt"
+msgstr "不確か"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgctxt "te_lane_corrections"
+msgid "Corrections"
+msgstr "修正"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Overview"
+msgstr "概要"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Overview of the whole recording: click moves the view, double-click jumps"
+msgstr "録音全体の概要：クリックで表示範囲を移動、ダブルクリックでジャンプ"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Timeline with lanes: click jumps there, dragging marks a passage"
+msgstr "レーン付きタイムライン：クリックでその位置へジャンプ、ドラッグで箇所を選択"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "Zoom"
+msgstr "ズーム"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "zoom out"
+msgstr "縮小"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "zoom in"
+msgstr "拡大"
+
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+#: src/lib/moliri/components/files/transcript/editor/Zeitleiste.svelte
+msgid "whole recording"
+msgstr "録音全体"
+
+#. 0: suche
+#: src/lib/Bibliothek.svelte
+msgctxt "library_search"
+msgid "Nothing found for “{0}”."
+msgstr "「{0}」に一致するものはありません。"
+
+#: src/routes/settings/+page.svelte
+msgid "Language of the interface"
+msgstr "表示言語"
+
+#: src/routes/settings/+page.svelte
+msgid "Until you choose one, Transcribe follows the language of Windows."
+msgstr "選択するまでは、Windows の言語で表示されます。"
+
+#: src/lib/Beschriften.svelte
+msgctxt "library_hide"
+msgid "Show again"
+msgstr "再表示"
+
+#. 0: a.title
+#: src/lib/Bibliothek.svelte
+msgctxt "library_hide"
+msgid "Show {0} again"
+msgstr "{0} を再表示"
+

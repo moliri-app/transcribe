@@ -25,6 +25,8 @@
 	import { sprachname } from '$lib/live/stand.svelte.js';
 	import MoliriLogo from '$lib/MoliriLogo.svelte';
 	import { HANDBUCH, MIT_MOLIRI, MOLIRI } from '$lib/moliri-links.js';
+	import { getLocale } from '$lib/moliri/i18n/locale.js';
+	import plural from '../locales/plural.js';
 
 	/** @typedef {{ id: number, name: string }} Sprecher */
 	/** @typedef {{ duration: number, speakers: Sprecher[], preview: string, edits: number, clips: number, done: number }} Inhalt */
@@ -42,25 +44,25 @@
 	/** @typedef {{ folders: Ordner[], sidecar: boolean, pick: boolean, hint?: { path: string, name: string, count: number } }} Ordnerstand */
 
 	const STATUS = /** @type {Record<string, string>} */ ({
-		queued: 'wartet',
-		running: 'läuft',
-		paused: 'pausiert',
-		canceling: 'bricht ab',
-		error: 'Fehler'
+		queued: /* @wc-include */ 'waiting',
+		running: /* @wc-include */ 'running',
+		paused: /* @wc-include */ 'paused',
+		canceling: /* @wc-include */ 'cancelling',
+		error: /* @wc-include */ 'Error'
 	});
 	const LAUFEND = ['queued', 'running', 'paused', 'canceling'];
 
 	const SORTEN = /** @type {const} */ ([
-		['zuletzt', 'Zuletzt bearbeitet'],
-		['name', 'Name'],
-		['laenge', 'Länge']
+		{ wert: 'zuletzt', name: /* @wc-include */ 'Last edited' },
+		{ wert: 'name', name: /* @wc-include */ 'Name' },
+		{ wert: 'laenge', name: /* @wc-include */ 'Length' }
 	]);
 
 	/** die Bereiche ohne die Ordner; ein Ordner ist sein Pfad */
 	const BEREICHE = /** @type {const} */ ([
-		['alle', 'Alle Aufnahmen'],
-		['upload', 'Hochgeladen'],
-		['live', 'Live-Aufnahmen']
+		{ b: 'alle', name: /* @wc-include */ 'All recordings' },
+		{ b: 'upload', name: /* @wc-include */ 'Uploaded' },
+		{ b: 'live', name: /* @wc-include */ 'Live recordings' }
 	]);
 
 	// Was die Bibliothek zuletzt zeigte, steht beim Öffnen sofort da; was der Server dann sagt, ersetzt es.
@@ -176,7 +178,7 @@
 	const letzter = $derived(new Map((jobs ?? []).map((j) => [j.audio, j])));
 	/** die Schlagworte der sichtbaren Aufnahmen, nach dem Alphabet */
 	const schlagworte = $derived(
-		[...new Set((aufnahmen ?? []).filter((a) => !a.hidden).flatMap((a) => a.tags))].sort((x, y) => x.localeCompare(y, 'de'))
+		[...new Set((aufnahmen ?? []).filter((a) => !a.hidden).flatMap((a) => a.tags))].sort((x, y) => x.localeCompare(y, getLocale()))
 	);
 	/** alle vergebenen, auch an ausgeblendeten, zum Antippen beim Beschriften */
 	const alleSchlagworte = $derived([...new Set((aufnahmen ?? []).flatMap((a) => a.tags))]);
@@ -200,7 +202,7 @@
 	const zahlen = $derived.by(() => {
 		/** @type {Record<string, { alle: number, offen: number }>} */
 		const z = {};
-		for (const b of [...BEREICHE.map(([b]) => b), ...ordner.folders.map((o) => o.path), ...schlagworte.map((t) => 'tag:' + t), 'versteckt']) {
+		for (const b of [...BEREICHE.map((x) => x.b), ...ordner.folders.map((o) => o.path), ...schlagworte.map((t) => 'tag:' + t), 'versteckt']) {
 			const in_ = (aufnahmen ?? []).filter((a) => gehoert(a, b));
 			z[b] = { alle: in_.length, offen: in_.filter((a) => !a.summary).length };
 		}
@@ -218,7 +220,7 @@
 			: fertig;
 		const nach = {
 			zuletzt: (/** @type {Aufnahme} */ a, /** @type {Aufnahme} */ b) => (b.summary?.done ?? 0) - (a.summary?.done ?? 0),
-			name: (/** @type {Aufnahme} */ a, /** @type {Aufnahme} */ b) => a.title.localeCompare(b.title, 'de'),
+			name: (/** @type {Aufnahme} */ a, /** @type {Aufnahme} */ b) => a.title.localeCompare(b.title, getLocale()),
 			laenge: (/** @type {Aufnahme} */ a, /** @type {Aufnahme} */ b) => (b.summary?.duration ?? 0) - (a.summary?.duration ?? 0)
 		}[sorte];
 		return treffer.toSorted(nach);
@@ -232,7 +234,7 @@
 	 * allen Aufnahmen, ihr Ordner
 	 * @param {Aufnahme} a */
 	function ort(a) {
-		if (a.source !== 'folder') return bereich === 'alle' && a.source === 'live' ? 'Live' : '';
+		if (a.source !== 'folder') return bereich === 'alle' && a.source === 'live' ? /* @wc-include */ 'Live' : '';
 		const name = ordner.folders.find((o) => o.path === a.folder)?.name ?? '';
 		return [bereich === 'alle' ? name : '', a.dir ?? ''].filter(Boolean).join(' / ');
 	}
@@ -247,9 +249,12 @@
 				new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()) /
 				864e5
 		);
-		if (tage === 0) return `heute, ${d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}`;
-		if (tage === 1) return 'gestern';
-		return d.toLocaleDateString('de-DE', {
+		if (tage === 0) {
+			const uhrzeit = d.toLocaleTimeString(getLocale(), { hour: '2-digit', minute: '2-digit' });
+			return /* @wc-include */ `today, ${uhrzeit}`;
+		}
+		if (tage === 1) return /* @wc-include */ 'yesterday';
+		return d.toLocaleDateString(getLocale(), {
 			day: 'numeric',
 			month: 'short',
 			...(d.getFullYear() !== h.getFullYear() && { year: 'numeric' })
@@ -258,16 +263,35 @@
 
 	/** wann die Aufnahme entstand: wie die Datei selbst es sagt, sonst das Frühere von angelegt und geändert (eine kopierte
 	 * Datei ist neu angelegt, aber nicht neu geändert)
-	 * @param {Aufnahme} a @returns {[number, string]} Sekunden und was das ist */
+	 * @param {Aufnahme} a @returns {[number, 'aufgenommen' | 'angelegt' | 'geaendert']} Sekunden und was das ist */
 	function entstanden(a) {
 		const t = a.media?.recorded ? Date.parse(a.media.recorded) / 1000 : NaN;
-		if (!isNaN(t)) return [t, 'Aufgenommen'];
-		return a.created && a.created < a.added ? [a.created, 'Angelegt'] : [a.added, 'Geändert'];
+		if (!isNaN(t)) return [t, 'aufgenommen'];
+		return a.created && a.created < a.added ? [a.created, 'angelegt'] : [a.added, 'geaendert'];
 	}
 
 	/** @param {number} sek */
 	const datum = (sek) =>
-		new Date(sek * 1000).toLocaleString('de-DE', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+		new Date(sek * 1000).toLocaleString(getLocale(), { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+	/** what entstanden() says, as a sentence for a tooltip
+	 * @param {string} was @param {number} sek */
+	function entstandenAm(was, sek) {
+		const am = datum(sek);
+		if (was === 'aufgenommen') return /* @wc-include */ `Recorded on ${am}`;
+		if (was === 'angelegt') return /* @wc-include */ `Created on ${am}`;
+		return /* @wc-include */ `Modified on ${am}`;
+	}
+
+	/** when it was transcribed, and what entstanden() says, for the tooltip on a transcript's date
+	 * @param {number} fertigSek @param {string} was @param {number} sek */
+	function transkribiertAm(fertigSek, was, sek) {
+		const fertigAm = datum(fertigSek);
+		const am = datum(sek);
+		if (was === 'aufgenommen') return /* @wc-include */ `Transcribed on ${fertigAm}, recorded on ${am}`;
+		if (was === 'angelegt') return /* @wc-include */ `Transcribed on ${fertigAm}, created on ${am}`;
+		return /* @wc-include */ `Transcribed on ${fertigAm}, modified on ${am}`;
+	}
 
 	/** das Format, wie die Endung es nennt: MP3, WAV, MP4
 	 * @param {string} name */
@@ -283,9 +307,9 @@
 		const o = j.options;
 		const sprecher = o.speakers || ({ interview: 2, vortrag: 1 })[o.preset];
 		return [
-			sprecher ? `${sprecher} Sprecher` : 'Sprecher automatisch',
+			sprecher ? plural(sprecher, ['# speaker', '# speakers']) : /* @wc-include */ 'Speakers: automatic',
 			o.language && o.language !== 'auto' ? sprachname(o.language) : '',
-			o.engine === 'api' ? 'über die API' : ''
+			o.engine === 'api' ? /* @wc-include */ 'via the API' : ''
 		]
 			.filter(Boolean)
 			.join(' · ');
@@ -399,7 +423,7 @@
 	async function verbinde(path) {
 		verbindenFehler = '';
 		if (!path.trim()) {
-			meldeVerbinden('Bitte einen Ordner wählen oder seinen Pfad einfügen.');
+			meldeVerbinden(/* @wc-include */ 'Please choose a folder or paste its path.');
 			return;
 		}
 		if (!(await ordnerAendern('add', path))) return;
@@ -408,7 +432,8 @@
 		if (neuer) {
 			zeige(neuer.path);
 			const n = zahlen[neuer.path]?.alle ?? 0;
-			meldung = `„${neuer.name}“ ist verbunden: ${n === 1 ? 'eine Aufnahme' : `${n} Aufnahmen`}.`;
+			const anzahl = plural(n, ['one recording', '# recordings']);
+			meldung = /* @wc-include */ `“${neuer.name}” is connected: ${anzahl}.`;
 		}
 	}
 
@@ -429,19 +454,21 @@
 	async function trennen(o) {
 		if (await ordnerAendern('remove', o.path)) {
 			zeige('alle');
-			meldung = `„${o.name}“ ist getrennt. Die Aufnahmen und Transkripte darin bleiben, wo sie sind.`;
+			meldung = /* @wc-include */ `“${o.name}” is disconnected. The recordings and transcripts in it stay where they are.`;
 		}
 	}
 
 	async function transkribieren() {
 		if (!gewaehlt.length) {
-			meldung = 'Bitte mindestens eine Aufnahme wählen.';
+			meldung = /* @wc-include */ 'Please choose at least one recording.';
 			return;
 		}
 		reiht = true;
 		try {
 			const n = await einreihen(gewaehlt, optionen);
-			meldung = n ? (n === 1 ? 'Eine Aufnahme wird transkribiert.' : `${n} Aufnahmen werden transkribiert.`) : 'Schon in Arbeit.';
+			meldung = n
+				? plural(n, ['One recording is being transcribed.', '# recordings are being transcribed.'])
+				: /* @wc-include */ 'Already in progress.';
 			gewaehlt = [];
 			geaendert();
 		} catch (e) {
@@ -456,7 +483,9 @@
 	async function neuTranskribieren(a) {
 		try {
 			const n = await einreihen([a.name], optionen);
-			meldung = n ? `„${a.title}“ wird neu transkribiert. Deine Korrekturen bleiben erhalten.` : 'Schon in Arbeit.';
+			meldung = n
+				? /* @wc-include */ `“${a.title}” is being transcribed again. Your corrections are kept.`
+				: /* @wc-include */ 'Already in progress.';
 			geaendert();
 		} catch (e) {
 			meldung = /** @type {Error} */ (e).message;
@@ -503,7 +532,7 @@
 		try {
 			const namen = [];
 			for (const f of input.files ?? []) {
-				meldung = `Lade ${f.name} hoch …`;
+				meldung = /* @wc-include */ `Uploading ${f.name}…`;
 				try {
 					namen.push(await upload(f));
 				} catch (err) {
@@ -512,7 +541,10 @@
 				}
 			}
 			input.value = '';
-			meldung = namen.length === 1 ? 'Hochgeladen. Sie steht jetzt unter „Noch nicht transkribiert“.' : 'Hochgeladen.';
+			meldung =
+				namen.length === 1
+					? /* @wc-include */ 'Uploaded. It is now under “Not transcribed yet”.'
+					: /* @wc-include */ 'Uploaded.';
 			// Hochgeladenes steht unter „Hochgeladen“ und ist gleich angekreuzt, ein Klick auf „Transkribieren“ genügt
 			if (bereich !== 'alle' && bereich !== 'upload') zeige('upload');
 			gewaehlt = [...new Set([...gewaehlt, ...namen])];
@@ -542,7 +574,7 @@
 		loescht = true;
 		try {
 			await post(`/api/delete?name=${encodeURIComponent(a.name)}`);
-			meldung = `„${a.title}“ ist gelöscht.`;
+			meldung = /* @wc-include */ `“${a.title}” has been deleted.`;
 			gewaehlt = gewaehlt.filter((n) => n !== a.name);
 			if (spielt?.name === a.name) spielt = null;
 		} catch (e) {
@@ -580,7 +612,7 @@
 		const warVersteckt = aufnahmen?.find((x) => x.stem === a.stem)?.hidden;
 		for (const x of aufnahmen ?? []) if (x.stem === a.stem) Object.assign(x, stand);
 		if (warVersteckt !== undefined && stand.hidden !== warVersteckt) sichtbarGemacht(a.stem, stand.title, stand.hidden);
-		else meldung = `„${stand.title}“ ist gespeichert.`;
+		else meldung = /* @wc-include */ `“${stand.title}” is saved.`;
 		ladeAufnahmen();
 	}
 
@@ -601,8 +633,8 @@
 	/** @param {string} stem @param {string} title @param {boolean} hidden */
 	function sichtbarGemacht(stem, title, hidden) {
 		meldung = hidden
-			? `„${title}“ ist ausgeblendet. Die Datei bleibt, wo sie ist; links unter „Ausgeblendet“ lässt sie sich wieder einblenden.`
-			: `„${title}“ ist wieder eingeblendet.`;
+			? /* @wc-include */ `“${title}” is hidden. The file stays where it is; you can show it again under “Hidden” on the left.`
+			: /* @wc-include */ `“${title}” is shown again.`;
 		const a = aufnahmen?.find((x) => x.stem === stem);
 		zurueck = a ? { meldung, tun: () => ausblenden(a, !hidden) } : null;
 	}
@@ -610,12 +642,9 @@
 	/** was von Hand am Transkript getan wurde: „2 Korrekturen von Hand und 1 Clip“
 	 * @param {Inhalt} s */
 	function arbeitInWorten(s) {
-		return [
-			s.edits === 1 ? '1 Korrektur von Hand' : s.edits ? `${s.edits} Korrekturen von Hand` : '',
-			s.clips === 1 ? '1 Clip' : s.clips ? `${s.clips} Clips` : ''
-		]
-			.filter(Boolean)
-			.join(' und ');
+		const korrekturen = s.edits ? plural(s.edits, ['# manual correction', '# manual corrections']) : '';
+		const clips = s.clips ? plural(s.clips, ['# clip', '# clips']) : '';
+		return korrekturen && clips ? /* @wc-include */ `${korrekturen} and ${clips}` : korrekturen || clips;
 	}
 
 	/** Der Editor öffnet die Aufnahme, die hier zuletzt gewählt wurde. */
@@ -675,7 +704,7 @@
 	});
 </script>
 
-<svelte:head><title>Bibliothek · Transcribe by Moliri</title></svelte:head>
+<svelte:head><title>Library · Transcribe by Moliri</title></svelte:head>
 
 {#snippet bereichsknopf(/** @type {string} */ b, /** @type {string} */ name, /** @type {any} */ Icon, /** @type {string} */ hinweis)}
 	{@const z = zahlen[b]}
@@ -683,7 +712,7 @@
 		<button type="button" class="bereich" aria-current={bereich === b ? 'page' : undefined} title={hinweis || undefined} onclick={() => zeige(b)}>
 			<Icon aria-hidden="true" />
 			<span class="bname">{name}</span>
-			{#if z?.offen}<span class="offen" title="{z.offen} ohne Transkript">{z.offen}</span>{/if}
+			{#if z?.offen}<span class="offen" title="{z.offen} without a transcript">{z.offen}</span>{/if}
 			<span class="bzahl">{z?.alle ?? 0}</span>
 		</button>
 	</li>
@@ -696,8 +725,8 @@
 		class="anhoeren"
 		class:laeuft
 		type="button"
-		title={laeuft ? 'Anhalten' : 'Anhören'}
-		aria-label="{a.title} {laeuft ? 'anhalten' : 'anhören'}"
+		title={laeuft ? /* @wc-context: te_pause_short */ /* @wc-include */ 'Pause' : /* @wc-include */ 'Listen'}
+		aria-label={laeuft ? /* @wc-include */ `Pause ${a.title}` : /* @wc-include */ `Listen to ${a.title}`}
 		onclick={() => anhoeren(a)}
 	>
 		{#if laeuft}<IconMaterialSymbolsPauseRounded aria-hidden="true" />{:else}<IconMaterialSymbolsPlayArrowRounded aria-hidden="true" />{/if}
@@ -707,22 +736,22 @@
 <!-- je Aufnahme: Details, Name und Schlagworte, dann Löschen oder, wo Transcribe nichts löscht
      (verbundene Ordner), Ausblenden; unter „Ausgeblendet“ statt beidem Einblenden -->
 {#snippet knoepfe(/** @type {Aufnahme} */ a)}
-	<button class="neu-tx" type="button" title="Details zur Datei" aria-label="Details zu {a.title}" onclick={() => zeigeDetails(a)}>
+	<button class="neu-tx" type="button" title="File details" aria-label="Details for {a.title}" onclick={() => zeigeDetails(a)}>
 		<IconMaterialSymbolsInfoOutlineRounded aria-hidden="true" />
 	</button>
-	<button class="neu-tx" type="button" title="Name und Schlagworte" aria-label="Name und Schlagworte von {a.title}" onclick={() => fragBeschriften(a)}>
+	<button class="neu-tx" type="button" title="Name and tags" aria-label="Name and tags of {a.title}" onclick={() => fragBeschriften(a)}>
 		<IconMaterialSymbolsSellOutline aria-hidden="true" />
 	</button>
 	{#if a.hidden}
-		<button class="neu-tx" type="button" title="Wieder einblenden" aria-label="{a.title} wieder einblenden" onclick={() => ausblenden(a, false)}>
+		<button class="neu-tx" type="button" title="Show again" aria-label={/* @wc-context: library_hide */ /* @wc-include */ `Show ${a.title} again`} onclick={() => ausblenden(a, false)}>
 			<IconMaterialSymbolsVisibilityOutlineRounded aria-hidden="true" />
 		</button>
 	{:else if a.source === 'folder'}
 		<button
 			class="neu-tx"
 			type="button"
-			title="Ausblenden; die Datei im Ordner bleibt"
-			aria-label="{a.title} ausblenden"
+			title="Hide; the file stays in the folder"
+			aria-label="Hide {a.title}"
 			onclick={() => ausblenden(a, true)}
 		>
 			<IconMaterialSymbolsVisibilityOffOutlineRounded aria-hidden="true" />
@@ -732,8 +761,8 @@
 			class="weg"
 			type="button"
 			disabled={inBearbeitung(a)}
-			title={inBearbeitung(a) ? 'Wird gerade transkribiert; erst abbrechen, dann löschen' : 'Löschen'}
-			aria-label="{a.title} löschen"
+			title={inBearbeitung(a) ? /* @wc-include */ 'Being transcribed right now; cancel first, then delete' : /* @wc-include */ 'Delete'}
+			aria-label="Delete {a.title}"
 			onclick={() => fragLoeschen(a)}
 		>
 			<IconMaterialSymbolsDeleteOutlineRounded aria-hidden="true" />
@@ -744,12 +773,12 @@
 <main>
 	<header class="kopf">
 		<div class="kopftext">
-			<h1>Bibliothek</h1>
-			<p>Deine Aufnahmen und ihre Transkripte. Neue Dateien und ganze Ordner kannst du auch einfach ins Fenster ziehen.</p>
+			<h1>Library</h1>
+			<p>Your recordings and their transcripts. You can also simply drag new files and whole folders into the window.</p>
 		</div>
 		<label class="hinzufuegen" class:laedt={laedtHoch}>
 			{#if laedtHoch}<IconEosIconsLoading aria-hidden="true" />{:else}<IconMaterialSymbolsUploadRounded aria-hidden="true" />{/if}
-			Dateien hinzufügen
+			Add files
 			<input class="sr" type="file" accept="audio/*,video/*" multiple onchange={hochladen} />
 		</label>
 	</header>
@@ -757,15 +786,15 @@
 	<p class="meldung" class:voll={!!meldung} role="status">
 		{meldung}
 		{#if zurueck && zurueck.meldung === meldung}
-			<button type="button" class="zurueck" onclick={() => zurueck?.tun()}>Rückgängig</button>
+			<button type="button" class="zurueck" onclick={() => zurueck?.tun()}>Undo</button>
 		{/if}
 	</p>
 
 	{#if offline}
 		<p class="leer fehler" role="alert">
-			Keine Verbindung zu Transcribe. Läuft das Programm noch?
-			{#if laufend.length}Wurde es beendet, ist auch die Transkription stehen geblieben: Nach einem Neustart lässt sie sich mit
-				„Erneut“ wieder anstoßen.{/if}
+			No connection to Transcribe. Is the app still running?
+			{#if laufend.length}If it was closed, the transcription has stopped too: after a restart you can start it again with
+				“Retry”.{/if}
 		</p>
 	{/if}
 
@@ -775,52 +804,75 @@
 			<IconMaterialSymbolsCreateNewFolderOutlineRounded aria-hidden="true" />
 			<div class="vtext">
 				<h2 id="h-vorschlag">
-					Neben Transcribe {h.count === 1 ? 'liegt eine Aufnahme' : `liegen ${h.count >= 1000 ? 'viele' : h.count} Aufnahmen`}
+					{h.count >= 1000
+						? /* @wc-include */ 'There are many recordings next to Transcribe'
+						: plural(h.count, ['There is one recording next to Transcribe', 'There are # recordings next to Transcribe'])}
 				</h2>
 				<p>
-					Im Ordner „{h.name}“{h.count === 1 ? '' : ' und seinen Unterordnern'}. Verbunden steht {h.count === 1 ? 'sie' : 'alles'}
-					hier, ohne kopiert zu werden, und die Transkripte liegen gleich daneben.
+					{#if h.count === 1}In the folder “{h.name}”. Once connected, it shows up here without being copied, and the transcripts
+						are saved right next to it.{:else}In the folder “{h.name}” and its subfolders. Once connected, everything shows up here
+						without being copied, and the transcripts are saved right next to it.{/if}
 				</p>
 			</div>
 			<div class="vtun">
-				<Button type="primary" size="large" onclick={() => verbinde(h.path)}>Ordner verbinden</Button>
-				<Button type="tertiary" size="large" onclick={() => ordnerAendern('decline', h.path)}>Nein, danke</Button>
+				<Button type="primary" size="large" onclick={() => verbinde(h.path)}>Connect folder</Button>
+				<Button type="tertiary" size="large" onclick={() => ordnerAendern('decline', h.path)}>No, thanks</Button>
 			</div>
 		</aside>
 	{/if}
 
 	<div class="rahmen">
-		<nav class="bereiche" aria-label="Bereiche der Bibliothek">
+		<nav class="bereiche" aria-label="Library sections">
 			<ul>
-				{@render bereichsknopf('alle', 'Alle Aufnahmen', IconMaterialSymbolsLibraryMusicOutlineRounded, '')}
-				{@render bereichsknopf('upload', 'Hochgeladen', IconMaterialSymbolsUploadFileOutlineRounded, 'Ins Fenster gezogen oder hinzugefügt; liegen im Datenordner von Transcribe')}
+				{@render bereichsknopf(
+					'alle',
+					/* @wc-include */ 'All recordings',
+					IconMaterialSymbolsLibraryMusicOutlineRounded,
+					''
+				)}
+				{@render bereichsknopf(
+					'upload',
+					/* @wc-include */ 'Uploaded',
+					IconMaterialSymbolsUploadFileOutlineRounded,
+					/* @wc-include */ 'Dragged into the window or added; stored in Transcribe’s data folder'
+				)}
 				{#if zahlen.live?.alle}
-					{@render bereichsknopf('live', 'Live-Aufnahmen', IconMaterialSymbolsMicOutlineRounded, 'Auf der Seite Live gespeicherte Aufnahmen')}
+					{@render bereichsknopf(
+						'live',
+						/* @wc-include */ 'Live recordings',
+						IconMaterialSymbolsMicOutlineRounded,
+						/* @wc-include */ 'Recordings saved on the Live page'
+					)}
 				{/if}
 			</ul>
 			{#if schlagworte.length}
-				<h2 class="bkopf">Schlagworte</h2>
+				<h2 class="bkopf">Tags</h2>
 				<ul>
 					{#each schlagworte as t (t)}
 						{@render bereichsknopf('tag:' + t, t, IconMaterialSymbolsSellOutline, '')}
 					{/each}
 				</ul>
 			{/if}
-			<h2 class="bkopf">Ordner</h2>
+			<h2 class="bkopf">Folders</h2>
 			{#if ordner.folders.length}
 				<ul>
 					{#each ordner.folders as o (o.path)}
-						{@render bereichsknopf(o.path, o.name, o.exists ? IconMaterialSymbolsFolderOutlineRounded : IconMaterialSymbolsFolderOffOutlineRounded, o.exists ? o.path : `${o.path} (nicht erreichbar)`)}
+						{@render bereichsknopf(o.path, o.name, o.exists ? IconMaterialSymbolsFolderOutlineRounded : IconMaterialSymbolsFolderOffOutlineRounded, o.exists ? o.path : /* @wc-include */ `${o.path} (not reachable)`)}
 					{/each}
 				</ul>
 			{/if}
 			<button type="button" class="bereich verbinden" aria-haspopup="dialog" onclick={oeffneVerbinden}>
 				<IconMaterialSymbolsCreateNewFolderOutlineRounded aria-hidden="true" />
-				<span class="bname">Ordner verbinden</span>
+				<span class="bname">Connect folder</span>
 			</button>
 			{#if zahlen.versteckt?.alle}
 				<ul class="unten">
-					{@render bereichsknopf('versteckt', 'Ausgeblendet', IconMaterialSymbolsVisibilityOffOutlineRounded, 'Aufnahmen, die du ausgeblendet hast; gelöscht ist nichts')}
+					{@render bereichsknopf(
+						'versteckt',
+						/* @wc-include */ 'Hidden',
+						IconMaterialSymbolsVisibilityOffOutlineRounded,
+						/* @wc-include */ 'Recordings you have hidden; nothing has been deleted'
+					)}
 				</ul>
 			{/if}
 		</nav>
@@ -833,18 +885,18 @@
 						<p class="ordnerpfad">{imOrdner.path}</p>
 						<p class="ordnerinfo">
 							{#if !imOrdner.exists}
-								<span class="fehler">Der Ordner ist gerade nicht erreichbar.</span>
+								<span class="fehler">The folder can’t be reached right now.</span>
 							{:else if ordner.sidecar}
 								<IconMaterialSymbolsDescriptionOutlineRounded aria-hidden="true" />
-								Transkripte liegen als Datei neben den Aufnahmen, für alle, die den Ordner teilen.
+								Transcripts are saved as files next to the recordings, for everyone who shares the folder.
 							{:else}
-								Transkripte bleiben nur in Transcribe (Einstellungen, Ordner).
+								Transcripts stay in Transcribe only (Settings, Folders).
 							{/if}
 						</p>
 					</div>
 					<Button type="tertiary" size="large" onclick={() => trennen(imOrdner)}>
 						{#snippet iconLeft()}<IconMaterialSymbolsLinkOffRounded />{/snippet}
-						Ordner trennen
+						Disconnect folder
 					</Button>
 				</div>
 			{/if}
@@ -852,15 +904,15 @@
 			{#if bereich === 'versteckt'}
 				<div class="ordnerkopf">
 					<div>
-						<h2>Ausgeblendet</h2>
-						<p class="ordnerinfo">Diese Aufnahmen stehen in keinem anderen Bereich. Gelöscht ist nichts, auch nicht ihr Transkript.</p>
+						<h2>Hidden</h2>
+						<p class="ordnerinfo">These recordings don’t appear in any other section. Nothing has been deleted, not even their transcripts.</p>
 					</div>
 				</div>
 			{:else if bereich.startsWith('tag:')}
 				<div class="ordnerkopf">
 					<div>
 						<h2><IconMaterialSymbolsSellOutline aria-hidden="true" />{bereich.slice(4)}</h2>
-						<p class="ordnerinfo">Alle Aufnahmen mit diesem Schlagwort.</p>
+						<p class="ordnerinfo">All recordings with this tag.</p>
 					</div>
 				</div>
 			{/if}
@@ -868,30 +920,33 @@
 			{#if inArbeit.length}
 				<section class="blatt" aria-labelledby="h-arbeit">
 					<div class="zeile">
-						<h2 id="h-arbeit">In Arbeit</h2>
+						<h2 id="h-arbeit">In progress</h2>
 						{#if laufend.length}<span class="zaehler">{laufend.length}</span>{/if}
 						<span class="platz"></span>
 						{#if laufend.length && !offline}
 							<Button type="secondary" size="large" disabled={schaltet} onclick={pause}>
 								{#snippet iconLeft()}{#if angehalten}<IconMaterialSymbolsPlayArrowRounded />{:else}<IconMaterialSymbolsPauseRounded />{/if}{/snippet}
-								{angehalten ? 'Fortsetzen' : 'Pausieren'}
+								{angehalten ? /* @wc-include */ 'Resume' : /* @wc-include */ 'Pause'}
 							</Button>
 						{/if}
 						{#if laufend.length > 1}
-							<Button type="secondary" size="large" onclick={alleAbbrechen}>Alle abbrechen</Button>
+							<Button type="secondary" size="large" onclick={alleAbbrechen}>Cancel all</Button>
 						{/if}
 					</div>
 					{#if laufend.length && !offline && (angehalten || liveHaelt)}
 						<p class="pausenhinweis" role="status">
 							<IconMaterialSymbolsPauseCircleOutlineRounded aria-hidden="true" />
-							{#if angehalten}
-								Pausiert, bis du fortsetzt, auch über einen Neustart. Die laufende Transkription bleibt an ihrer Stelle stehen{liveHaelt ? '; gerade läuft auch eine Live-Transkription' : ''}.
+							{#if angehalten && liveHaelt}
+								Paused until you resume, even across a restart. The running transcription stays where it is; a live transcription is
+								also running right now.
+							{:else if angehalten}
+								Paused until you resume, even across a restart. The running transcription stays where it is.
 							{:else}
-								Pausiert, solange eine Live-Transkription läuft. Danach geht es von selbst an derselben Stelle weiter.
+								Paused while a live transcription is running. Afterwards it continues on its own from the same point.
 							{/if}
 						</p>
 					{/if}
-					<ul class="auftraege" aria-label="Aufträge">
+					<ul class="auftraege" aria-label="Jobs">
 						{#each inArbeit as j (j.id)}
 							{@const pct = Math.round((j.progress || 0) * 100)}
 							{@const laeuft = LAUFEND.includes(j.status)}
@@ -900,7 +955,7 @@
 									<div class="was">
 										<span class="name">{titel(j.audio)}</span>
 										{#if offline && laeuft}
-											<span class="status unbekannt">unbekannt</span>
+											<span class="status unbekannt">unknown</span>
 										{:else}
 											<span class="status {j.status}">{STATUS[j.status] || j.status}</span>
 										{/if}
@@ -908,27 +963,27 @@
 									</div>
 									<div class="tun">
 										{#if laeuft}
-											<Button type="secondary" size="large" disabled={offline || j.status === 'canceling'} onclick={() => aktion(j, 'cancel')}>Abbrechen</Button>
+											<Button type="secondary" size="large" disabled={offline || j.status === 'canceling'} onclick={() => aktion(j, 'cancel')}>Cancel</Button>
 										{:else}
 											<Button type="secondary" size="large" onclick={() => aktion(j, 'retry')}>
 												{#snippet iconLeft()}<IconMaterialSymbolsRefreshRounded />{/snippet}
-												Erneut
+												Retry
 											</Button>
-											<Button type="tertiary" size="large" onclick={() => aktion(j, 'remove')}>Entfernen</Button>
+											<Button type="tertiary" size="large" onclick={() => aktion(j, 'remove')}>Remove</Button>
 										{/if}
 									</div>
 								</div>
 								{#if (j.status === 'running' || j.status === 'paused') && !offline}
-									<div class="balken" class:ruht={j.status === 'paused'} role="progressbar" aria-label="Fortschritt {titel(j.audio)}" aria-valuenow={pct} aria-valuemin="0" aria-valuemax="100">
+									<div class="balken" class:ruht={j.status === 'paused'} role="progressbar" aria-label="Progress of {titel(j.audio)}" aria-valuenow={pct} aria-valuemin="0" aria-valuemax="100">
 										<i style:width="{pct}%"></i>
 									</div>
-									<p class="schritt">{j.step || 'startet …'} ({pct} %)</p>
+									<p class="schritt">{j.step || /* @wc-include */ 'starting…'} ({pct} %)</p>
 								{/if}
 								{#if j.note}<p class="schritt">{j.note}</p>{/if}
 								{#if j.error}<p class="fehler">{j.error}</p>{/if}
 								{#if j.log?.length && j.status === 'error'}
 									<details>
-										<summary>Protokoll</summary>
+										<summary>Log</summary>
 										<pre>{j.log.join('\n')}</pre>
 									</details>
 								{/if}
@@ -941,10 +996,10 @@
 			{#if neu.length}
 				<section class="blatt" aria-labelledby="h-neu">
 					<div class="zeile">
-						<h2 id="h-neu">Noch nicht transkribiert</h2>
+						<h2 id="h-neu">Not transcribed yet</h2>
 						<span class="anzahl">{neu.length}</span>
 					</div>
-					<div class="aufnahmen" role="group" aria-label="Aufnahmen ohne Transkript">
+					<div class="aufnahmen" role="group" aria-label="Recordings without a transcript">
 						{#each neu as a (a.name)}
 							{@const wo = ort(a)}
 							{@const [wannEntstanden, wasEntstanden] = entstanden(a)}
@@ -962,7 +1017,7 @@
 										<span class="laenge">{a.media ? dauer(a.media.duration) : ''}</span>
 										<span class="format" title={formatInWorten(a)}>{endung(a.name)}</span>
 										<span class="groesse">{a.size ? groesse(a.size) : ''}</span>
-										<span class="datum" title="{wasEntstanden} am {datum(wannEntstanden)}">{wann(wannEntstanden)}</span>
+										<span class="datum" title={entstandenAm(wasEntstanden, wannEntstanden)}>{wann(wannEntstanden)}</span>
 									</span>
 								</label>
 								{@render knoepfe(a)}
@@ -973,7 +1028,9 @@
 					<div class="handeln">
 						<Button type="primary" size="large" loading={reiht} onclick={transkribieren}>
 							{#snippet iconLeft()}<IconMaterialSymbolsGraphicEqRounded />{/snippet}
-							{gewaehlt.length > 1 ? `${gewaehlt.length} Aufnahmen transkribieren` : 'Transkribieren'}
+							{gewaehlt.length > 1
+								? plural(gewaehlt.length, ['Transcribe # recording', 'Transcribe # recordings'])
+								: /* @wc-include */ 'Transcribe'}
 						</Button>
 						{#if neu.length > 1}
 							<button
@@ -981,7 +1038,7 @@
 								type="button"
 								onclick={() => (gewaehlt = gewaehlt.length === neu.length ? [] : neu.map((a) => a.name))}
 							>
-								{gewaehlt.length === neu.length ? 'Keine auswählen' : 'Alle auswählen'}
+								{gewaehlt.length === neu.length ? /* @wc-include */ 'Select none' : /* @wc-include */ 'Select all'}
 							</button>
 						{/if}
 					</div>
@@ -990,42 +1047,42 @@
 
 			<section class="regal" aria-labelledby="h-fertig">
 				<div class="regalkopf">
-					<h2 id="h-fertig">Transkribiert</h2>
+					<h2 id="h-fertig">Transcribed</h2>
 					{#if fertig.length}<span class="anzahl">{fertig.length}</span>{/if}
 					<span class="platz"></span>
 					{#if fertig.length > 3}
 						<label class="suche">
 							<IconMaterialSymbolsSearchRounded aria-hidden="true" />
-							<span class="sr">In Transkripten suchen</span>
-							<input class="feld" type="search" placeholder="Name, Sprecher oder Text" bind:value={suche} />
+							<span class="sr">Search transcripts</span>
+							<input class="feld" type="search" placeholder="Name, speaker or text" bind:value={suche} />
 						</label>
 					{/if}
 					{#if fertig.length > 1}
 						<label class="sortieren">
-							<span class="sr">Sortieren nach</span>
+							<span class="sr">Sort by</span>
 							<select class="feld" bind:value={sorte}>
-								{#each SORTEN as [wert, name] (wert)}<option value={wert}>{name}</option>{/each}
+								{#each SORTEN as s (s.wert)}<option value={s.wert}>{s.name}</option>{/each}
 							</select>
 						</label>
 					{/if}
 				</div>
 
 				{#if aufnahmen === null}
-					<p class="leer">Lade die Bibliothek …</p>
+					<p class="leer">Loading the library…</p>
 				{:else if !aufnahmen.length}
 					<div class="willkommen">
 						<IconMaterialSymbolsLibraryMusicOutlineRounded aria-hidden="true" />
-						<strong>Noch keine Aufnahmen</strong>
+						<strong>No recordings yet</strong>
 						<span>
-							Zieh Audio- oder Videodateien in dieses Fenster, wähle sie aus, oder verbinde einen Ordner, in dem sie liegen.
-							Transcribe schreibt mit, wer was sagt.
+							Drag audio or video files into this window, choose them, or connect a folder they are in. Transcribe writes down
+							who says what.
 						</span>
 						<div class="wkn">
 							<label class="knopf">
-								Dateien auswählen
+								Choose files
 								<input class="sr" type="file" accept="audio/*,video/*" multiple onchange={hochladen} />
 							</label>
-							<button type="button" class="knopf hell" onclick={oeffneVerbinden}>Ordner verbinden</button>
+							<button type="button" class="knopf hell" onclick={oeffneVerbinden}>Connect folder</button>
 						</div>
 					</div>
 					<!-- wer Transcribe neu hat: woher es kommt und dass es auch ohne Moliri ganz da ist -->
@@ -1034,25 +1091,27 @@
 						<div>
 							<h3 id="h-moliri">Transcribe by Moliri</h3>
 							<p>
-								Transcribe läuft für sich auf deinem Rechner, ohne Konto, und deine Aufnahmen bleiben hier. Es ist
-								auch die Begleit-App zur Museumsdatenbank Moliri: Verbunden diktierst du in Moliris Textfelder, und
-								Transcribe liest den Text aus Scans.
+								Transcribe runs on its own on your computer, without an account, and your recordings stay here. It is
+								also the companion app to the museum database Moliri: once connected, you dictate into Moliri’s text
+								fields, and Transcribe reads the text from scans.
 							</p>
 							<ul class="moliri-wege">
-								<li><a href={HANDBUCH} target="_blank" rel="noopener">Handbuch lesen</a></li>
-								<li><a href={MIT_MOLIRI} target="_blank" rel="noopener">Mit Moliri verbinden</a></li>
-								<li><a href={MOLIRI} target="_blank" rel="noopener">Moliri kennenlernen</a></li>
+								<li><a href={HANDBUCH} target="_blank" rel="noopener">Read the manual</a></li>
+								<li><a href={MIT_MOLIRI} target="_blank" rel="noopener">Connect to Moliri</a></li>
+								<li><a href={MOLIRI} target="_blank" rel="noopener">Get to know Moliri</a></li>
 							</ul>
 						</div>
 					</aside>
 				{:else if !fertig.length}
 					<p class="leer">
-						{imBereich.length ? 'Hier ist noch kein Transkript fertig. Was du oben transkribierst, steht danach hier.' : 'Hier liegen keine Aufnahmen.'}
+						{imBereich.length
+							? /* @wc-include */ 'No transcript is ready here yet. What you transcribe above will show up here afterwards.'
+							: /* @wc-include */ 'There are no recordings here.'}
 					</p>
 				{:else if !regal.length}
-					<p class="leer">Nichts gefunden zu „{suche}“.</p>
+					<p class="leer">{/* @wc-context: library_search */ /* @wc-include */ `Nothing found for “${suche}”.`}</p>
 				{:else}
-					<ul class="liste" aria-label="Transkribierte Aufnahmen">
+					<ul class="liste" aria-label="Transcribed recordings">
 						{#each regal as a (a.name)}
 							{@const s = /** @type {Inhalt} */ (a.summary)}
 							{@const j = letzter.get(a.name)}
@@ -1064,28 +1123,28 @@
 								{@render abspielknopf(a)}
 								<div class="haupt">
 									<h3 class="titel">
-										<a href="/editor" data-sveltekit-reload onclick={() => imEditor(a.stem)} title="{a.title} im Editor öffnen">{a.title}</a>
+										<a href="/editor" data-sveltekit-reload onclick={() => imEditor(a.stem)} title="Open {a.title} in the editor">{a.title}</a>
 									</h3>
 									{#if wo}<span class="wo">{wo}</span>{/if}
 									{#each a.tags as t (t)}
-										<button type="button" class="marke" title="Alle mit diesem Schlagwort" onclick={() => zeige('tag:' + t)}>{t}</button>
+										<button type="button" class="marke" title="All with this tag" onclick={() => zeige('tag:' + t)}>{t}</button>
 									{/each}
 									{#if a.sidecar}
-										<span class="neben" title="Das Transkript liegt als Datei neben der Aufnahme">
-											<IconMaterialSymbolsDescriptionOutlineRounded aria-hidden="true" /><span class="sr">Transkript neben der Aufnahme</span>
+										<span class="neben" title="The transcript is saved as a file next to the recording">
+											<IconMaterialSymbolsDescriptionOutlineRounded aria-hidden="true" /><span class="sr">Transcript next to the recording</span>
 										</span>
 									{/if}
 									{#if arbeitet}
-										<span class="status running">wird neu transkribiert</span>
+										<span class="status running">being transcribed again</span>
 									{:else if frisch(a)}
-										<span class="status done">neu</span>
+										<span class="status done">new</span>
 									{/if}
 									<p class="auszug">
 										{#if erster}<span class="wer" style:--c="var(--spk{erster.id % 8})">{erster.name}</span>{/if}
-										{s.preview || 'Kein Text erkannt.'}
+										{s.preview || /* @wc-include */ 'No text recognised.'}
 									</p>
 								</div>
-								<ul class="stimmen" aria-label="Sprecher">
+								<ul class="stimmen" aria-label="Speakers">
 									{#each s.speakers.slice(0, 3) as p (p.id)}
 										<li><span class="punkt" style:--c="var(--spk{p.id % 8})" aria-hidden="true"></span>{p.name}</li>
 									{/each}
@@ -1095,20 +1154,20 @@
 									{#if a.video}<IconMaterialSymbolsMovieOutlineRounded aria-label="Video" />{/if}
 									<span class="zeit">{dauer(s.duration)} <span class="format" title={formatInWorten(a)}>{endung(a.name)}</span></span>
 									<span class="sr">,</span>
-									<span class="leise">{s.speakers.length === 1 ? '1 Sprecher' : `${s.speakers.length} Sprecher`}</span>
+									<span class="leise">{plural(s.speakers.length, ['# speaker', '# speakers'])}</span>
 								</p>
 								<p class="arbeit">
-									{#if s.edits}<span title="Von Hand korrigiert"><IconMaterialSymbolsEditOutlineRounded aria-hidden="true" />{s.edits === 1 ? '1 Korrektur' : `${s.edits} Korrekturen`}</span>{/if}
-									{#if s.clips}<span title="Clips"><IconMaterialSymbolsContentCutRounded aria-hidden="true" />{s.clips === 1 ? '1 Clip' : `${s.clips} Clips`}</span>{/if}
+									{#if s.edits}<span title="Corrected by hand"><IconMaterialSymbolsEditOutlineRounded aria-hidden="true" />{plural(s.edits, ['# correction', '# corrections'])}</span>{/if}
+									{#if s.clips}<span title="Clips"><IconMaterialSymbolsContentCutRounded aria-hidden="true" />{plural(s.clips, ['# clip', '# clips'])}</span>{/if}
 								</p>
-								<p class="wann" title="Transkribiert am {datum(s.done)}, {wasEntstanden.toLowerCase()} am {datum(wannEntstanden)}">{wann(s.done)}</p>
+								<p class="wann" title={transkribiertAm(s.done, wasEntstanden, wannEntstanden)}>{wann(s.done)}</p>
 								<div class="knoepfe-zeile">
 									<button
 										class="neu-tx"
 										type="button"
 										disabled={arbeitet}
-										title="Neu transkribieren; Korrekturen von Hand bleiben erhalten"
-										aria-label="{a.title} neu transkribieren"
+										title="Transcribe again; corrections made by hand are kept"
+										aria-label="Transcribe {a.title} again"
 										onclick={() => neuTranskribieren(a)}
 									>
 										<IconMaterialSymbolsRefreshRounded aria-hidden="true" />
@@ -1124,13 +1183,13 @@
 	</div>
 
 	{#if spielt}
-		<div class="leiste" role="region" aria-label="Wiedergabe">
+		<div class="leiste" role="region" aria-label="Playback">
 			<div class="spielt">
 				<strong>{spielt.title}</strong>
 				{#if spielt.title !== spielt.file}<span class="leise">{spielt.file}</span>{/if}
 			</div>
 			<Abspielen bind:this={spieler} bind:pause={pausiert} datei={spielt.name} titel={spielt.title} sofort />
-			<button type="button" class="zu" aria-label="Wiedergabe schließen" title="Schließen" onclick={() => (spielt = null)}>
+			<button type="button" class="zu" aria-label="Close playback" title="Close" onclick={() => (spielt = null)}>
 				<IconMaterialSymbolsCloseRounded aria-hidden="true" />
 			</button>
 		</div>
@@ -1141,35 +1200,35 @@
 
 	<dialog class="verbinden-dialog" bind:this={verbindenDialog} aria-labelledby="h-verbinden" onclose={() => (verbinden = false)}>
 		<div class="zeile">
-			<h2 id="h-verbinden">Ordner verbinden</h2>
+			<h2 id="h-verbinden">Connect folder</h2>
 			<span class="platz"></span>
-			<button type="button" class="zu" aria-label="Schließen" onclick={schliesseVerbinden}><IconMaterialSymbolsCloseRounded /></button>
+			<button type="button" class="zu" aria-label="Close" onclick={schliesseVerbinden}><IconMaterialSymbolsCloseRounded /></button>
 		</div>
 		<p class="erklaert">
-			Alle Aufnahmen im Ordner und in seinen Unterordnern stehen dann hier, ohne kopiert zu werden. Neue kommen von selbst
-			dazu. {#if ordner.sidecar}Jedes Transkript legt Transcribe als Datei neben seine Aufnahme („Interview.mp3.transcribe.json“):
-				Wer den Ordner mit dir teilt, etwa über Nextcloud, sieht dieselben Transkripte und Korrekturen.{:else}Transkripte
-				bleiben nur in Transcribe; neben die Aufnahmen legen lässt es sich in den Einstellungen.{/if}
+			All recordings in the folder and its subfolders then show up here, without being copied. New ones are added on
+			their own. {#if ordner.sidecar}Transcribe saves each transcript as a file next to its recording (“Interview.mp3.transcribe.json”):
+				anyone who shares the folder with you, for example via Nextcloud, sees the same transcripts and corrections.{:else}Transcripts
+				stay in Transcribe only; you can have them saved next to the recordings in the settings.{/if}
 		</p>
 		<div class="wege">
 			{#if ordner.pick}
 				<Button type="primary" size="large" loading={waehlt} onclick={waehlen}>
 					{#snippet iconLeft()}<IconMaterialSymbolsFolderOpenOutlineRounded />{/snippet}
-					Ordner wählen …
+					Choose folder…
 				</Button>
-				<span class="oder">oder</span>
+				<span class="oder">or</span>
 			{/if}
 			<div class="pfad">
-				<label class="sr" for="pfad">Pfad des Ordners</label>
+				<label class="sr" for="pfad">Folder path</label>
 				<input
 					id="pfad"
 					class="feld"
 					type="text"
-					placeholder="Pfad einfügen, etwa C:\Nextcloud\Interviews"
+					placeholder="Paste a path, e.g. C:\Nextcloud\Interviews"
 					bind:value={pfad}
 					onkeydown={(e) => e.key === 'Enter' && verbinde(pfad)}
 				/>
-				<Button type="secondary" size="large" onclick={() => verbinde(pfad)}>Verbinden</Button>
+				<Button type="secondary" size="large" onclick={() => verbinde(pfad)}>Connect</Button>
 			</div>
 		</div>
 		{#if verbindenFehler}<p class="fehler" role="alert">{verbindenFehler}</p>{/if}
@@ -1178,27 +1237,27 @@
 	<dialog class="rueckfrage" bind:this={rueckfrage} aria-labelledby="h-loeschen" onclose={() => (loeschen = null)}>
 		{#if loeschen}
 			{@const s = loeschen.summary}
-			<h2 id="h-loeschen">„{loeschen.title}“ löschen?</h2>
+			<h2 id="h-loeschen">Delete “{loeschen.title}”?</h2>
 			{#if s}
 				<p>
-					Die Aufnahme wird von diesem Computer gelöscht, und mit ihr das Transkript samt allen Korrekturen, Sprechernamen und
-					Clips.
+					The recording will be deleted from this computer, and with it the transcript including all corrections, speaker names
+					and clips.
 				</p>
 				{#if s.edits || s.clips}
-					<p>Darin stecken {arbeitInWorten(s)}.</p>
+					<p>It contains {arbeitInWorten(s)}.</p>
 				{/if}
 			{:else}
-				<p>Die Datei wird aus der Bibliothek und von diesem Computer gelöscht.</p>
+				<p>The file will be deleted from the library and from this computer.</p>
 			{/if}
 			{#if letzter.get(loeschen.name)?.status === 'queued'}
-				<p>Sie wartet gerade darauf, transkribiert zu werden; der Auftrag wird abgebrochen.</p>
+				<p>It is currently waiting to be transcribed; the job will be cancelled.</p>
 			{/if}
-			<p><strong>Das lässt sich nicht rückgängig machen.</strong></p>
+			<p><strong>This cannot be undone.</strong></p>
 			<div class="knoepfe">
-				<Button type="secondary" size="large" autofocus onclick={() => rueckfrage.close()}>Abbrechen</Button>
+				<Button type="secondary" size="large" autofocus onclick={() => rueckfrage.close()}>Cancel</Button>
 				<button class="endgueltig" type="button" disabled={loescht} onclick={loeschenBestaetigt}>
 					<IconMaterialSymbolsDeleteOutlineRounded aria-hidden="true" />
-					{s ? 'Aufnahme und Transkript löschen' : 'Aufnahme löschen'}
+					{s ? /* @wc-include */ 'Delete recording and transcript' : /* @wc-include */ 'Delete recording'}
 				</button>
 			</div>
 		{/if}

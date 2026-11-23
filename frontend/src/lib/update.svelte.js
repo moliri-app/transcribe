@@ -33,7 +33,7 @@ export function vorherigeVersion() {
 
 /** v1.2.3 → 1.2.3; eine Entwicklerversion heißt so @param {string | undefined} v */
 export function versionText(v) {
-	if (!v) return 'Entwicklerversion';
+	if (!v) return /* @wc-include */ 'Developer version';
 	return /^v\d/.test(v) ? v.slice(1) : v;
 }
 
@@ -46,7 +46,7 @@ export async function ladeUpdate() {
 		update.weg = false;
 		if (geladenMit === null) geladenMit = s.version;
 		else if (s.version !== geladenMit) {
-			sessionStorage.setItem(VORHER, geladenMit || 'Entwicklerversion');
+			sessionStorage.setItem(VORHER, geladenMit || versionText(''));
 			location.reload();
 			return;
 		}
