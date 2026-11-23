@@ -12,6 +12,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/moliri-app/transcribe/internal/msg"
 )
 
 func TestCallKeptAndReadBack(t *testing.T) {
@@ -19,7 +21,7 @@ func TestCallKeptAndReadBack(t *testing.T) {
 	open := func(context.Context, string) (Stream, error) { return &fakeStream{}, nil }
 	h := NewHub(dir, open)
 	c := h.Call(KindOCR, "Moliri", "Tesseract 5.5.0", "Bild: scan.png", Fact{Label: "Grafikkarte", Value: "ja"})
-	c.Status("Liest …")
+	c.Status(msg.New("test.reading", "Liest …"))
 	if n := h.Notes()[0]; n.Ended != nil || n.Partial != "Liest …" || !callID(n.ID) {
 		t.Fatalf("running call: %+v", n)
 	}
@@ -70,7 +72,7 @@ func TestCallTextClipped(t *testing.T) {
 func TestNilCall(t *testing.T) {
 	var h *Hub
 	c := h.Call(KindFilter, "", "", "")
-	c.Status("x")
+	c.Status(msg.New("test.x", "x"))
 	c.End("", nil)
 	h.Logged(KindFilter, "", "", "", nil)
 }

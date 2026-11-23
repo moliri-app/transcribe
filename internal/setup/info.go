@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/models"
 )
 
@@ -26,8 +27,9 @@ type Component struct {
 	Done      int64  `json:"done"`
 	Total     int64  `json:"total"`
 	Error     string `json:"error,omitempty"`
-	OnDemand  bool   `json:"onDemand"` // not fetched at startup
-	Device    string `json:"device,omitempty"` // the graphics card it runs on
+	ErrorMsg  *msg.M `json:"errorMsg,omitempty"` // Error for the interface to translate (internal/msg)
+	OnDemand  bool   `json:"onDemand"`           // not fetched at startup
+	Device    string `json:"device,omitempty"`   // the graphics card it runs on
 }
 
 // DirSize sums the size of all files below dir.
@@ -69,7 +71,7 @@ func Info(dataDir, ffmpegPath string) []Component {
 	add := func(c Component) {
 		c.Label = models.Label(c.Name)
 		if st, ok := status[c.Name]; ok {
-			c.State, c.Done, c.Total, c.Error = st.State, st.Done, st.Total, st.Error
+			c.State, c.Done, c.Total, c.Error, c.ErrorMsg = st.State, st.Done, st.Total, st.Error, msg.Of(st.Err())
 		}
 		out = append(out, c)
 	}

@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/update"
 )
 
@@ -32,16 +33,16 @@ func (s *Server) updateAPI(w http.ResponseWriter, r *http.Request) {
 		switch in.Action {
 		case "check":
 			if !u.Status().Checks {
-				fail(w, 409, "Eine Entwicklerversion sucht nicht nach Updates.")
+				fail(w, 409, msg.New("update.devBuild", "Eine Entwicklerversion sucht nicht nach Updates."))
 				return
 			}
 			if err := u.Check(r.Context()); err != nil {
-				fail(w, 502, "GitHub war nicht zu erreichen. Versuch es später noch einmal.")
+				fail(w, 502, msg.New("update.unreachable", "GitHub war nicht zu erreichen. Versuch es später noch einmal."))
 				return
 			}
 		case "install":
 			if err := u.Install(); err != nil {
-				fail(w, 409, err.Error())
+				fail(w, 409, err)
 				return
 			}
 		default:

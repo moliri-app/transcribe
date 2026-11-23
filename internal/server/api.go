@@ -26,6 +26,7 @@ import (
 	"github.com/moliri-app/transcribe/fileutil"
 	"github.com/moliri-app/transcribe/internal/media"
 	"github.com/moliri-app/transcribe/internal/memo"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/queue"
 	"github.com/moliri-app/transcribe/internal/results"
@@ -423,11 +424,11 @@ func (s *Server) queueAction(w http.ResponseWriter, r *http.Request) {
 	case err == nil:
 		writeJSON(w, 200, map[string]any{"ok": true})
 	case errors.Is(err, queue.ErrUnknownJob):
-		fail(w, 404, err.Error())
+		fail(w, 404, err)
 	case errors.As(err, &je):
-		fail(w, 400, err.Error())
+		fail(w, 400, err)
 	default:
-		fail(w, 500, err.Error())
+		fail(w, 500, err)
 	}
 }
 
@@ -453,7 +454,7 @@ func (s *Server) upload(w http.ResponseWriter, r *http.Request) {
 	}
 	dir := s.audioDir()
 	if err := os.MkdirAll(dir, 0o755); err != nil {
-		fail(w, 500, err.Error())
+		fail(w, 500, err)
 		return
 	}
 	ext := filepath.Ext(name)
@@ -468,7 +469,7 @@ func (s *Server) upload(w http.ResponseWriter, r *http.Request) {
 	part := target + ".part"
 	f, err := os.Create(part)
 	if err != nil {
-		fail(w, 500, err.Error())
+		fail(w, 500, err)
 		return
 	}
 	n, err := io.Copy(f, r.Body)
@@ -480,7 +481,7 @@ func (s *Server) upload(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := os.Rename(part, target); err != nil {
 		os.Remove(part)
-		fail(w, 500, err.Error())
+		fail(w, 500, err)
 		return
 	}
 	writeJSON(w, 200, map[string]any{"ok": true, "name": name})
@@ -539,7 +540,7 @@ func (s *Server) annotations(w http.ResponseWriter, r *http.Request) {
 		keepHistory(rdir, old)
 	}
 	if err := fileutil.WriteJSON(target, ann); err != nil {
-		fail(w, 500, err.Error())
+		fail(w, 500, err)
 		return
 	}
 	sidecar.Schedule(s.cfg.DataDir, stem)
@@ -572,17 +573,17 @@ func (s *Server) apply(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := results.Apply(r.Context(), s.cfg.DataDir, stem, s.cfg.Retranscriber); err != nil {
-		msg := err.Error()
-		if len(msg) > 2000 {
-			msg = msg[len(msg)-2000:]
+		text := err.Error()
+		if len(text) > 2000 {
+			text = text[len(text)-2000:]
 		}
-		fail(w, 500, msg)
+		fail(w, 500, text)
 		return
 	}
 	sidecar.Schedule(s.cfg.DataDir, stem)
 	raw, err := os.ReadFile(filepath.Join(results.Dir(s.cfg.DataDir, stem), "_final.json"))
 	if err != nil {
-		fail(w, 500, err.Error())
+		fail(w, 500, err)
 		return
 	}
 	var f struct {
@@ -602,6 +603,14 @@ func (s *Server) apply(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) setup(w http.ResponseWriter, r *http.Request) {
-	items, ready := models.Snapshot()
+	type item struct {
+		models.Status
+		ErrorMsg *msg.M `json:"errorMsg,omitempty"` // Error for the interface to translate (internal/msg)
+	}
+	snap, ready := models.Snapshot()
+	items := make([]item, len(snap))
+	for i, st := range snap {
+		items[i] = item{st, msg.Of(st.Err())}
+	}
 	writeJSON(w, 200, map[string]any{"ready": ready, "items": items})
 }

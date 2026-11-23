@@ -8,8 +8,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/binary"
-	"errors"
-	"fmt"
 	"log"
 	"math"
 	"net/http"
@@ -20,6 +18,7 @@ import (
 	"github.com/coder/websocket/wsjson"
 
 	"github.com/moliri-app/transcribe/internal/live"
+	"github.com/moliri-app/transcribe/internal/msg"
 )
 
 // message is what the service sends during live transcription.
@@ -42,9 +41,9 @@ func dial(ctx context.Context, cfg Config, lang string) (*session, error) {
 	c, resp, err := websocket.Dial(dctx, elevenLabsLiveURL(cfg, lang), &websocket.DialOptions{HTTPHeader: http.Header{"xi-api-key": {cfg.Key}}})
 	if err != nil {
 		if resp != nil && (resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusForbidden) {
-			return nil, errors.New("ElevenLabs hat den API-Schlüssel abgelehnt.")
+			return nil, msg.New("api.keyRejected", "{service} hat den API-Schlüssel abgelehnt. {detail}", "service", "ElevenLabs", "detail", "")
 		}
-		return nil, fmt.Errorf("ElevenLabs ist nicht erreichbar: %w", err)
+		return nil, msg.New("api.unreachable", "{service} ist nicht erreichbar: {error}", "service", "ElevenLabs", "error", err)
 	}
 	c.SetReadLimit(1 << 20)
 	// the session ends with Close, not with the context of whoever opened it
@@ -54,11 +53,11 @@ func dial(ctx context.Context, cfg Config, lang string) (*session, error) {
 	var first message
 	if err := wsjson.Read(dctx, c, &first); err != nil {
 		s.close()
-		return nil, fmt.Errorf("ElevenLabs antwortet nicht: %w", err)
+		return nil, msg.New("api.noAnswer", "{service} antwortet nicht: {error}", "service", "ElevenLabs", "error", err)
 	}
 	if first.Type != "session_started" {
 		s.close()
-		return nil, fmt.Errorf("ElevenLabs lehnt ab: %s", refusal(first))
+		return nil, msg.New("api.refused", "{service} lehnt ab: {reason}", "service", "ElevenLabs", "reason", refusal(first))
 	}
 	go func() {
 		defer close(s.in)
@@ -77,12 +76,12 @@ func dial(ctx context.Context, cfg Config, lang string) (*session, error) {
 }
 
 // refusal explains an error message of the service.
-func refusal(m message) string {
+func refusal(m message) any {
 	switch m.Type {
 	case "auth_error":
-		return "Der API-Schlüssel wurde nicht angenommen."
+		return msg.New("api.keyNotAccepted", "Der API-Schlüssel wurde nicht angenommen.")
 	case "quota_exceeded", "rate_limited":
-		return "Guthaben oder Anfragen sind aufgebraucht."
+		return msg.New("api.quota", "Guthaben oder Anfragen sind aufgebraucht.")
 	}
 	if m.Error != "" {
 		return m.Error

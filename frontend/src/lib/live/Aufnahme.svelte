@@ -12,7 +12,7 @@
 	import Teilen from '$lib/Teilen.svelte';
 	import Abspielen from './Abspielen.svelte';
 	import Platzhalter from './Platzhalter.svelte';
-	import { art, laenge, LINIE, live, QUELLEN, sprachname, tag, text, uhrzeit, vonHand, WARTET, wer } from './stand.svelte.js';
+	import { art, fehler, laenge, LINIE, live, QUELLEN, sprachname, tag, text, uhrzeit, vonHand, WARTET, wer } from './stand.svelte.js';
 	import { stellenIn, stuecke } from './suche.js';
 	import plural from '../../locales/plural.js';
 
@@ -176,7 +176,7 @@
 	<div class="tisch" tabindex="0" role="log" aria-live={laeuft ? 'polite' : 'off'} aria-label="Recording text" {@attach mitscrollen}>
 		<div class="blatt" bind:this={blatt}>
 			{#if n.error}
-				<p class="fehler" role="alert"><IconMaterialSymbolsErrorOutlineRounded aria-hidden="true" />{n.error}</p>
+				<p class="fehler" role="alert"><IconMaterialSymbolsErrorOutlineRounded aria-hidden="true" />{fehler(n)}</p>
 			{/if}
 			{#each zeilen as z, i (i)}
 				<div class="satz" class:wechsel={z.wechsel} class:treffer={z.stellen} class:spielt={i === spielt}>

@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/ocrapi"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/setup"
@@ -153,27 +154,27 @@ func (s *Server) prefsAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if in.Accel != nil && *in.Accel == "cuda" && models.FindLib(setup.CudaLibDir(s.cfg.DataDir)) == "" {
-		fail(w, 400, "Die GPU-Runtime ist noch nicht heruntergeladen.")
+		fail(w, 400, msg.New("prefs.cudaMissing", "Die GPU-Runtime ist noch nicht heruntergeladen."))
 		return
 	}
 	if in.Language != nil {
 		l, err := jobs.NormLanguage(*in.Language)
 		if err != nil {
-			fail(w, 400, "Sprache: automatisch oder Codes wie de oder de,en")
+			fail(w, 400, msg.New("prefs.language", "Sprache: automatisch oder Codes wie de oder de,en"))
 			return
 		}
 		in.Language = &l
 	}
 	if in.API != nil && in.API.Provider != nil && sttapi.Find(*in.API.Provider).ID != *in.API.Provider {
-		fail(w, 400, "Unbekannter Dienst: "+*in.API.Provider)
+		fail(w, 400, msg.New("prefs.unknownService", "Unbekannter Dienst: {id}", "id", *in.API.Provider))
 		return
 	}
 	if in.OCRAPI != nil && in.OCRAPI.Provider != nil && ocrapi.Find(*in.OCRAPI.Provider).ID != *in.OCRAPI.Provider {
-		fail(w, 400, "Unbekannter Dienst: "+*in.OCRAPI.Provider)
+		fail(w, 400, msg.New("prefs.unknownService", "Unbekannter Dienst: {id}", "id", *in.OCRAPI.Provider))
 		return
 	}
 	if in.OCREngine != nil && !s.ocrEngineKnown(*in.OCREngine) {
-		fail(w, 400, "Unbekannte Texterkennung: "+*in.OCREngine)
+		fail(w, 400, msg.New("prefs.unknownOCR", "Unbekannte Texterkennung: {id}", "id", *in.OCREngine))
 		return
 	}
 	before := prefs.Load(s.cfg.DataDir)
@@ -217,7 +218,7 @@ func (s *Server) prefsAPI(w http.ResponseWriter, r *http.Request) {
 		}
 	})
 	if err != nil {
-		fail(w, 500, err.Error())
+		fail(w, 500, err)
 		return
 	}
 	if s.Live != nil {
@@ -290,12 +291,12 @@ func (s *Server) gpuChoice(enable bool) http.HandlerFunc {
 		}
 		g := cachedGPU(s.cfg.DataDir, true)
 		if !g.Present || !g.Supported {
-			fail(w, 400, "Keine unterstützte NVIDIA-GPU gefunden.")
+			fail(w, 400, msg.New("gpu.none", "Keine unterstützte NVIDIA-GPU gefunden."))
 			return
 		}
 		_, _ = prefs.Update(s.cfg.DataDir, func(p *prefs.Prefs) { p.GpuAsked = true })
 		if !g.Ready && g.Fetch == 0 {
-			fail(w, 400, "Es fehlen NVIDIA-Bibliotheken, die die App nicht selbst laden kann: "+strings.Join(g.Missing, ", "))
+			fail(w, 400, msg.New("gpu.missingLibs", "Es fehlen NVIDIA-Bibliotheken, die die App nicht selbst laden kann: {libs}", "libs", strings.Join(g.Missing, ", ")))
 			return
 		}
 		go func() {

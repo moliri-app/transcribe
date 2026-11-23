@@ -14,7 +14,8 @@
 	import plural from '../locales/plural.js';
 
 	/** @typedef {{ origin: string, client?: string, at: string }} Frage */
-	/** @type {{ blocked: Frage[], program: string, hint: boolean } | null} */
+	/** unnamed: the program gave no name (program is then the server's German word for one)
+	 * @type {{ blocked: Frage[], program: string, unnamed?: boolean, hint: boolean } | null} */
 	let stand = $state(null);
 	/** gerade erlaubt: die Karte sagt kurz, wie es weitergeht */
 	let erlaubt = $state(/** @type {Frage | null} */ (null));
@@ -109,7 +110,7 @@
 		{#if stand?.hint}
 			<div class="teil" class:darunter={frage || erlaubt}>
 				{#if !frage && !erlaubt}
-					<h2 id="h-zugriff-frage"><IconMaterialSymbolsCableRounded aria-hidden="true" />{stand.program} uses Transcribe</h2>
+					<h2 id="h-zugriff-frage"><IconMaterialSymbolsCableRounded aria-hidden="true" />{#if stand.unnamed}An app uses Transcribe{:else}{stand.program} uses Transcribe{/if}</h2>
 				{:else}
 					<h3>So that apps can always reach Transcribe</h3>
 				{/if}

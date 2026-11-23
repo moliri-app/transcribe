@@ -17,6 +17,7 @@ import (
 	"strings"
 
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/results"
 	"github.com/moliri-app/transcribe/internal/setup"
@@ -157,12 +158,29 @@ func (r *Runner) cudaLib() string {
 // Run executes events -> speakers -> text -> annotate on <data>/audio/<audioFile> (or the linked
 // recording of that name, media.Path) and writes
 // results/<stem>/: _machine.json, _final.json and the re-recognition cache.
+// Errors of the engine come back as messages the interface translates (internal/msg).
 func (r *Runner) Run(ctx context.Context, dataDir, audioFile string, o jobs.Options, p jobs.Progress) error {
+	return explain(r.run(ctx, dataDir, audioFile, o, p))
+}
+
+// explain turns the engine's errors that people see into messages.
+func explain(err error) error {
+	var short *pipeline.ShortError
+	switch {
+	case errors.Is(err, pipeline.ErrEmpty) && err.Error() == pipeline.ErrEmpty.Error():
+		return msg.New("job.empty", err.Error())
+	case errors.As(err, &short) && short.Error() == err.Error():
+		return msg.New("job.tooShort", "Die Aufnahme ist zu kurz ({seconds} s), um darin etwas zu erkennen.", "seconds", short.Seconds)
+	}
+	return err
+}
+
+func (r *Runner) run(ctx context.Context, dataDir, audioFile string, o jobs.Options, p jobs.Progress) error {
 	if o.Engine == prefs.API {
 		return r.runAPI(ctx, dataDir, audioFile, o, p)
 	}
 	if !prefs.Load(r.DataDir).UsesModels() {
-		return errors.New("Die Erkennung auf diesem Rechner ist ausgeschaltet (Einstellungen, Erkennung: nur externe API).")
+		return msg.New("job.localOff", "Die Erkennung auf diesem Rechner ist ausgeschaltet (Einstellungen, Erkennung: nur externe API).")
 	}
 	stem := strings.TrimSuffix(audioFile, filepath.Ext(audioFile))
 	ann, cache, err := results.Inputs(dataDir, stem)

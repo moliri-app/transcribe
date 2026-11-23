@@ -7,6 +7,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
 	"net/url"
@@ -20,6 +21,7 @@ import (
 	"github.com/moliri-app/transcribe/embed"
 	"github.com/moliri-app/transcribe/internal/live"
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/queue"
 	"github.com/moliri-app/transcribe/internal/update"
 	"github.com/moliri-app/transcribe/ocr"
@@ -176,8 +178,22 @@ func writeJSON(w http.ResponseWriter, code int, v any) {
 	_, _ = w.Write(b)
 }
 
-func fail(w http.ResponseWriter, code int, msg string) {
-	writeJSON(w, code, map[string]any{"ok": false, "error": msg})
+// fail answers with an error: e is a text or an error. The German text goes out as error, as the
+// API has always sent it; a message the interface can translate (msg.M) goes beside it as msg.
+func fail(w http.ResponseWriter, code int, e any) {
+	body := map[string]any{"ok": false}
+	switch x := e.(type) {
+	case *msg.M:
+		body["error"], body["msg"] = x.Error(), x
+	case error:
+		body["error"] = x.Error()
+		if m := msg.Of(x); m != nil {
+			body["msg"] = m
+		}
+	default:
+		body["error"] = fmt.Sprint(e)
+	}
+	writeJSON(w, code, body)
 }
 
 func localHost(h string) bool { return h == "localhost" || h == "127.0.0.1" }

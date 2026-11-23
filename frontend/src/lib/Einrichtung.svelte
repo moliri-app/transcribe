@@ -21,8 +21,9 @@
 	import { geaendert } from '$lib/auftraege.svelte.js';
 	import { MEDIA, einreihen, getJSON, post, upload, vorgaben } from '$lib/api.js';
 	import plural from '../locales/plural.js';
+	import { komponente, meldung } from '$lib/meldungen.js';
 
-	/** @typedef {{ label: string, state: string, done: number, total: number, error?: string }} Teil */
+	/** @typedef {{ name: string, label: string, state: string, done: number, total: number, error?: string, errorMsg?: import('$lib/meldungen.js').Meldung }} Teil */
 
 	// ---- Ersteinrichtung ----
 	/** null: nichts zu zeigen */
@@ -56,7 +57,7 @@
 		if (fehler) {
 			beobachtet = false;
 			stand = {
-				text: /* @wc-include */ `Download failed (${fehler.label}): ${fehler.error}`,
+				text: /* @wc-include */ `Download failed (${komponente(fehler.name, fehler.label)}): ${meldung(fehler.errorMsg, fehler.error)}`,
 				pct: 0,
 				fehler: true,
 				fertig: false
@@ -67,7 +68,7 @@
 		let text = /* @wc-include */ `First-time setup (${fertig}/${n})…`;
 		let pct = n ? (fertig / n) * 100 : 0;
 		if (laedt) {
-			const name = laedt.label;
+			const name = komponente(laedt.name, laedt.label);
 			if (laedt.total > 0) {
 				const done = mb(laedt.done);
 				const total = mb(laedt.total);

@@ -17,6 +17,8 @@ import (
 	"syscall"
 	"time"
 	"unsafe"
+
+	"github.com/moliri-app/transcribe/internal/msg"
 )
 
 // What the computer plays is recorded with WASAPI loopback on the default output device; the
@@ -393,10 +395,10 @@ func sampleFormat(f []byte) (channels, rate int, kind sampleKind, err error) {
 	case !float && bits == 32:
 		kind = kindInt32
 	default:
-		return 0, 0, 0, fmt.Errorf("Audio: unbekanntes Format (%d Bit)", bits)
+		return 0, 0, 0, msg.New("capture.format", "Audio: unbekanntes Format ({bits} Bit)", "bits", bits)
 	}
 	if channels < 1 {
-		return 0, 0, 0, errors.New("Audio: Format ohne Kanäle")
+		return 0, 0, 0, msg.New("capture.noChannels", "Audio: Format ohne Kanäle")
 	}
 	return channels, rate, kind, nil
 }

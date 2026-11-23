@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"path/filepath"
 	"slices"
 	"sort"
@@ -273,13 +274,24 @@ func (r *Runner) Apply(ctx context.Context, in annotate.Input) (map[string]any, 
 // minAudio is the shortest recording worth transcribing; the models fail on much less.
 const minAudio = audio.SR / 2
 
-// TooShort explains a recording with no sound in it, or too little to recognise anything.
+// ErrEmpty is a recording with no sound in it.
+var ErrEmpty = errors.New("Die Aufnahme ist leer: Es ist kein Ton darin.")
+
+// ShortError is a recording too short to recognise anything in: Seconds long (one decimal).
+type ShortError struct{ Seconds float64 }
+
+func (e *ShortError) Error() string {
+	return fmt.Sprintf("Die Aufnahme ist zu kurz (%s s), um darin etwas zu erkennen.", strings.Replace(fmt.Sprintf("%.1f", e.Seconds), ".", ",", 1))
+}
+
+// TooShort explains a recording with no sound in it (ErrEmpty), or too little to recognise
+// anything (*ShortError).
 func TooShort(pcm []float32) error {
 	if len(pcm) == 0 {
-		return errors.New("Die Aufnahme ist leer: Es ist kein Ton darin.")
+		return ErrEmpty
 	}
 	if len(pcm) < minAudio {
-		return fmt.Errorf("Die Aufnahme ist zu kurz (%s s), um darin etwas zu erkennen.", strings.Replace(fmt.Sprintf("%.1f", float64(len(pcm))/audio.SR), ".", ",", 1))
+		return &ShortError{Seconds: math.Round(float64(len(pcm))/audio.SR*10) / 10}
 	}
 	return nil
 }

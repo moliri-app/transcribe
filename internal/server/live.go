@@ -25,6 +25,7 @@ import (
 
 	"github.com/moliri-app/transcribe/internal/live"
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/queue"
 	"github.com/moliri-app/transcribe/jobs"
@@ -401,7 +402,7 @@ func (s *Server) liveAPI(w http.ResponseWriter, r *http.Request) {
 	case "language":
 		lang, e := jobs.NormLanguage(in.Language)
 		if e != nil {
-			err = errors.New("Sprache: auto oder Codes wie de oder de,en")
+			err = msg.New("prefs.language", "Sprache: automatisch oder Codes wie de oder de,en")
 			break
 		}
 		_, err = prefs.Update(s.cfg.DataDir, func(p *prefs.Prefs) { p.LiveLanguage = strings.TrimPrefix(lang, "auto") })
@@ -441,7 +442,7 @@ func (s *Server) liveAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		fail(w, 400, err.Error())
+		fail(w, 400, err)
 		return
 	}
 	writeJSON(w, 200, map[string]any{"ok": true})

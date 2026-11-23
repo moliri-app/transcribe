@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/prefs"
 )
 
@@ -49,7 +50,7 @@ func (s *Server) dictate(w http.ResponseWriter, r *http.Request) {
 				p.DictateNoClipboard = !*in.Clipboard
 			}
 		}); uerr != nil {
-			fail(w, 500, uerr.Error())
+			fail(w, 500, uerr)
 			return
 		}
 		if s.Dictation != nil {
@@ -64,7 +65,7 @@ func (s *Server) dictate(w http.ResponseWriter, r *http.Request) {
 	p := prefs.Load(s.cfg.DataDir)
 	out := map[string]any{"supported": s.Dictation != nil, "key": p.DictateKey, "insert": !p.DictateNoInsert, "clipboard": !p.DictateNoClipboard, "keys": prefs.DictateKeys}
 	if err != nil {
-		out["error"] = err.Error()
+		out["error"], out["errorMsg"] = err.Error(), msg.Of(err)
 	}
 	writeJSON(w, 200, out)
 }

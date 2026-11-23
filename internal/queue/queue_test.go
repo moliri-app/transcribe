@@ -174,7 +174,7 @@ func TestRestartRecovery(t *testing.T) {
 	q2 := New(d, nil, 0)
 	l := q2.List()
 	// still running after a restart: the app crashed on it, so it is not run again by itself
-	if l[0].Status != Failed || l[0].Error == nil || *l[0].Error != Interrupted || l[0].Finished == nil {
+	if l[0].Status != Failed || l[0].Error == nil || *l[0].Error != Interrupted.Error() || l[0].Finished == nil {
 		t.Errorf("running not marked as interrupted: %+v", l[0])
 	}
 	if l[1].Status != Canceled || l[1].Finished == nil {

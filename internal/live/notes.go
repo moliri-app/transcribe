@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/moliri-app/transcribe/fileutil"
+	"github.com/moliri-app/transcribe/internal/msg"
 )
 
 // Kinds of notes.
@@ -38,16 +39,18 @@ type Note struct {
 	Language      string     `json:"language,omitempty"`      // chosen for the recording: auto or a code like de
 	Source        string     `json:"source,omitempty"`        // what the app recorded (SourceMic, SourceSystem, SourceBoth); empty when a program sent the audio
 	Error         string     `json:"error,omitempty"`
+	ErrorMsg      *msg.M     `json:"errorMsg,omitempty"`  // Error for the interface to translate, when it is a message (internal/msg)
 	Transient     bool       `json:"transient,omitempty"` // kept only for a while in memory, never saved (apinotes.go)
 	Loading       bool       `json:"loading,omitempty"`   // recognition is still being loaded
 	Waiting       bool       `json:"waiting,omitempty"`   // recognition is ready, the recording has not given sound yet
 	// A call (calls.go): what answered, what was asked and came back, and what else is worth
 	// knowing. Partial says what it is doing while it runs.
-	Model    string `json:"model,omitempty"`
-	Request  string `json:"request,omitempty"`
-	Response string `json:"response,omitempty"`
-	Facts    []Fact `json:"facts,omitempty"`
-	Image    string `json:"image,omitempty"` // the image text recognition read, in images/ (calls.go)
+	PartialMsg *msg.M `json:"partialMsg,omitempty"` // a call's Partial, for the interface to translate
+	Model      string `json:"model,omitempty"`
+	Request    string `json:"request,omitempty"`
+	Response   string `json:"response,omitempty"`
+	Facts      []Fact `json:"facts,omitempty"`
+	Image      string `json:"image,omitempty"` // the image text recognition read, in images/ (calls.go)
 }
 
 // Line is one utterance; its times count seconds since the note started.

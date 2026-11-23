@@ -8,7 +8,6 @@ import (
 	"cmp"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -21,6 +20,7 @@ import (
 	"time"
 
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/prefs"
 )
 
@@ -426,7 +426,7 @@ func (h *Hub) finish(t *tap, err error) {
 	}
 	n.Ended, n.Partial, n.PartialSource, n.Loading, n.Waiting = &now, "", "", false, false
 	if err != nil {
-		n.Error = err.Error()
+		n.Error, n.ErrorMsg = err.Error(), msg.Of(err)
 	}
 	h.active--
 	if h.active == 0 && h.release != nil {
@@ -469,10 +469,10 @@ func (h *Hub) Delete(id string) error {
 	defer h.mu.Unlock()
 	n := h.byID[id]
 	if n == nil {
-		return errors.New("Diese Notiz gibt es nicht.")
+		return msg.New("live.noSuchNote", "Diese Notiz gibt es nicht.")
 	}
 	if n.Ended == nil {
-		return errors.New("Die Notiz läuft noch.")
+		return msg.New("live.noteRunning", "Die Notiz läuft noch.")
 	}
 	if err := removeNote(h.dataDir, id); err != nil {
 		return err
@@ -572,7 +572,7 @@ func (h *Hub) StartDauer(ctx context.Context, save bool) error {
 	h.starting = !busy
 	h.micMu.Unlock()
 	if busy {
-		return errors.New("Die Aufnahme läuft schon.")
+		return msg.New("live.alreadyRecording", "Die Aufnahme läuft schon.")
 	}
 	wav := ""
 	if save {
@@ -869,7 +869,10 @@ func (h *Hub) Blocked() []Refusal {
 	return append([]Refusal{}, h.blocked...)
 }
 
-// Program names the program that used the API last since the app started ("Ein Programm" when
+// UnnamedProgram is what Program says of a program that gave no name.
+const UnnamedProgram = "Ein Programm"
+
+// Program names the program that used the API last since the app started (UnnamedProgram when
 // it gave no name), "" when none did.
 func (h *Hub) Program() string {
 	h.mu.Lock()
@@ -879,14 +882,14 @@ func (h *Hub) Program() string {
 
 // used notes that client, a program, uses the API; h.mu is held.
 func (h *Hub) used(client string) {
-	h.program = cmp.Or(strings.TrimPrefix(strings.TrimPrefix(client, "https://"), "http://"), "Ein Programm")
+	h.program = cmp.Or(strings.TrimPrefix(strings.TrimPrefix(client, "https://"), "http://"), UnnamedProgram)
 }
 
 // Allow lets origin use live transcription from now on (allow) or no longer (!allow).
 func (h *Hub) Allow(origin string, allow bool) error {
 	origin = Origin(origin)
 	if origin == "" {
-		return errors.New("Adresse fehlt.")
+		return msg.New("live.noOrigin", "Adresse fehlt.")
 	}
 	_, err := prefs.Update(h.dataDir, func(p *prefs.Prefs) {
 		p.LiveOrigins = slices.DeleteFunc(p.LiveOrigins, func(o string) bool { return o == origin })

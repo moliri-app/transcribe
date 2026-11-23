@@ -23,6 +23,7 @@
 	import { auftraege, geaendert } from '$lib/auftraege.svelte.js';
 	import { beschriften, dauer, einreihen, einzeln, getJSON, groesse, post, upload, verbindung, vorgaben } from '$lib/api.js';
 	import { sprachname } from '$lib/live/stand.svelte.js';
+	import { meldung as serverText, schritt } from '$lib/meldungen.js';
 	import MoliriLogo from '$lib/MoliriLogo.svelte';
 	import { HANDBUCH, MIT_MOLIRI, MOLIRI } from '$lib/moliri-links.js';
 	import { getLocale } from '$lib/moliri/i18n/locale.js';
@@ -441,7 +442,7 @@
 	async function waehlen() {
 		waehlt = true;
 		try {
-			const { path } = await post('/api/folders/pick');
+			const { path } = await post('/api/folders/pick', { title: /* @wc-include */ 'Connect a folder with recordings' });
 			if (path) await verbinde(path);
 		} catch (e) {
 			meldeVerbinden(/** @type {Error} */ (e).message);
@@ -977,10 +978,10 @@
 									<div class="balken" class:ruht={j.status === 'paused'} role="progressbar" aria-label="Progress of {titel(j.audio)}" aria-valuenow={pct} aria-valuemin="0" aria-valuemax="100">
 										<i style:width="{pct}%"></i>
 									</div>
-									<p class="schritt">{j.step || /* @wc-include */ 'starting…'} ({pct} %)</p>
+									<p class="schritt">{j.step ? schritt(j.step) : /* @wc-include */ 'starting…'} ({pct} %)</p>
 								{/if}
-								{#if j.note}<p class="schritt">{j.note}</p>{/if}
-								{#if j.error}<p class="fehler">{j.error}</p>{/if}
+								{#if j.note}<p class="schritt">{serverText(j.noteMsg, j.note)}</p>{/if}
+								{#if j.error}<p class="fehler">{serverText(j.errorMsg, j.error)}</p>{/if}
 								{#if j.log?.length && j.status === 'error'}
 									<details>
 										<summary>Log</summary>

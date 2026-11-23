@@ -11,6 +11,7 @@ import (
 
 	"github.com/moliri-app/transcribe/internal/autostart"
 	"github.com/moliri-app/transcribe/internal/live"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/prefs"
 )
 
@@ -47,19 +48,19 @@ func (s *Server) background(w http.ResponseWriter, r *http.Request) {
 				fixed = s.cfg.DataDir
 			}
 			if err := autostart.Set(*in.Autostart, fixed); err != nil {
-				fail(w, 500, "Autostart ließ sich nicht ändern: "+err.Error())
+				fail(w, 500, msg.New("autostart.failed", "Autostart ließ sich nicht ändern: {error}", "error", err))
 				return
 			}
 		}
 		if in.Background != nil {
 			if _, err := prefs.Update(s.cfg.DataDir, func(p *prefs.Prefs) { p.Background = *in.Background }); err != nil {
-				fail(w, 500, err.Error())
+				fail(w, 500, err)
 				return
 			}
 		}
 		if in.Ready != nil && s.Live != nil {
 			if err := s.Live.SetEnabled(*in.Ready); err != nil {
-				fail(w, 500, err.Error())
+				fail(w, 500, err)
 				return
 			}
 		}
@@ -97,7 +98,7 @@ func (s *Server) access(w http.ResponseWriter, r *http.Request) {
 		}
 		if in.Hint != nil {
 			if _, err := prefs.Update(s.cfg.DataDir, func(p *prefs.Prefs) { p.NoBackgroundHint = !*in.Hint }); err != nil {
-				fail(w, 500, err.Error())
+				fail(w, 500, err)
 				return
 			}
 		}
@@ -111,5 +112,5 @@ func (s *Server) access(w http.ResponseWriter, r *http.Request) {
 	}
 	hint := autostart.Supported() && !autostart.Enabled() && !prefs.Load(s.cfg.DataDir).NoBackgroundHint &&
 		(len(blocked) > 0 || program != "")
-	writeJSON(w, 200, map[string]any{"blocked": blocked, "program": program, "hint": hint})
+	writeJSON(w, 200, map[string]any{"blocked": blocked, "program": program, "unnamed": program == live.UnnamedProgram, "hint": hint})
 }

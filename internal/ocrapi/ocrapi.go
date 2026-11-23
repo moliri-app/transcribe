@@ -14,13 +14,13 @@ package ocrapi
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"regexp"
 	"strings"
 	"time"
 	"unicode/utf8"
 
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/ocr"
 )
@@ -109,17 +109,23 @@ func (c Config) base() string { return strings.TrimRight(c.URL, "/") }
 func (c Config) Usable() error {
 	switch {
 	case c.URL == "":
-		return errors.New("Für den KI-Dienst fehlt die Adresse (Einstellungen, Texterkennung)")
+		return ErrNoURL
 	case c.Model == "":
-		return errors.New("Für den KI-Dienst fehlt das Modell (Einstellungen, Texterkennung)")
+		return ErrNoModel
 	case c.Key == "" && !c.provider().NoKey:
 		return ErrNoKey
 	}
 	return nil
 }
 
+// What Usable finds missing.
+var (
+	ErrNoURL   = msg.New("ocrApi.noURL", "Für den KI-Dienst fehlt die Adresse (Einstellungen, Texterkennung)")
+	ErrNoModel = msg.New("ocrApi.noModel", "Für den KI-Dienst fehlt das Modell (Einstellungen, Texterkennung)")
+)
+
 // ErrNoKey is returned when no key is stored for a service that needs one.
-var ErrNoKey = errors.New("Für den KI-Dienst ist noch kein Schlüssel hinterlegt (Einstellungen, Texterkennung)")
+var ErrNoKey = msg.New("ocrApi.noKey", "Für den KI-Dienst ist noch kein Schlüssel hinterlegt (Einstellungen, Texterkennung)")
 
 // Timeout is how long a reading may take at most: large models think for a minute on a dense page.
 const Timeout = 150 * time.Second

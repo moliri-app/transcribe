@@ -6,7 +6,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"log"
 	"strings"
 	"sync"
@@ -14,6 +13,7 @@ import (
 	"unicode"
 
 	"github.com/moliri-app/transcribe/internal/live"
+	appmsg "github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/prefs"
 )
 
@@ -24,7 +24,7 @@ import (
 // dictation on the Live page, where every dictation is kept. Only Windows has the shortcut; it
 // needs the tray icon, whose window receives it.
 
-var errNoTray = errors.New("Das Tastenkürzel wirkt nur, solange Transcribe mit seinem Symbol im Infobereich läuft.")
+var errNoTray = appmsg.New("dictate.noTray", "Das Tastenkürzel wirkt nur, solange Transcribe mit seinem Symbol im Infobereich läuft.")
 
 // dictation is the shortcut and the dictation going on; it is the server's Dictation.
 type dictation struct {

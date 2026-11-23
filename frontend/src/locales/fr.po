@@ -7,12 +7,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3\n"
 "X-Plurals-Order: one, many, other\n"
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
-"Language-Team: \n"
 
 #. 0: r.status
 #. 0: r.status
@@ -434,7 +428,7 @@ msgstr "Fermer"
 msgid "All set."
 msgstr "Tout est prêt."
 
-#. 0: fehler.label; 1: fehler.error
+#. 0: komponente(fehler.name, fehler.label); 1: meldung(fehler.errorMsg, fehler.error)
 #: src/lib/Einrichtung.svelte
 msgid "Download failed ({0}): {1}"
 msgstr "Échec du téléchargement ({0}) : {1}"
@@ -1366,11 +1360,6 @@ msgstr "<0/>{0} peut maintenant utiliser Transcribe"
 #: src/lib/Zugriff.svelte
 msgid "Try again there. You can take this back under <0>Settings › Apps</0>."
 msgstr "Réessayez là-bas. Vous pouvez revenir sur ce choix sous <0>Paramètres › Applications</0>."
-
-#. 0: stand.program
-#: src/lib/Zugriff.svelte
-msgid "<0/>{0} uses Transcribe"
-msgstr "<0/>{0} utilise Transcribe"
 
 #: src/lib/Zugriff.svelte
 msgid "So that apps can always reach Transcribe"
@@ -2424,6 +2413,7 @@ msgstr "Dossier de données"
 msgid "Results"
 msgstr "Résultats"
 
+#: src/lib/live/stand.svelte.js
 #: src/routes/settings/+page.svelte
 msgid "Models"
 msgstr "Modèles"
@@ -2614,6 +2604,7 @@ msgstr "Service d’IA"
 msgid "Try it"
 msgstr "Essayer"
 
+#: src/lib/live/stand.svelte.js
 #: src/routes/settings/+page.svelte
 #: src/routes/settings/+page.svelte
 msgid "Graphics card"
@@ -3075,6 +3066,7 @@ msgstr "La première fois, Transcribe télécharge Tesseract et la langue ; ce
 msgid "The image that was read, with the words found outlined"
 msgstr "L’image lue, avec les mots trouvés encadrés"
 
+#: src/lib/live/stand.svelte.js
 #: src/routes/settings/+page.svelte
 msgid "# line"
 msgid_plural "# lines"
@@ -3387,12 +3379,12 @@ msgstr "à la demande"
 msgid "missing"
 msgstr "manquant"
 
-#. 0: c.label || c.name
+#. 0: komponente(c.name, c.label || c.name)
 #: src/routes/settings/+page.svelte
 msgid "Download {0} again"
 msgstr "Retélécharger {0}"
 
-#. 0: c.label || c.name
+#. 0: komponente(c.name, c.label || c.name)
 #: src/routes/settings/+page.svelte
 msgid "Download {0}"
 msgstr "Télécharger {0}"
@@ -3405,7 +3397,7 @@ msgstr "Retélécharger"
 msgid "Download"
 msgstr "Télécharger"
 
-#. 0: c.label || c.name
+#. 0: komponente(c.name, c.label || c.name)
 #: src/routes/settings/+page.svelte
 msgid "Downloading {0}"
 msgstr "Téléchargement de {0}"
@@ -4518,3 +4510,702 @@ msgctxt "library_hide"
 msgid "Show {0} again"
 msgstr "Réafficher {0}"
 
+#: src/lib/meldungen.js
+msgid "Please enter a full path, such as D:\\Transcribe."
+msgstr "Indiquez un chemin complet, par exemple D:\\Transcribe."
+
+#: src/lib/meldungen.js
+msgid "The data is already there."
+msgstr "Les données s’y trouvent déjà."
+
+#: src/lib/meldungen.js
+msgid "The new location must not be inside the current data folder."
+msgstr "Le nouvel emplacement ne doit pas se trouver dans le dossier de données actuel."
+
+#: src/lib/meldungen.js
+msgid "There are other files there already. Please choose an empty folder."
+msgstr "D’autres fichiers s’y trouvent déjà. Choisissez un dossier vide."
+
+#: src/lib/meldungen.js
+msgid "That is a file, not a folder."
+msgstr "C’est un fichier, pas un dossier."
+
+#: src/lib/meldungen.js
+msgid "A job is running. The data folder can be moved once all jobs are done."
+msgstr "Une tâche est en cours. Le dossier de données pourra être déplacé une fois toutes les tâches terminées."
+
+#: src/lib/meldungen.js
+msgid "A recording is running. The data folder can be moved once it has ended."
+msgstr "Un enregistrement est en cours. Le dossier de données pourra être déplacé une fois qu’il sera terminé."
+
+#: src/lib/meldungen.js
+msgid "The app is downloading models. The data folder can be moved once the download is done."
+msgstr "L’application télécharge des modèles. Le dossier de données pourra être déplacé une fois le téléchargement terminé."
+
+#: src/lib/meldungen.js
+msgid "The app is downloading components. The data folder can be moved once the download is done."
+msgstr "L’application télécharge des composants. Le dossier de données pourra être déplacé une fois le téléchargement terminé."
+
+#: src/lib/meldungen.js
+msgid "The data folder was set at startup (--data or TRANSCRIBE_DATA) and cannot be changed here."
+msgstr "Le dossier de données a été fixé au démarrage (--data ou TRANSCRIBE_DATA) et ne peut pas être modifié ici."
+
+#: src/lib/meldungen.js
+msgid "The data folder is already being moved."
+msgstr "Le dossier de données est déjà en cours de déplacement."
+
+#. 0: a.error
+#: src/lib/meldungen.js
+msgid "Moving did not work; the data is still in its old place. ({0})"
+msgstr "Le déplacement n’a pas fonctionné ; les données sont toujours à leur ancien emplacement. ({0})"
+
+#: src/lib/meldungen.js
+msgid "The folder dialog is already open."
+msgstr "La boîte de dialogue de choix de dossier est déjà ouverte."
+
+#: src/lib/meldungen.js
+msgid "Please enter the full path of the folder, such as C:\\Nextcloud\\Interviews."
+msgstr "Indiquez le chemin complet du dossier, par exemple C:\\Nextcloud\\Interviews."
+
+#. 0: a.path
+#: src/lib/meldungen.js
+msgid "This folder does not exist: {0}"
+msgstr "Ce dossier n’existe pas : {0}"
+
+#: src/lib/meldungen.js
+msgid "Transcribe does not delete anything in a connected folder."
+msgstr "Transcribe ne supprime rien dans un dossier connecté."
+
+#: src/lib/meldungen.js
+msgid "This recording is being transcribed. Cancel that first."
+msgstr "Cet enregistrement est en cours de transcription. Annulez-la d’abord."
+
+#: src/lib/meldungen.js
+msgid "Transcribe ended unexpectedly during this transcription. “Retry” starts it again."
+msgstr "Transcribe s’est arrêté de manière inattendue pendant cette transcription. « Réessayer » la relance."
+
+#: src/lib/meldungen.js
+msgid "queued again after a restart"
+msgstr "remis en file d’attente après un redémarrage"
+
+#: src/lib/meldungen.js
+msgid "The recording is empty: there is no sound in it."
+msgstr "L’enregistrement est vide : il ne contient aucun son."
+
+#. 0: a.seconds
+#: src/lib/meldungen.js
+msgid "The recording is too short ({0} s) to recognize anything in it."
+msgstr "L’enregistrement est trop court ({0} s) pour y reconnaître quoi que ce soit."
+
+#: src/lib/meldungen.js
+msgid "Recognition on this computer is turned off (Settings, Recognition: external API only)."
+msgstr "La reconnaissance sur cet ordinateur est désactivée (Paramètres, Reconnaissance : API externe uniquement)."
+
+#: src/lib/meldungen.js
+msgid "The address of the API is missing (Settings, Recognition)."
+msgstr "L’adresse de l’API manque (Paramètres, Reconnaissance)."
+
+#: src/lib/meldungen.js
+msgid "No key for the API has been entered yet (Settings, Recognition)."
+msgstr "Aucune clé n’a encore été saisie pour l’API (Paramètres, Reconnaissance)."
+
+#. 0: a.service; 1: a.error
+#: src/lib/meldungen.js
+msgid "{0} cannot be reached: {1}"
+msgstr "{0} est injoignable : {1}"
+
+#. 0: a.service; 1: a.error
+#: src/lib/meldungen.js
+msgid "{0} does not answer: {1}"
+msgstr "{0} ne répond pas : {1}"
+
+#. 0: a.service; 1: a.error
+#: src/lib/meldungen.js
+msgid "{0}: unexpected answer: {1}"
+msgstr "{0} : réponse inattendue : {1}"
+
+#. 0: a.service
+#. 0: a.service
+#: src/lib/meldungen.js
+#: src/lib/meldungen.js
+msgid "{0} rejected the API key."
+msgstr "{0} a refusé la clé d’API."
+
+#. 0: a.service
+#. 0: a.service
+#: src/lib/meldungen.js
+#: src/lib/meldungen.js
+msgid "{0} is not accepting anything right now (credit or requests used up)."
+msgstr "{0} n’accepte rien pour le moment (crédit ou requêtes épuisés)."
+
+#. 0: a.service; 1: a.status
+#. 0: a.service; 1: a.status
+#: src/lib/meldungen.js
+#: src/lib/meldungen.js
+msgid "{0}: error {1}:"
+msgstr "{0} : erreur {1} :"
+
+#. 0: a.service; 1: a.reason
+#: src/lib/meldungen.js
+msgid "{0} refuses: {1}"
+msgstr "{0} refuse : {1}"
+
+#: src/lib/meldungen.js
+msgid "The API key was not accepted."
+msgstr "La clé d’API n’a pas été acceptée."
+
+#: src/lib/meldungen.js
+msgid "Credit or requests are used up."
+msgstr "Le crédit ou les requêtes sont épuisés."
+
+#: src/lib/meldungen.js
+msgid "Text recognition is not available"
+msgstr "La reconnaissance de texte n’est pas disponible"
+
+#: src/lib/meldungen.js
+msgid "Image larger than 64 MB"
+msgstr "Image de plus de 64 Mo"
+
+#: src/lib/meldungen.js
+msgid "Windows has no language installed for text recognition (Settings › Time & language › Language)"
+msgstr "Aucune langue n’est installée dans Windows pour la reconnaissance de texte (Paramètres › Heure et langue › Langue)"
+
+#: src/lib/meldungen.js
+msgid "Tesseract is downloaded the first time it reads"
+msgstr "Tesseract est téléchargé lors de la première lecture"
+
+#: src/lib/meldungen.js
+msgid "The address of the AI service is missing (Settings, Text recognition)"
+msgstr "L’adresse du service d’IA manque (Paramètres, Reconnaissance de texte)"
+
+#: src/lib/meldungen.js
+msgid "The model of the AI service is missing (Settings, Text recognition)"
+msgstr "Le modèle du service d’IA manque (Paramètres, Reconnaissance de texte)"
+
+#: src/lib/meldungen.js
+msgid "No key for the AI service has been entered yet (Settings, Text recognition)"
+msgstr "Aucune clé n’a encore été saisie pour le service d’IA (Paramètres, Reconnaissance de texte)"
+
+#. 0: a.service; 1: a.url
+#: src/lib/meldungen.js
+msgid "{0} cannot be reached ({1})."
+msgstr "{0} est injoignable ({1})."
+
+#. 0: a.service; 1: a.detail
+#: src/lib/meldungen.js
+msgid "{0} did not answer in time ({1})."
+msgstr "{0} n’a pas répondu à temps ({1})."
+
+#. 0: a.service; 1: a.model
+#: src/lib/meldungen.js
+msgid "{0} does not know the model “{1}”, or it cannot read images."
+msgstr "{0} ne connaît pas le modèle « {1} », ou celui-ci ne lit pas les images."
+
+#. 0: a.url; 1: a.status
+#: src/lib/meldungen.js
+msgid "No matching interface answers at {0} (error {1}). Is the address right?"
+msgstr "Aucune interface adaptée ne répond à {0} (erreur {1}). L’adresse est-elle correcte ?"
+
+#. 0: a.url
+#: src/lib/meldungen.js
+msgid "No matching interface answers at {0}. Is the address right?"
+msgstr "Aucune interface adaptée ne répond à {0}. L’adresse est-elle correcte ?"
+
+#. 0: a.service; 1: a.status
+#: src/lib/meldungen.js
+msgid "{0} reported an error ({1})."
+msgstr "{0} a signalé une erreur ({1})."
+
+#. 0: a.service
+#: src/lib/meldungen.js
+msgid "{0} refused the image:"
+msgstr "{0} a refusé l’image :"
+
+#: src/lib/meldungen.js
+msgid "The program stopped waiting for the answer"
+msgstr "Le programme a cessé d’attendre la réponse"
+
+#: src/lib/meldungen.js
+msgid "Loading the model …"
+msgstr "Chargement du modèle…"
+
+#: src/lib/meldungen.js
+msgid "The model has not been downloaded yet"
+msgstr "Le modèle n’a pas encore été téléchargé"
+
+#: src/lib/meldungen.js
+msgid "The language model has not been downloaded yet"
+msgstr "Le modèle de langage n’a pas encore été téléchargé"
+
+#: src/lib/meldungen.js
+msgid "The language model is not loaded in Transcribe"
+msgstr "Le modèle de langage n’est pas chargé dans Transcribe"
+
+#: src/lib/meldungen.js
+msgid "The field catalog is too long for the language model"
+msgstr "Le catalogue de champs est trop long pour le modèle de langage"
+
+#: src/lib/meldungen.js
+msgid "Too many questions are waiting already"
+msgstr "Trop de questions sont déjà en attente"
+
+#: src/lib/meldungen.js
+msgid "Waiting for the questions before it to be answered …"
+msgstr "En attente de la réponse aux questions précédentes…"
+
+#: src/lib/meldungen.js
+msgid "Computing …"
+msgstr "Calcul en cours…"
+
+#: src/lib/meldungen.js
+msgid "Loading the language model …"
+msgstr "Chargement du modèle de langage…"
+
+#: src/lib/meldungen.js
+msgid "Reading the question …"
+msgstr "Lecture de la question…"
+
+#: src/lib/meldungen.js
+msgid "Writing the answer …"
+msgstr "Rédaction de la réponse…"
+
+#: src/lib/meldungen.js
+msgid "Cancelled"
+msgstr "Annulé"
+
+#: src/lib/meldungen.js
+msgid "Cancelled before it was asked"
+msgstr "Annulée avant d’être posée"
+
+#: src/lib/meldungen.js
+msgid "The answer of the language model contains no JSON"
+msgstr "La réponse du modèle de langage ne contient pas de JSON"
+
+#. 0: a.reason
+#: src/lib/meldungen.js
+msgid "Recording failed: {0}"
+msgstr "L’enregistrement a échoué : {0}"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: no microphone found"
+msgstr "L’enregistrement a échoué : aucun microphone trouvé"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: the microphone stopped delivering sound"
+msgstr "L’enregistrement a échoué : le microphone ne fournit plus de son"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: no output device found for the system audio"
+msgstr "L’enregistrement a échoué : aucun périphérique de sortie trouvé pour l’audio système"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: the system audio stopped delivering sound"
+msgstr "L’enregistrement a échoué : l’audio système ne fournit plus de son"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: recording the system audio does not work on the Mac yet"
+msgstr "L’enregistrement a échoué : l’enregistrement de l’audio système ne fonctionne pas encore sur Mac"
+
+#: src/lib/meldungen.js
+msgid "A recording of the system audio alone is running. To dictate, first end that recording on the Live page."
+msgstr "Un enregistrement de l’audio système seul est en cours. Pour dicter, terminez d’abord cet enregistrement sur la page Live."
+
+#: src/lib/meldungen.js
+msgid "No sound arrived before the recording ended, so nothing was saved."
+msgstr "Aucun son n’est arrivé avant la fin de l’enregistrement, rien n’a donc été enregistré."
+
+#. 0: a.bits
+#: src/lib/meldungen.js
+msgid "Audio: unknown format ({0} bit)"
+msgstr "Audio : format inconnu ({0} bits)"
+
+#: src/lib/meldungen.js
+msgid "Audio: format without channels"
+msgstr "Audio : format sans canaux"
+
+#: src/lib/meldungen.js
+msgid "This note does not exist."
+msgstr "Cette note n’existe pas."
+
+#: src/lib/meldungen.js
+msgid "The note is still running."
+msgstr "La note est toujours en cours."
+
+#: src/lib/meldungen.js
+msgid "The recording is already running."
+msgstr "L’enregistrement est déjà en cours."
+
+#: src/lib/meldungen.js
+msgid "The address is missing."
+msgstr "L’adresse manque."
+
+#: src/lib/meldungen.js
+msgid "The shortcut only works while Transcribe runs with its icon in the notification area."
+msgstr "Le raccourci ne fonctionne que tant que Transcribe tourne avec son icône dans la zone de notification."
+
+#: src/lib/meldungen.js
+msgid "Another program already uses this shortcut. Choose a different one."
+msgstr "Un autre programme utilise déjà ce raccourci. Choisissez-en un autre."
+
+#. 0: a.error
+#: src/lib/meldungen.js
+msgid "Starting with Windows could not be changed: {0}"
+msgstr "Le démarrage avec Windows n’a pas pu être modifié : {0}"
+
+#: src/lib/meldungen.js
+msgid "The GPU runtime has not been downloaded yet."
+msgstr "Le runtime GPU n’a pas encore été téléchargé."
+
+#: src/lib/meldungen.js
+msgid "Language: automatic, or codes such as de or de,en"
+msgstr "Langue : automatique, ou des codes comme de ou de,en"
+
+#. 0: a.id
+#: src/lib/meldungen.js
+msgid "Unknown service: {0}"
+msgstr "Service inconnu : {0}"
+
+#. 0: a.id
+#: src/lib/meldungen.js
+msgid "Unknown text recognition: {0}"
+msgstr "Reconnaissance de texte inconnue : {0}"
+
+#: src/lib/meldungen.js
+msgid "No supported NVIDIA GPU found."
+msgstr "Aucun GPU NVIDIA pris en charge n’a été trouvé."
+
+#. 0: a.libs
+#: src/lib/meldungen.js
+msgid "NVIDIA libraries are missing that the app cannot download itself: {0}"
+msgstr "Il manque des bibliothèques NVIDIA que l’application ne peut pas télécharger elle-même : {0}"
+
+#: src/lib/meldungen.js
+msgid "The NVIDIA libraries cannot be downloaded automatically on this system."
+msgstr "Les bibliothèques NVIDIA ne peuvent pas être téléchargées automatiquement sur ce système."
+
+#: src/lib/meldungen.js
+msgid "A development build does not look for updates."
+msgstr "Une version de développement ne recherche pas de mises à jour."
+
+#: src/lib/meldungen.js
+msgid "GitHub could not be reached. Please try again later."
+msgstr "GitHub est injoignable. Réessayez plus tard."
+
+#: src/lib/meldungen.js
+msgid "There is no newer version."
+msgstr "Il n’y a pas de version plus récente."
+
+#: src/lib/meldungen.js
+msgid "Transcribe may not change its program folder. Download the new version from the releases page and replace the EXE by hand."
+msgstr "Transcribe n’a pas le droit de modifier son dossier de programme. Téléchargez la nouvelle version depuis la page des versions et remplacez l’EXE à la main."
+
+#: src/lib/meldungen.js
+msgid "The download took too long. Please try again later."
+msgstr "Le téléchargement a pris trop de temps. Réessayez plus tard."
+
+#. 0: a.error
+#: src/lib/meldungen.js
+msgid "The update could not be installed: {0}"
+msgstr "La mise à jour n’a pas pu être installée : {0}"
+
+#: src/lib/meldungen.js
+msgid "Recognition runtime (sherpa-onnx)"
+msgstr "Runtime de reconnaissance (sherpa-onnx)"
+
+#: src/lib/meldungen.js
+msgid "Voice activity (Silero VAD)"
+msgstr "Activité vocale (Silero VAD)"
+
+#: src/lib/meldungen.js
+msgid "Speaker separation (pyannote)"
+msgstr "Séparation des locuteurs (pyannote)"
+
+#: src/lib/meldungen.js
+msgid "Speaker embeddings (CAM++)"
+msgstr "Empreintes de locuteurs (CAM++)"
+
+#: src/lib/meldungen.js
+msgid "Sound recognition (CED)"
+msgstr "Reconnaissance des sons (CED)"
+
+#: src/lib/meldungen.js
+msgid "Speech recognition (Parakeet v3)"
+msgstr "Reconnaissance vocale (Parakeet v3)"
+
+#: src/lib/meldungen.js
+msgid "German model (FastConformer)"
+msgstr "Modèle allemand (FastConformer)"
+
+#: src/lib/meldungen.js
+msgid "German live (Kroko)"
+msgstr "Allemand en direct (Kroko)"
+
+#: src/lib/meldungen.js
+msgid "Speech recognition (Whisper base)"
+msgstr "Reconnaissance vocale (Whisper base)"
+
+#: src/lib/meldungen.js
+msgid "Other languages (Whisper turbo)"
+msgstr "Autres langues (Whisper turbo)"
+
+#: src/lib/meldungen.js
+msgid "GPU runtime (CUDA)"
+msgstr "Runtime GPU (CUDA)"
+
+#: src/lib/meldungen.js
+msgid "NVIDIA libraries (CUDA, cuDNN)"
+msgstr "Bibliothèques NVIDIA (CUDA, cuDNN)"
+
+#: src/lib/meldungen.js
+msgid "ffmpeg (audio/video)"
+msgstr "ffmpeg (audio/vidéo)"
+
+#: src/lib/meldungen.js
+msgid "Text recognition (Tesseract)"
+msgstr "Reconnaissance de texte (Tesseract)"
+
+#: src/lib/meldungen.js
+msgid "Text recognition German"
+msgstr "Reconnaissance de texte : allemand"
+
+#: src/lib/meldungen.js
+msgid "Text recognition English"
+msgstr "Reconnaissance de texte : anglais"
+
+#: src/lib/meldungen.js
+msgid "Text recognition Fraktur (frk)"
+msgstr "Reconnaissance de texte : Fraktur (frk)"
+
+#: src/lib/meldungen.js
+msgid "Text recognition Fraktur script"
+msgstr "Reconnaissance de texte : écriture Fraktur"
+
+#: src/lib/meldungen.js
+msgid "Text recognition Fraktur (frak2021)"
+msgstr "Reconnaissance de texte : Fraktur (frak2021)"
+
+#: src/lib/meldungen.js
+msgid "Text recognition (PP-OCRv5)"
+msgstr "Reconnaissance de texte (PP-OCRv5)"
+
+#: src/lib/meldungen.js
+msgid "Search by meaning (EmbeddingGemma)"
+msgstr "Recherche par le sens (EmbeddingGemma)"
+
+#: src/lib/meldungen.js
+msgid "Filter in your own words (Qwen 2.5 7B)"
+msgstr "Filtrage avec vos propres mots (Qwen 2.5 7B)"
+
+#. 0: api[1]
+#: src/lib/meldungen.js
+msgid "transcribing ({0})"
+msgstr "transcription en cours ({0})"
+
+#: src/lib/meldungen.js
+msgid "starting"
+msgstr "démarrage"
+
+#: src/lib/meldungen.js
+msgid "finding sounds"
+msgstr "détection des sons"
+
+#: src/lib/meldungen.js
+msgid "telling speakers apart"
+msgstr "distinction des locuteurs"
+
+#: src/lib/meldungen.js
+msgid "transcribing"
+msgstr "transcription en cours"
+
+#: src/lib/meldungen.js
+msgid "putting it together"
+msgstr "assemblage"
+
+#: src/lib/meldungen.js
+msgid "Your own server (OpenAI-compatible, such as Ollama)"
+msgstr "Votre propre serveur (compatible OpenAI, par ex. Ollama)"
+
+#: src/lib/meldungen.js
+msgid "Your own server (OpenAI-compatible)"
+msgstr "Votre propre serveur (compatible OpenAI)"
+
+#: src/lib/meldungen.js
+msgid "Ctrl + Alt + Space"
+msgstr "Ctrl + Alt + Espace"
+
+#: src/lib/meldungen.js
+msgid "Ctrl + Shift + Space"
+msgstr "Ctrl + Maj + Espace"
+
+#: src/lib/meldungen.js
+msgid "Ctrl + Alt + D"
+msgstr "Ctrl + Alt + D"
+
+#: src/lib/Bibliothek.svelte
+msgid "Connect a folder with recordings"
+msgstr "Connecter un dossier d’enregistrements"
+
+#: src/lib/Zugriff.svelte
+msgid "An app uses Transcribe"
+msgstr "Une application utilise Transcribe"
+
+#. 0: stand.program
+#: src/lib/Zugriff.svelte
+msgid "{0} uses Transcribe"
+msgstr "{0} utilise Transcribe"
+
+#: src/lib/live/stand.svelte.js
+msgid "Recognized"
+msgstr "Reconnu"
+
+#: src/lib/live/stand.svelte.js
+msgid "# word"
+msgid_plural "# words"
+msgstr[0] "# mot"
+msgstr[1] "# mots"
+msgstr[2] "# mots"
+
+#: src/lib/live/stand.svelte.js
+msgid "Engine"
+msgstr "Moteur"
+
+#: src/lib/live/stand.svelte.js
+msgid "Image size"
+msgstr "Taille de l’image"
+
+#. 0: a.width; 1: a.height
+#: src/lib/live/stand.svelte.js
+msgid "{0} × {1} pixels"
+msgstr "{0} × {1} pixels"
+
+#: src/lib/live/stand.svelte.js
+msgid "yes"
+msgstr "oui"
+
+#: src/lib/live/stand.svelte.js
+msgid "Texts"
+msgstr "Textes"
+
+#. 0: a.texts; 1: a.chars
+#: src/lib/live/stand.svelte.js
+msgid "{0}, {1} characters in all"
+msgstr "{0}, {1} caractères au total"
+
+#: src/lib/live/stand.svelte.js
+msgid "Model"
+msgstr "Modèle"
+
+#: src/lib/live/stand.svelte.js
+msgid "was already loaded"
+msgstr "était déjà chargé"
+
+#: src/lib/live/stand.svelte.js
+msgid "had to be loaded first"
+msgstr "a dû être chargé d’abord"
+
+#: src/lib/live/stand.svelte.js
+msgid "Waited"
+msgstr "Attente"
+
+#: src/lib/live/stand.svelte.js
+msgid "Computing time"
+msgstr "Temps de calcul"
+
+#: src/lib/live/stand.svelte.js
+msgid "Tokens read"
+msgstr "Jetons lus"
+
+#. 0: a.tokens; 1: a.cached
+#: src/lib/live/stand.svelte.js
+msgid "{0}, {1} of them already cached"
+msgstr "{0}, dont {1} déjà en cache"
+
+#: src/lib/live/stand.svelte.js
+msgid "Tokens written"
+msgstr "Jetons écrits"
+
+#: src/lib/live/stand.svelte.js
+msgid "Device"
+msgstr "Appareil"
+
+#: src/lib/live/stand.svelte.js
+msgid "Result"
+msgstr "Résultat"
+
+#: src/lib/live/stand.svelte.js
+msgid "# condition"
+msgid_plural "# conditions"
+msgstr[0] "# condition"
+msgstr[1] "# conditions"
+msgstr[2] "# conditions"
+
+#. 0: plural(zahl.conditions, ['# condition', '# conditions']); 1: a.notUnderstood; 2: a.dropped
+#: src/lib/live/stand.svelte.js
+msgid "{0}, {1} not understood, {2} dropped"
+msgstr "{0}, {1} non comprises, {2} écartées"
+
+#: src/lib/live/stand.svelte.js
+msgid "default"
+msgstr "par défaut"
+
+#: src/lib/live/stand.svelte.js
+msgid "not given"
+msgstr "non indiqué"
+
+#. 0: wert(v)
+#: src/lib/live/stand.svelte.js
+msgid "Image: {0}"
+msgstr "Image : {0}"
+
+#. 0: wert(v)
+#: src/lib/live/stand.svelte.js
+msgid "Languages: {0}"
+msgstr "Langues : {0}"
+
+#. 0: wert(v)
+#: src/lib/live/stand.svelte.js
+msgid "Layout: {0}"
+msgstr "Mise en page : {0}"
+
+#. 0: v
+#: src/lib/live/stand.svelte.js
+msgid "Question: {0}"
+msgstr "Question : {0}"
+
+#. 0: v
+#: src/lib/live/stand.svelte.js
+msgid "Fields: {0}"
+msgstr "Champs : {0}"
+
+#. 0: v
+#: src/lib/live/stand.svelte.js
+msgid "Kind: {0}"
+msgstr "Type : {0}"
+
+#. 0: v[1]; 1: v[2]
+#: src/lib/live/stand.svelte.js
+msgid "{0} vectors of {1} numbers each"
+msgstr "{0} vecteurs de {1} nombres chacun"
+
+#. 0: Number(k[1]).toLocaleString(getLocale())
+#: src/lib/live/stand.svelte.js
+msgid "… (shortened, {0} characters in all)"
+msgstr "… (raccourci, {0} caractères au total)"
+
+#: src/routes/settings/+page.svelte
+msgid "Where should Transcribe keep its data?"
+msgstr "Où Transcribe doit-il conserver ses données ?"
+
+#: src/lib/meldungen.js
+msgid "Transcribe is not recording the microphone for other programs right now: “Ready in the background” is off. It still processes audio and images that are sent to it. To record, turn it on in Transcribe under Settings › Apps."
+msgstr "Transcribe n’enregistre pas le microphone pour d’autres programmes en ce moment : « Prêt en arrière-plan » est désactivé. Il traite toujours l’audio et les images qu’on lui envoie. Pour enregistrer, activez-le dans Transcribe sous Paramètres › Applications."
+
+#. 0: win[1]
+#: src/lib/meldungen.js
+msgid "Windows text recognition{0}"
+msgstr "Reconnaissance de texte Windows{0}"
+
+#. 0: dienst; 1: ki[2]
+#: src/lib/meldungen.js
+msgid "AI service ({0}){1}"
+msgstr "Service d’IA ({0}){1}"

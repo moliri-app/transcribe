@@ -17,7 +17,8 @@
 	import Toggle from '$lib/moliri/components/ui/Toggle.svelte';
 	import AuftragsOptionen from '$lib/AuftragsOptionen.svelte';
 	import { einrichtung } from '$lib/Einrichtung.svelte';
-	import { ENGINES, einzeln, getJSON, post, sprecherAus, verbindung } from '$lib/api.js';
+	import { ENGINES, einzeln, getJSON, post, serverFehler, sprecherAus, verbindung } from '$lib/api.js';
+	import { dienstName, komponente, leserName, meldung, tastenkuerzel } from '$lib/meldungen.js';
 	import { ladeUpdate, update, updateAktion, versionText, vorherigeVersion } from '$lib/update.svelte.js';
 	import AufnahmeWahl from '$lib/live/AufnahmeWahl.svelte';
 	import StimmeWahl from '$lib/live/StimmeWahl.svelte';
@@ -267,7 +268,7 @@
 		ortFertig = '';
 		ortLaeuft = 'waehlen';
 		try {
-			const r = await post('/api/settings/location/pick', {});
+			const r = await post('/api/settings/location/pick', { title: /* @wc-include */ 'Where should Transcribe keep its data?' });
 			if (r.target) ortZiel = { target: r.target, size: r.size };
 		} catch (e) {
 			ortFehler = /** @type {Error} */ (e).message;
@@ -496,6 +497,7 @@
 				? {
 						engines: (await r.json()).engines.map((/** @type {Leser} */ l) => ({
 							...l,
+							name: leserName(l.name),
 							languages: l.languages ?? [],
 							download: l.download ?? [],
 							layouts: l.layouts ?? []
@@ -527,7 +529,7 @@
 			form.append('layout', ocrLayout);
 			const r = await fetch('/api/ocr', { method: 'POST', body: form });
 			const j = await r.json().catch(() => ({}));
-			if (!r.ok || j.ok === false) throw new Error(j.error || r.statusText);
+			if (!r.ok || j.ok === false) throw serverFehler(j, r);
 			/** @typedef {{ text: string, para?: number, bbox?: number[], words?: { bbox?: number[] }[] }} Zeile */
 			const seite = j.pages?.[0] ?? { width: 1, height: 1 };
 			/** @type {Zeile[]} */
@@ -927,7 +929,7 @@
 								<label class="feldname">
 									Service
 									<select class="feld" value={a.provider} onchange={(ev) => apiSetzen({ provider: ev.currentTarget.value })}>
-										{#each e.apiProviders as d (d.id)}<option value={d.id}>{d.label}</option>{/each}
+										{#each e.apiProviders as d (d.id)}<option value={d.id}>{dienstName(d, 'stt')}</option>{/each}
 									</select>
 								</label>
 								<label class="feldname adresse">
@@ -1323,7 +1325,7 @@ ws.onmessage = (e) => {
 										On Linux and macOS, the installed program <code>tesseract</code> does the reading; install it with its languages,
 										then reload this page.
 									{:else if !l.usable && l.error}
-										{l.error}.
+										{meldung(l.errorMsg, l.error)}.
 									{/if}
 								</p>
 							</div>
@@ -1369,7 +1371,7 @@ ws.onmessage = (e) => {
 								<label class="feldname">
 									Service
 									<select class="feld" value={a.provider} onchange={(ev) => ocrApiSetzen({ provider: ev.currentTarget.value })}>
-										{#each od.ocrApiProviders as d (d.id)}<option value={d.id}>{d.label}</option>{/each}
+										{#each od.ocrApiProviders as d (d.id)}<option value={d.id}>{dienstName(d, 'ocr')}</option>{/each}
 									</select>
 								</label>
 								<label class="feldname adresse">
@@ -1549,7 +1551,7 @@ ws.onmessage = (e) => {
 
 			{#if diktat?.supported}
 				{@const dk = diktat}
-				{@const kuerzel = dk.keys.find((k) => k.key === dk.key)?.label}
+				{@const kuerzel = tastenkuerzel(dk.key, dk.keys.find((k) => k.key === dk.key)?.label)}
 				<section id="diktieren" class="blatt" aria-labelledby="h-diktat">
 					<h2 id="h-diktat">Dictate into any app</h2>
 					<p class="hinweis">
@@ -1565,7 +1567,7 @@ ws.onmessage = (e) => {
 						<label class="feldname">
 							Keyboard shortcut
 							<select class="feld" value={dk.key} onchange={(e) => diktatSetzen({ key: e.currentTarget.value })}>
-								{#each dk.keys as k (k.key)}<option value={k.key}>{k.label}</option>{/each}
+								{#each dk.keys as k (k.key)}<option value={k.key}>{tastenkuerzel(k.key, k.label)}</option>{/each}
 								<option value="off">{/* @wc-include */ 'Off'}</option>
 							</select>
 						</label>
@@ -1598,7 +1600,7 @@ ws.onmessage = (e) => {
 						Dictation uses the microphone and language set on the <a href="/live">Live</a> page. Every dictation then appears
 						there too.
 					</p>
-					{#if dk.error}<p class="warnung">{dk.error}</p>{/if}
+					{#if dk.error}<p class="warnung">{meldung(dk.errorMsg, dk.error)}</p>{/if}
 					{#if diktatFehler}<p class="warnung">{diktatFehler}</p>{/if}
 				</section>
 			{/if}
@@ -1673,7 +1675,7 @@ ws.onmessage = (e) => {
 									<p class="warnung">Download failed. Is the computer connected to the internet?</p>
 									<details>
 										<summary>Technical details</summary>
-										<p class="technik">{nvidia.error}</p>
+										<p class="technik">{meldung(nvidia.errorMsg, nvidia.error)}</p>
 									</details>
 								</div>
 							{/if}
@@ -1708,7 +1710,7 @@ ws.onmessage = (e) => {
 								Download the GPU runtime
 							</Button>
 						</div>
-						{#if cuda?.state === 'error'}<p class="warnung">{cuda.error}</p>{/if}
+						{#if cuda?.state === 'error'}<p class="warnung">{meldung(cuda.errorMsg, cuda.error)}</p>{/if}
 						{#if gpuFehler}<p class="warnung">{gpuFehler}</p>{/if}
 					{:else}
 						<Toggle
@@ -1798,7 +1800,7 @@ ws.onmessage = (e) => {
 						</div>
 						{#if ortFertig}<p role="status">The data is now in <span class="pfad">{ortFertig}</span>.</p>{/if}
 					{/if}
-					{#if umzug?.state === 'error'}<p class="warnung">{umzug.error}</p>{/if}
+					{#if umzug?.state === 'error'}<p class="warnung">{meldung(umzug.errorMsg, umzug.error)}</p>{/if}
 					{#if ortFehler}<p class="warnung">{ortFehler}</p>{/if}
 				{/if}
 				<h3 class="teil">Storage locations</h3>
@@ -1844,7 +1846,7 @@ ws.onmessage = (e) => {
 							{@const laedt = c.state === 'downloading'}
 							<li class="eintrag">
 								<div class="was">
-									<span class="name">{c.label || c.name}</span>
+									<span class="name">{komponente(c.name, c.label || c.name)}</span>
 									{#if c.device}<span class="geraet">runs on the graphics card: {c.device}</span>{/if}
 									<span class="pfad">{c.path}</span>
 								</div>
@@ -1865,8 +1867,8 @@ ws.onmessage = (e) => {
 											size="large"
 											loading={fordert.includes(c.name)}
 											aria-label={c.state === 'error'
-												? /* @wc-include */ `Download ${c.label || c.name} again`
-												: /* @wc-include */ `Download ${c.label || c.name}`}
+												? /* @wc-include */ `Download ${komponente(c.name, c.label || c.name)} again`
+												: /* @wc-include */ `Download ${komponente(c.name, c.label || c.name)}`}
 											onclick={() => herunterladen(c.name)}
 										>
 											{#snippet iconLeft()}<IconMaterialSymbolsDownloadRounded />{/snippet}
@@ -1875,7 +1877,7 @@ ws.onmessage = (e) => {
 									{/if}
 								</div>
 								{#if laedt && c.total}
-									<div class="balken voll" role="progressbar" aria-label="Downloading {c.label || c.name}" aria-valuenow={prozent(c)} aria-valuemin="0" aria-valuemax="100">
+									<div class="balken voll" role="progressbar" aria-label="Downloading {komponente(c.name, c.label || c.name)}" aria-valuenow={prozent(c)} aria-valuemin="0" aria-valuemax="100">
 										<i style:width="{prozent(c)}%"></i>
 									</div>
 								{/if}
@@ -1887,7 +1889,7 @@ ws.onmessage = (e) => {
 										<p class="fehler">Download failed. Is the computer connected to the internet?</p>
 										<details>
 											<summary>Technical details</summary>
-											<p class="technik">{c.error}</p>
+											<p class="technik">{meldung(c.errorMsg, c.error)}</p>
 										</details>
 									</div>
 								{/if}
@@ -1945,7 +1947,7 @@ ws.onmessage = (e) => {
 									{u.state === 'failed' ? /* @wc-include */ 'Try again' : /* @wc-include */ 'Update now'}
 								</Button>
 							</div>
-							{#if u.state === 'failed'}<p class="warnung">{u.error}</p>{/if}
+							{#if u.state === 'failed'}<p class="warnung">{meldung(u.errorMsg, u.error)}</p>{/if}
 						</div>
 					{:else if u.state === 'downloading'}
 						<p>Downloading version {neu}…</p>

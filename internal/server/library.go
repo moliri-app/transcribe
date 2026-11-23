@@ -20,6 +20,7 @@ import (
 	"github.com/moliri-app/transcribe/fileutil"
 	"github.com/moliri-app/transcribe/internal/media"
 	"github.com/moliri-app/transcribe/internal/memo"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/queue"
 	"github.com/moliri-app/transcribe/internal/shelf"
 	"github.com/moliri-app/transcribe/model"
@@ -144,7 +145,7 @@ func (s *Server) deleteRecording(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if media.IsLinked(name) {
-		fail(w, 400, "Transcribe löscht nichts in einem verbundenen Ordner.")
+		fail(w, 400, msg.New("library.linkedNoDelete", "Transcribe löscht nichts in einem verbundenen Ordner."))
 		return
 	}
 	if st, err := os.Stat(filepath.Join(s.audioDir(), name)); err != nil || st.IsDir() {
@@ -152,11 +153,11 @@ func (s *Server) deleteRecording(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := s.Queue.Forget(name); errors.Is(err, queue.ErrBusy) {
-		fail(w, 409, "Die Aufnahme wird gerade transkribiert. Brich das zuerst ab.")
+		fail(w, 409, msg.New("library.deleteRunning", "Die Aufnahme wird gerade transkribiert. Brich das zuerst ab."))
 		return
 	}
 	if err := s.removeRecording(name); err != nil {
-		fail(w, 500, err.Error())
+		fail(w, 500, err)
 		return
 	}
 	writeJSON(w, 200, map[string]any{"ok": true})
@@ -216,7 +217,7 @@ func (s *Server) shelve(w http.ResponseWriter, r *http.Request) {
 		}
 	})
 	if err != nil {
-		fail(w, 500, err.Error())
+		fail(w, 500, err)
 		return
 	}
 	writeJSON(w, 200, map[string]any{"ok": true, "title": cmp.Or(e.Title, media.Title(stem)),

@@ -19,6 +19,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/moliri-app/transcribe/internal/msg"
 )
 
 // LatestURL is the GitHub API's latest release of the app: neither drafts nor pre-releases.
@@ -51,7 +53,8 @@ type Status struct {
 	Page     string  `json:"page,omitempty"`   // its page on GitHub, with what is new
 	Progress float64 `json:"progress,omitempty"`
 	Error    string  `json:"error,omitempty"`
-	Checked  int64   `json:"checked,omitempty"` // unix seconds of the last successful look
+	ErrorMsg *msg.M  `json:"errorMsg,omitempty"` // Error for the interface to translate (internal/msg)
+	Checked  int64   `json:"checked,omitempty"`  // unix seconds of the last successful look
 }
 
 type release struct {
@@ -135,7 +138,7 @@ func (u *Updater) Check(ctx context.Context) error {
 	u.st.Checked = time.Now().Unix()
 	tell := ""
 	if !u.running && u.st.State != Waiting && u.st.State != Restarting {
-		u.st.Error, u.st.Progress = "", 0
+		u.st.Error, u.st.ErrorMsg, u.st.Progress = "", nil, 0
 		if rel != nil && Compare(rel.version, u.Current) > 0 {
 			u.rel = rel
 			u.st.State, u.st.Latest, u.st.Page = Available, rel.version, rel.page
@@ -216,10 +219,10 @@ func (u *Updater) Install() error {
 		return nil // already under way
 	}
 	if u.rel == nil {
-		return errors.New("Es gibt keine neuere Version.")
+		return msg.New("update.none", "Es gibt keine neuere Version.")
 	}
 	u.running = true
-	u.st.State, u.st.Progress, u.st.Error = Downloading, 0, ""
+	u.st.State, u.st.Progress, u.st.Error, u.st.ErrorMsg = Downloading, 0, "", nil
 	go u.install(*u.rel)
 	return nil
 }
@@ -237,7 +240,8 @@ func (u *Updater) install(rel release) {
 	if err != nil {
 		_ = os.Remove(newPath(u.Exe))
 		log.Println("update:", err)
-		u.st.State, u.st.Progress, u.st.Error = Failed, 0, explain(err)
+		m := explain(err)
+		u.st.State, u.st.Progress, u.st.Error, u.st.ErrorMsg = Failed, 0, m.Error(), m
 		u.mu.Unlock()
 		return
 	}
@@ -320,12 +324,12 @@ func (p *progress) Write(b []byte) (int, error) {
 }
 
 // explain says in the UI's words why installing failed.
-func explain(err error) string {
+func explain(err error) *msg.M {
 	switch {
 	case errors.Is(err, os.ErrPermission):
-		return "Transcribe darf seinen Programmordner nicht ändern. Lade die neue Version von der Releases-Seite und ersetze die EXE von Hand."
+		return msg.New("update.noPermission", "Transcribe darf seinen Programmordner nicht ändern. Lade die neue Version von der Releases-Seite und ersetze die EXE von Hand.")
 	case errors.Is(err, context.DeadlineExceeded):
-		return "Der Download hat zu lange gedauert. Versuch es später noch einmal."
+		return msg.New("update.tooSlow", "Der Download hat zu lange gedauert. Versuch es später noch einmal.")
 	}
-	return "Das Update ließ sich nicht installieren: " + err.Error()
+	return msg.New("update.failed", "Das Update ließ sich nicht installieren: {error}", "error", err)
 }
