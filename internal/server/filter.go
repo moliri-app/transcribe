@@ -21,6 +21,7 @@ import (
 
 	"github.com/moliri-app/transcribe/internal/live"
 	"github.com/moliri-app/transcribe/internal/llm"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/natfilter"
 	"github.com/moliri-app/transcribe/internal/setup"
 	"github.com/moliri-app/transcribe/models"
@@ -162,7 +163,7 @@ func (s *Server) filterAsk(w http.ResponseWriter, r *http.Request) {
 	}
 	request := filterRequest(in)
 	if !s.cfg.Filter.Ready() {
-		s.Live.Logged(live.KindFilter, clientName(r), s.cfg.FilterModel, request, errors.New("Das Sprachmodell ist noch nicht heruntergeladen"))
+		s.Live.Logged(live.KindFilter, clientName(r), s.cfg.FilterModel, request, msg.New("call.llmMissing", "Das Sprachmodell ist noch nicht heruntergeladen"))
 		fail(w, http.StatusServiceUnavailable, "Das Sprachmodell für den Filter in eigenen Worten ist in Transcribe noch nicht geladen")
 		return
 	}
@@ -171,15 +172,16 @@ func (s *Server) filterAsk(w http.ResponseWriter, r *http.Request) {
 	q.sweep()
 	if len(q.pending) >= maxFilterQueue {
 		q.mu.Unlock()
-		s.Live.Logged(live.KindFilter, clientName(r), s.cfg.FilterModel, request, errors.New("Zu viele Fragen warten schon"))
-		fail(w, http.StatusTooManyRequests, "Zu viele Fragen warten schon")
+		tooMany := msg.New("call.tooMany", "Zu viele Fragen warten schon")
+		s.Live.Logged(live.KindFilter, clientName(r), s.cfg.FilterModel, request, tooMany)
+		fail(w, http.StatusTooManyRequests, tooMany)
 		return
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	job := &filterJob{ID: newJobID(), in: in, ctx: ctx, cancel: cancel, created: time.Now(), status: "pending",
 		call: s.Live.Call(live.KindFilter, clientName(r), s.cfg.FilterModel, request)}
 	if q.running || len(q.pending) > 0 {
-		job.call.Status("Wartet, bis die Fragen davor beantwortet sind …")
+		job.call.Status(msg.New("call.waiting", "Wartet, bis die Fragen davor beantwortet sind …"))
 	}
 	if q.jobs == nil {
 		q.jobs = map[string]*filterJob{}
@@ -212,7 +214,7 @@ func (s *Server) filterWork() {
 		q.pending = q.pending[1:]
 		job.status, job.started = "processing", time.Now()
 		q.mu.Unlock()
-		job.call.Status("Rechnet …")
+		job.call.Status(msg.New("call.computing", "Rechnet …"))
 
 		key := sha256.Sum256([]byte(natfilter.Prefix(job.in.Catalog)))
 		msgs := natfilter.Messages(job.in.Text, job.in.Catalog)
@@ -227,7 +229,7 @@ func (s *Server) filterWork() {
 			job.stage = p.Stage
 			q.mu.Unlock()
 			if tell {
-				job.call.Status(filterStages[p.Stage])
+				job.call.Status(filterStage(p.Stage))
 			}
 		})
 
@@ -257,9 +259,17 @@ func (s *Server) filterWork() {
 		job.cancel()
 		var failed error
 		if job.status == "failed" {
-			failed = errors.New(job.errText)
-			if job.errKind == "no_json" {
-				failed = errors.New("Die Antwort des Sprachmodells enthält kein JSON")
+			switch job.errKind {
+			case "cancelled":
+				failed = msg.New("call.cancelled", job.errText)
+			case "not_installed":
+				failed = msg.New("call.llmNotLoaded", job.errText)
+			case "too_long":
+				failed = msg.New("call.catalogTooLong", job.errText)
+			case "no_json":
+				failed = msg.New("call.noJSON", "Die Antwort des Sprachmodells enthält kein JSON")
+			default:
+				failed = errors.New(job.errText)
 			}
 		}
 		facts := s.filterFacts(job, ans)
@@ -352,7 +362,7 @@ func (s *Server) filterCancel(w http.ResponseWriter, r *http.Request) {
 			if p == job {
 				q.pending = append(q.pending[:i], q.pending[i+1:]...)
 				job.status, job.errKind, job.errText, job.finished = "failed", "cancelled", "Abgebrochen", time.Now()
-				job.call.End("", errors.New("Abgebrochen, bevor sie gestellt wurde"))
+				job.call.End("", msg.New("call.cancelledBefore", "Abgebrochen, bevor sie gestellt wurde"))
 				break
 			}
 		}
@@ -393,7 +403,18 @@ func newJobID() string {
 }
 
 // filterStages say on the Live page what the model is doing.
-var filterStages = map[string]string{"loading": "Lädt das Sprachmodell …", "reading": "Liest die Frage …", "writing": "Schreibt die Antwort …"}
+// filterStage says what the language model is doing at stage, for the Live page; nil for none.
+func filterStage(stage string) *msg.M {
+	switch stage {
+	case "loading":
+		return msg.New("call.loadingLLM", "Lädt das Sprachmodell …")
+	case "reading":
+		return msg.New("call.reading", "Liest die Frage …")
+	case "writing":
+		return msg.New("call.writing", "Schreibt die Antwort …")
+	}
+	return nil
+}
 
 // filterRequest is what the Live page shows of a question: the words, then what the model is
 // given, its prompt with the catalog of fields.
@@ -410,25 +431,29 @@ func filterRequest(in natfilter.Input) string {
 // Called with the queue's mu held.
 func (s *Server) filterFacts(job *filterJob, ans llm.Answer) []live.Fact {
 	var facts []live.Fact
-	add := func(label, value string) { facts = append(facts, live.Fact{Label: label, Value: value}) }
+	add := func(key, label string, value *msg.M) { facts = append(facts, live.NewFact(key, label, value)) }
+	seconds := func(d time.Duration) *msg.M {
+		return msg.New("", "{text}", "text", live.Seconds(d), "seconds", d.Seconds())
+	}
 	if !job.started.IsZero() {
-		add("Gewartet", live.Seconds(job.started.Sub(job.created)))
+		add("waited", "Gewartet", seconds(job.started.Sub(job.created)))
 	}
 	if ans.Seconds > 0 {
-		add("Rechenzeit", live.Seconds(time.Duration(ans.Seconds*float64(time.Second))))
+		add("computeTime", "Rechenzeit", seconds(time.Duration(ans.Seconds*float64(time.Second))))
 	}
 	if ans.PromptTokens > 0 {
-		add("Tokens gelesen", fmt.Sprintf("%d, davon %d schon zwischengespeichert", ans.PromptTokens, ans.CachedTokens))
+		add("tokensRead", "Tokens gelesen", msg.New("", "{tokens}, davon {cached} schon zwischengespeichert",
+			"tokens", ans.PromptTokens, "cached", ans.CachedTokens))
 	}
 	if ans.Tokens > 0 {
-		add("Tokens geschrieben", fmt.Sprint(ans.Tokens))
+		add("tokensWritten", "Tokens geschrieben", msg.New("", "{tokens}", "tokens", ans.Tokens))
 	}
 	if d := s.filterDevice(); d != nil {
-		add("Gerät", strings.TrimSpace(d["build"]+" "+d["name"]))
+		add("device", "Gerät", msg.New("", "{device}", "device", strings.TrimSpace(d["build"]+" "+d["name"])))
 	}
 	if job.status == "done" {
-		add("Ergebnis", fmt.Sprintf("%d Bedingungen, %d nicht verstanden, %d verworfen",
-			len(job.result.Conditions), len(job.result.NotUnderstood), len(job.result.Dropped)))
+		add("result", "Ergebnis", msg.New("", "{conditions} Bedingungen, {notUnderstood} nicht verstanden, {dropped} verworfen",
+			"conditions", len(job.result.Conditions), "notUnderstood", len(job.result.NotUnderstood), "dropped", len(job.result.Dropped)))
 	}
 	return facts
 }

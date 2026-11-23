@@ -6,9 +6,9 @@ package live
 
 import (
 	"cmp"
-	"errors"
 	"strings"
 
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/prefs"
 )
 
@@ -34,7 +34,7 @@ const (
 	WarmReady   = "ready"   // a recording starts at once
 )
 
-var errOff = errors.New("Transcribe nimmt für andere Programme gerade nicht über das Mikrofon auf: „Im Hintergrund bereit“ ist aus. Geschickte Audiodaten und Bilder verarbeitet es weiterhin. Zum Aufnehmen in Transcribe unter Einstellungen, „Andere Programme“, einschalten.")
+var errOff = msg.New("live.off", "Transcribe nimmt für andere Programme gerade nicht über das Mikrofon auf: „Im Hintergrund bereit“ ist aus. Geschickte Audiodaten und Bilder verarbeitet es weiterhin. Zum Aufnehmen in Transcribe unter Einstellungen, „Andere Programme“, einschalten.")
 
 // Enabled reports whether the background mode is on.
 func (h *Hub) Enabled() bool { return !prefs.Load(h.dataDir).LiveOff }

@@ -15,6 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/prefs"
 )
 
@@ -43,9 +44,18 @@ func callID(id string) bool {
 }
 
 // Fact is something about a call worth knowing when looking into it, such as how long it took.
+// Label and Value are German, as the API has always sent them; Msg says the same for the interface
+// to translate: its key names the fact, its arguments make the value (frontend/src/lib/meldungen.js).
 type Fact struct {
 	Label string `json:"label"`
 	Value string `json:"value"`
+	Msg   *msg.M `json:"msg,omitempty"`
+}
+
+// NewFact is the fact key, labelled label, whose value is the message value.
+func NewFact(key, label string, value *msg.M) Fact {
+	value.Key = "fact." + key
+	return Fact{Label: label, Value: value.Error(), Msg: value}
 }
 
 // maxCallText is how much of a request or response a call keeps.
@@ -93,18 +103,22 @@ func (h *Hub) Logged(kind, client, model, request string, err error, facts ...Fa
 	h.Call(kind, client, model, request).End("", err, facts...)
 }
 
-// Status says what the call is doing now ("" when nothing worth saying), for the Live page.
-func (c *Call) Status(s string) {
+// Status says what the call is doing now (nil when nothing worth saying), for the Live page.
+func (c *Call) Status(m *msg.M) {
 	if c == nil {
 		return
+	}
+	s := ""
+	if m != nil {
+		s = m.Error()
 	}
 	c.h.mu.Lock()
 	defer c.h.mu.Unlock()
 	if c.n.Ended != nil || c.n.Partial == s {
 		return
 	}
-	c.n.Partial = s
-	c.h.broadcastLocked(map[string]any{"type": "partial", "id": c.n.ID, "text": s})
+	c.n.Partial, c.n.PartialMsg = s, m
+	c.h.broadcastLocked(map[string]any{"type": "partial", "id": c.n.ID, "text": s, "msg": m})
 }
 
 // Model names the engine or model that answers, once it is known.
@@ -211,10 +225,10 @@ func (c *Call) End(response string, err error, facts ...Fact) {
 		return
 	}
 	now := time.Now()
-	n.Ended, n.Partial = &now, ""
+	n.Ended, n.Partial, n.PartialMsg = &now, "", nil
 	n.Response = clip(response)
 	if err != nil {
-		n.Error = err.Error()
+		n.Error, n.ErrorMsg = err.Error(), msg.Of(err)
 	}
 	n.Facts = append(n.Facts, facts...)
 	h.sendNote(n)

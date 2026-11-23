@@ -5,12 +5,13 @@
 package pick
 
 import (
-	"errors"
 	"fmt"
 	"runtime"
 	"sync"
 	"syscall"
 	"unsafe"
+
+	"github.com/moliri-app/transcribe/internal/msg"
 )
 
 // The dialog is the Explorer's own (IFileOpenDialog with FOS_PICKFOLDERS), driven over COM
@@ -70,7 +71,7 @@ var open sync.Mutex
 // returns the folder; "" if they cancelled.
 func Folder(title string) (string, error) {
 	if !open.TryLock() {
-		return "", errors.New("Der Dialog zur Ordnerwahl ist schon offen.")
+		return "", msg.New("pick.open", "Der Dialog zur Ordnerwahl ist schon offen.")
 	}
 	defer open.Unlock()
 	type result struct {

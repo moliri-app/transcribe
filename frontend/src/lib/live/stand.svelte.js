@@ -7,6 +7,8 @@
 import { einreihen, getJSON, post, vorgaben } from '$lib/api.js';
 import { langName } from '$lib/moliri/components/files/transcript/editor/sprachen.js';
 import { getLocale } from '$lib/moliri/i18n/locale.js';
+import { argumente, leserName, meldung } from '$lib/meldungen.js';
+import plural from '../../locales/plural.js';
 
 /** source: woher der Satz kam, wenn die Aufnahme Mikrofon und Systemaudio mischt
  * @typedef {{ text: string, start: number, end: number, source?: 'mic' | 'system' }} Zeile */
@@ -14,9 +16,12 @@ import { getLocale } from '$lib/moliri/i18n/locale.js';
  * einen Dienst (ocr, filter, embed; internal/live/calls.go) hat statt Sätzen model, request, response und
  * facts (bei der Texterkennung auch das Bild, image); partial sagt, was sie gerade tut.
  * @typedef {{ id: string, kind: 'audio' | 'mic' | 'dauer' | 'diktat' | Dienst, client?: string, started: string, ended?: string,
- *   lines: Zeile[], partial?: string, partialSource?: 'mic' | 'system', audio?: string, language?: string,
- *   source?: Quelle, error?: string, loading?: boolean, waiting?: boolean, transient?: boolean,
- *   model?: string, request?: string, response?: string, facts?: { label: string, value: string }[], image?: string }} Notiz */
+ *   lines: Zeile[], partial?: string, partialMsg?: Meldung, partialSource?: 'mic' | 'system', audio?: string, language?: string,
+ *   source?: Quelle, error?: string, errorMsg?: Meldung, loading?: boolean, waiting?: boolean, transient?: boolean,
+ *   model?: string, request?: string, response?: string, facts?: Fakt[], image?: string }} Notiz */
+/** label und value auf Deutsch, msg dasselbe zum Übersetzen (fakt)
+ * @typedef {{ label: string, value: string, msg?: Meldung }} Fakt */
+/** @typedef {import('$lib/meldungen.js').Meldung} Meldung */
 /** @typedef {keyof typeof DIENSTE} Dienst */
 /** @typedef {'mic' | 'system' | 'both'} Quelle */
 /** input: was mit dem Mikrofon nicht stimmt, solange die Aufnahme läuft (internal/live/input.go)
@@ -153,6 +158,119 @@ export function worum(n) {
 	if (n.kind === 'filter') return nach(/^Frage: /);
 	if (n.kind === 'embed') return nach(/^1\. /);
 	return (n.response ?? '').replace(/\s+/g, ' ').trim();
+}
+
+/** Was eine Anfrage beantwortete, in der Sprache der Oberfläche (die Texterkennung von Windows, ein KI-Dienst).
+ * @param {Notiz} n */
+export const modell = (n) => (n.kind === 'ocr' ? leserName(n.model ?? '') : (n.model ?? ''));
+
+/** Der Fehler einer Notiz in der Sprache der Oberfläche (der Server schickt ihn auf Deutsch und als
+ * Meldung, internal/msg).
+ * @param {Notiz} n */
+export const fehler = (n) => meldung(n.errorMsg, n.error ?? '');
+
+/** Was gerade erkannt wird, oder bei einer Anfrage, was sie gerade tut (eine Meldung des Servers).
+ * @param {Notiz} n */
+export const zwischenstand = (n) => (n.partialMsg ? meldung(n.partialMsg, n.partial ?? '') : (n.partial ?? ''));
+
+/** Ein Fakt einer Anfrage (internal/live/calls.go: Fact) mit Namen und Wert in der Sprache der
+ * Oberfläche: die Meldung nennt mit ihrem Schlüssel den Fakt, ihre Argumente machen den Wert.
+ * @param {Fakt} f
+ * @returns {{ label: string, value: string }} */
+export function fakt(f) {
+	const m = f.msg;
+	if (!m) return { label: f.label, value: f.value };
+	const a = argumente(m);
+	/** @type {Record<string, number>} */
+	const zahl = new Proxy({}, { get: (_, k) => Number(m.args?.[String(k)] ?? 0) });
+	switch (m.key) {
+		case 'fact.recognized':
+			return {
+				label: /* @wc-include */ 'Recognized',
+				value: `${plural(zahl.lines, ['# line', '# lines'])}, ${plural(zahl.words, ['# word', '# words'])}`
+			};
+		case 'fact.engine':
+			return { label: /* @wc-include */ 'Engine', value: a.name };
+		case 'fact.imageSize':
+			return { label: /* @wc-include */ 'Image size', value: /* @wc-include */ `${a.width} × ${a.height} pixels` };
+		case 'fact.models':
+			return { label: /* @wc-include */ 'Models', value: a.models };
+		case 'fact.gpu':
+			return { label: /* @wc-include */ 'Graphics card', value: /* @wc-include */ 'yes' };
+		case 'fact.texts':
+			return { label: /* @wc-include */ 'Texts', value: /* @wc-include */ `${a.texts}, ${a.chars} characters in all` };
+		case 'fact.model':
+			return {
+				label: /* @wc-include */ 'Model',
+				value: m.args?.loaded ? /* @wc-include */ 'was already loaded' : /* @wc-include */ 'had to be loaded first'
+			};
+		case 'fact.waited':
+			return { label: /* @wc-include */ 'Waited', value: sekunden(zahl.seconds) };
+		case 'fact.computeTime':
+			return { label: /* @wc-include */ 'Computing time', value: sekunden(zahl.seconds) };
+		case 'fact.tokensRead':
+			return { label: /* @wc-include */ 'Tokens read', value: /* @wc-include */ `${a.tokens}, ${a.cached} of them already cached` };
+		case 'fact.tokensWritten':
+			return { label: /* @wc-include */ 'Tokens written', value: a.tokens };
+		case 'fact.device':
+			return { label: /* @wc-include */ 'Device', value: a.device };
+		case 'fact.result':
+			return {
+				label: /* @wc-include */ 'Result',
+				value: /* @wc-include */ `${plural(zahl.conditions, ['# condition', '# conditions'])}, ${a.notUnderstood} not understood, ${a.dropped} dropped`
+			};
+	}
+	return { label: f.label, value: f.value };
+}
+
+/** Die Anfrage, wie die Live-Seite sie zeigt: die Zeilen, mit denen der Server sie beschreibt (Bild,
+ * Sprachen, Frage …, internal/server: ocrRequest, filterRequest, embedRequest), in der Sprache der
+ * Oberfläche; was danach kommt (die Texte, die Nachrichten an das Sprachmodell), wie es ist.
+ * @param {Notiz} n */
+export function anfrageText(n) {
+	const r = n.request ?? '';
+	const ende = r.indexOf('\n\n');
+	const kopf = ende < 0 ? r : r.slice(0, ende);
+	/** "Standard" und "ohne Angabe" des Servers */
+	const wert = (/** @type {string} */ v) =>
+		v === 'Standard' ? /* @wc-include */ 'default' : v === 'ohne Angabe' ? /* @wc-include */ 'not given' : v;
+	const zeilen = kopf.split('\n').map((z) => {
+		const [, name, v] = /^(Bild|Sprachen|Layout|Frage|Felder|Art): (.*)$/.exec(z) ?? [];
+		switch (name) {
+			case 'Bild':
+				return /* @wc-include */ `Image: ${wert(v)}`;
+			case 'Sprachen':
+				return /* @wc-include */ `Languages: ${wert(v)}`;
+			case 'Layout':
+				return /* @wc-include */ `Layout: ${wert(v)}`;
+			case 'Frage':
+				return /* @wc-include */ `Question: ${v}`;
+			case 'Felder':
+				return /* @wc-include */ `Fields: ${v}`;
+			case 'Art':
+				return /* @wc-include */ `Kind: ${v}`;
+		}
+		return z;
+	});
+	return gekuerzt(zeilen.join('\n') + (ende < 0 ? '' : r.slice(ende)));
+}
+
+/** Die Antwort, wie die Live-Seite sie zeigt; bei der Suche nach Bedeutung die erste Zeile (wie viele
+ * Vektoren) in der Sprache der Oberfläche.
+ * @param {Notiz} n */
+export function antwortText(n) {
+	const r = n.response ?? '';
+	const v = /^(\d+) Vektoren mit je (\d+) Zahlen/.exec(r);
+	if (n.kind !== 'embed' || !v) return gekuerzt(r);
+	return gekuerzt(/* @wc-include */ `${v[1]} vectors of ${v[2]} numbers each` + r.slice(v[0].length));
+}
+
+/** was der Server an eine gekürzte Anfrage oder Antwort hängt (internal/live/calls.go: clip)
+ * @param {string} s */
+function gekuerzt(s) {
+	const k = /\n… \(gekürzt, insgesamt (\d+) Zeichen\)$/.exec(s);
+	if (!k) return s;
+	return s.slice(0, k.index) + '\n' + /* @wc-include */ `… (shortened, ${Number(k[1]).toLocaleString(getLocale())} characters in all)`;
 }
 
 /** wie lange eine Anfrage dauerte, genauer als die Länge einer Aufnahme: „0,42 s“, „12 s“, „2:05 min“
@@ -306,6 +424,7 @@ class Live {
 				const n = this.notizen?.find((x) => x.id === m.id);
 				if (n) {
 					n.partial = m.text;
+					n.partialMsg = m.msg;
 					n.partialSource = m.source;
 				}
 				break;

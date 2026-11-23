@@ -17,6 +17,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/ocr"
 )
 
@@ -53,6 +54,9 @@ type Engine struct {
 	sys system
 }
 
+// ErrNoLanguages is the Error of the engine while Windows has no language for it.
+var ErrNoLanguages = msg.New("ocr.noWindowsLanguage", "In Windows ist keine Sprache für die Texterkennung installiert (Einstellungen › Zeit und Sprache › Sprache)")
+
 func (e *Engine) Info() ocr.Info {
 	info := ocr.Info{ID: "os", Name: e.sys.Name(), Version: e.sys.Version(), Languages: []string{},
 		Layouts: []string{"auto", "lines"}, Boxes: "words"}
@@ -62,7 +66,7 @@ func (e *Engine) Info() ocr.Info {
 	case err != nil:
 		info.Error = err.Error()
 	case len(codes) == 0:
-		info.Error = "In Windows ist keine Sprache für die Texterkennung installiert (Einstellungen › Zeit und Sprache › Sprache)"
+		info.Error = ErrNoLanguages.Error()
 	default:
 		info.Ready, info.Usable = true, true
 	}

@@ -6,7 +6,7 @@
      API, KI & OCR) und sortiert; unten der Weg zu „Programme“ in den Einstellungen. -->
 <script>
 	import { dauer } from '$lib/api.js';
-	import { anfrage, DIENSTE, live, laenge, QUELLEN, sekunden, tag, uhrzeit, vonHand, WARTET, wer, worum } from './stand.svelte.js';
+	import { anfrage, DIENSTE, fehler, live, laenge, modell, QUELLEN, sekunden, tag, uhrzeit, vonHand, WARTET, wer, worum, zwischenstand } from './stand.svelte.js';
 	import { ausschnitt, HERKUNFT, passt, SORTIERUNG, sortieren, stellenIn, stuecke, suchen } from './suche.js';
 	import plural from '../../locales/plural.js';
 
@@ -225,8 +225,8 @@
 								{#each v as s, i (i)}{#if s.an}<mark>{s.t}</mark>{:else}{s.t}{/if}{/each}
 							{:else}
 								{dienst
-									? n.error || (n.ended ? /* @wc-include */ 'Empty response' : n.partial || /* @wc-include */ 'Running…')
-									: n.error
+									? fehler(n) || (n.ended ? /* @wc-include */ 'Empty response' : zwischenstand(n) || /* @wc-include */ 'Running…')
+									: fehler(n)
 										? /* @wc-include */ 'No text'
 										: n.loading
 											? /* @wc-include */ 'Loading recognition…'
@@ -241,7 +241,7 @@
 							{#if dienst}
 								<span class="dauer">{n.ended ? sekunden(laenge(n, live.jetzt)) : dauer(laenge(n, live.jetzt))}</span>
 								<span>{DIENSTE[/** @type {import('./stand.svelte.js').Dienst} */ (n.kind)]}</span>
-								{#if n.model}<span class="modell" title={n.model}>{n.model}</span>{/if}
+								{#if n.model}<span class="modell" title={modell(n)}>{modell(n)}</span>{/if}
 							{:else}
 								<span class="dauer">{dauer(laenge(n, live.jetzt))}</span>
 							{/if}

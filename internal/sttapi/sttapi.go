@@ -11,12 +11,12 @@ package sttapi
 
 import (
 	"context"
-	"errors"
 	"io"
 	"math"
 	"strings"
 
 	"github.com/moliri-app/transcribe/internal/live"
+	"github.com/moliri-app/transcribe/internal/msg"
 )
 
 // The protocols a service speaks.
@@ -103,7 +103,7 @@ func (c Config) base() string { return strings.TrimRight(c.URL, "/") }
 // Usable explains what is missing before the service can be used; nil if nothing.
 func (c Config) Usable() error {
 	if c.URL == "" {
-		return errors.New("Für die API fehlt die Adresse (Einstellungen, Erkennung).")
+		return msg.New("api.noURL", "Für die API fehlt die Adresse (Einstellungen, Erkennung).")
 	}
 	if c.Key == "" && !c.provider().NoKey {
 		return ErrNoKey
@@ -112,7 +112,7 @@ func (c Config) Usable() error {
 }
 
 // ErrNoKey is returned when no API key is stored for a service that needs one.
-var ErrNoKey = errors.New("Für die API ist noch kein Schlüssel hinterlegt (Einstellungen, Erkennung).")
+var ErrNoKey = msg.New("api.noKey", "Für die API ist noch kein Schlüssel hinterlegt (Einstellungen, Erkennung).")
 
 // Request says what is known about a recording.
 type Request struct {

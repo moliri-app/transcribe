@@ -7,13 +7,14 @@ package sttapi
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/moliri-app/transcribe/internal/msg"
 )
 
 // ElevenLabs (Scribe): whole recordings over HTTP, with speakers and sounds; live over a WebSocket.
@@ -55,7 +56,7 @@ func elevenLabsTranscribe(ctx context.Context, c Config, audio io.Reader, name s
 	}
 	var r elResult
 	if err := json.Unmarshal(body, &r); err != nil {
-		return nil, fmt.Errorf("%s: unerwartete Antwort: %w", c.Label(), err)
+		return nil, msg.New("api.badAnswer", "{service}: unerwartete Antwort: {error}", "service", c.Label(), "error", err)
 	}
 	res := &Result{Language: shortLang(r.LanguageCode), Duration: r.Duration}
 	for _, w := range r.Words {
@@ -109,7 +110,7 @@ func post(ctx context.Context, target string, hdr http.Header, fields map[string
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
 		}
-		return nil, fmt.Errorf("%s ist nicht erreichbar: %w", label, err)
+		return nil, msg.New("api.unreachable", "{service} ist nicht erreichbar: {error}", "service", label, "error", err)
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(io.LimitReader(resp.Body, 256<<20))
@@ -129,14 +130,17 @@ type apiError struct {
 	label  string
 }
 
-func (e *apiError) Error() string {
+func (e *apiError) Error() string { return e.Msg().Error() }
+
+// Msg says the refusal for the interface (internal/msg).
+func (e *apiError) Msg() *msg.M {
 	switch e.status {
 	case http.StatusUnauthorized, http.StatusForbidden:
-		return fmt.Sprintf("%s hat den API-Schlüssel abgelehnt. %s", e.label, e.msg)
+		return msg.New("api.keyRejected", "{service} hat den API-Schlüssel abgelehnt. {detail}", "service", e.label, "detail", e.msg)
 	case http.StatusPaymentRequired, http.StatusTooManyRequests:
-		return fmt.Sprintf("%s nimmt gerade nichts an (Guthaben oder Anfragen aufgebraucht). %s", e.label, e.msg)
+		return msg.New("api.exhausted", "{service} nimmt gerade nichts an (Guthaben oder Anfragen aufgebraucht). {detail}", "service", e.label, "detail", e.msg)
 	}
-	return fmt.Sprintf("%s: Fehler %d: %s", e.label, e.status, e.msg)
+	return msg.New("api.error", "{service}: Fehler {status}: {detail}", "service", e.label, "status", e.status, "detail", e.msg)
 }
 
 // errorMessage reads what a service says about an error: {"detail": ...} (ElevenLabs),

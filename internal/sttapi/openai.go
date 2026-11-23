@@ -9,10 +9,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/moliri-app/transcribe/internal/msg"
 )
 
 // The OpenAI-compatible transcription API: POST <base>/audio/transcriptions with the audio and
@@ -72,7 +73,7 @@ func openAITranscribe(ctx context.Context, c Config, audio io.Reader, name strin
 	}
 	var r oaResult
 	if err := json.Unmarshal(body, &r); err != nil {
-		return nil, fmt.Errorf("%s: unerwartete Antwort: %w", c.Label(), err)
+		return nil, msg.New("api.badAnswer", "{service}: unerwartete Antwort: {error}", "service", c.Label(), "error", err)
 	}
 	res := &Result{Language: shortLang(r.Language), Duration: r.Duration}
 	if res.Duration == 0 {

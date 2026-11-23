@@ -9,7 +9,6 @@ import (
 	"cmp"
 	"context"
 	"encoding/binary"
-	"errors"
 	"io"
 	"log"
 	"os"
@@ -24,6 +23,7 @@ import (
 	"time"
 
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/proc"
 )
 
@@ -327,18 +327,19 @@ func record(ctx context.Context, input []string, ended error, piece func([]float
 	return ended
 }
 
-type captureError string
-
-func (e captureError) Error() string { return "Aufnahme fehlgeschlagen: " + string(e) }
+// captureError is a recording that failed for reason, as the system (ffmpeg, Windows) gave it.
+func captureError(reason string) error {
+	return msg.New("capture.failed", "Aufnahme fehlgeschlagen: {reason}", "reason", reason)
+}
 
 var (
-	errNoDevice    = captureError("kein Mikrofon gefunden")
-	errEnded       = captureError("das Mikrofon hat aufgehört zu liefern")
-	errNoOutput    = captureError("kein Ausgabegerät für das Systemaudio gefunden")
-	errSystemEnded = captureError("das Systemaudio hat aufgehört zu liefern")
-	errNoSystem    = captureError("Systemaudio aufzunehmen geht auf dem Mac noch nicht")
-	errSystemOnly  = errors.New("Gerade läuft eine Aufnahme nur vom Systemaudio. Zum Diktieren erst diese Aufnahme auf der Seite Live beenden.")
-	errNoSound     = errors.New("Es kam kein Ton an, bevor die Aufnahme beendet wurde, darum ist nichts gespeichert.")
+	errNoDevice    = msg.New("capture.noDevice", "Aufnahme fehlgeschlagen: kein Mikrofon gefunden")
+	errEnded       = msg.New("capture.micEnded", "Aufnahme fehlgeschlagen: das Mikrofon hat aufgehört zu liefern")
+	errNoOutput    = msg.New("capture.noOutput", "Aufnahme fehlgeschlagen: kein Ausgabegerät für das Systemaudio gefunden")
+	errSystemEnded = msg.New("capture.systemEnded", "Aufnahme fehlgeschlagen: das Systemaudio hat aufgehört zu liefern")
+	errNoSystem    = msg.New("capture.noSystemOnMac", "Aufnahme fehlgeschlagen: Systemaudio aufzunehmen geht auf dem Mac noch nicht")
+	errSystemOnly  = msg.New("capture.systemOnly", "Gerade läuft eine Aufnahme nur vom Systemaudio. Zum Diktieren erst diese Aufnahme auf der Seite Live beenden.")
+	errNoSound     = msg.New("capture.noSound", "Es kam kein Ton an, bevor die Aufnahme beendet wurde, darum ist nichts gespeichert.")
 )
 
 func s16le(b []byte) []float32 {

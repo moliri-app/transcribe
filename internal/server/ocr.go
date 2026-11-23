@@ -15,6 +15,9 @@ import (
 	"strings"
 
 	"github.com/moliri-app/transcribe/internal/live"
+	"github.com/moliri-app/transcribe/internal/msg"
+	"github.com/moliri-app/transcribe/internal/ocrapi"
+	"github.com/moliri-app/transcribe/internal/osocr"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/ocr"
 )
@@ -85,7 +88,7 @@ func (s *Server) ocrEngines(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if s.cfg.OCR == nil {
-		fail(w, http.StatusServiceUnavailable, "Texterkennung ist nicht verfügbar")
+		fail(w, http.StatusServiceUnavailable, msg.New("ocr.unavailable", "Texterkennung ist nicht verfügbar"))
 		return
 	}
 	accel := "cpu"
@@ -98,8 +101,33 @@ func (s *Server) ocrEngines(w http.ResponseWriter, r *http.Request) {
 		"place":   s.cfg.OCR.Place,
 		"accel":   accel, // the app's GPU choice; each engine says whether it runs on the GPU
 		"default": s.cfg.OCR.DefaultEngine(),
-		"engines": s.cfg.OCR.Engines(),
+		"engines": ocrEngines(s.cfg.OCR.Engines()),
 	})
+}
+
+// ocrEngine is an engine as the settings page sees it: with its Error as a message to translate.
+type ocrEngine struct {
+	ocr.Info
+	ErrorMsg *msg.M `json:"errorMsg,omitempty"`
+}
+
+func ocrEngines(infos []ocr.Info) []ocrEngine {
+	out := make([]ocrEngine, len(infos))
+	for i, info := range infos {
+		out[i].Info = info
+		if info.Error == "" {
+			continue
+		}
+		if info.Error == ocr.ErrNotFetched.Error() {
+			out[i].ErrorMsg = msg.New("ocr.tesseractLater", info.Error)
+		}
+		for _, m := range []*msg.M{osocr.ErrNoLanguages, ocrapi.ErrNoURL, ocrapi.ErrNoModel, ocrapi.ErrNoKey} {
+			if info.Error == m.Error() {
+				out[i].ErrorMsg = m
+			}
+		}
+	}
+	return out
 }
 
 func (s *Server) ocrSchema(w http.ResponseWriter, r *http.Request) {
@@ -121,7 +149,7 @@ func (s *Server) ocrRead(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if s.cfg.OCR == nil {
-		fail(w, http.StatusServiceUnavailable, "Texterkennung ist nicht verfügbar")
+		fail(w, http.StatusServiceUnavailable, msg.New("ocr.unavailable", "Texterkennung ist nicht verfügbar"))
 		return
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, maxOCRImage)
@@ -147,13 +175,13 @@ func (s *Server) ocrRead(w http.ResponseWriter, r *http.Request) {
 	engine, o, err := s.cfg.OCR.Prepare(field("engine"), asked)
 	if err != nil {
 		s.Live.Logged(live.KindOCR, clientName(r), field("engine"), ocrRequest(image, 0, asked), err)
-		fail(w, ocrStatus(err), err.Error())
+		fail(w, ocrStatus(err), err)
 		return
 	}
 	info := engine.Info()
 	tmp, err := os.CreateTemp("", "transcribe-ocr-*")
 	if err != nil {
-		fail(w, 500, err.Error())
+		fail(w, 500, err)
 		return
 	}
 	defer os.Remove(tmp.Name())
@@ -162,11 +190,12 @@ func (s *Server) ocrRead(w http.ResponseWriter, r *http.Request) {
 	var tooBig *http.MaxBytesError
 	switch {
 	case errors.As(err, &tooBig):
-		s.Live.Logged(live.KindOCR, clientName(r), engineName(info), ocrRequest(image, 0, o), errors.New("Bild größer als 64 MB"))
-		fail(w, http.StatusRequestEntityTooLarge, "Bild größer als 64 MB")
+		tooBig := msg.New("ocr.tooBig", "Bild größer als 64 MB")
+		s.Live.Logged(live.KindOCR, clientName(r), engineName(info), ocrRequest(image, 0, o), tooBig)
+		fail(w, http.StatusRequestEntityTooLarge, tooBig)
 		return
 	case err != nil:
-		fail(w, http.StatusBadRequest, err.Error())
+		fail(w, http.StatusBadRequest, err)
 		return
 	case n == 0:
 		fail(w, http.StatusBadRequest, "Bild fehlt")
@@ -174,7 +203,7 @@ func (s *Server) ocrRead(w http.ResponseWriter, r *http.Request) {
 	}
 	var facts []live.Fact
 	if info.GPU {
-		facts = append(facts, live.Fact{Label: "Grafikkarte", Value: "ja"})
+		facts = append(facts, live.NewFact("gpu", "Grafikkarte", msg.New("", "ja")))
 	}
 	call := s.Live.Call(live.KindOCR, clientName(r), engineName(info), ocrRequest(image, n, o), facts...)
 	call.Image(tmp.Name())
@@ -185,7 +214,7 @@ func (s *Server) ocrRead(w http.ResponseWriter, r *http.Request) {
 			return // the caller went away
 		}
 		call.End("", err)
-		fail(w, ocrStatus(err), err.Error())
+		fail(w, ocrStatus(err), err)
 		return
 	}
 	call.End(res.Text(), nil, ocrFacts(res)...)
@@ -193,7 +222,7 @@ func (s *Server) ocrRead(w http.ResponseWriter, r *http.Request) {
 }
 
 // errGone ends a call whose program went away before the answer came.
-var errGone = errors.New("Das Programm hat nicht mehr auf die Antwort gewartet")
+var errGone = msg.New("call.gone", "Das Programm hat nicht mehr auf die Antwort gewartet")
 
 // engineName names an OCR engine for the Live page: its name and version.
 func engineName(info ocr.Info) string {
@@ -222,14 +251,15 @@ func ocrFacts(res *ocr.Result) []live.Fact {
 		lines += len(p.Lines)
 	}
 	facts := []live.Fact{
-		{Label: "Erkannt", Value: fmt.Sprintf("%d Zeilen, %d Wörter", lines, res.Words())},
-		{Label: "Engine", Value: res.Engine},
+		live.NewFact("recognized", "Erkannt", msg.New("", "{lines} Zeilen, {words} Wörter", "lines", lines, "words", res.Words())),
+		live.NewFact("engine", "Engine", msg.New("", "{name}", "name", res.Engine)),
 	}
 	if len(res.Pages) > 0 {
-		facts = append(facts, live.Fact{Label: "Bildgröße", Value: fmt.Sprintf("%d × %d Pixel", res.Pages[0].Width, res.Pages[0].Height)})
+		facts = append(facts, live.NewFact("imageSize", "Bildgröße",
+			msg.New("", "{width} × {height} Pixel", "width", res.Pages[0].Width, "height", res.Pages[0].Height)))
 	}
 	if res.Language != "" {
-		facts = append(facts, live.Fact{Label: "Modelle", Value: res.Language})
+		facts = append(facts, live.NewFact("models", "Modelle", msg.New("", "{models}", "models", res.Language)))
 	}
 	return facts
 }

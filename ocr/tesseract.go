@@ -79,12 +79,15 @@ func (t *Tesseract) env(threads int) []string {
 	return env
 }
 
+// ErrNotFetched is what Check says while the Tesseract library has not been downloaded yet.
+var ErrNotFetched = errors.New("Tesseract wird beim ersten Lesen heruntergeladen")
+
 // Check asks the program for its version and installed models (once) and reports whether it
 // runs. With Lib it reports whether the library is there.
 func (t *Tesseract) Check() error {
 	if t.Lib != nil {
 		if !t.Lib.Installed() {
-			return errors.New("Tesseract wird beim ersten Lesen heruntergeladen")
+			return ErrNotFetched
 		}
 		return nil
 	}

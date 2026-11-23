@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/pick"
 	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/queue"
@@ -87,7 +88,7 @@ func (s *Server) folders(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if err := s.changeFolders(body.Action, body.Path, body.On); err != nil {
-			fail(w, 400, err.Error())
+			fail(w, 400, err)
 			return
 		}
 		media.Forget(s.cfg.DataDir)
@@ -110,11 +111,11 @@ func (s *Server) changeFolders(action, path string, on bool) error {
 	switch action {
 	case "add":
 		if !filepath.IsAbs(path) {
-			return errors.New("Bitte den ganzen Pfad des Ordners angeben, etwa C:\\Nextcloud\\Interviews.")
+			return msg.New("folders.relative", "Bitte den ganzen Pfad des Ordners angeben, etwa C:\\Nextcloud\\Interviews.")
 		}
 		path = filepath.Clean(path)
 		if st, err := os.Stat(path); err != nil || !st.IsDir() {
-			return errors.New("Diesen Ordner gibt es nicht: " + path)
+			return msg.New("folders.missing", "Diesen Ordner gibt es nicht: {path}", "path", path)
 		}
 		_, err := prefs.Update(s.cfg.DataDir, func(p *prefs.Prefs) { p.Folders = append(p.Folders, path) })
 		return err
@@ -139,10 +140,23 @@ func (s *Server) folderPick(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "forbidden", 403)
 		return
 	}
-	path, err := pick.Folder("Ordner mit Aufnahmen verbinden")
+	path, err := pick.Folder(dialogTitle(r, "Ordner mit Aufnahmen verbinden"))
 	if err != nil {
-		fail(w, 500, err.Error())
+		fail(w, 500, err)
 		return
 	}
 	writeJSON(w, 200, map[string]any{"ok": true, "path": path})
+}
+
+// dialogTitle is the title of the system's folder dialog: the one the page sends in the interface
+// language (POST {"title": …}), else fallback.
+func dialogTitle(r *http.Request, fallback string) string {
+	var in struct {
+		Title string `json:"title"`
+	}
+	_ = json.NewDecoder(http.MaxBytesReader(nil, r.Body, 1<<12)).Decode(&in)
+	if t := strings.TrimSpace(in.Title); t != "" && len(t) <= 200 {
+		return t
+	}
+	return fallback
 }

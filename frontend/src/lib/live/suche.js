@@ -7,7 +7,7 @@
 // fast jede Buchstabenfolge irgendwo verstreut, und echte Tippfehler („Absperung“) wären davon nicht
 // zu unterscheiden. Mehrere Suchwörter müssen alle in derselben Aufnahme vorkommen.
 import fuzzysort from 'fuzzysort';
-import { anfrage, art, DIENSTE, laenge, sprachname, vonHand, wer, worum } from './stand.svelte.js';
+import { anfrage, anfrageText, antwortText, art, DIENSTE, fehler, laenge, modell, sprachname, vonHand, wer, worum } from './stand.svelte.js';
 
 /** @typedef {import('./stand.svelte.js').Notiz} Notiz */
 /** zeile: der Satz, der die Suchwörter am besten trifft (-1: Treffer nur im Namen)
@@ -96,9 +96,9 @@ export function suchen(notizen, q) {
 	for (const n of notizen) {
 		if (anfrage(n)) {
 			// beim Sprachmodell nur die Frage, nicht der ganze Prompt mit dem Feldkatalog
-			const gefragt = n.kind === 'filter' ? worum(n) : (n.request ?? '');
+			const gefragt = n.kind === 'filter' ? worum(n) : anfrageText(n);
 			const dienst = DIENSTE[/** @type {import('./stand.svelte.js').Dienst} */ (n.kind)];
-			merken(`${wer(n)} ${art(n)} ${dienst} ${n.model ?? ''} ${gefragt} ${n.response ?? ''} ${n.error ?? ''}`, n.id, -1);
+			merken(`${wer(n)} ${art(n)} ${dienst} ${modell(n)} ${gefragt} ${antwortText(n)} ${fehler(n)}`, n.id, -1);
 			continue;
 		}
 		merken(`${wer(n)} ${n.client ?? ''} ${art(n)} ${sprachname(n.language)} ${n.audio ?? ''}`, n.id, -1);

@@ -18,7 +18,11 @@ type Status struct {
 	Done  int64  `json:"done"`
 	Total int64  `json:"total"`
 	Error string `json:"error,omitempty"`
+	err   error  // what Error says, for an app that says it in its own words
 }
+
+// Err is the error the component failed with, nil if none.
+func (s Status) Err() error { return s.err }
 
 var (
 	trMu    sync.Mutex
@@ -74,7 +78,7 @@ func Track(name, state string, done, total int64, err error) {
 	if total > 0 {
 		s.Done, s.Total = done, total
 	}
-	s.Error = ""
+	s.Error, s.err = "", err
 	if err != nil {
 		s.Error = err.Error()
 	}

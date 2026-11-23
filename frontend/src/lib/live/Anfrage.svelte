@@ -6,7 +6,7 @@
      Löschen; darunter die Anfrage, die Antwort und was beim Nachsehen hilft (Zeiten, Größen, Tokens). -->
 <script>
 	import { getLocale } from '$lib/moliri/i18n/locale.js';
-	import { anfrage, art, DIENSTE, laenge, live, sekunden, tag, uhrzeit, wer } from './stand.svelte.js';
+	import { anfrage, anfrageText, antwortText, art, DIENSTE, fakt, fehler, laenge, live, modell, sekunden, tag, uhrzeit, wer, zwischenstand } from './stand.svelte.js';
 
 	/** @typedef {import('./stand.svelte.js').Notiz} Notiz */
 
@@ -18,7 +18,7 @@
 
 	/** Die Antwort des Sprachmodells ist JSON: eingerückt liest sie sich besser. */
 	const antwort = $derived.by(() => {
-		const r = n.response ?? '';
+		const r = antwortText(n);
 		if (!r.trimStart().startsWith('{')) return r;
 		try {
 			return JSON.stringify(JSON.parse(r), null, 2);
@@ -38,7 +38,7 @@
 	/** @param {'anfrage' | 'antwort'} was */
 	async function kopieren(was) {
 		try {
-			await navigator.clipboard.writeText(was === 'anfrage' ? (n.request ?? '') : antwort);
+			await navigator.clipboard.writeText(was === 'anfrage' ? anfrageText(n) : antwort);
 			kopiert = was;
 			setTimeout(() => (kopiert = ''), 2000);
 		} catch {
@@ -74,7 +74,7 @@
 					>Via API: <b>{wer(n)}</b> {art(n)}</span
 				>
 			</span>
-			{#if n.model}<span>AI <b>{n.model}</b></span>{/if}
+			{#if n.model}<span>AI <b>{modell(n)}</b></span>{/if}
 			<span>Duration <b>{sekunden(laenge(n, live.jetzt))}</b></span>
 			{#if n.transient}<span class="fluechtig">Won't be saved</span>{/if}
 		</p>
@@ -100,7 +100,7 @@
 	<div class="tisch" tabindex="0" role="region" aria-label="Request and response">
 		<div class="blatt">
 			{#if n.error}
-				<p class="fehler" role="alert"><IconMaterialSymbolsErrorOutlineRounded aria-hidden="true" />{n.error}</p>
+				<p class="fehler" role="alert"><IconMaterialSymbolsErrorOutlineRounded aria-hidden="true" />{fehler(n)}</p>
 			{/if}
 
 			<section aria-labelledby="h-anfrage-{n.id}">
@@ -118,13 +118,13 @@
 						<img src={bild} alt="The image that was read" />
 					</a>
 				{/if}
-				<pre>{n.request || '–'}</pre>
+				<pre>{anfrageText(n) || '–'}</pre>
 			</section>
 
 			<section aria-labelledby="h-antwort-{n.id}">
 				<div class="abschnitt"><h2 id="h-antwort-{n.id}">Response</h2></div>
 				{#if laeuft}
-					<p class="warten"><span class="punkt" aria-hidden="true"></span>{n.partial || /* @wc-include */ 'Running…'}</p>
+					<p class="warten"><span class="punkt" aria-hidden="true"></span>{zwischenstand(n) || /* @wc-include */ 'Running…'}</p>
 				{:else if antwort}
 					<pre>{antwort}</pre>
 				{:else}
@@ -137,7 +137,7 @@
 				<dl>
 					<dt>Service</dt>
 					<dd>{dienst}</dd>
-					{#if n.model}<dt>AI</dt><dd>{n.model}</dd>{/if}
+					{#if n.model}<dt>AI</dt><dd>{modell(n)}</dd>{/if}
 					<dt>App</dt>
 					<dd>{n.client || /* @wc-include */ 'unnamed'}</dd>
 					<dt>Started</dt>
@@ -145,7 +145,7 @@
 					{#if n.ended}<dt>Finished</dt><dd>{genau(n.ended)}</dd>{/if}
 					<dt>Duration</dt>
 					<dd>{sekunden(laenge(n, live.jetzt))}</dd>
-					{#each n.facts ?? [] as f, i (i)}
+					{#each (n.facts ?? []).map(fakt) as f, i (i)}
 						<dt>{f.label}</dt>
 						<dd>{f.value}</dd>
 					{/each}

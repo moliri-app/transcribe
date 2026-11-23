@@ -18,6 +18,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/ocr"
 )
 
@@ -306,7 +307,7 @@ func errorKind(status int, message string, decoded map[string]any) string {
 	return KindBadRequest
 }
 
-// ServiceError is a failure of the service, said for people (in German, as the app speaks).
+// ServiceError is a failure of the service, said for people (Msg).
 type ServiceError struct {
 	Kind   string // KindAuth, …
 	Status int    // HTTP status, 0 when there was no answer
@@ -318,34 +319,34 @@ type ServiceError struct {
 
 func (e *ServiceError) Unwrap() error { return ocr.ErrService }
 
-func (e *ServiceError) Error() string {
+func (e *ServiceError) Error() string { return e.Msg().Error() }
+
+// Msg says the failure for the interface (internal/msg); the service's own words come last.
+func (e *ServiceError) Msg() *msg.M {
 	detail := strings.TrimSpace(e.Detail)
-	with := func(s string) string {
-		if detail == "" {
-			return s
-		}
-		return s + " " + detail
+	say := func(key, de string, kv ...any) *msg.M {
+		return msg.New("ocrApi."+key, de+" {detail}", append(kv, "service", e.Label, "url", e.URL, "detail", detail)...)
 	}
 	switch e.Kind {
 	case KindUnreachable:
-		return with(fmt.Sprintf("%s ist nicht erreichbar (%s).", e.Label, e.URL))
+		return say("unreachable", "{service} ist nicht erreichbar ({url}).")
 	case KindTimeout:
-		return fmt.Sprintf("%s hat nicht rechtzeitig geantwortet (%s).", e.Label, detail)
+		return msg.New("ocrApi.timeout", "{service} hat nicht rechtzeitig geantwortet ({detail}).", "service", e.Label, "detail", detail)
 	case KindAuth:
-		return with(fmt.Sprintf("%s hat den API-Schlüssel abgelehnt.", e.Label))
+		return say("keyRejected", "{service} hat den API-Schlüssel abgelehnt.")
 	case KindRateLimit:
-		return with(fmt.Sprintf("%s nimmt gerade nichts an (Guthaben oder Anfragen aufgebraucht).", e.Label))
+		return say("exhausted", "{service} nimmt gerade nichts an (Guthaben oder Anfragen aufgebraucht).")
 	case KindModel:
-		return with(fmt.Sprintf("%s kennt das Modell „%s“ nicht, oder es liest keine Bilder.", e.Label, e.Model))
+		return say("unknownModel", "{service} kennt das Modell „{model}“ nicht, oder es liest keine Bilder.", "model", e.Model)
 	case KindEndpoint:
 		if e.Status != 0 && e.Status != http.StatusOK {
-			return with(fmt.Sprintf("Unter %s antwortet keine passende Schnittstelle (Fehler %d). Stimmt die Adresse?", e.URL, e.Status))
+			return say("noEndpointStatus", "Unter {url} antwortet keine passende Schnittstelle (Fehler {status}). Stimmt die Adresse?", "status", e.Status)
 		}
-		return with(fmt.Sprintf("Unter %s antwortet keine passende Schnittstelle. Stimmt die Adresse?", e.URL))
+		return say("noEndpoint", "Unter {url} antwortet keine passende Schnittstelle. Stimmt die Adresse?")
 	case KindServer:
-		return with(fmt.Sprintf("%s hat einen Fehler gemeldet (%d).", e.Label, e.Status))
+		return say("serverError", "{service} hat einen Fehler gemeldet ({status}).", "status", e.Status)
 	case KindRefused:
-		return with(fmt.Sprintf("%s hat das Bild abgelehnt:", e.Label))
+		return say("imageRefused", "{service} hat das Bild abgelehnt:")
 	}
-	return with(fmt.Sprintf("%s: Fehler %d:", e.Label, e.Status))
+	return say("error", "{service}: Fehler {status}:", "status", e.Status)
 }

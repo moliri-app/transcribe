@@ -7,12 +7,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2\n"
 "X-Plurals-Order: one, other\n"
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
-"Language-Team: \n"
 
 #. 0: r.status
 #. 0: r.status
@@ -430,7 +424,7 @@ msgstr "Κλείσιμο"
 msgid "All set."
 msgstr "Όλα έτοιμα."
 
-#. 0: fehler.label; 1: fehler.error
+#. 0: komponente(fehler.name, fehler.label); 1: meldung(fehler.errorMsg, fehler.error)
 #: src/lib/Einrichtung.svelte
 msgid "Download failed ({0}): {1}"
 msgstr "Η λήψη απέτυχε ({0}): {1}"
@@ -1355,11 +1349,6 @@ msgstr "<0/>Το {0} μπορεί πλέον να χρησιμοποιεί το 
 #: src/lib/Zugriff.svelte
 msgid "Try again there. You can take this back under <0>Settings › Apps</0>."
 msgstr "Δοκιμάστε ξανά εκεί. Μπορείτε να το ανακαλέσετε στις <0>Ρυθμίσεις › Εφαρμογές</0>."
-
-#. 0: stand.program
-#: src/lib/Zugriff.svelte
-msgid "<0/>{0} uses Transcribe"
-msgstr "<0/>Το {0} χρησιμοποιεί το Transcribe"
 
 #: src/lib/Zugriff.svelte
 msgid "So that apps can always reach Transcribe"
@@ -2407,6 +2396,7 @@ msgstr "Φάκελος δεδομένων"
 msgid "Results"
 msgstr "Αποτελέσματα"
 
+#: src/lib/live/stand.svelte.js
 #: src/routes/settings/+page.svelte
 msgid "Models"
 msgstr "Μοντέλα"
@@ -2597,6 +2587,7 @@ msgstr "Υπηρεσία ΤΝ"
 msgid "Try it"
 msgstr "Δοκιμή"
 
+#: src/lib/live/stand.svelte.js
 #: src/routes/settings/+page.svelte
 #: src/routes/settings/+page.svelte
 msgid "Graphics card"
@@ -3058,6 +3049,7 @@ msgstr "Την πρώτη φορά, το Transcribe κατεβάζει το Tess
 msgid "The image that was read, with the words found outlined"
 msgstr "Η εικόνα που διαβάστηκε, με πλαίσιο γύρω από τις λέξεις που βρέθηκαν"
 
+#: src/lib/live/stand.svelte.js
 #: src/routes/settings/+page.svelte
 msgid "# line"
 msgid_plural "# lines"
@@ -3369,12 +3361,12 @@ msgstr "κατά απαίτηση"
 msgid "missing"
 msgstr "λείπει"
 
-#. 0: c.label || c.name
+#. 0: komponente(c.name, c.label || c.name)
 #: src/routes/settings/+page.svelte
 msgid "Download {0} again"
 msgstr "Νέα λήψη του {0}"
 
-#. 0: c.label || c.name
+#. 0: komponente(c.name, c.label || c.name)
 #: src/routes/settings/+page.svelte
 msgid "Download {0}"
 msgstr "Λήψη του {0}"
@@ -3387,7 +3379,7 @@ msgstr "Νέα λήψη"
 msgid "Download"
 msgstr "Λήψη"
 
-#. 0: c.label || c.name
+#. 0: komponente(c.name, c.label || c.name)
 #: src/routes/settings/+page.svelte
 msgid "Downloading {0}"
 msgstr "Γίνεται λήψη του {0}"
@@ -4500,3 +4492,700 @@ msgctxt "library_hide"
 msgid "Show {0} again"
 msgstr "Εμφάνιση ξανά {0}"
 
+#: src/lib/meldungen.js
+msgid "Please enter a full path, such as D:\\Transcribe."
+msgstr "Δώστε μια πλήρη διαδρομή, π.χ. D:\\Transcribe."
+
+#: src/lib/meldungen.js
+msgid "The data is already there."
+msgstr "Τα δεδομένα βρίσκονται ήδη εκεί."
+
+#: src/lib/meldungen.js
+msgid "The new location must not be inside the current data folder."
+msgstr "Η νέα θέση δεν μπορεί να βρίσκεται μέσα στον τρέχοντα φάκελο δεδομένων."
+
+#: src/lib/meldungen.js
+msgid "There are other files there already. Please choose an empty folder."
+msgstr "Υπάρχουν ήδη άλλα αρχεία εκεί. Επιλέξτε έναν κενό φάκελο."
+
+#: src/lib/meldungen.js
+msgid "That is a file, not a folder."
+msgstr "Αυτό είναι αρχείο, όχι φάκελος."
+
+#: src/lib/meldungen.js
+msgid "A job is running. The data folder can be moved once all jobs are done."
+msgstr "Εκτελείται μια εργασία. Ο φάκελος δεδομένων μπορεί να μετακινηθεί όταν ολοκληρωθούν όλες οι εργασίες."
+
+#: src/lib/meldungen.js
+msgid "A recording is running. The data folder can be moved once it has ended."
+msgstr "Γίνεται εγγραφή. Ο φάκελος δεδομένων μπορεί να μετακινηθεί όταν τελειώσει."
+
+#: src/lib/meldungen.js
+msgid "The app is downloading models. The data folder can be moved once the download is done."
+msgstr "Η εφαρμογή κατεβάζει μοντέλα. Ο φάκελος δεδομένων μπορεί να μετακινηθεί όταν ολοκληρωθεί η λήψη."
+
+#: src/lib/meldungen.js
+msgid "The app is downloading components. The data folder can be moved once the download is done."
+msgstr "Η εφαρμογή κατεβάζει στοιχεία. Ο φάκελος δεδομένων μπορεί να μετακινηθεί όταν ολοκληρωθεί η λήψη."
+
+#: src/lib/meldungen.js
+msgid "The data folder was set at startup (--data or TRANSCRIBE_DATA) and cannot be changed here."
+msgstr "Ο φάκελος δεδομένων ορίστηκε κατά την εκκίνηση (--data ή TRANSCRIBE_DATA) και δεν μπορεί να αλλάξει εδώ."
+
+#: src/lib/meldungen.js
+msgid "The data folder is already being moved."
+msgstr "Ο φάκελος δεδομένων μετακινείται ήδη."
+
+#. 0: a.error
+#: src/lib/meldungen.js
+msgid "Moving did not work; the data is still in its old place. ({0})"
+msgstr "Η μετακίνηση απέτυχε· τα δεδομένα παραμένουν στην παλιά θέση. ({0})"
+
+#: src/lib/meldungen.js
+msgid "The folder dialog is already open."
+msgstr "Το παράθυρο επιλογής φακέλου είναι ήδη ανοιχτό."
+
+#: src/lib/meldungen.js
+msgid "Please enter the full path of the folder, such as C:\\Nextcloud\\Interviews."
+msgstr "Δώστε την πλήρη διαδρομή του φακέλου, π.χ. C:\\Nextcloud\\Interviews."
+
+#. 0: a.path
+#: src/lib/meldungen.js
+msgid "This folder does not exist: {0}"
+msgstr "Αυτός ο φάκελος δεν υπάρχει: {0}"
+
+#: src/lib/meldungen.js
+msgid "Transcribe does not delete anything in a connected folder."
+msgstr "Το Transcribe δεν διαγράφει τίποτα σε συνδεδεμένο φάκελο."
+
+#: src/lib/meldungen.js
+msgid "This recording is being transcribed. Cancel that first."
+msgstr "Αυτή η εγγραφή μεταγράφεται τώρα. Ακυρώστε το πρώτα."
+
+#: src/lib/meldungen.js
+msgid "Transcribe ended unexpectedly during this transcription. “Retry” starts it again."
+msgstr "Το Transcribe τερματίστηκε απρόσμενα κατά τη μεταγραφή. Το «Δοκιμή ξανά» την ξεκινά πάλι."
+
+#: src/lib/meldungen.js
+msgid "queued again after a restart"
+msgstr "μπήκε ξανά στην ουρά μετά από επανεκκίνηση"
+
+#: src/lib/meldungen.js
+msgid "The recording is empty: there is no sound in it."
+msgstr "Η εγγραφή είναι κενή: δεν περιέχει ήχο."
+
+#. 0: a.seconds
+#: src/lib/meldungen.js
+msgid "The recording is too short ({0} s) to recognize anything in it."
+msgstr "Η εγγραφή είναι πολύ σύντομη ({0} δευτ.) για να αναγνωριστεί κάτι."
+
+#: src/lib/meldungen.js
+msgid "Recognition on this computer is turned off (Settings, Recognition: external API only)."
+msgstr "Η αναγνώριση σε αυτόν τον υπολογιστή είναι απενεργοποιημένη (Ρυθμίσεις, Αναγνώριση: μόνο εξωτερικό API)."
+
+#: src/lib/meldungen.js
+msgid "The address of the API is missing (Settings, Recognition)."
+msgstr "Λείπει η διεύθυνση του API (Ρυθμίσεις, Αναγνώριση)."
+
+#: src/lib/meldungen.js
+msgid "No key for the API has been entered yet (Settings, Recognition)."
+msgstr "Δεν έχει καταχωριστεί ακόμη κλειδί για το API (Ρυθμίσεις, Αναγνώριση)."
+
+#. 0: a.service; 1: a.error
+#: src/lib/meldungen.js
+msgid "{0} cannot be reached: {1}"
+msgstr "Το {0} δεν είναι προσβάσιμο: {1}"
+
+#. 0: a.service; 1: a.error
+#: src/lib/meldungen.js
+msgid "{0} does not answer: {1}"
+msgstr "Το {0} δεν απαντά: {1}"
+
+#. 0: a.service; 1: a.error
+#: src/lib/meldungen.js
+msgid "{0}: unexpected answer: {1}"
+msgstr "{0}: απρόσμενη απάντηση: {1}"
+
+#. 0: a.service
+#. 0: a.service
+#: src/lib/meldungen.js
+#: src/lib/meldungen.js
+msgid "{0} rejected the API key."
+msgstr "Το {0} απέρριψε το κλειδί API."
+
+#. 0: a.service
+#. 0: a.service
+#: src/lib/meldungen.js
+#: src/lib/meldungen.js
+msgid "{0} is not accepting anything right now (credit or requests used up)."
+msgstr "Το {0} δεν δέχεται τίποτα αυτή τη στιγμή (εξαντλήθηκε το υπόλοιπο ή τα αιτήματα)."
+
+#. 0: a.service; 1: a.status
+#. 0: a.service; 1: a.status
+#: src/lib/meldungen.js
+#: src/lib/meldungen.js
+msgid "{0}: error {1}:"
+msgstr "{0}: σφάλμα {1}:"
+
+#. 0: a.service; 1: a.reason
+#: src/lib/meldungen.js
+msgid "{0} refuses: {1}"
+msgstr "Το {0} αρνείται: {1}"
+
+#: src/lib/meldungen.js
+msgid "The API key was not accepted."
+msgstr "Το κλειδί API δεν έγινε δεκτό."
+
+#: src/lib/meldungen.js
+msgid "Credit or requests are used up."
+msgstr "Το υπόλοιπο ή τα αιτήματα εξαντλήθηκαν."
+
+#: src/lib/meldungen.js
+msgid "Text recognition is not available"
+msgstr "Η αναγνώριση κειμένου δεν είναι διαθέσιμη"
+
+#: src/lib/meldungen.js
+msgid "Image larger than 64 MB"
+msgstr "Εικόνα μεγαλύτερη από 64 MB"
+
+#: src/lib/meldungen.js
+msgid "Windows has no language installed for text recognition (Settings › Time & language › Language)"
+msgstr "Δεν έχει εγκατασταθεί γλώσσα για αναγνώριση κειμένου στα Windows (Ρυθμίσεις › Ώρα και γλώσσα › Γλώσσα)"
+
+#: src/lib/meldungen.js
+msgid "Tesseract is downloaded the first time it reads"
+msgstr "Το Tesseract κατεβαίνει την πρώτη φορά που διαβάζει"
+
+#: src/lib/meldungen.js
+msgid "The address of the AI service is missing (Settings, Text recognition)"
+msgstr "Λείπει η διεύθυνση της υπηρεσίας ΤΝ (Ρυθμίσεις, Αναγνώριση κειμένου)"
+
+#: src/lib/meldungen.js
+msgid "The model of the AI service is missing (Settings, Text recognition)"
+msgstr "Λείπει το μοντέλο της υπηρεσίας ΤΝ (Ρυθμίσεις, Αναγνώριση κειμένου)"
+
+#: src/lib/meldungen.js
+msgid "No key for the AI service has been entered yet (Settings, Text recognition)"
+msgstr "Δεν έχει καταχωριστεί ακόμη κλειδί για την υπηρεσία ΤΝ (Ρυθμίσεις, Αναγνώριση κειμένου)"
+
+#. 0: a.service; 1: a.url
+#: src/lib/meldungen.js
+msgid "{0} cannot be reached ({1})."
+msgstr "Το {0} δεν είναι προσβάσιμο ({1})."
+
+#. 0: a.service; 1: a.detail
+#: src/lib/meldungen.js
+msgid "{0} did not answer in time ({1})."
+msgstr "Το {0} δεν απάντησε εγκαίρως ({1})."
+
+#. 0: a.service; 1: a.model
+#: src/lib/meldungen.js
+msgid "{0} does not know the model “{1}”, or it cannot read images."
+msgstr "Το {0} δεν γνωρίζει το μοντέλο «{1}» ή αυτό δεν διαβάζει εικόνες."
+
+#. 0: a.url; 1: a.status
+#: src/lib/meldungen.js
+msgid "No matching interface answers at {0} (error {1}). Is the address right?"
+msgstr "Στη διεύθυνση {0} δεν απαντά κατάλληλη διεπαφή (σφάλμα {1}). Είναι σωστή η διεύθυνση;"
+
+#. 0: a.url
+#: src/lib/meldungen.js
+msgid "No matching interface answers at {0}. Is the address right?"
+msgstr "Στη διεύθυνση {0} δεν απαντά κατάλληλη διεπαφή. Είναι σωστή η διεύθυνση;"
+
+#. 0: a.service; 1: a.status
+#: src/lib/meldungen.js
+msgid "{0} reported an error ({1})."
+msgstr "Το {0} ανέφερε σφάλμα ({1})."
+
+#. 0: a.service
+#: src/lib/meldungen.js
+msgid "{0} refused the image:"
+msgstr "Το {0} απέρριψε την εικόνα:"
+
+#: src/lib/meldungen.js
+msgid "The program stopped waiting for the answer"
+msgstr "Το πρόγραμμα σταμάτησε να περιμένει την απάντηση"
+
+#: src/lib/meldungen.js
+msgid "Loading the model …"
+msgstr "Φόρτωση του μοντέλου…"
+
+#: src/lib/meldungen.js
+msgid "The model has not been downloaded yet"
+msgstr "Το μοντέλο δεν έχει κατέβει ακόμη"
+
+#: src/lib/meldungen.js
+msgid "The language model has not been downloaded yet"
+msgstr "Το γλωσσικό μοντέλο δεν έχει κατέβει ακόμη"
+
+#: src/lib/meldungen.js
+msgid "The language model is not loaded in Transcribe"
+msgstr "Το γλωσσικό μοντέλο δεν έχει φορτωθεί στο Transcribe"
+
+#: src/lib/meldungen.js
+msgid "The field catalog is too long for the language model"
+msgstr "Ο κατάλογος πεδίων είναι πολύ μεγάλος για το γλωσσικό μοντέλο"
+
+#: src/lib/meldungen.js
+msgid "Too many questions are waiting already"
+msgstr "Περιμένουν ήδη πάρα πολλές ερωτήσεις"
+
+#: src/lib/meldungen.js
+msgid "Waiting for the questions before it to be answered …"
+msgstr "Αναμονή για απάντηση στις προηγούμενες ερωτήσεις…"
+
+#: src/lib/meldungen.js
+msgid "Computing …"
+msgstr "Υπολογισμός…"
+
+#: src/lib/meldungen.js
+msgid "Loading the language model …"
+msgstr "Φόρτωση του γλωσσικού μοντέλου…"
+
+#: src/lib/meldungen.js
+msgid "Reading the question …"
+msgstr "Ανάγνωση της ερώτησης…"
+
+#: src/lib/meldungen.js
+msgid "Writing the answer …"
+msgstr "Σύνταξη της απάντησης…"
+
+#: src/lib/meldungen.js
+msgid "Cancelled"
+msgstr "Ακυρώθηκε"
+
+#: src/lib/meldungen.js
+msgid "Cancelled before it was asked"
+msgstr "Ακυρώθηκε πριν υποβληθεί"
+
+#: src/lib/meldungen.js
+msgid "The answer of the language model contains no JSON"
+msgstr "Η απάντηση του γλωσσικού μοντέλου δεν περιέχει JSON"
+
+#. 0: a.reason
+#: src/lib/meldungen.js
+msgid "Recording failed: {0}"
+msgstr "Η εγγραφή απέτυχε: {0}"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: no microphone found"
+msgstr "Η εγγραφή απέτυχε: δεν βρέθηκε μικρόφωνο"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: the microphone stopped delivering sound"
+msgstr "Η εγγραφή απέτυχε: το μικρόφωνο σταμάτησε να στέλνει ήχο"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: no output device found for the system audio"
+msgstr "Η εγγραφή απέτυχε: δεν βρέθηκε συσκευή εξόδου για τον ήχο συστήματος"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: the system audio stopped delivering sound"
+msgstr "Η εγγραφή απέτυχε: ο ήχος συστήματος σταμάτησε"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: recording the system audio does not work on the Mac yet"
+msgstr "Η εγγραφή απέτυχε: η εγγραφή του ήχου συστήματος δεν λειτουργεί ακόμη σε Mac"
+
+#: src/lib/meldungen.js
+msgid "A recording of the system audio alone is running. To dictate, first end that recording on the Live page."
+msgstr "Γίνεται εγγραφή μόνο του ήχου συστήματος. Για υπαγόρευση, τερματίστε πρώτα αυτή την εγγραφή στη σελίδα Live."
+
+#: src/lib/meldungen.js
+msgid "No sound arrived before the recording ended, so nothing was saved."
+msgstr "Δεν έφτασε ήχος πριν τελειώσει η εγγραφή, οπότε δεν αποθηκεύτηκε τίποτα."
+
+#. 0: a.bits
+#: src/lib/meldungen.js
+msgid "Audio: unknown format ({0} bit)"
+msgstr "Ήχος: άγνωστη μορφή ({0} bit)"
+
+#: src/lib/meldungen.js
+msgid "Audio: format without channels"
+msgstr "Ήχος: μορφή χωρίς κανάλια"
+
+#: src/lib/meldungen.js
+msgid "This note does not exist."
+msgstr "Αυτή η σημείωση δεν υπάρχει."
+
+#: src/lib/meldungen.js
+msgid "The note is still running."
+msgstr "Η σημείωση είναι ακόμη σε εξέλιξη."
+
+#: src/lib/meldungen.js
+msgid "The recording is already running."
+msgstr "Η εγγραφή είναι ήδη σε εξέλιξη."
+
+#: src/lib/meldungen.js
+msgid "The address is missing."
+msgstr "Λείπει η διεύθυνση."
+
+#: src/lib/meldungen.js
+msgid "The shortcut only works while Transcribe runs with its icon in the notification area."
+msgstr "Η συντόμευση λειτουργεί μόνο όσο το Transcribe εκτελείται με το εικονίδιό του στην περιοχή ειδοποιήσεων."
+
+#: src/lib/meldungen.js
+msgid "Another program already uses this shortcut. Choose a different one."
+msgstr "Άλλο πρόγραμμα χρησιμοποιεί ήδη αυτή τη συντόμευση. Επιλέξτε άλλη."
+
+#. 0: a.error
+#: src/lib/meldungen.js
+msgid "Starting with Windows could not be changed: {0}"
+msgstr "Δεν ήταν δυνατή η αλλαγή της εκκίνησης με τα Windows: {0}"
+
+#: src/lib/meldungen.js
+msgid "The GPU runtime has not been downloaded yet."
+msgstr "Το περιβάλλον εκτέλεσης GPU δεν έχει κατέβει ακόμη."
+
+#: src/lib/meldungen.js
+msgid "Language: automatic, or codes such as de or de,en"
+msgstr "Γλώσσα: αυτόματα ή κωδικοί όπως de ή de,en"
+
+#. 0: a.id
+#: src/lib/meldungen.js
+msgid "Unknown service: {0}"
+msgstr "Άγνωστη υπηρεσία: {0}"
+
+#. 0: a.id
+#: src/lib/meldungen.js
+msgid "Unknown text recognition: {0}"
+msgstr "Άγνωστη αναγνώριση κειμένου: {0}"
+
+#: src/lib/meldungen.js
+msgid "No supported NVIDIA GPU found."
+msgstr "Δεν βρέθηκε υποστηριζόμενη GPU NVIDIA."
+
+#. 0: a.libs
+#: src/lib/meldungen.js
+msgid "NVIDIA libraries are missing that the app cannot download itself: {0}"
+msgstr "Λείπουν βιβλιοθήκες NVIDIA που η εφαρμογή δεν μπορεί να κατεβάσει μόνη της: {0}"
+
+#: src/lib/meldungen.js
+msgid "The NVIDIA libraries cannot be downloaded automatically on this system."
+msgstr "Οι βιβλιοθήκες NVIDIA δεν μπορούν να κατέβουν αυτόματα σε αυτό το σύστημα."
+
+#: src/lib/meldungen.js
+msgid "A development build does not look for updates."
+msgstr "Μια έκδοση ανάπτυξης δεν αναζητά ενημερώσεις."
+
+#: src/lib/meldungen.js
+msgid "GitHub could not be reached. Please try again later."
+msgstr "Δεν ήταν δυνατή η πρόσβαση στο GitHub. Δοκιμάστε ξανά αργότερα."
+
+#: src/lib/meldungen.js
+msgid "There is no newer version."
+msgstr "Δεν υπάρχει νεότερη έκδοση."
+
+#: src/lib/meldungen.js
+msgid "Transcribe may not change its program folder. Download the new version from the releases page and replace the EXE by hand."
+msgstr "Το Transcribe δεν επιτρέπεται να αλλάξει τον φάκελο του προγράμματος. Κατεβάστε τη νέα έκδοση από τη σελίδα εκδόσεων και αντικαταστήστε το EXE χειροκίνητα."
+
+#: src/lib/meldungen.js
+msgid "The download took too long. Please try again later."
+msgstr "Η λήψη άργησε πολύ. Δοκιμάστε ξανά αργότερα."
+
+#. 0: a.error
+#: src/lib/meldungen.js
+msgid "The update could not be installed: {0}"
+msgstr "Δεν ήταν δυνατή η εγκατάσταση της ενημέρωσης: {0}"
+
+#: src/lib/meldungen.js
+msgid "Recognition runtime (sherpa-onnx)"
+msgstr "Περιβάλλον αναγνώρισης (sherpa-onnx)"
+
+#: src/lib/meldungen.js
+msgid "Voice activity (Silero VAD)"
+msgstr "Δραστηριότητα φωνής (Silero VAD)"
+
+#: src/lib/meldungen.js
+msgid "Speaker separation (pyannote)"
+msgstr "Διαχωρισμός ομιλητών (pyannote)"
+
+#: src/lib/meldungen.js
+msgid "Speaker embeddings (CAM++)"
+msgstr "Ενσωματώσεις ομιλητών (CAM++)"
+
+#: src/lib/meldungen.js
+msgid "Sound recognition (CED)"
+msgstr "Αναγνώριση ήχων (CED)"
+
+#: src/lib/meldungen.js
+msgid "Speech recognition (Parakeet v3)"
+msgstr "Αναγνώριση ομιλίας (Parakeet v3)"
+
+#: src/lib/meldungen.js
+msgid "German model (FastConformer)"
+msgstr "Μοντέλο γερμανικών (FastConformer)"
+
+#: src/lib/meldungen.js
+msgid "German live (Kroko)"
+msgstr "Γερμανικά ζωντανά (Kroko)"
+
+#: src/lib/meldungen.js
+msgid "Speech recognition (Whisper base)"
+msgstr "Αναγνώριση ομιλίας (Whisper base)"
+
+#: src/lib/meldungen.js
+msgid "Other languages (Whisper turbo)"
+msgstr "Άλλες γλώσσες (Whisper turbo)"
+
+#: src/lib/meldungen.js
+msgid "GPU runtime (CUDA)"
+msgstr "Περιβάλλον GPU (CUDA)"
+
+#: src/lib/meldungen.js
+msgid "NVIDIA libraries (CUDA, cuDNN)"
+msgstr "Βιβλιοθήκες NVIDIA (CUDA, cuDNN)"
+
+#: src/lib/meldungen.js
+msgid "ffmpeg (audio/video)"
+msgstr "ffmpeg (ήχος/βίντεο)"
+
+#: src/lib/meldungen.js
+msgid "Text recognition (Tesseract)"
+msgstr "Αναγνώριση κειμένου (Tesseract)"
+
+#: src/lib/meldungen.js
+msgid "Text recognition German"
+msgstr "Αναγνώριση κειμένου: γερμανικά"
+
+#: src/lib/meldungen.js
+msgid "Text recognition English"
+msgstr "Αναγνώριση κειμένου: αγγλικά"
+
+#: src/lib/meldungen.js
+msgid "Text recognition Fraktur (frk)"
+msgstr "Αναγνώριση κειμένου: Fraktur (frk)"
+
+#: src/lib/meldungen.js
+msgid "Text recognition Fraktur script"
+msgstr "Αναγνώριση κειμένου: γραφή Fraktur"
+
+#: src/lib/meldungen.js
+msgid "Text recognition Fraktur (frak2021)"
+msgstr "Αναγνώριση κειμένου: Fraktur (frak2021)"
+
+#: src/lib/meldungen.js
+msgid "Text recognition (PP-OCRv5)"
+msgstr "Αναγνώριση κειμένου (PP-OCRv5)"
+
+#: src/lib/meldungen.js
+msgid "Search by meaning (EmbeddingGemma)"
+msgstr "Αναζήτηση κατά νόημα (EmbeddingGemma)"
+
+#: src/lib/meldungen.js
+msgid "Filter in your own words (Qwen 2.5 7B)"
+msgstr "Φίλτρο με δικά σας λόγια (Qwen 2.5 7B)"
+
+#. 0: api[1]
+#: src/lib/meldungen.js
+msgid "transcribing ({0})"
+msgstr "μεταγραφή ({0})"
+
+#: src/lib/meldungen.js
+msgid "starting"
+msgstr "εκκίνηση"
+
+#: src/lib/meldungen.js
+msgid "finding sounds"
+msgstr "εντοπισμός ήχων"
+
+#: src/lib/meldungen.js
+msgid "telling speakers apart"
+msgstr "διάκριση ομιλητών"
+
+#: src/lib/meldungen.js
+msgid "transcribing"
+msgstr "μεταγραφή"
+
+#: src/lib/meldungen.js
+msgid "putting it together"
+msgstr "συγκέντρωση όλων"
+
+#: src/lib/meldungen.js
+msgid "Your own server (OpenAI-compatible, such as Ollama)"
+msgstr "Δικός σας διακομιστής (συμβατός με OpenAI, π.χ. Ollama)"
+
+#: src/lib/meldungen.js
+msgid "Your own server (OpenAI-compatible)"
+msgstr "Δικός σας διακομιστής (συμβατός με OpenAI)"
+
+#: src/lib/meldungen.js
+msgid "Ctrl + Alt + Space"
+msgstr "Ctrl + Alt + Διάστημα"
+
+#: src/lib/meldungen.js
+msgid "Ctrl + Shift + Space"
+msgstr "Ctrl + Shift + Διάστημα"
+
+#: src/lib/meldungen.js
+msgid "Ctrl + Alt + D"
+msgstr "Ctrl + Alt + D"
+
+#: src/lib/Bibliothek.svelte
+msgid "Connect a folder with recordings"
+msgstr "Σύνδεση φακέλου με εγγραφές"
+
+#: src/lib/Zugriff.svelte
+msgid "An app uses Transcribe"
+msgstr "Μια εφαρμογή χρησιμοποιεί το Transcribe"
+
+#. 0: stand.program
+#: src/lib/Zugriff.svelte
+msgid "{0} uses Transcribe"
+msgstr "Το {0} χρησιμοποιεί το Transcribe"
+
+#: src/lib/live/stand.svelte.js
+msgid "Recognized"
+msgstr "Αναγνωρίστηκαν"
+
+#: src/lib/live/stand.svelte.js
+msgid "# word"
+msgid_plural "# words"
+msgstr[0] "# λέξη"
+msgstr[1] "# λέξεις"
+
+#: src/lib/live/stand.svelte.js
+msgid "Engine"
+msgstr "Μηχανή"
+
+#: src/lib/live/stand.svelte.js
+msgid "Image size"
+msgstr "Μέγεθος εικόνας"
+
+#. 0: a.width; 1: a.height
+#: src/lib/live/stand.svelte.js
+msgid "{0} × {1} pixels"
+msgstr "{0} × {1} pixel"
+
+#: src/lib/live/stand.svelte.js
+msgid "yes"
+msgstr "ναι"
+
+#: src/lib/live/stand.svelte.js
+msgid "Texts"
+msgstr "Κείμενα"
+
+#. 0: a.texts; 1: a.chars
+#: src/lib/live/stand.svelte.js
+msgid "{0}, {1} characters in all"
+msgstr "{0}, συνολικά {1} χαρακτήρες"
+
+#: src/lib/live/stand.svelte.js
+msgid "Model"
+msgstr "Μοντέλο"
+
+#: src/lib/live/stand.svelte.js
+msgid "was already loaded"
+msgstr "ήταν ήδη φορτωμένο"
+
+#: src/lib/live/stand.svelte.js
+msgid "had to be loaded first"
+msgstr "χρειάστηκε πρώτα να φορτωθεί"
+
+#: src/lib/live/stand.svelte.js
+msgid "Waited"
+msgstr "Αναμονή"
+
+#: src/lib/live/stand.svelte.js
+msgid "Computing time"
+msgstr "Χρόνος υπολογισμού"
+
+#: src/lib/live/stand.svelte.js
+msgid "Tokens read"
+msgstr "Διαβασμένα tokens"
+
+#. 0: a.tokens; 1: a.cached
+#: src/lib/live/stand.svelte.js
+msgid "{0}, {1} of them already cached"
+msgstr "{0}, από τα οποία {1} ήδη στην προσωρινή μνήμη"
+
+#: src/lib/live/stand.svelte.js
+msgid "Tokens written"
+msgstr "Γραμμένα tokens"
+
+#: src/lib/live/stand.svelte.js
+msgid "Device"
+msgstr "Συσκευή"
+
+#: src/lib/live/stand.svelte.js
+msgid "Result"
+msgstr "Αποτέλεσμα"
+
+#: src/lib/live/stand.svelte.js
+msgid "# condition"
+msgid_plural "# conditions"
+msgstr[0] "# συνθήκη"
+msgstr[1] "# συνθήκες"
+
+#. 0: plural(zahl.conditions, ['# condition', '# conditions']); 1: a.notUnderstood; 2: a.dropped
+#: src/lib/live/stand.svelte.js
+msgid "{0}, {1} not understood, {2} dropped"
+msgstr "{0}, {1} δεν έγιναν κατανοητές, {2} απορρίφθηκαν"
+
+#: src/lib/live/stand.svelte.js
+msgid "default"
+msgstr "προεπιλογή"
+
+#: src/lib/live/stand.svelte.js
+msgid "not given"
+msgstr "δεν δόθηκε"
+
+#. 0: wert(v)
+#: src/lib/live/stand.svelte.js
+msgid "Image: {0}"
+msgstr "Εικόνα: {0}"
+
+#. 0: wert(v)
+#: src/lib/live/stand.svelte.js
+msgid "Languages: {0}"
+msgstr "Γλώσσες: {0}"
+
+#. 0: wert(v)
+#: src/lib/live/stand.svelte.js
+msgid "Layout: {0}"
+msgstr "Διάταξη: {0}"
+
+#. 0: v
+#: src/lib/live/stand.svelte.js
+msgid "Question: {0}"
+msgstr "Ερώτηση: {0}"
+
+#. 0: v
+#: src/lib/live/stand.svelte.js
+msgid "Fields: {0}"
+msgstr "Πεδία: {0}"
+
+#. 0: v
+#: src/lib/live/stand.svelte.js
+msgid "Kind: {0}"
+msgstr "Είδος: {0}"
+
+#. 0: v[1]; 1: v[2]
+#: src/lib/live/stand.svelte.js
+msgid "{0} vectors of {1} numbers each"
+msgstr "{0} διανύσματα με {1} αριθμούς το καθένα"
+
+#. 0: Number(k[1]).toLocaleString(getLocale())
+#: src/lib/live/stand.svelte.js
+msgid "… (shortened, {0} characters in all)"
+msgstr "… (συντομεύτηκε, συνολικά {0} χαρακτήρες)"
+
+#: src/routes/settings/+page.svelte
+msgid "Where should Transcribe keep its data?"
+msgstr "Πού να αποθηκεύει το Transcribe τα δεδομένα του;"
+
+#: src/lib/meldungen.js
+msgid "Transcribe is not recording the microphone for other programs right now: “Ready in the background” is off. It still processes audio and images that are sent to it. To record, turn it on in Transcribe under Settings › Apps."
+msgstr "Το Transcribe δεν καταγράφει αυτή τη στιγμή το μικρόφωνο για άλλα προγράμματα: το «Έτοιμο στο παρασκήνιο» είναι απενεργοποιημένο. Εξακολουθεί να επεξεργάζεται ήχο και εικόνες που του στέλνονται. Για εγγραφή, ενεργοποιήστε το στο Transcribe στις Ρυθμίσεις › Εφαρμογές."
+
+#. 0: win[1]
+#: src/lib/meldungen.js
+msgid "Windows text recognition{0}"
+msgstr "Αναγνώριση κειμένου των Windows{0}"
+
+#. 0: dienst; 1: ki[2]
+#: src/lib/meldungen.js
+msgid "AI service ({0}){1}"
+msgstr "Υπηρεσία ΤΝ ({0}){1}"

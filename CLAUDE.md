@@ -28,3 +28,12 @@ translation in every `frontend/src/locales/<locale>.po` (run `pnpm i18n:extract`
 then fill the empty `msgstr`); a missing one shows English. The mirrored Moliri components get
 their translations from Moliri through `pnpm sync:moliri`. The language is chosen in the settings
 (System › Language) and otherwise follows the browser's, i.e. Windows', language.
+
+Texts the Go side makes for the interface (error messages, what a call on the Live page is doing,
+its facts) are messages of `internal/msg`: a stable key with arguments, sent beside the German text
+that programs calling the API (Moliri, curl) keep getting (`msg`, `errorMsg`, `partialMsg` …). The
+frontend turns the key into text in `frontend/src/lib/meldungen.js` (names of components, steps of a
+job and dictation shortcuts too); a new message needs its entry there, which
+`TestFrontendKnowsEveryMessage` in `internal/msg` checks. Engine packages cannot import
+`internal/msg`: they return errors of their own (`pipeline.ErrEmpty`, `*pipeline.ShortError`) that
+`internal/` turns into messages.

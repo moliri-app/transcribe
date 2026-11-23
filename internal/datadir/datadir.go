@@ -21,6 +21,8 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/moliri-app/transcribe/internal/msg"
 )
 
 // Name is the folder the data lies in, and the one made in a folder the user chose that holds
@@ -166,11 +168,11 @@ func inside(dir, parent string) bool {
 
 // Errors of Target, said to the user.
 var (
-	ErrRelative = errors.New("Bitte einen vollständigen Pfad angeben, etwa D:\\Transcribe.")
-	ErrSame     = errors.New("Die Daten liegen schon dort.")
-	ErrInside   = errors.New("Der neue Ort darf nicht im jetzigen Datenordner liegen.")
-	ErrNotEmpty = errors.New("Dort liegen schon andere Dateien. Bitte einen leeren Ordner wählen.")
-	ErrNotDir   = errors.New("Dort liegt eine Datei, kein Ordner.")
+	ErrRelative = msg.New("dataDir.relative", "Bitte einen vollständigen Pfad angeben, etwa D:\\Transcribe.")
+	ErrSame     = msg.New("dataDir.same", "Die Daten liegen schon dort.")
+	ErrInside   = msg.New("dataDir.inside", "Der neue Ort darf nicht im jetzigen Datenordner liegen.")
+	ErrNotEmpty = msg.New("dataDir.notEmpty", "Dort liegen schon andere Dateien. Bitte einen leeren Ordner wählen.")
+	ErrNotDir   = msg.New("dataDir.notDir", "Dort liegt eine Datei, kein Ordner.")
 )
 
 // Target is the folder the data in current moves to when the user chose dir: dir itself when it

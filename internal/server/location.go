@@ -14,6 +14,7 @@ import (
 	"sync"
 
 	"github.com/moliri-app/transcribe/internal/datadir"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/pick"
 	"github.com/moliri-app/transcribe/internal/setup"
 	"github.com/moliri-app/transcribe/models"
@@ -30,7 +31,7 @@ type moving struct {
 	done   int64
 	total  int64
 	state  string // "", "copying", "restarting", "error"
-	err    string
+	err    *msg.M
 }
 
 func (m *moving) snapshot() map[string]any {
@@ -39,7 +40,11 @@ func (m *moving) snapshot() map[string]any {
 	if m.state == "" {
 		return nil
 	}
-	return map[string]any{"target": m.target, "done": m.done, "total": m.total, "state": m.state, "error": m.err}
+	snap := map[string]any{"target": m.target, "done": m.done, "total": m.total, "state": m.state, "error": ""}
+	if m.err != nil {
+		snap["error"], snap["errorMsg"] = m.err.Error(), m.err
+	}
+	return snap
 }
 
 // location is what the settings page shows of the data dir's place.
@@ -54,26 +59,26 @@ func (s *Server) location() map[string]any {
 	}
 }
 
-// busy says why the data cannot move now, or "".
-func (s *Server) busy() string {
+// busy says why the data cannot move now, or nil.
+func (s *Server) busy() *msg.M {
 	if s.Queue.Busy() {
-		return "Gerade läuft ein Auftrag. Der Datenordner lässt sich verschieben, wenn alle Aufträge fertig sind."
+		return msg.New("dataDir.busyJob", "Gerade läuft ein Auftrag. Der Datenordner lässt sich verschieben, wenn alle Aufträge fertig sind.")
 	}
 	if s.Live != nil && s.Live.Busy() {
-		return "Gerade läuft eine Aufnahme. Der Datenordner lässt sich verschieben, wenn sie beendet ist."
+		return msg.New("dataDir.busyRecording", "Gerade läuft eine Aufnahme. Der Datenordner lässt sich verschieben, wenn sie beendet ist.")
 	}
 	items, _ := models.Snapshot()
 	for _, it := range items {
 		if it.State == "downloading" {
-			return "Gerade lädt die App Modelle. Der Datenordner lässt sich verschieben, wenn der Download fertig ist."
+			return msg.New("dataDir.busyModels", "Gerade lädt die App Modelle. Der Datenordner lässt sich verschieben, wenn der Download fertig ist.")
 		}
 	}
 	for _, c := range setup.Info(s.cfg.DataDir, "") {
 		if c.State == "downloading" {
-			return "Gerade lädt die App Komponenten. Der Datenordner lässt sich verschieben, wenn der Download fertig ist."
+			return msg.New("dataDir.busyComponents", "Gerade lädt die App Komponenten. Der Datenordner lässt sich verschieben, wenn der Download fertig ist.")
 		}
 	}
-	return ""
+	return nil
 }
 
 // locationPick shows the system's folder dialog and returns the folder chosen ("" when cancelled).
@@ -85,16 +90,16 @@ func (s *Server) locationPick(w http.ResponseWriter, r *http.Request) {
 	// TRANSCRIBE_PICK_FOLDER stands in for the user's choice in the dialog (e2e tests)
 	dir, err := os.Getenv("TRANSCRIBE_PICK_FOLDER"), error(nil)
 	if dir == "" {
-		dir, err = pick.Folder("Wohin sollen die Daten von Transcribe?")
+		dir, err = pick.Folder(dialogTitle(r, "Wohin sollen die Daten von Transcribe?"))
 	}
 	if err != nil {
-		fail(w, 500, err.Error())
+		fail(w, 500, err)
 		return
 	}
 	target := ""
 	if dir != "" {
 		if target, err = datadir.Target(s.cfg.DataDir, dir); err != nil {
-			fail(w, 400, err.Error())
+			fail(w, 400, err)
 			return
 		}
 	}
@@ -117,19 +122,19 @@ func (s *Server) locationMove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if s.Restart == nil {
-		fail(w, 409, "Der Datenordner ist beim Start festgelegt (--data oder TRANSCRIBE_DATA) und lässt sich hier nicht ändern.")
+		fail(w, 409, msg.New("dataDir.fixed", "Der Datenordner ist beim Start festgelegt (--data oder TRANSCRIBE_DATA) und lässt sich hier nicht ändern."))
 		return
 	}
 	target, err := datadir.Target(s.cfg.DataDir, in.Path)
 	if err != nil {
-		fail(w, 400, err.Error())
+		fail(w, 400, err)
 		return
 	}
 	if in.Check {
 		writeJSON(w, 200, map[string]any{"target": target, "size": datadir.Size(s.cfg.DataDir)})
 		return
 	}
-	if why := s.busy(); why != "" {
+	if why := s.busy(); why != nil {
 		fail(w, 409, why)
 		return
 	}
@@ -137,10 +142,10 @@ func (s *Server) locationMove(w http.ResponseWriter, r *http.Request) {
 	m.mu.Lock()
 	if m.state == "copying" || m.state == "restarting" {
 		m.mu.Unlock()
-		fail(w, 409, "Der Datenordner wird schon verschoben.")
+		fail(w, 409, msg.New("dataDir.moving", "Der Datenordner wird schon verschoben."))
 		return
 	}
-	m.target, m.done, m.total, m.state, m.err = target, 0, datadir.Size(s.cfg.DataDir), "copying", ""
+	m.target, m.done, m.total, m.state, m.err = target, 0, datadir.Size(s.cfg.DataDir), "copying", nil
 	m.mu.Unlock()
 	go s.relocate(target)
 	writeJSON(w, 202, map[string]any{"target": target})
@@ -162,7 +167,7 @@ func (s *Server) relocate(target string) {
 	defer m.mu.Unlock()
 	if err != nil {
 		log.Println("moving the data:", err)
-		m.state, m.err = "error", "Das Verschieben hat nicht geklappt, die Daten liegen weiter am alten Ort. ("+err.Error()+")"
+		m.state, m.err = "error", msg.New("dataDir.moveFailed", "Das Verschieben hat nicht geklappt, die Daten liegen weiter am alten Ort. ({error})", "error", err)
 		return
 	}
 	m.state = "restarting"

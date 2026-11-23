@@ -18,6 +18,7 @@ import (
 
 	"github.com/moliri-app/transcribe/fileutil"
 	"github.com/moliri-app/transcribe/internal/media"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/internal/prio"
 	"github.com/moliri-app/transcribe/jobs"
 )
@@ -37,7 +38,10 @@ const (
 var ErrUnknownJob = errors.New("unknown job")
 
 // Interrupted is the error of a job that was running when the app ended without shutting down.
-const Interrupted = "Transcribe wurde während dieser Transkription unerwartet beendet. „Erneut“ startet sie noch einmal."
+var Interrupted = msg.New("job.interrupted", "Transcribe wurde während dieser Transkription unerwartet beendet. „Erneut“ startet sie noch einmal.")
+
+// requeued is the note on a job a shutdown put back in the queue.
+var requeued = msg.New("job.requeued", "nach Neustart erneut eingereiht")
 
 // Runner must produce results/<stem>/_final.json; audioFile is a file name inside <data>/audio or
 // the name of a recording in a connected folder (media.Path finds both).
@@ -56,7 +60,9 @@ type Job struct {
 	Started  *float64     `json:"started"`
 	Finished *float64     `json:"finished"`
 	Error    *string      `json:"error"`
+	ErrorMsg *msg.M       `json:"errorMsg,omitempty"` // Error for the interface to translate (internal/msg)
 	Note     *string      `json:"note"`
+	NoteMsg  *msg.M       `json:"noteMsg,omitempty"` // Note for the interface to translate
 }
 
 func (j *Job) active() bool {
@@ -85,8 +91,8 @@ type Queue struct {
 	// Background is told whether a job is working (running, not waiting at the gate), to lower
 	// the app's priority meanwhile (prio.Background unless set otherwise).
 	Background func(on bool)
-	wake    chan struct{}
-	done    chan struct{}
+	wake       chan struct{}
+	done       chan struct{}
 }
 
 func New(dataDir string, run Runner, defaultThreads int) *Queue {
@@ -121,7 +127,7 @@ func (q *Queue) load() {
 			// a shutdown puts its job back in the queue (runNext), so this one was running when the
 			// app crashed or was killed; running it again at once could crash it again, at every start
 			j.Status, j.Finished = Failed, ptr(now())
-			j.Error = ptr(Interrupted)
+			j.Error, j.ErrorMsg = ptr(Interrupted.Error()), Interrupted
 		case Canceling:
 			j.Status, j.Finished = Canceled, ptr(now())
 		}
@@ -348,7 +354,7 @@ func (q *Queue) Retry(id string) error {
 		return jobs.JobError("job is still active")
 	}
 	j.Status, j.Progress, j.Step, j.Log = Queued, 0, nil, []string{}
-	j.Error, j.Note, j.Started, j.Finished = nil, nil, nil, nil
+	j.Error, j.ErrorMsg, j.Note, j.NoteMsg, j.Started, j.Finished = nil, nil, nil, nil, nil, nil
 	q.save()
 	q.poke()
 	return nil
@@ -463,7 +469,7 @@ func (q *Queue) runNext(parent context.Context) bool {
 	ctx, cancel := context.WithCancel(parent)
 	q.cancel, q.current = cancel, j
 	j.Status, j.Started, j.Progress, j.Step = Running, ptr(now()), 0, ptr("Start")
-	j.Log, j.Error = []string{}, nil
+	j.Log, j.Error, j.ErrorMsg = []string{}, nil, nil
 	q.priority()
 	q.save()
 	audio, o := j.Audio, j.Options
@@ -490,7 +496,7 @@ func (q *Queue) runNext(parent context.Context) bool {
 	if parent.Err() != nil && (j.Status == Running || j.Status == Paused) {
 		// shutting down: the job runs again on the next start
 		j.Status, j.Progress, j.Step, j.Started = Queued, 0, nil, nil
-		j.Note = ptr("nach Neustart erneut eingereiht")
+		j.Note, j.NoteMsg = ptr(requeued.Error()), requeued
 		q.save()
 		return true
 	}
@@ -499,7 +505,7 @@ func (q *Queue) runNext(parent context.Context) bool {
 	case j.Status == Canceling:
 		j.Status = Canceled
 	case err != nil:
-		j.Status, j.Error = Failed, ptr(err.Error())
+		j.Status, j.Error, j.ErrorMsg = Failed, ptr(err.Error()), msg.Of(err)
 	default:
 		j.Status, j.Progress, j.Step = Done, 1, nil
 	}

@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 	"unsafe"
+
+	appmsg "github.com/moliri-app/transcribe/internal/msg"
 )
 
 // The Windows side of dictating (dictate.go): the shortcut and Esc are hotkeys of the tray
@@ -128,7 +130,7 @@ func (t *tray) setHotkey() {
 		return
 	}
 	if r, _, _ := procRegisterHotKey.Call(t.wnd, hotkeyDictate, hk[0]|modNoRepeat, hk[1]); r == 0 {
-		t.keyErr = errors.New("Ein anderes Programm benutzt dieses Tastenkürzel schon. Wähle ein anderes.")
+		t.keyErr = appmsg.New("dictate.keyTaken", "Ein anderes Programm benutzt dieses Tastenkürzel schon. Wähle ein anderes.")
 	}
 }
 

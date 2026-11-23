@@ -6,6 +6,7 @@
 
 import { getLocale } from '$lib/moliri/i18n/locale.js';
 import plural from '../locales/plural.js';
+import { meldung } from './meldungen.js';
 
 /** @param {string} url @param {RequestInit} [init] */
 export async function getJSON(url, init) {
@@ -60,6 +61,15 @@ export function verbindung() {
 }
 
 /**
+ * Der Fehler, mit dem der Server ablehnt, in der Sprache der Oberfläche: msg ist seine Meldung
+ * (internal/msg), error derselbe Text auf Deutsch (meldungen.js).
+ * @param {{ error?: string, msg?: import('./meldungen.js').Meldung }} j @param {Response} r
+ */
+export function serverFehler(j, r) {
+	return new Error(meldung(j.msg, j.error || r.statusText));
+}
+
+/**
  * POST mit JSON; wirft mit der Meldung des Servers, wenn er ablehnt.
  * @param {string} url
  * @param {unknown} [body]
@@ -71,7 +81,7 @@ export async function post(url, body) {
 		body: body === undefined ? undefined : JSON.stringify(body)
 	});
 	const j = await r.json().catch(() => ({}));
-	if (!r.ok || j.ok === false) throw new Error(j.error || r.statusText);
+	if (!r.ok || j.ok === false) throw serverFehler(j, r);
 	return j;
 }
 
@@ -83,7 +93,7 @@ export async function post(url, body) {
 export async function upload(f) {
 	const r = await fetch(`/api/upload?name=${encodeURIComponent(f.name)}`, { method: 'POST', body: f });
 	const j = await r.json().catch(() => ({}));
-	if (!r.ok) throw new Error(j.error || r.statusText);
+	if (!r.ok) throw serverFehler(j, r);
 	return j.name;
 }
 

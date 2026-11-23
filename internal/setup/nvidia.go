@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"compress/flate"
 	"context"
+	"errors"
 	"fmt"
 	"hash/crc32"
 	"io"
@@ -21,6 +22,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/models"
 )
 
@@ -98,14 +100,14 @@ func FetchNvidiaLibs(ctx context.Context, dataDir string) error {
 	defer nvidiaMu.Unlock()
 	g := DetectGPU(dataDir)
 	if !g.Present || !g.Supported {
-		return fmt.Errorf("keine unterstützte NVIDIA-GPU gefunden")
+		return msg.New("gpu.none", "Keine unterstützte NVIDIA-GPU gefunden.")
 	}
 	if len(g.Missing) == 0 {
 		return nil
 	}
 	pkgs := nvidiaFetch(g.CudaMajor, g.Missing)
 	if len(pkgs) == 0 {
-		return fmt.Errorf("die NVIDIA-Bibliotheken lassen sich auf diesem System nicht automatisch laden")
+		return msg.New("gpu.noAutoLibs", "Die NVIDIA-Bibliotheken lassen sich auf diesem System nicht automatisch laden.")
 	}
 	var total int64
 	for _, p := range pkgs {
@@ -160,7 +162,7 @@ func fetchFromZip(ctx context.Context, url string, p nvidiaPackage, dir string, 
 		}
 	}
 	if found == 0 {
-		return fmt.Errorf("%s: keine der gesuchten Bibliotheken im Archiv", url)
+		return fmt.Errorf("%s: none of the libraries looked for in the archive", url)
 	}
 	return nil
 }
@@ -183,7 +185,7 @@ func fetchEntry(ctx context.Context, ra *remoteFile, f *zip.File, dst string, pr
 		defer fr.Close()
 		src = fr
 	default:
-		return fmt.Errorf("unbekannte Kompression %d", f.Method)
+		return fmt.Errorf("unknown compression %d", f.Method)
 	}
 	tmp := dst + ".part"
 	out, err := os.Create(tmp)
@@ -196,7 +198,7 @@ func fetchEntry(ctx context.Context, ra *remoteFile, f *zip.File, dst string, pr
 		err = cerr
 	}
 	if err == nil && (uint64(n) != f.UncompressedSize64 || h.Sum32() != f.CRC32) {
-		err = fmt.Errorf("Download beschädigt")
+		err = errors.New("download damaged")
 	}
 	if err != nil {
 		os.Remove(tmp)

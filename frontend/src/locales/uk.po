@@ -7,12 +7,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4\n"
 "X-Plurals-Order: one, few, many, other\n"
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
-"Language-Team: \n"
 
 #. 0: r.status
 #. 0: r.status
@@ -438,7 +432,7 @@ msgstr "Закрити"
 msgid "All set."
 msgstr "Усе готово."
 
-#. 0: fehler.label; 1: fehler.error
+#. 0: komponente(fehler.name, fehler.label); 1: meldung(fehler.errorMsg, fehler.error)
 #: src/lib/Einrichtung.svelte
 msgid "Download failed ({0}): {1}"
 msgstr "Не вдалося завантажити ({0}): {1}"
@@ -1377,11 +1371,6 @@ msgstr "<0/>{0} тепер може використовувати Transcribe"
 #: src/lib/Zugriff.svelte
 msgid "Try again there. You can take this back under <0>Settings › Apps</0>."
 msgstr "Спробуйте там ще раз. Скасувати дозвіл можна в розділі <0>Налаштування › Застосунки</0>."
-
-#. 0: stand.program
-#: src/lib/Zugriff.svelte
-msgid "<0/>{0} uses Transcribe"
-msgstr "<0/>{0} використовує Transcribe"
 
 #: src/lib/Zugriff.svelte
 msgid "So that apps can always reach Transcribe"
@@ -2441,6 +2430,7 @@ msgstr "Тека даних"
 msgid "Results"
 msgstr "Результати"
 
+#: src/lib/live/stand.svelte.js
 #: src/routes/settings/+page.svelte
 msgid "Models"
 msgstr "Моделі"
@@ -2631,6 +2621,7 @@ msgstr "Сервіс ШІ"
 msgid "Try it"
 msgstr "Спробувати"
 
+#: src/lib/live/stand.svelte.js
 #: src/routes/settings/+page.svelte
 #: src/routes/settings/+page.svelte
 msgid "Graphics card"
@@ -3092,6 +3083,7 @@ msgstr "Першого разу Transcribe завантажує Tesseract і м�
 msgid "The image that was read, with the words found outlined"
 msgstr "Прочитане зображення з обведеними знайденими словами"
 
+#: src/lib/live/stand.svelte.js
 #: src/routes/settings/+page.svelte
 msgid "# line"
 msgid_plural "# lines"
@@ -3405,12 +3397,12 @@ msgstr "за потреби"
 msgid "missing"
 msgstr "немає"
 
-#. 0: c.label || c.name
+#. 0: komponente(c.name, c.label || c.name)
 #: src/routes/settings/+page.svelte
 msgid "Download {0} again"
 msgstr "Завантажити {0} знову"
 
-#. 0: c.label || c.name
+#. 0: komponente(c.name, c.label || c.name)
 #: src/routes/settings/+page.svelte
 msgid "Download {0}"
 msgstr "Завантажити {0}"
@@ -3423,7 +3415,7 @@ msgstr "Завантажити знову"
 msgid "Download"
 msgstr "Завантажити"
 
-#. 0: c.label || c.name
+#. 0: komponente(c.name, c.label || c.name)
 #: src/routes/settings/+page.svelte
 msgid "Downloading {0}"
 msgstr "Завантаження {0}"
@@ -4536,3 +4528,704 @@ msgctxt "library_hide"
 msgid "Show {0} again"
 msgstr "Знову показати {0}"
 
+#: src/lib/meldungen.js
+msgid "Please enter a full path, such as D:\\Transcribe."
+msgstr "Вкажіть повний шлях, наприклад D:\\Transcribe."
+
+#: src/lib/meldungen.js
+msgid "The data is already there."
+msgstr "Дані вже там."
+
+#: src/lib/meldungen.js
+msgid "The new location must not be inside the current data folder."
+msgstr "Нове місце не може бути всередині поточної теки даних."
+
+#: src/lib/meldungen.js
+msgid "There are other files there already. Please choose an empty folder."
+msgstr "Там уже є інші файли. Виберіть порожню теку."
+
+#: src/lib/meldungen.js
+msgid "That is a file, not a folder."
+msgstr "Це файл, а не тека."
+
+#: src/lib/meldungen.js
+msgid "A job is running. The data folder can be moved once all jobs are done."
+msgstr "Зараз виконується завдання. Теку даних можна буде перемістити, коли всі завдання завершаться."
+
+#: src/lib/meldungen.js
+msgid "A recording is running. The data folder can be moved once it has ended."
+msgstr "Зараз триває запис. Теку даних можна буде перемістити, коли він завершиться."
+
+#: src/lib/meldungen.js
+msgid "The app is downloading models. The data folder can be moved once the download is done."
+msgstr "Застосунок завантажує моделі. Теку даних можна буде перемістити після завершення завантаження."
+
+#: src/lib/meldungen.js
+msgid "The app is downloading components. The data folder can be moved once the download is done."
+msgstr "Застосунок завантажує компоненти. Теку даних можна буде перемістити після завершення завантаження."
+
+#: src/lib/meldungen.js
+msgid "The data folder was set at startup (--data or TRANSCRIBE_DATA) and cannot be changed here."
+msgstr "Теку даних задано під час запуску (--data або TRANSCRIBE_DATA), і тут її змінити не можна."
+
+#: src/lib/meldungen.js
+msgid "The data folder is already being moved."
+msgstr "Теку даних уже переміщують."
+
+#. 0: a.error
+#: src/lib/meldungen.js
+msgid "Moving did not work; the data is still in its old place. ({0})"
+msgstr "Перемістити не вдалося; дані залишилися на старому місці. ({0})"
+
+#: src/lib/meldungen.js
+msgid "The folder dialog is already open."
+msgstr "Вікно вибору теки вже відкрите."
+
+#: src/lib/meldungen.js
+msgid "Please enter the full path of the folder, such as C:\\Nextcloud\\Interviews."
+msgstr "Вкажіть повний шлях до теки, наприклад C:\\Nextcloud\\Interviews."
+
+#. 0: a.path
+#: src/lib/meldungen.js
+msgid "This folder does not exist: {0}"
+msgstr "Такої теки немає: {0}"
+
+#: src/lib/meldungen.js
+msgid "Transcribe does not delete anything in a connected folder."
+msgstr "Transcribe нічого не видаляє в під’єднаній теці."
+
+#: src/lib/meldungen.js
+msgid "This recording is being transcribed. Cancel that first."
+msgstr "Цей запис зараз транскрибується. Спершу скасуйте це."
+
+#: src/lib/meldungen.js
+msgid "Transcribe ended unexpectedly during this transcription. “Retry” starts it again."
+msgstr "Transcribe несподівано завершив роботу під час цієї транскрипції. «Повторити» запускає її знову."
+
+#: src/lib/meldungen.js
+msgid "queued again after a restart"
+msgstr "знову в черзі після перезапуску"
+
+#: src/lib/meldungen.js
+msgid "The recording is empty: there is no sound in it."
+msgstr "Запис порожній: у ньому немає звуку."
+
+#. 0: a.seconds
+#: src/lib/meldungen.js
+msgid "The recording is too short ({0} s) to recognize anything in it."
+msgstr "Запис закороткий ({0} с), щоб у ньому щось розпізнати."
+
+#: src/lib/meldungen.js
+msgid "Recognition on this computer is turned off (Settings, Recognition: external API only)."
+msgstr "Розпізнавання на цьому комп’ютері вимкнено (Налаштування, Розпізнавання: лише зовнішній API)."
+
+#: src/lib/meldungen.js
+msgid "The address of the API is missing (Settings, Recognition)."
+msgstr "Не вказано адресу API (Налаштування, Розпізнавання)."
+
+#: src/lib/meldungen.js
+msgid "No key for the API has been entered yet (Settings, Recognition)."
+msgstr "Ключ для API ще не вказано (Налаштування, Розпізнавання)."
+
+#. 0: a.service; 1: a.error
+#: src/lib/meldungen.js
+msgid "{0} cannot be reached: {1}"
+msgstr "{0} недоступний: {1}"
+
+#. 0: a.service; 1: a.error
+#: src/lib/meldungen.js
+msgid "{0} does not answer: {1}"
+msgstr "{0} не відповідає: {1}"
+
+#. 0: a.service; 1: a.error
+#: src/lib/meldungen.js
+msgid "{0}: unexpected answer: {1}"
+msgstr "{0}: неочікувана відповідь: {1}"
+
+#. 0: a.service
+#. 0: a.service
+#: src/lib/meldungen.js
+#: src/lib/meldungen.js
+msgid "{0} rejected the API key."
+msgstr "{0} відхилив ключ API."
+
+#. 0: a.service
+#. 0: a.service
+#: src/lib/meldungen.js
+#: src/lib/meldungen.js
+msgid "{0} is not accepting anything right now (credit or requests used up)."
+msgstr "{0} зараз нічого не приймає (вичерпано кошти або запити)."
+
+#. 0: a.service; 1: a.status
+#. 0: a.service; 1: a.status
+#: src/lib/meldungen.js
+#: src/lib/meldungen.js
+msgid "{0}: error {1}:"
+msgstr "{0}: помилка {1}:"
+
+#. 0: a.service; 1: a.reason
+#: src/lib/meldungen.js
+msgid "{0} refuses: {1}"
+msgstr "{0} відмовляє: {1}"
+
+#: src/lib/meldungen.js
+msgid "The API key was not accepted."
+msgstr "Ключ API не прийнято."
+
+#: src/lib/meldungen.js
+msgid "Credit or requests are used up."
+msgstr "Кошти або запити вичерпано."
+
+#: src/lib/meldungen.js
+msgid "Text recognition is not available"
+msgstr "Розпізнавання тексту недоступне"
+
+#: src/lib/meldungen.js
+msgid "Image larger than 64 MB"
+msgstr "Зображення більше за 64 МБ"
+
+#: src/lib/meldungen.js
+msgid "Windows has no language installed for text recognition (Settings › Time & language › Language)"
+msgstr "У Windows не встановлено жодної мови для розпізнавання тексту (Параметри › Час і мова › Мова)"
+
+#: src/lib/meldungen.js
+msgid "Tesseract is downloaded the first time it reads"
+msgstr "Tesseract завантажується під час першого читання"
+
+#: src/lib/meldungen.js
+msgid "The address of the AI service is missing (Settings, Text recognition)"
+msgstr "Не вказано адресу сервісу ШІ (Налаштування, Розпізнавання тексту)"
+
+#: src/lib/meldungen.js
+msgid "The model of the AI service is missing (Settings, Text recognition)"
+msgstr "Не вказано модель сервісу ШІ (Налаштування, Розпізнавання тексту)"
+
+#: src/lib/meldungen.js
+msgid "No key for the AI service has been entered yet (Settings, Text recognition)"
+msgstr "Ключ для сервісу ШІ ще не вказано (Налаштування, Розпізнавання тексту)"
+
+#. 0: a.service; 1: a.url
+#: src/lib/meldungen.js
+msgid "{0} cannot be reached ({1})."
+msgstr "{0} недоступний ({1})."
+
+#. 0: a.service; 1: a.detail
+#: src/lib/meldungen.js
+msgid "{0} did not answer in time ({1})."
+msgstr "{0} не відповів вчасно ({1})."
+
+#. 0: a.service; 1: a.model
+#: src/lib/meldungen.js
+msgid "{0} does not know the model “{1}”, or it cannot read images."
+msgstr "{0} не знає моделі «{1}», або вона не читає зображень."
+
+#. 0: a.url; 1: a.status
+#: src/lib/meldungen.js
+msgid "No matching interface answers at {0} (error {1}). Is the address right?"
+msgstr "За адресою {0} не відповідає відповідний інтерфейс (помилка {1}). Чи правильна адреса?"
+
+#. 0: a.url
+#: src/lib/meldungen.js
+msgid "No matching interface answers at {0}. Is the address right?"
+msgstr "За адресою {0} не відповідає відповідний інтерфейс. Чи правильна адреса?"
+
+#. 0: a.service; 1: a.status
+#: src/lib/meldungen.js
+msgid "{0} reported an error ({1})."
+msgstr "{0} повідомив про помилку ({1})."
+
+#. 0: a.service
+#: src/lib/meldungen.js
+msgid "{0} refused the image:"
+msgstr "{0} відхилив зображення:"
+
+#: src/lib/meldungen.js
+msgid "The program stopped waiting for the answer"
+msgstr "Програма перестала чекати на відповідь"
+
+#: src/lib/meldungen.js
+msgid "Loading the model …"
+msgstr "Завантаження моделі…"
+
+#: src/lib/meldungen.js
+msgid "The model has not been downloaded yet"
+msgstr "Модель ще не завантажено"
+
+#: src/lib/meldungen.js
+msgid "The language model has not been downloaded yet"
+msgstr "Мовну модель ще не завантажено"
+
+#: src/lib/meldungen.js
+msgid "The language model is not loaded in Transcribe"
+msgstr "Мовну модель не завантажено в Transcribe"
+
+#: src/lib/meldungen.js
+msgid "The field catalog is too long for the language model"
+msgstr "Каталог полів задовгий для мовної моделі"
+
+#: src/lib/meldungen.js
+msgid "Too many questions are waiting already"
+msgstr "Уже чекає забагато запитань"
+
+#: src/lib/meldungen.js
+msgid "Waiting for the questions before it to be answered …"
+msgstr "Чекає, доки дадуть відповідь на попередні запитання…"
+
+#: src/lib/meldungen.js
+msgid "Computing …"
+msgstr "Обчислення…"
+
+#: src/lib/meldungen.js
+msgid "Loading the language model …"
+msgstr "Завантаження мовної моделі…"
+
+#: src/lib/meldungen.js
+msgid "Reading the question …"
+msgstr "Читає запитання…"
+
+#: src/lib/meldungen.js
+msgid "Writing the answer …"
+msgstr "Пише відповідь…"
+
+#: src/lib/meldungen.js
+msgid "Cancelled"
+msgstr "Скасовано"
+
+#: src/lib/meldungen.js
+msgid "Cancelled before it was asked"
+msgstr "Скасовано, перш ніж його поставили"
+
+#: src/lib/meldungen.js
+msgid "The answer of the language model contains no JSON"
+msgstr "Відповідь мовної моделі не містить JSON"
+
+#. 0: a.reason
+#: src/lib/meldungen.js
+msgid "Recording failed: {0}"
+msgstr "Запис не вдався: {0}"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: no microphone found"
+msgstr "Запис не вдався: мікрофон не знайдено"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: the microphone stopped delivering sound"
+msgstr "Запис не вдався: мікрофон перестав передавати звук"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: no output device found for the system audio"
+msgstr "Запис не вдався: не знайдено пристрою виводу для системного звуку"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: the system audio stopped delivering sound"
+msgstr "Запис не вдався: системний звук перестав надходити"
+
+#: src/lib/meldungen.js
+msgid "Recording failed: recording the system audio does not work on the Mac yet"
+msgstr "Запис не вдався: на Mac запис системного звуку ще не працює"
+
+#: src/lib/meldungen.js
+msgid "A recording of the system audio alone is running. To dictate, first end that recording on the Live page."
+msgstr "Зараз триває запис лише системного звуку. Щоб диктувати, спершу завершіть цей запис на сторінці Live."
+
+#: src/lib/meldungen.js
+msgid "No sound arrived before the recording ended, so nothing was saved."
+msgstr "До завершення запису не надійшло жодного звуку, тому нічого не збережено."
+
+#. 0: a.bits
+#: src/lib/meldungen.js
+msgid "Audio: unknown format ({0} bit)"
+msgstr "Аудіо: невідомий формат ({0} біт)"
+
+#: src/lib/meldungen.js
+msgid "Audio: format without channels"
+msgstr "Аудіо: формат без каналів"
+
+#: src/lib/meldungen.js
+msgid "This note does not exist."
+msgstr "Такої нотатки немає."
+
+#: src/lib/meldungen.js
+msgid "The note is still running."
+msgstr "Нотатка ще триває."
+
+#: src/lib/meldungen.js
+msgid "The recording is already running."
+msgstr "Запис уже триває."
+
+#: src/lib/meldungen.js
+msgid "The address is missing."
+msgstr "Не вказано адресу."
+
+#: src/lib/meldungen.js
+msgid "The shortcut only works while Transcribe runs with its icon in the notification area."
+msgstr "Сполучення клавіш працює, лише поки Transcribe працює зі значком в області сповіщень."
+
+#: src/lib/meldungen.js
+msgid "Another program already uses this shortcut. Choose a different one."
+msgstr "Інша програма вже використовує це сполучення клавіш. Виберіть інше."
+
+#. 0: a.error
+#: src/lib/meldungen.js
+msgid "Starting with Windows could not be changed: {0}"
+msgstr "Не вдалося змінити запуск разом із Windows: {0}"
+
+#: src/lib/meldungen.js
+msgid "The GPU runtime has not been downloaded yet."
+msgstr "Середовище GPU ще не завантажено."
+
+#: src/lib/meldungen.js
+msgid "Language: automatic, or codes such as de or de,en"
+msgstr "Мова: автоматично або коди на зразок de чи de,en"
+
+#. 0: a.id
+#: src/lib/meldungen.js
+msgid "Unknown service: {0}"
+msgstr "Невідомий сервіс: {0}"
+
+#. 0: a.id
+#: src/lib/meldungen.js
+msgid "Unknown text recognition: {0}"
+msgstr "Невідоме розпізнавання тексту: {0}"
+
+#: src/lib/meldungen.js
+msgid "No supported NVIDIA GPU found."
+msgstr "Не знайдено підтримуваного GPU NVIDIA."
+
+#. 0: a.libs
+#: src/lib/meldungen.js
+msgid "NVIDIA libraries are missing that the app cannot download itself: {0}"
+msgstr "Бракує бібліотек NVIDIA, які застосунок не може завантажити сам: {0}"
+
+#: src/lib/meldungen.js
+msgid "The NVIDIA libraries cannot be downloaded automatically on this system."
+msgstr "На цій системі бібліотеки NVIDIA не можна завантажити автоматично."
+
+#: src/lib/meldungen.js
+msgid "A development build does not look for updates."
+msgstr "Версія для розробки не шукає оновлень."
+
+#: src/lib/meldungen.js
+msgid "GitHub could not be reached. Please try again later."
+msgstr "Не вдалося зв’язатися з GitHub. Спробуйте пізніше."
+
+#: src/lib/meldungen.js
+msgid "There is no newer version."
+msgstr "Новішої версії немає."
+
+#: src/lib/meldungen.js
+msgid "Transcribe may not change its program folder. Download the new version from the releases page and replace the EXE by hand."
+msgstr "Transcribe не має права змінювати теку програми. Завантажте нову версію зі сторінки релізів і замініть EXE вручну."
+
+#: src/lib/meldungen.js
+msgid "The download took too long. Please try again later."
+msgstr "Завантаження тривало надто довго. Спробуйте пізніше."
+
+#. 0: a.error
+#: src/lib/meldungen.js
+msgid "The update could not be installed: {0}"
+msgstr "Не вдалося встановити оновлення: {0}"
+
+#: src/lib/meldungen.js
+msgid "Recognition runtime (sherpa-onnx)"
+msgstr "Середовище розпізнавання (sherpa-onnx)"
+
+#: src/lib/meldungen.js
+msgid "Voice activity (Silero VAD)"
+msgstr "Голосова активність (Silero VAD)"
+
+#: src/lib/meldungen.js
+msgid "Speaker separation (pyannote)"
+msgstr "Розділення мовців (pyannote)"
+
+#: src/lib/meldungen.js
+msgid "Speaker embeddings (CAM++)"
+msgstr "Ембединги мовців (CAM++)"
+
+#: src/lib/meldungen.js
+msgid "Sound recognition (CED)"
+msgstr "Розпізнавання звуків (CED)"
+
+#: src/lib/meldungen.js
+msgid "Speech recognition (Parakeet v3)"
+msgstr "Розпізнавання мовлення (Parakeet v3)"
+
+#: src/lib/meldungen.js
+msgid "German model (FastConformer)"
+msgstr "Модель для німецької (FastConformer)"
+
+#: src/lib/meldungen.js
+msgid "German live (Kroko)"
+msgstr "Німецька наживо (Kroko)"
+
+#: src/lib/meldungen.js
+msgid "Speech recognition (Whisper base)"
+msgstr "Розпізнавання мовлення (Whisper base)"
+
+#: src/lib/meldungen.js
+msgid "Other languages (Whisper turbo)"
+msgstr "Інші мови (Whisper turbo)"
+
+#: src/lib/meldungen.js
+msgid "GPU runtime (CUDA)"
+msgstr "Середовище GPU (CUDA)"
+
+#: src/lib/meldungen.js
+msgid "NVIDIA libraries (CUDA, cuDNN)"
+msgstr "Бібліотеки NVIDIA (CUDA, cuDNN)"
+
+#: src/lib/meldungen.js
+msgid "ffmpeg (audio/video)"
+msgstr "ffmpeg (аудіо/відео)"
+
+#: src/lib/meldungen.js
+msgid "Text recognition (Tesseract)"
+msgstr "Розпізнавання тексту (Tesseract)"
+
+#: src/lib/meldungen.js
+msgid "Text recognition German"
+msgstr "Розпізнавання тексту: німецька"
+
+#: src/lib/meldungen.js
+msgid "Text recognition English"
+msgstr "Розпізнавання тексту: англійська"
+
+#: src/lib/meldungen.js
+msgid "Text recognition Fraktur (frk)"
+msgstr "Розпізнавання тексту: фрактура (frk)"
+
+#: src/lib/meldungen.js
+msgid "Text recognition Fraktur script"
+msgstr "Розпізнавання тексту: шрифт фрактура"
+
+#: src/lib/meldungen.js
+msgid "Text recognition Fraktur (frak2021)"
+msgstr "Розпізнавання тексту: фрактура (frak2021)"
+
+#: src/lib/meldungen.js
+msgid "Text recognition (PP-OCRv5)"
+msgstr "Розпізнавання тексту (PP-OCRv5)"
+
+#: src/lib/meldungen.js
+msgid "Search by meaning (EmbeddingGemma)"
+msgstr "Пошук за значенням (EmbeddingGemma)"
+
+#: src/lib/meldungen.js
+msgid "Filter in your own words (Qwen 2.5 7B)"
+msgstr "Фільтр власними словами (Qwen 2.5 7B)"
+
+#. 0: api[1]
+#: src/lib/meldungen.js
+msgid "transcribing ({0})"
+msgstr "транскрибування ({0})"
+
+#: src/lib/meldungen.js
+msgid "starting"
+msgstr "запуск"
+
+#: src/lib/meldungen.js
+msgid "finding sounds"
+msgstr "пошук звуків"
+
+#: src/lib/meldungen.js
+msgid "telling speakers apart"
+msgstr "розрізнення мовців"
+
+#: src/lib/meldungen.js
+msgid "transcribing"
+msgstr "транскрибування"
+
+#: src/lib/meldungen.js
+msgid "putting it together"
+msgstr "збирання докупи"
+
+#: src/lib/meldungen.js
+msgid "Your own server (OpenAI-compatible, such as Ollama)"
+msgstr "Власний сервер (сумісний з OpenAI, напр. Ollama)"
+
+#: src/lib/meldungen.js
+msgid "Your own server (OpenAI-compatible)"
+msgstr "Власний сервер (сумісний з OpenAI)"
+
+#: src/lib/meldungen.js
+msgid "Ctrl + Alt + Space"
+msgstr "Ctrl + Alt + Пробіл"
+
+#: src/lib/meldungen.js
+msgid "Ctrl + Shift + Space"
+msgstr "Ctrl + Shift + Пробіл"
+
+#: src/lib/meldungen.js
+msgid "Ctrl + Alt + D"
+msgstr "Ctrl + Alt + D"
+
+#: src/lib/Bibliothek.svelte
+msgid "Connect a folder with recordings"
+msgstr "Під’єднати теку із записами"
+
+#: src/lib/Zugriff.svelte
+msgid "An app uses Transcribe"
+msgstr "Застосунок використовує Transcribe"
+
+#. 0: stand.program
+#: src/lib/Zugriff.svelte
+msgid "{0} uses Transcribe"
+msgstr "{0} використовує Transcribe"
+
+#: src/lib/live/stand.svelte.js
+msgid "Recognized"
+msgstr "Розпізнано"
+
+#: src/lib/live/stand.svelte.js
+msgid "# word"
+msgid_plural "# words"
+msgstr[0] "# слово"
+msgstr[1] "# слова"
+msgstr[2] "# слів"
+msgstr[3] "# слова"
+
+#: src/lib/live/stand.svelte.js
+msgid "Engine"
+msgstr "Рушій"
+
+#: src/lib/live/stand.svelte.js
+msgid "Image size"
+msgstr "Розмір зображення"
+
+#. 0: a.width; 1: a.height
+#: src/lib/live/stand.svelte.js
+msgid "{0} × {1} pixels"
+msgstr "{0} × {1} пікселів"
+
+#: src/lib/live/stand.svelte.js
+msgid "yes"
+msgstr "так"
+
+#: src/lib/live/stand.svelte.js
+msgid "Texts"
+msgstr "Тексти"
+
+#. 0: a.texts; 1: a.chars
+#: src/lib/live/stand.svelte.js
+msgid "{0}, {1} characters in all"
+msgstr "{0}, усього {1} символів"
+
+#: src/lib/live/stand.svelte.js
+msgid "Model"
+msgstr "Модель"
+
+#: src/lib/live/stand.svelte.js
+msgid "was already loaded"
+msgstr "уже було завантажено"
+
+#: src/lib/live/stand.svelte.js
+msgid "had to be loaded first"
+msgstr "довелося спершу завантажити"
+
+#: src/lib/live/stand.svelte.js
+msgid "Waited"
+msgstr "Очікування"
+
+#: src/lib/live/stand.svelte.js
+msgid "Computing time"
+msgstr "Час обчислення"
+
+#: src/lib/live/stand.svelte.js
+msgid "Tokens read"
+msgstr "Прочитано токенів"
+
+#. 0: a.tokens; 1: a.cached
+#: src/lib/live/stand.svelte.js
+msgid "{0}, {1} of them already cached"
+msgstr "{0}, з них {1} уже в кеші"
+
+#: src/lib/live/stand.svelte.js
+msgid "Tokens written"
+msgstr "Записано токенів"
+
+#: src/lib/live/stand.svelte.js
+msgid "Device"
+msgstr "Пристрій"
+
+#: src/lib/live/stand.svelte.js
+msgid "Result"
+msgstr "Результат"
+
+#: src/lib/live/stand.svelte.js
+msgid "# condition"
+msgid_plural "# conditions"
+msgstr[0] "# умова"
+msgstr[1] "# умови"
+msgstr[2] "# умов"
+msgstr[3] "# умови"
+
+#. 0: plural(zahl.conditions, ['# condition', '# conditions']); 1: a.notUnderstood; 2: a.dropped
+#: src/lib/live/stand.svelte.js
+msgid "{0}, {1} not understood, {2} dropped"
+msgstr "{0}, не зрозуміло: {1}, відкинуто: {2}"
+
+#: src/lib/live/stand.svelte.js
+msgid "default"
+msgstr "типово"
+
+#: src/lib/live/stand.svelte.js
+msgid "not given"
+msgstr "не вказано"
+
+#. 0: wert(v)
+#: src/lib/live/stand.svelte.js
+msgid "Image: {0}"
+msgstr "Зображення: {0}"
+
+#. 0: wert(v)
+#: src/lib/live/stand.svelte.js
+msgid "Languages: {0}"
+msgstr "Мови: {0}"
+
+#. 0: wert(v)
+#: src/lib/live/stand.svelte.js
+msgid "Layout: {0}"
+msgstr "Макет: {0}"
+
+#. 0: v
+#: src/lib/live/stand.svelte.js
+msgid "Question: {0}"
+msgstr "Запитання: {0}"
+
+#. 0: v
+#: src/lib/live/stand.svelte.js
+msgid "Fields: {0}"
+msgstr "Поля: {0}"
+
+#. 0: v
+#: src/lib/live/stand.svelte.js
+msgid "Kind: {0}"
+msgstr "Тип: {0}"
+
+#. 0: v[1]; 1: v[2]
+#: src/lib/live/stand.svelte.js
+msgid "{0} vectors of {1} numbers each"
+msgstr "{0} векторів по {1} чисел"
+
+#. 0: Number(k[1]).toLocaleString(getLocale())
+#: src/lib/live/stand.svelte.js
+msgid "… (shortened, {0} characters in all)"
+msgstr "… (скорочено, усього {0} символів)"
+
+#: src/routes/settings/+page.svelte
+msgid "Where should Transcribe keep its data?"
+msgstr "Де Transcribe має зберігати свої дані?"
+
+#: src/lib/meldungen.js
+msgid "Transcribe is not recording the microphone for other programs right now: “Ready in the background” is off. It still processes audio and images that are sent to it. To record, turn it on in Transcribe under Settings › Apps."
+msgstr "Зараз Transcribe не записує мікрофон для інших програм: «Напоготові у фоні» вимкнено. Надіслані аудіо та зображення він і далі обробляє. Щоб записувати, увімкніть це в Transcribe у розділі Налаштування › Застосунки."
+
+#. 0: win[1]
+#: src/lib/meldungen.js
+msgid "Windows text recognition{0}"
+msgstr "Розпізнавання тексту Windows{0}"
+
+#. 0: dienst; 1: ki[2]
+#: src/lib/meldungen.js
+msgid "AI service ({0}){1}"
+msgstr "Сервіс ШІ ({0}){1}"

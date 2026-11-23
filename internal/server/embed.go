@@ -17,6 +17,7 @@ import (
 
 	"github.com/moliri-app/transcribe/embed"
 	"github.com/moliri-app/transcribe/internal/live"
+	"github.com/moliri-app/transcribe/internal/msg"
 	"github.com/moliri-app/transcribe/models"
 )
 
@@ -114,14 +115,14 @@ func (s *Server) embedTexts(w http.ResponseWriter, r *http.Request) {
 		chars += utf8.RuneCountInString(t)
 	}
 	call := s.Live.Call(live.KindEmbed, clientName(r), embed.ModelID+" ("+string(embed.Dtype)+")", embedRequest(body.Texts, body.Kind),
-		live.Fact{Label: "Texte", Value: fmt.Sprintf("%d, zusammen %d Zeichen", len(body.Texts), chars)})
+		live.NewFact("texts", "Texte", msg.New("", "{texts}, zusammen {chars} Zeichen", "texts", len(body.Texts), "chars", chars)))
 	if !loaded && s.cfg.Embed.Installed() {
-		call.Status("Lädt das Modell …")
+		call.Status(msg.New("call.loadingModel", "Lädt das Modell …"))
 	}
 	vectors, err := s.cfg.Embed.Embed(r.Context(), body.Texts, body.Kind)
 	switch {
 	case errors.Is(err, embed.ErrNotInstalled):
-		call.End("", errors.New("Das Modell ist noch nicht heruntergeladen"))
+		call.End("", msg.New("call.modelMissing", "Das Modell ist noch nicht heruntergeladen"))
 		fail(w, http.StatusServiceUnavailable, "Das Modell für die Suche nach Bedeutung ist in Transcribe noch nicht geladen")
 		return
 	case err != nil:
@@ -130,10 +131,14 @@ func (s *Server) embedTexts(w http.ResponseWriter, r *http.Request) {
 			return // the caller went away
 		}
 		call.End("", err)
-		fail(w, http.StatusInternalServerError, err.Error())
+		fail(w, http.StatusInternalServerError, err)
 		return
 	}
-	call.End(embedResponse(vectors), nil, live.Fact{Label: "Modell", Value: map[bool]string{true: "war schon geladen", false: "wurde erst geladen"}[loaded]})
+	modelState := msg.New("", "wurde erst geladen", "loaded", false)
+	if loaded {
+		modelState = msg.New("", "war schon geladen", "loaded", true)
+	}
+	call.End(embedResponse(vectors), nil, live.NewFact("model", "Modell", modelState))
 	writeJSON(w, 200, map[string]any{"ok": true, "model": embed.ModelID, "dtype": embed.Dtype, "dim": embed.Dim, "vectors": vectors})
 }
 
