@@ -298,8 +298,8 @@ func (t *tray) menu() {
 		p, _ := syscall.UTF16PtrFromString(text)
 		procAppendMenu.Call(m, mfString, id, uintptr(unsafe.Pointer(p)))
 	}
-	item(menuOpen, "Transcribe öffnen")
-	item(menuSettings, "Einstellungen")
+	item(menuOpen, tx("Open Transcribe"))
+	item(menuSettings, tx("Settings"))
 	if t.actions.updateItem != nil {
 		if text, enabled := t.actions.updateItem(); text != "" {
 			p, _ := syscall.UTF16PtrFromString(text)
@@ -312,7 +312,7 @@ func (t *tray) menu() {
 		}
 	}
 	procAppendMenu.Call(m, mfSeparator, 0, 0)
-	item(menuQuit, "Beenden")
+	item(menuQuit, tx("Quit"))
 	procSetMenuDefaultItem.Call(m, menuOpen, 0)
 
 	var pt struct{ x, y int32 }

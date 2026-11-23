@@ -53,8 +53,8 @@ func dataDir(flagged string) (dir string, fixed bool) {
 	if missing == "" {
 		return dir, false
 	}
-	if !confirm("Der Datenordner " + missing + " ist nicht erreichbar. Ist das Laufwerk angeschlossen?\n\n" +
-		"„Ja“ startet Transcribe mit dem Standardordner " + datadir.Default() + ", „Nein“ beendet es.") {
+	if !confirm(tx("The data folder %s cannot be reached. Is the drive connected?\n\n“Yes” starts Transcribe with the default folder %s, “No” quits it.",
+		missing, datadir.Default())) {
 		os.Exit(1)
 	}
 	if err := datadir.Forget(); err != nil {
@@ -79,7 +79,7 @@ func openBrowser(url string) {
 // fail reports a fatal error in a message box (the Windows build has no console).
 func fail(err error) {
 	log.Println("Fehler:", err)
-	showError("Fehler: " + err.Error())
+	showError(tx("Error: %s", err.Error()))
 	os.Exit(1)
 }
 
@@ -121,6 +121,7 @@ func main() {
 	}
 	defer unlock()
 	setupLog(*data)
+	useLocaleOf(*data)
 	log.Println("Transcribe", version)
 
 	// an update puts the new EXE in place and ends the app; the new one starts once this one is done
@@ -200,8 +201,8 @@ func main() {
 		upd.Idle = func() bool { return !srv.Queue.Busy() && !srv.Live.Busy() }
 		upd.Restart = restart
 		upd.Found = func(v string) {
-			tr.notify("Transcribe "+strings.TrimPrefix(v, "v")+" ist da",
-				"Ein Klick auf „Aktualisieren“ im Menü des Symbols oder in den Einstellungen installiert die neue Version.")
+			tr.notify(tx("Transcribe %s is available", strings.TrimPrefix(v, "v")),
+				tx("A click on “Update” in the icon's menu or in the settings installs the new version."))
 		}
 	}
 	if *noBrowser && !*background {
@@ -236,12 +237,12 @@ func main() {
 			if srv.WindowInSight() {
 				return
 			}
-			who := strings.TrimPrefix(strings.TrimPrefix(origin, "https://"), "http://")
+			title := tx("May %s use Transcribe?", strings.TrimPrefix(strings.TrimPrefix(origin, "https://"), "http://"))
 			if origin == "null" {
-				who = "Eine Datei oder eingebettete Seite"
+				title = tx("May a file or an embedded page use Transcribe?")
 			}
-			tr.notifyThen("Darf "+who+" Transcribe nutzen?",
-				"Die Seite möchte Sprache als Text holen oder Text aus Bildern lesen lassen. Ein Klick hier zeigt die Anfrage.",
+			tr.notifyThen(title,
+				tx("The page wants to turn speech into text or have text read from images. Click here to see the request."),
 				func() { showAppWindow(url, *data) })
 		}
 		firstWait := 90 * time.Second
@@ -260,8 +261,8 @@ func main() {
 				case prefs.Load(*data).Background || autostart.Enabled():
 					if !told && srv.WindowSeen() {
 						log.Println("window closed, running on in the background")
-						tr.notify("Transcribe läuft im Hintergrund weiter",
-							"Aufträge und Live-Anfragen laufen weiter. Ein Klick auf das Symbol öffnet das Fenster wieder.")
+						tr.notify(tx("Transcribe keeps running in the background"),
+							tx("Jobs and live requests carry on. Click the icon to open the window again."))
 						told = true
 					}
 				case !srv.Queue.Busy() && !srv.Live.Busy():

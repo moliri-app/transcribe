@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -22,6 +23,7 @@ import (
 	"github.com/moliri-app/transcribe/internal/live"
 	"github.com/moliri-app/transcribe/internal/media"
 	"github.com/moliri-app/transcribe/internal/msg"
+	"github.com/moliri-app/transcribe/internal/prefs"
 	"github.com/moliri-app/transcribe/internal/queue"
 	"github.com/moliri-app/transcribe/internal/update"
 	"github.com/moliri-app/transcribe/ocr"
@@ -63,6 +65,7 @@ type Server struct {
 	lastPing  atomic.Int64 // unix nanos of the last UI heartbeat
 	hidden    atomic.Bool  // the last heartbeat came from a page out of sight (minimized, covered)
 	lastBye   atomic.Int64
+	uiLocale  atomic.Value // string: the interface language the pages last reported, as stored
 	move      moving
 	filters   filterQueue
 }
@@ -97,9 +100,20 @@ func (s *Server) bye(w http.ResponseWriter, r *http.Request) {
 // what it shows, the user sees.
 func (s *Server) WindowInSight() bool { return s.WindowOpen() && !s.hidden.Load() }
 
+// ping is a page's heartbeat. It also says the interface language (lang), which the settings keep
+// for what the EXE shows itself: the tray menu, notifications, the dictation window.
 func (s *Server) ping(w http.ResponseWriter, r *http.Request) {
 	s.hidden.Store(r.URL.Query().Has("hidden"))
 	s.lastPing.Store(time.Now().UnixNano())
+	if l := prefs.UILocale(r.URL.Query().Get("lang")); l != "" && l != s.uiLocale.Load() && allowedPost(r) {
+		if p := prefs.Load(s.cfg.DataDir); p.UILocale == l {
+			s.uiLocale.Store(l)
+		} else if _, err := prefs.Update(s.cfg.DataDir, func(p *prefs.Prefs) { p.UILocale = l }); err == nil {
+			s.uiLocale.Store(l)
+		} else {
+			log.Println("prefs:", err)
+		}
+	}
 	w.WriteHeader(http.StatusNoContent)
 }
 

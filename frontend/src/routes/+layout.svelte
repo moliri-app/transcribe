@@ -10,15 +10,21 @@
 	import AppBar from '$lib/AppBar.svelte';
 	import Einrichtung from '$lib/Einrichtung.svelte';
 	import Zugriff from '$lib/Zugriff.svelte';
+	import { getLocale } from '$lib/moliri/i18n/locale.js';
 
 	let { children } = $props();
 
-	// Lebenszeichen an die EXE wie bei den alten Seiten (web/setup.js): ohne sie beendet sie sich,
-	// sobald das Fenster zu ist (server.WindowGone). Es sagt auch, ob das Fenster zu sehen ist: wenn
-	// nicht, meldet die EXE eine Anfrage mit einer Benachrichtigung (server.WindowInSight).
+	// A heartbeat to the EXE as the old pages send it (web/setup.js): without it, the EXE ends once
+	// the window is closed (server.WindowGone). It also says whether the window is in sight: if not,
+	// the EXE announces a request with a notification (server.WindowInSight). And it names the
+	// interface language, in which the EXE shows its tray menu, its notifications and the dictation
+	// window (cmd/transcribe/texts.go).
 	onMount(() => {
 		const ping = () =>
-			fetch(document.visibilityState === 'hidden' ? '/api/ping?hidden' : '/api/ping', { method: 'POST', keepalive: true }).catch(() => {});
+			fetch(`/api/ping?lang=${getLocale()}${document.visibilityState === 'hidden' ? '&hidden' : ''}`, {
+				method: 'POST',
+				keepalive: true
+			}).catch(() => {});
 		ping();
 		const t = setInterval(ping, 5000);
 		const bye = () => navigator.sendBeacon('/api/bye');

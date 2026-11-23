@@ -120,7 +120,7 @@ func (d *dictation) toggle() {
 	d.mu.Unlock()
 
 	t.escape(true)
-	t.show(overlay{dot: dotWait, title: "Diktat wird vorbereitet …", body: "Einen Moment, gleich kannst du sprechen."}, 0)
+	t.show(overlay{dot: dotWait, title: tx("Getting ready to dictate …"), body: tx("One moment, you can speak shortly.")}, 0)
 	began := time.Now()
 	l, err := d.hub.Dictate(context.Background(), func(ev live.Event) { d.heard(on, ev) })
 	log.Printf("dictate: recognition ready after %.1f s", time.Since(began).Seconds())
@@ -129,7 +129,7 @@ func (d *dictation) toggle() {
 		d.on = nil
 		d.mu.Unlock()
 		t.escape(false)
-		t.show(overlay{dot: dotWait, title: "Diktieren ging nicht", body: err.Error()}, 6*time.Second)
+		t.show(overlay{dot: dotWait, title: tx("Dictation did not work"), body: err.Error()}, 6*time.Second)
 		return
 	}
 	d.mu.Lock()
@@ -196,11 +196,11 @@ func (d *dictation) update(on *dictating) {
 	text := join(append(on.lines[:len(on.lines):len(on.lines)], on.partial))
 	heard := on.heard
 	d.mu.Unlock()
-	o := overlay{dot: dotListen, title: "Ich höre zu", hint: prefs.DictateLabel(on.key) + ": fertig   Esc: abbrechen", body: tail(text), note: on.l.Note()}
+	o := overlay{dot: dotListen, title: tx("I'm listening"), hint: tx("%s: done   Esc: cancel", keyLabel(on.key)), body: tail(text), note: on.l.Note()}
 	if !heard {
-		o.dot, o.title, o.body = dotWait, "Mikrofon startet …", "Gleich kannst du sprechen."
+		o.dot, o.title, o.body = dotWait, tx("Microphone starting …"), tx("You can speak in a moment.")
 	} else if text == "" {
-		o.body = "Sprich jetzt."
+		o.body = tx("Speak now.")
 	}
 	t.show(o, 0)
 }
@@ -218,7 +218,7 @@ func (d *dictation) end(on *dictating, cancel bool) {
 	t.escape(false)
 	p := prefs.Load(d.data)
 	if !cancel {
-		t.show(overlay{dot: dotWait, title: "Einen Moment …", body: "Das zuletzt Gesagte wird noch erkannt."}, 0)
+		t.show(overlay{dot: dotWait, title: tx("One moment …"), body: tx("The last words are still being recognised.")}, 0)
 	}
 	on.l.Stop() // what is still being said is recognised first
 	d.mu.Lock()
@@ -232,17 +232,17 @@ func (d *dictation) end(on *dictating, cancel bool) {
 	}
 	switch {
 	case cancel:
-		t.show(overlay{dot: dotWait, title: "Diktat abgebrochen", body: "Es wurde nichts eingefügt."}, 2*time.Second)
+		t.show(overlay{dot: dotWait, title: tx("Dictation cancelled"), body: tx("Nothing was inserted.")}, 2*time.Second)
 	case text == "" && on.l.Err() != nil:
-		t.show(overlay{dot: dotWait, title: "Diktieren ging nicht", body: on.l.Err().Error()}, 6*time.Second)
+		t.show(overlay{dot: dotWait, title: tx("Dictation did not work"), body: on.l.Err().Error()}, 6*time.Second)
 	case text == "":
-		t.show(overlay{dot: dotWait, title: "Nichts verstanden", body: "Es kam kein Text an. " + prefs.DictateLabel(on.key) + " startet ein neues Diktat."}, 4*time.Second)
+		t.show(overlay{dot: dotWait, title: tx("Nothing understood"), body: tx("No text came through. %s starts a new dictation.", keyLabel(on.key))}, 4*time.Second)
 	default:
 		insert, clipboard := !p.DictateNoInsert, !p.DictateNoClipboard
 		if clipboard {
 			if err := setClipboard(text); err != nil {
 				log.Println("dictate: clipboard:", err)
-				t.show(overlay{dot: dotWait, title: "Zwischenablage ging nicht", body: err.Error(), note: on.l.Note()}, 6*time.Second)
+				t.show(overlay{dot: dotWait, title: tx("Clipboard did not work"), body: err.Error(), note: on.l.Note()}, 6*time.Second)
 				return
 			}
 		}
@@ -250,14 +250,14 @@ func (d *dictation) end(on *dictating, cancel bool) {
 		switch {
 		case insert && clipboard:
 			paste() // Ctrl+V: one step to undo in the program
-			o.title, o.hint = "Eingefügt", "liegt auch in der Zwischenablage"
+			o.title, o.hint = tx("Inserted"), tx("also on the clipboard")
 		case insert:
 			typeText(text) // typed, so the clipboard stays as it was
-			o.title = "Eingefügt"
+			o.title = tx("Inserted")
 		case clipboard:
-			o.title, o.hint = "In der Zwischenablage", "Strg + V: einfügen"
+			o.title, o.hint = tx("On the clipboard"), tx("%s: paste", keyLabel("ctrl+v"))
 		default:
-			o.title, o.hint = "Auf der Seite Live gespeichert", "Klick: dort öffnen"
+			o.title, o.hint = tx("Saved on the Live page"), tx("Click: open it there")
 		}
 		shown := 3 * time.Second
 		if !insert {
