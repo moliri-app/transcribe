@@ -46,3 +46,11 @@ the catalogue in `cmd/transcribe/texts.go`; a new or changed text needs its line
 language (`TestEveryTextTranslated` checks). The language is the one the pages last reported with
 their heartbeat (`/api/ping?lang=`, kept as `uiLocale` in the settings), else Windows' display
 language, else English.
+
+When a dictation fails, the window shows the reason, an `internal/msg` message of the recording
+(`internal/live`) or of a speech recognition service (`internal/sttapi`). The EXE cannot run
+`meldungen.js`, so those messages have their texts in `cmd/transcribe/messages.go`, copied from the
+frontend: `TestMessagesAgreeWithTheFrontend` compares them with `meldungen.js` and the `.po`
+catalogues, and `TestDictationErrorsTranslated` fails for a new message in those two packages that
+has no texts there. A changed frontend text or translation therefore needs the same change in
+`messages.go`.
