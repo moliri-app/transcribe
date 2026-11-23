@@ -1,8 +1,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/files/transcript/editor/SprecherMenue.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/files/transcript/editor/SprecherMenue.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
@@ -15,7 +15,6 @@
      transcribe-go wirkt beides erst nach „Neu berechnen“). Wer
      nicht korrigieren darf, sieht nur die Ansicht. -->
 <script>
-	import * as msg from '$lib/moliri/texte.js';
 	import { untrack } from 'svelte';
 	import { fmt, speakingTime } from './model.js';
 	import { spkColor } from './editor.svelte.js';
@@ -96,7 +95,7 @@
 			class="menue"
 			role="dialog"
 			tabindex="-1"
-			aria-label={msg.te_speaker_dialog({ name: ed.spkName(m.k) })}
+			aria-label="Speaker {ed.spkName(m.k)}"
 			bind:this={box}
 			style:left="{pos.left}px"
 			style:top="{pos.top}px"
@@ -111,7 +110,7 @@
 				<div class="kopf">
 					<span class="pkt" aria-hidden="true"></span>
 					<b>{ed.spkName(m.k)}</b>
-					<span class="dauer">{msg.te_speaks({ time: fmt(dur) })}</span>
+					<span class="dauer">speaks {fmt(dur)}</span>
 				</div>
 
 				{#if others.length}
@@ -125,19 +124,19 @@
 							}}
 						>
 							<IconMaterialSymbolsFilterCenterFocusRounded />
-							{ed.focused === m.k ? msg.te_show_all() : msg.te_show_only_this()}
+							{ed.focused === m.k ? /* @wc-context: te_show_all */ /* @wc-include */ 'Show all' : /* @wc-include */ 'Show only this one'}
 						</button>
 						<button
 							type="button"
 							class="pille"
 							disabled={lastVisible}
-							title={lastVisible ? msg.te_one_stays_visible() : msg.te_hide_hint()}
+							title={lastVisible ? /* @wc-include */ 'One speaker always stays visible' : /* @wc-include */ 'fold in the text and skip when playing'}
 							onclick={() => {
 								ed.toggleSpeaker(m.k);
 								close();
 							}}
 						>
-							{#if vis}<IconMaterialSymbolsVisibilityOffOutlineRounded />{msg.te_hide()}{:else}<IconMaterialSymbolsVisibilityOutlineRounded />{msg.te_show_again()}{/if}
+							{#if vis}<IconMaterialSymbolsVisibilityOffOutlineRounded /><!-- @wc-context: te_hide -->Hide{:else}<IconMaterialSymbolsVisibilityOutlineRounded />Show again{/if}
 						</button>
 					</div>
 				{/if}
@@ -145,15 +144,15 @@
 				{#if ed.canEdit}
 				<div class="felder">
 					<label class="feldname">
-						{msg.te_name()}
+						<!-- @wc-context: te_name -->Name
 						<input class="feld name" bind:this={nameField} bind:value={name} spellcheck="false" autocomplete="off" />
 					</label>
-					<Sprachwahl bind:value={language} none={msg.te_language_auto()} />
+					<Sprachwahl bind:value={language} none={/* @wc-include */ 'recognise automatically'} />
 					{#if others.length}
 						<label class="feldname">
-							{msg.te_merge_with()}
+							Merge with
 							<select class="feld" bind:value={merge}>
-								<option value="">{msg.te_merge_none()}</option>
+								<option value="">{/* @wc-include */ 'do not merge'}</option>
 								{#each others as k (k)}<option value={String(k)}>{ed.spkName(k)}</option>{/each}
 							</select>
 						</label>
@@ -161,22 +160,22 @@
 					{#if target}
 						<p class="folge">
 							<IconMaterialSymbolsCallMergeRounded />
-							<span>{ed.recomputes ? msg.te_merge_note_recompute({ from: ed.spkName(m.k), into: target }) : msg.te_merge_note({ from: ed.spkName(m.k), into: target })}</span>
+							<span>{ed.recomputes ? /* @wc-include */ `Everything from ${ed.spkName(m.k)} goes into ${target} once recomputed.` : /* @wc-include */ `Everything of ${ed.spkName(m.k)} goes into ${target}.`}</span>
 						</p>
 					{:else if language}
 						<p class="folge">
 							<IconMaterialSymbolsTranslateRounded />
 							<span
-								>{msg.te_speaker_language_note({ name: ed.spkName(m.k) })}
-								{#if recognizable(language)}{ed.recomputes ? msg.te_language_redone_recompute({ language: langName(language) }) : msg.te_language_redone({ language: langName(language) })}{:else}{msg.te_language_noted({ language: langName(language) })}{/if}</span
+								>Applies to everything {ed.spkName(m.k)} says.
+								{#if recognizable(language)}{ed.recomputes ? /* @wc-include */ `Recompute recognises it again in ${langName(language)}.` : /* @wc-include */ `The machine recognises it again in ${langName(language)} by itself.`}{:else}{langName(language)} is noted; the machine cannot recognise it again, the words stay.{/if}</span
 							>
 						</p>
 					{/if}
 				</div>
 
 				<div class="fuss">
-					<button type="button" class="pille" onclick={() => close()}>{msg.te_cancel()}</button>
-					<button type="submit" class="pille rot" disabled={!changed}>{msg.te_apply()}</button>
+					<button type="button" class="pille" onclick={() => close()}><!-- @wc-context: te_cancel -->Cancel</button>
+					<button type="submit" class="pille rot" disabled={!changed}><!-- @wc-context: te_apply -->Apply</button>
 				</div>
 				{/if}
 			</form>

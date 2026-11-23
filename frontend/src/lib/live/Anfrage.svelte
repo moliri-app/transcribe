@@ -5,6 +5,7 @@
      nach Bedeutung): oben wer fragte, welche KI antwortete und wie lange es dauerte, mit Kopieren und
      Löschen; darunter die Anfrage, die Antwort und was beim Nachsehen hilft (Zeiten, Größen, Tokens). -->
 <script>
+	import { getLocale } from '$lib/moliri/i18n/locale.js';
 	import { anfrage, art, DIENSTE, laenge, live, sekunden, tag, uhrzeit, wer } from './stand.svelte.js';
 
 	/** @typedef {import('./stand.svelte.js').Notiz} Notiz */
@@ -41,28 +42,28 @@
 			kopiert = was;
 			setTimeout(() => (kopiert = ''), 2000);
 		} catch {
-			meldung = 'Kopieren ging nicht.';
+			meldung = /* @wc-include */ 'Copying did not work.';
 		}
 	}
 
 	/** die Uhrzeit auf die Sekunde, zum Abgleich mit dem Protokoll des Programms
 	 * @param {string} iso */
-	const genau = (iso) => new Date(iso).toLocaleTimeString('de-DE');
+	const genau = (iso) => new Date(iso).toLocaleTimeString(getLocale());
 </script>
 
 <article class="anfrage" aria-labelledby="titel-{n.id}">
 	<header class="kopf">
 		{#if onzurueck}
 			<button class="zurueck" type="button" onclick={onzurueck}>
-				<IconMaterialSymbolsArrowBackRounded aria-hidden="true" />Alle Aufnahmen
+				<IconMaterialSymbolsArrowBackRounded aria-hidden="true" />All recordings
 			</button>
 		{/if}
 		<div class="titel">
 			<h1 id="titel-{n.id}">{dienst}, {tag(n.started, live.jetzt)}, {uhrzeit(n.started)}</h1>
 			{#if laeuft}
-				<span class="status live"><span class="punkt" aria-hidden="true"></span>läuft</span>
+				<span class="status live"><span class="punkt" aria-hidden="true"></span>running</span>
 			{:else if n.error}
-				<span class="status fehler">Fehler</span>
+				<span class="status fehler">Error</span>
 			{/if}
 		</div>
 		<p class="meta">
@@ -70,24 +71,24 @@
 				{#if n.kind === 'ocr'}<IconMaterialSymbolsDocumentScannerOutlineRounded aria-hidden="true" />{:else if n.kind === 'filter'}<IconMaterialSymbolsAutoAwesomeOutlineRounded
 						aria-hidden="true"
 					/>{:else}<IconMaterialSymbolsManageSearchRounded aria-hidden="true" />{/if}<span
-					>Per API: <b>{wer(n)}</b> {art(n)}</span
+					>Via API: <b>{wer(n)}</b> {art(n)}</span
 				>
 			</span>
-			{#if n.model}<span>KI <b>{n.model}</b></span>{/if}
-			<span>Dauer <b>{sekunden(laenge(n, live.jetzt))}</b></span>
-			{#if n.transient}<span class="fluechtig">Wird nicht gespeichert</span>{/if}
+			{#if n.model}<span>AI <b>{n.model}</b></span>{/if}
+			<span>Duration <b>{sekunden(laenge(n, live.jetzt))}</b></span>
+			{#if n.transient}<span class="fluechtig">Won't be saved</span>{/if}
 		</p>
 		<div class="tun">
 			{#if n.ended && n.response}
 				<button class="pille" type="button" onclick={() => kopieren('antwort')}>
-					{#if kopiert === 'antwort'}<IconMaterialSymbolsCheckRounded aria-hidden="true" />Kopiert{:else}<IconMaterialSymbolsContentCopyOutlineRounded
+					{#if kopiert === 'antwort'}<IconMaterialSymbolsCheckRounded aria-hidden="true" />Copied{:else}<IconMaterialSymbolsContentCopyOutlineRounded
 							aria-hidden="true"
-						/>Antwort kopieren{/if}
+						/>Copy response{/if}
 				</button>
 			{/if}
 			{#if n.ended}
-				<button class="pille leise" type="button" title="Anfrage {tag(n.started, live.jetzt)}, {uhrzeit(n.started)} löschen" onclick={() => live.loeschen(n)}>
-					<IconMaterialSymbolsDeleteOutlineRounded aria-hidden="true" />Löschen
+				<button class="pille leise" type="button" title="Delete request {tag(n.started, live.jetzt)}, {uhrzeit(n.started)}" onclick={() => live.loeschen(n)}>
+					<IconMaterialSymbolsDeleteOutlineRounded aria-hidden="true" />Delete
 				</button>
 			{/if}
 		</div>
@@ -96,7 +97,7 @@
 
 	<!-- mit Tab erreichbar, damit es sich mit den Pfeiltasten scrollen lässt -->
 	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-	<div class="tisch" tabindex="0" role="region" aria-label="Anfrage und Antwort">
+	<div class="tisch" tabindex="0" role="region" aria-label="Request and response">
 		<div class="blatt">
 			{#if n.error}
 				<p class="fehler" role="alert"><IconMaterialSymbolsErrorOutlineRounded aria-hidden="true" />{n.error}</p>
@@ -104,45 +105,45 @@
 
 			<section aria-labelledby="h-anfrage-{n.id}">
 				<div class="abschnitt">
-					<h2 id="h-anfrage-{n.id}">Anfrage</h2>
+					<h2 id="h-anfrage-{n.id}">Request</h2>
 					{#if n.request}
 						<button class="klein" type="button" onclick={() => kopieren('anfrage')}>
-							{kopiert === 'anfrage' ? 'Kopiert' : 'Kopieren'}
+							{kopiert === 'anfrage' ? /* @wc-include */ 'Copied' : /* @wc-include */ 'Copy'}
 						</button>
 					{/if}
 				</div>
 				{#if n.image}
 					{@const bild = `/api/live/image?id=${encodeURIComponent(n.id)}`}
-					<a class="bild" href={bild} target="_blank" rel="noopener" title="Bild in voller Größe öffnen">
-						<img src={bild} alt="Das Bild, das gelesen wurde" />
+					<a class="bild" href={bild} target="_blank" rel="noopener" title="Open image at full size">
+						<img src={bild} alt="The image that was read" />
 					</a>
 				{/if}
 				<pre>{n.request || '–'}</pre>
 			</section>
 
 			<section aria-labelledby="h-antwort-{n.id}">
-				<div class="abschnitt"><h2 id="h-antwort-{n.id}">Antwort</h2></div>
+				<div class="abschnitt"><h2 id="h-antwort-{n.id}">Response</h2></div>
 				{#if laeuft}
-					<p class="warten"><span class="punkt" aria-hidden="true"></span>{n.partial || 'Läuft …'}</p>
+					<p class="warten"><span class="punkt" aria-hidden="true"></span>{n.partial || /* @wc-include */ 'Running…'}</p>
 				{:else if antwort}
 					<pre>{antwort}</pre>
 				{:else}
-					<p class="warten">{n.error ? 'Keine Antwort.' : 'Leere Antwort.'}</p>
+					<p class="warten">{n.error ? /* @wc-include */ 'No response.' : /* @wc-include */ 'Empty response.'}</p>
 				{/if}
 			</section>
 
 			<section aria-labelledby="h-details-{n.id}">
 				<div class="abschnitt"><h2 id="h-details-{n.id}">Details</h2></div>
 				<dl>
-					<dt>Dienst</dt>
+					<dt>Service</dt>
 					<dd>{dienst}</dd>
-					{#if n.model}<dt>KI</dt><dd>{n.model}</dd>{/if}
-					<dt>Programm</dt>
-					<dd>{n.client || 'ohne Namen'}</dd>
-					<dt>Gestartet</dt>
+					{#if n.model}<dt>AI</dt><dd>{n.model}</dd>{/if}
+					<dt>App</dt>
+					<dd>{n.client || /* @wc-include */ 'unnamed'}</dd>
+					<dt>Started</dt>
 					<dd>{genau(n.started)}</dd>
-					{#if n.ended}<dt>Fertig</dt><dd>{genau(n.ended)}</dd>{/if}
-					<dt>Dauer</dt>
+					{#if n.ended}<dt>Finished</dt><dd>{genau(n.ended)}</dd>{/if}
+					<dt>Duration</dt>
 					<dd>{sekunden(laenge(n, live.jetzt))}</dd>
 					{#each n.facts ?? [] as f, i (i)}
 						<dt>{f.label}</dt>

@@ -1,12 +1,12 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/ui/SimpleModal.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/ui/SimpleModal.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <script>
     import { lockscroll } from '@svelte-put/lockscroll';
-    import * as m from "$lib/moliri/texte.js";
     import Portal from "svelte-portal";
+    import { closeOnBack } from '$lib/moliri/history/closeOnBack.svelte.js';
 
     /**
      * @typedef {Object} Props
@@ -37,6 +37,9 @@
         open=false;
         onclosed?.();
 		}
+
+    // The back button closes it as ✕ does (docs/mobile-companion-plan.md §2.2).
+    closeOnBack({ prefix: 'modal', isOpen: () => open, close });
   
     </script>
 
@@ -51,18 +54,20 @@
               {@render children?.()}
 
               {#if showCloseButton}
-                <button type="button" class="close" aria-label={m.close()} onclick={close}>
+                <button type="button" class="close" aria-label="Close" onclick={close}>
                   <IconMaterialSymbolsClose />
                 </button>
               {/if}
           </div>
         </div>
-        <button type="button" class="bg" aria-label={m.close_modal()} onclick={close}></button>
+        <button type="button" class="bg" aria-label="Close modal" onclick={close}></button>
     </div>
   </Portal>
   {/if}
   
   <style lang="scss">
+    @use 'scss/breakpoints' as bp;
+
   
     .close {
       margin-left: auto;
@@ -132,6 +137,25 @@
           max-width: 100%;
           max-height: 100%;
         }
+    }
+
+    /* Phone: the dialog may take the whole screen; the content decides how much it needs. */
+    @include bp.phone {
+      .modal-outer {
+        padding: 0;
+        min-width: 0;
+        min-height: 0;
+        max-width: 100%;
+        max-height: 100%;
+      }
+      .modal-inner {
+        max-height: 100dvh;
+      }
+      .close {
+        top: 0.25rem;
+        right: 0.25rem;
+        z-index: 1;
+      }
     }
 
     .bg {

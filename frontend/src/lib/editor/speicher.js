@@ -39,7 +39,7 @@ const resultsPath = (/** @type {string} */ stem) => `/results/${stem.split('/').
 /** Fehler einer Anfrage als Satzteil für die Statuszeile */
 const reason = (/** @type {unknown} */ err) => {
 	const msg = err instanceof Error ? err.message : String(err);
-	return msg === 'Failed to fetch' ? 'Transcribe antwortet nicht' : msg;
+	return msg === 'Failed to fetch' ? /* @wc-include */ 'Transcribe does not answer' : msg;
 };
 
 /** Antwort als Datei herunterladen, unter dem Namen aus Content-Disposition; gibt den Namen zurück */
@@ -142,7 +142,7 @@ export function transcribeStore(stem) {
 					const r = await fetch(`/api/apply?stem=${q}`, { method: 'POST' });
 					/** @type {{ ok?: boolean, error?: string, final?: any }} */
 					const j = await r.json().catch(() => ({}));
-					if (!r.ok || !j.ok || !j.final) return { error: j.error || r.statusText || `Fehler ${r.status}` };
+					if (!r.ok || !j.ok || !j.final) return { error: j.error || r.statusText || /* @wc-include */ `Error ${r.status}` };
 					return { final: j.final };
 				} catch (err) {
 					return { error: reason(err) };

@@ -14,6 +14,7 @@
 	import AufnahmeWahl from './AufnahmeWahl.svelte';
 	import StimmeWahl from './StimmeWahl.svelte';
 	import { EINGANG, laenge, live, QUELLEN, sprachname } from './stand.svelte.js';
+	import plural from '../../locales/plural.js';
 
 	let offen = $state(false);
 	/** @type {HTMLElement | undefined} */
@@ -27,12 +28,18 @@
 
 	/** was eingestellt ist, in einer Zeile */
 	const stand = $derived(
-		[QUELLEN[live.quelle], sprachname(live.sprache), live.speichern ? 'wird gespeichert' : 'nur Text'].join(' · ')
+		[QUELLEN[live.quelle], sprachname(live.sprache), live.speichern ? /* @wc-include */ 'saving audio' : /* @wc-include */ 'text only'].join(' · ')
 	);
 
 	/** was der Schalter „Im Hintergrund bereit“ sagt */
 	const modus = $derived(
-		!live.an ? 'aus' : live.warm === 'ready' ? 'an, sofort bereit' : live.warm === 'loading' ? 'lädt die Erkennung …' : 'an'
+		!live.an
+			? /* @wc-include */ 'off'
+			: live.warm === 'ready'
+				? /* @wc-include */ 'on, ready at once'
+				: live.warm === 'loading'
+					? /* @wc-include */ 'loading recognition…'
+					: /* @wc-include */ 'on'
 	);
 
 	/** so lange wartet die Aufnahme schon auf den ersten Ton, in Sekunden */
@@ -40,7 +47,7 @@
 		live.laufend?.waiting ? (live.jetzt - new Date(live.laufend.started).getTime()) / 1000 : 0
 	);
 	/** wie das Mikrofon heißt, auf das gewartet wird */
-	const mikrofon = $derived(live.geraet || live.standard || 'dem Mikrofon');
+	const mikrofon = $derived(live.geraet || live.standard || /* @wc-include */ 'the microphone');
 
 	$effect(() => {
 		if (offen) tick().then(() => fenster?.querySelector('input, select')?.focus?.());
@@ -61,22 +68,22 @@
 
 <svelte:window onpointerdown={daneben} />
 
-<div class="leiste" role="group" aria-label="Aufnehmen">
+<div class="leiste" role="group" aria-label="Record">
 	<div class="links">
 		{#if live.laufend}
 			<button class="beenden" type="button" disabled={live.beendet} aria-busy={live.beendet} onclick={() => live.beenden()}>
-				{#if live.beendet}<IconEosIconsLoading aria-hidden="true" />Wird beendet …{:else}<IconMaterialSymbolsStopRounded
+				{#if live.beendet}<IconEosIconsLoading aria-hidden="true" />Stopping…{:else}<IconMaterialSymbolsStopRounded
 						aria-hidden="true"
-					/>Beenden{/if}
+					/>Stop{/if}
 			</button>
 			<div class="jetzt">
 				{#if live.laufend.loading || live.laufend.waiting}
-					<span class="uhr wartet">startet …</span>
+					<span class="uhr wartet">starting…</span>
 				{:else}
 					<span class="uhr"><span class="punkt" aria-hidden="true"></span>{dauer(laenge(live.laufend, live.jetzt))}</span>
 				{/if}
 				<span class="unter">
-					{QUELLEN[live.mic.source ?? 'mic']}{#if live.laufend.audio}&nbsp;· wird gespeichert{/if}
+					{QUELLEN[live.mic.source ?? 'mic']}{#if live.laufend.audio}{'\u00a0· '}{/* @wc-include */ 'saving audio'}{/if}
 				</span>
 			</div>
 		{:else}
@@ -85,7 +92,7 @@
 					{#if live.startet}<IconEosIconsLoading aria-hidden="true" />{:else}<IconMaterialSymbolsMicRounded aria-hidden="true" />{/if}
 				</span>
 				<span class="jetzt">
-					<span class="was">{live.startet ? 'Startet …' : 'Aufnahme starten'}</span>
+					<span class="was">{live.startet ? /* @wc-include */ 'Starting…' : /* @wc-include */ 'Start recording'}</span>
 					<span class="unter">{stand}</span>
 				</span>
 			</button>
@@ -95,23 +102,21 @@
 	<p class="meldung" role="status">
 		{#if live.meldung}{live.meldung}{:else if wartet > 6 && live.quelle !== 'system'}<span class="eingang"
 				><IconMaterialSymbolsInfoOutlineRounded aria-hidden="true" /><span
-					>Von {mikrofon} kommt noch kein Ton. Ist es eingeschaltet und verbunden?
-					<button class="link" type="button" onclick={() => (offen = true)}>Ein anderes Mikrofon wählen?</button></span
+					>No sound is coming from {mikrofon} yet. Is it switched on and connected?
+					<button class="link" type="button" onclick={() => (offen = true)}>Choose a different microphone?</button></span
 				></span
 			>{:else if live.mic.running && live.mic.input}<span class="eingang"
 				><IconMaterialSymbolsInfoOutlineRounded aria-hidden="true" /><span
 					>{EINGANG[live.mic.input]}
-					<button class="link" type="button" onclick={() => (offen = true)}>Ein anderes Mikrofon wählen?</button></span
+					<button class="link" type="button" onclick={() => (offen = true)}>Choose a different microphone?</button></span
 				></span
-			>{:else if live.mic.listeners}{live.mic.listeners === 1
-				? 'Ein Programm hört mit.'
-				: `${live.mic.listeners} Programme hören mit.`}{/if}
+			>{:else if live.mic.listeners}{plural(live.mic.listeners, ['One app is listening in.', '# apps are listening in.'])}{/if}
 	</p>
 
 	<div class="pegel" class:an={live.mic.running} aria-hidden="true">
 		{#each pegelQuellen as q (q)}
 			<div class="balken">
-				<span>{q === 'mic' ? 'Mikrofon' : 'System'}</span>
+				<span>{q === 'mic' ? /* @wc-include */ 'Microphone' : /* @wc-include */ 'System'}</span>
 				<i><b style:width="{Math.round((live.pegel[q] ?? 0) * 100)}%"></b></i>
 			</div>
 		{/each}
@@ -122,14 +127,14 @@
 		type="button"
 		role="switch"
 		aria-checked={live.an}
-		aria-label="Im Hintergrund bereit"
+		aria-label="Ready in the background"
 		title={live.an
-			? 'An: Andere Programme wie Moliri dürfen über Transcribe das Mikrofon aufnehmen lassen, und die Erkennung bleibt geladen, damit alles sofort startet. Das belegt etwa 1 GB Arbeitsspeicher. Audiodaten und Bilder, die ein Programm schickt, verarbeitet Transcribe immer.'
-			: 'Aus: Andere Programme dürfen das Mikrofon nicht über Transcribe aufnehmen lassen, und nichts bleibt geladen. Audiodaten und Bilder, die ein Programm schickt, verarbeitet Transcribe trotzdem. Von Hand aufnehmen geht auch, es startet nur etwas langsamer.'}
+			? /* @wc-include */ 'On: Other apps like Moliri may have Transcribe record from the microphone, and the recognition stays loaded so everything starts at once. This takes about 1 GB of memory. Transcribe always processes audio and images that an app sends.'
+			: /* @wc-include */ 'Off: Other apps may not have Transcribe record from the microphone, and nothing stays loaded. Transcribe still processes audio and images that an app sends. Recording by hand works too, it just starts a little more slowly.'}
 		onclick={() => live.modusSetzen(!live.an)}
 	>
 		<span class="schiene" aria-hidden="true"><span class="knubbel"></span></span>
-		<span class="mtext"><span class="mname">Im Hintergrund bereit</span><span class="mstand">{modus}</span></span>
+		<span class="mtext"><span class="mname">Ready in the background</span><span class="mstand">{modus}</span></span>
 	</button>
 
 	<button
@@ -140,7 +145,7 @@
 		aria-controls="einrichten"
 		onclick={() => (offen = !offen)}
 	>
-		<IconMaterialSymbolsTuneRounded aria-hidden="true" /><span class="lbl">Einrichten</span>
+		<IconMaterialSymbolsTuneRounded aria-hidden="true" /><span class="lbl">Set up</span>
 	</button>
 
 	{#if offen}
@@ -154,17 +159,17 @@
 			onkeydown={(e) => e.key === 'Escape' && (e.stopPropagation(), schliessen())}
 		>
 			<div class="fkopf">
-				<h2 id="h-einrichten">Aufnahme einrichten</h2>
+				<h2 id="h-einrichten">Set up recording</h2>
 				<button class="zu" type="button" onclick={schliessen}>
-					<IconMaterialSymbolsCloseRounded aria-hidden="true" /><span class="sr">Schließen</span>
+					<IconMaterialSymbolsCloseRounded aria-hidden="true" /><span class="sr">Close</span>
 				</button>
 			</div>
-			{#if live.mic.running}<p class="hinweis">Änderungen gelten ab der nächsten Aufnahme.</p>{/if}
+			{#if live.mic.running}<p class="hinweis">Changes apply from the next recording on.</p>{/if}
 
 			<AufnahmeWahl />
 			<StimmeWahl kurz />
 			<a class="mehr" href="/settings#live" data-sveltekit-reload>
-				Eigene Wörter, Satzzeichen und Diktieren: alle Einstellungen für Live
+				Custom words, punctuation and dictation: all settings for Live
 				<IconMaterialSymbolsArrowForwardRounded aria-hidden="true" />
 			</a>
 		</div>

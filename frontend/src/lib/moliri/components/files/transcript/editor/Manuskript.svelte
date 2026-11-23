@@ -1,8 +1,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/files/transcript/editor/Manuskript.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/files/transcript/editor/Manuskript.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
@@ -15,7 +15,6 @@
      Bereichsdialog; Zeitanker lassen sich auf ein anderes Wort ziehen. Wer nicht korrigieren darf, liest
      nur (kein Tippen, keine Anker). Treffer der Suche (ed.hits) sind markiert, der gezeigte umrandet. -->
 <script>
-	import * as m from '$lib/moliri/texte.js';
 	import { tick, untrack } from 'svelte';
 	import { anchorBounds, cueName, fmt, fmtT, gapRange, itemAt, langName, textEdits, wordLang, QUIET_EVENTS } from './model.js';
 	import { spkColor } from './editor.svelte.js';
@@ -65,9 +64,9 @@
 		const L = it.kind === 'w' ? wordLang(it, ed.ann) : null;
 		return (
 			fmt(it.start) +
-			(it.p !== undefined ? ` · ${m.te_confidence({ percent: Math.round(it.p * 100) })}` : '') +
+			(it.p !== undefined ? ` · ${/* @wc-include */ `confidence ${Math.round(it.p * 100)} %`}` : '') +
 			(L && L.lang !== 'de' ? ` · ${langName(L.lang)}` : '') +
-			(it.edited ? ` · ${m.te_sign_edited()}` : it.fill ? ` · ${m.te_filled()}` : it.redone ? ` · ${m.te_redone()}` : '')
+			(it.edited ? ` · ${/* @wc-include */ 'corrected by hand'}` : it.fill ? ` · ${/* @wc-include */ 'filled in'}` : it.redone ? ` · ${/* @wc-include */ 'recognised again'}` : '')
 		);
 	}
 
@@ -202,7 +201,7 @@
 		// nichts geändert (oder nur Leerzeichen): der Absatz wird wieder, was er war
 		ed.editing = false;
 		ed.textGen++;
-		ed.status(m.te_no_change());
+		ed.status(/* @wc-include */ 'no change');
 		return false;
 	}
 	function discard() {
@@ -210,7 +209,7 @@
 		editP = null;
 		ed.editing = false;
 		ed.textGen++;
-		ed.status(m.te_input_discarded());
+		ed.status(/* @wc-include */ 'input discarded');
 	}
 	ed.textEdit = { commit: () => (editP ? commitText() : false), discard };
 
@@ -223,7 +222,7 @@
 		ed.editing = true;
 		ed.wordbar = null;
 		ed.range = null;
-		ed.status(m.te_input_open(), 'offen');
+		ed.status(/* @wc-include */ 'input open: applied in a moment, Esc discards', 'offen');
 		clearTimeout(pauseTimer);
 		pauseTimer = setTimeout(autoCommit, PAUSE);
 	}
@@ -611,18 +610,18 @@
 		if (it.kind !== 'w') return [{ kind: 'blau', value: it.w.replace(/^\(|\)$/g, '') }];
 		if (it.speaker != null) {
 			const bySpan = ed.ann.spans.some((s) => s.speaker !== undefined && s.speaker !== '' && s.start <= at && at <= s.end);
-			parts.push({ kind: 'spk', value: ed.spkName(it.speaker), note: bySpan ? m.te_by_hand() : '', color: spkColor(it.speaker) });
+			parts.push({ kind: 'spk', value: ed.spkName(it.speaker), note: bySpan ? /* @wc-context: te_by_hand */ /* @wc-include */ 'by hand' : '', color: spkColor(it.speaker) });
 		}
 		const L = wordLang(it, ed.ann);
-		parts.push({ kind: L.by === 'mensch' ? 'rot' : '', label: m.transcript_language(), value: langName(L.lang), note: L.by === 'mensch' ? m.te_by_hand() : L.by === 'maschine' ? m.te_recognised() : '' });
-		if (it.edited) parts.push({ kind: 'rot', value: m.te_sign_edited() });
-		else if (it.fill) parts.push({ kind: '', value: m.te_filled(), note: m.te_by_machine() });
+		parts.push({ kind: L.by === 'mensch' ? 'rot' : '', label: /* @wc-include */ 'Language', value: langName(L.lang), note: L.by === 'mensch' ? /* @wc-context: te_by_hand */ /* @wc-include */ 'by hand' : L.by === 'maschine' ? /* @wc-include */ 'recognised' : '' });
+		if (it.edited) parts.push({ kind: 'rot', value: /* @wc-include */ 'corrected by hand' });
+		else if (it.fill) parts.push({ kind: '', value: /* @wc-include */ 'filled in', note: /* @wc-include */ 'by the machine' });
 		else if (it.p !== undefined)
-			parts.push({ kind: it.p < 0.5 ? 'zweifel' : '', label: m.te_confidence_label(), value: `${Math.round(it.p * 100)} %`, note: it.p < 0.5 ? m.te_unsure() : '' });
-		if (it.redone) parts.push({ kind: 'blau', value: m.te_redone() });
+			parts.push({ kind: it.p < 0.5 ? 'zweifel' : '', label: /* @wc-context: te_confidence_label */ /* @wc-include */ 'Confidence', value: `${Math.round(it.p * 100)} %`, note: it.p < 0.5 ? /* @wc-include */ 'unsure' : '' });
+		if (it.redone) parts.push({ kind: 'blau', value: /* @wc-include */ 'recognised again' });
 		const ev = (ed.final?.events || []).find((/** @type {any} */ e) => e.start <= at && at <= e.end && !QUIET_EVENTS.includes(e.label));
-		if (ev) parts.push({ kind: 'blau', value: ev.label === 'Musik' ? m.te_background_music() : cueName(ev.label) });
-		if (it.pin) parts.push({ kind: 'rot', value: m.te_anchor(), note: m.te_by_hand() });
+		if (ev) parts.push({ kind: 'blau', value: ev.label === 'Musik' ? /* @wc-include */ 'background music' : cueName(ev.label) });
+		if (it.pin) parts.push({ kind: 'rot', value: /* @wc-include */ 'Time anchor', note: /* @wc-context: te_by_hand */ /* @wc-include */ 'by hand' });
 		for (const c of ed.ann.clips) if (c.start <= at && at <= c.end) parts.push({ kind: 'clip', value: c.title, clip: c });
 		return parts;
 	});
@@ -673,7 +672,7 @@
 	class="manuskript"
 	class:tippt={ed.editing}
 	role="region"
-	aria-label={m.file_tab_transcript()}
+	aria-label="Transcript"
 	bind:this={box}
 	{onclick}
 	{onmouseover}
@@ -702,18 +701,18 @@
 						<button
 							class="klappe-btn"
 							aria-expanded={b.open}
-							title={b.open ? m.te_fold() : m.te_unfold_hint()}
+							title={b.open ? /* @wc-include */ 'fold again' : /* @wc-include */ 'unfold: show the text and play it along'}
 							onclick={() => ed.toggleFold(b)}
 						>
 							<IconMaterialSymbolsChevronRightRounded />
-							{b.open ? m.te_unfolded() : m.te_folded()} · <span class="zeit">{fmt(b.start)} – {fmt(b.end)}</span> · {m.te_words({ count: b.n })}
+							{b.open ? /* @wc-include */ 'unfolded' : /* @wc-include */ 'folded'} · <span class="zeit">{fmt(b.start)} – {fmt(b.end)}</span> · {b.n} words
 						</button>
 					</div>
 				</div>
 			{:else if b.kind === 'cue'}
 				<div class="absatz cue" class:aus={b.aus}>
 					<div class="rand">
-						<button class="tc" aria-label={m.te_play_from({ time: fmt(b.start) })} onclick={() => ed.seek(b.start)}>{fmt(b.start)}</button>
+						<button class="tc" aria-label={/* @wc-include */ `play from ${fmt(b.start)}`} onclick={() => ed.seek(b.start)}>{fmt(b.start)}</button>
 					</div>
 					<button class="cue-text" data-t={b.start}>
 						<span class="w ev" data-i={b.i}><b>{cueName(b.label)}</b>{fmt(b.start)} – {fmt(b.end)}</span>
@@ -728,19 +727,19 @@
 							<button
 								class="name"
 								style:--c={spkColor(k)}
-								title={m.te_speaker_edit_hint()}
+								title="Edit speaker: name, language, merge, view"
 								aria-haspopup="dialog"
 								onclick={(e) => (ed.speakerMenu = { k, anchor: /** @type {HTMLElement} */ (e.currentTarget) })}
 								>{ed.spkName(k)}{#if lang}<span class="lang">{langName(lang)}</span>{/if}</button
 							>
 						{/if}
-						<button class="tc" aria-label={m.te_play_from({ time: fmt(b.start) })} onclick={() => ed.seek(b.start)}>{fmt(b.start)}</button>
+						<button class="tc" aria-label={/* @wc-include */ `play from ${fmt(b.start)}`} onclick={() => ed.seek(b.start)}>{fmt(b.start)}</button>
 						{#if ed.isVideo && ed.thumbs}
 							{@const tm = ed.thumbs.meta}
 							{@const n = Math.max(0, Math.min(tm.count - 1, Math.round(b.start / tm.step)))}
 							<button
 								class="thumb"
-								aria-label={m.te_still_at({ time: fmt(b.start) })}
+								aria-label="Still at {fmt(b.start)}, play from here"
 								style:width="{tm.w * 0.9}px"
 								style:height="{tm.h * 0.9}px"
 								style:background-image="url(&quot;{ed.thumbs.url}&quot;)"
@@ -759,15 +758,15 @@
 									data-clip={c.id}
 									data-clip-oeffnet
 									class:spielt={ed.playingClip === c.id}
-									aria-label={m.te_clip_named({ title: c.title })}
-									title={m.te_clip_mark_hint({ from: fmt(c.start), to: fmt(c.end) })}
+									aria-label="Clip {c.title}"
+									title="Clip {fmt(c.start)} – {fmt(c.end)}: click to play, edit or export"
 									><IconMaterialSymbolsContentCutRounded /><span>{c.title}</span></button
 								>{/each}{#if it.kind === 'w' && it.wi !== undefined && anchorSet.has(it.wi)}<span
 									class="anker"
 									class:pin={it.pin}
 									contenteditable="false"
 									data-wi={it.wi}
-									title={it.pin ? m.te_anchor_hint_pinned({ time: fmtT(it.start) }) : m.te_anchor_hint({ time: fmtT(it.start) })}
+									title={it.pin ? /* @wc-include */ `Time anchor ${fmtT(it.start)}, set by hand: drag to give the time to another word` : /* @wc-include */ `Time anchor ${fmtT(it.start)}: drag to give the time to another word`}
 								></span>{/if}<span
 									contenteditable={it.kind === 'ev' ? 'false' : undefined}
 								class="w"
@@ -795,16 +794,16 @@
 		class="wortleiste"
 		class:unten={wlPos.below}
 		role="toolbar"
-		aria-label={m.te_wordbar()}
+		aria-label="Place in the text"
 		bind:this={bar}
 		style:left="{wlPos.left}px"
 		style:top="{wlPos.top}px"
 		style:--ax="{wlPos.ax}px"
 		style:visibility={wlPos.hidden ? 'hidden' : undefined}
 	>
-		<button class="wplay" title={wlPlaying ? m.te_pause() : m.te_play_from_word()} onpointerdown={(e) => e.preventDefault()} onclick={wlPlay}>
+		<button class="wplay" title={wlPlaying ? /* @wc-include */ 'pause' : /* @wc-include */ 'play from this word'} onpointerdown={(e) => e.preventDefault()} onclick={wlPlay}>
 			{#if wlPlaying}<IconMaterialSymbolsPauseRounded />{:else}<IconMaterialSymbolsPlayArrowRounded />{/if}
-			<span>{wlPlaying ? m.te_pause_short() : m.te_from_here()}</span>
+			<span>{wlPlaying ? /* @wc-context: te_pause_short */ /* @wc-include */ 'Pause' : /* @wc-include */ 'From here'}</span>
 		</button>
 		<span class="wi"><span class="zeit">{fmtT(wl.it.start)}</span></span>
 		{#each wlInfo as p, k (k)}
@@ -813,7 +812,7 @@
 				<button
 					class="wi wclip"
 					data-clip-oeffnet
-					title={m.te_clip_bar_hint({ from: fmt(c.start), to: fmt(c.end) })}
+					title="Clip {fmt(c.start)} – {fmt(c.end)}: edit, play, export"
 					onclick={(e) => {
 						ed.wordbar = null;
 						ed.showClip(c);

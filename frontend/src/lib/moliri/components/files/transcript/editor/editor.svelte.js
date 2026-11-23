@@ -2,8 +2,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Gespiegelt aus Moliri (src/lib/components/files/transcript/editor/editor.svelte.js) von frontend/scripts/sync-moliri.mjs.
-// Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri.
+// Mirrored from Moliri (src/lib/components/files/transcript/editor/editor.svelte.js) by frontend/scripts/sync-moliri.mjs.
+// Do not change it here: change it in Moliri, then pnpm sync:moliri.
 
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -20,10 +20,10 @@
 // bringt `recompute` mit: dann merkt der Editor Sprache und Zusammenlegen für „Neu berechnen“ vor.
 //
 // Der Editor wird nach transcribe-go gespiegelt (dort frontend/scripts/sync-moliri.mjs): Dateien in
-// diesem Ordner importieren nur einander und Paraglide, nichts sonst aus Moliri.
+// diesem Ordner importieren nur einander, nichts sonst aus Moliri. Ihre Texte stehen englisch im
+// Code (`@wc-include`), übersetzt in src/locales/*.po.
 
-import * as m from '$lib/moliri/texte.js';
-import { getLocale } from '$lib/moliri/locale.js';
+import { getLocale } from '$lib/moliri/i18n/locale.js';
 import { buildBlocks, buildItems, buildWords, defaultTitle, playRanges, r3, rangeText, speakerIds } from './model.js';
 import { recognizable } from './sprachen.js';
 
@@ -200,7 +200,7 @@ export class Editor {
 		const own = this.ann.speakers[k]?.name;
 		if (own) return own;
 		const given = String(this.final?.speakers?.[k]?.name ?? '');
-		return given && given !== `S${+k + 1}` ? given : m.transcript_speaker({ n: +k + 1 });
+		return given && given !== `S${+k + 1}` ? given : /* @wc-include */ `Speaker ${+k + 1}`;
 	}
 
 	// ---------------- laden ----------------
@@ -235,7 +235,7 @@ export class Editor {
 				this.media.playbackRate = this.rate;
 			}
 			this.saveKind = 'ok';
-			this.saveText = this.nCorrections ? m.te_saved_all() : m.te_no_corrections();
+			this.saveText = this.nCorrections ? /* @wc-include */ 'all corrections saved' : /* @wc-include */ 'no corrections yet';
 			this.view = { a: 0, b: Math.min(data.final?.duration || 120, 120) };
 			this.store.peaks().then((pk) => (this.peaks = pk));
 			if (data.isVideo) this.loadThumbs();
@@ -319,17 +319,17 @@ export class Editor {
 		if (!rc || this.computing) return;
 		this.computing = true;
 		try {
-			if (!(await this.saveNow())) return this.status(m.te_recompute_unsaved(), 'fehler');
+			if (!(await this.saveNow())) return this.status(/* @wc-include */ 'Recomputing works only once the corrections are saved.', 'fehler');
 			const part = serverPart(this.ann);
-			this.status(m.te_recompute_running(), 'offen');
+			this.status(/* @wc-include */ 'recomputing …', 'offen');
 			const r = await rc.run();
-			if (!r.final) return this.status(m.te_recompute_failed({ reason: r.error || m.te_recompute_unknown() }), 'fehler');
+			if (!r.final) return this.status(/* @wc-include */ `Recomputing did not work (${r.error || /* @wc-include */ 'unknown error'}).`, 'fehler');
 			this.final = r.final;
 			this.#computed = part;
 			// was in der Zwischenzeit festgelegt wurde, bleibt vorgemerkt
 			this.#setPending(serverPart(this.ann) !== part);
 			this.rebuild();
-			this.status(m.te_recomputed_at({ time: clock() }));
+			this.status(/* @wc-include */ `recomputed ${clock()}`);
 		} finally {
 			this.computing = false;
 		}
@@ -367,7 +367,7 @@ export class Editor {
 
 	scheduleSave() {
 		clearTimeout(this.#saveTimer);
-		this.status(m.te_saving(), 'offen');
+		this.status(/* @wc-include */ 'saving …', 'offen');
 		this.#saveTimer = setTimeout(() => this.saveNow(), 800);
 	}
 
@@ -379,7 +379,7 @@ export class Editor {
 		if (!this.#dirty) return true;
 		const ann = this.ann;
 		this.#dirty = false;
-		this.status(m.te_saving(), 'offen');
+		this.status(/* @wc-include */ 'saving …', 'offen');
 		this.#saving = this.store
 			.save(ann, this.version)
 			.then((r) => {
@@ -392,7 +392,7 @@ export class Editor {
 					}
 					if (r.languagesPending) this.languagesBusy = true;
 					if (!this.#dirty && !this.editing)
-						this.status(r.applyFailed ? m.te_saved_apply_later() : m.te_saved_at({ time: clock() }), r.applyFailed ? 'offen' : 'ok');
+						this.status(r.applyFailed ? /* @wc-include */ 'saved; the text follows once the service answers' : /* @wc-include */ `saved ${clock()}`, r.applyFailed ? 'offen' : 'ok');
 					return true;
 				}
 				if (r.status === 'conflict') {
@@ -404,15 +404,15 @@ export class Editor {
 					this.version = r.version ?? this.version;
 					if (r.final) this.final = r.final;
 					this.rebuild();
-					this.status(m.te_conflict(), 'fehler');
+					this.status(/* @wc-include */ 'Someone else corrected meanwhile: their state is loaded, the last change here was not saved.', 'fehler');
 					return false;
 				}
 				this.#dirty = true;
 				if (r.status === 'refused') {
-					this.status(m.te_save_refused(), 'fehler');
+					this.status(/* @wc-include */ 'not saved: no permission or no transcript', 'fehler');
 					return false;
 				}
-				this.status(m.te_save_retry(), 'fehler');
+				this.status(/* @wc-include */ 'not saved, trying again …', 'fehler');
 				this.#saveTimer = setTimeout(() => this.saveNow(), 3000);
 				return false;
 			})
@@ -496,12 +496,13 @@ export class Editor {
 		if (g.open) this.opened = this.opened.filter((r) => r.b < g.start - 0.3 || r.a > g.end + 0.3);
 		else this.opened = [...this.opened, { a: g.start, b: g.end }];
 	}
-	filterLabel = $derived.by(() => {
+	// A getter, not a $derived field: wuchale does not look into class fields.
+	get filterLabel() {
 		if (!this.hidden.size) return '';
 		const off = this.speakers.filter((k) => this.hidden.has(k));
-		if (this.focused != null) return m.te_filter_only({ name: this.spkName(this.focused) });
-		return off.length === 1 ? m.te_filter_hidden_one({ name: this.spkName(off[0]) }) : m.te_filter_hidden_many({ count: off.length });
-	});
+		if (this.focused != null) return /* @wc-include */ `Only ${this.spkName(this.focused)}`;
+		return off.length === 1 ? /* @wc-context: te_filter_hidden_one */ /* @wc-include */ `${this.spkName(off[0])} hidden` : /* @wc-include */ `${off.length} speakers hidden`;
+	}
 
 	// ---------------- Abspielen ----------------
 
@@ -712,18 +713,18 @@ export class Editor {
 	/** lädt Clips herunter: einen oder einen Zusammenschnitt, als mp3, mp4 oder txt; vorher wird gespeichert */
 	async exportClips(/** @type {import('./model.js').Clip[]} */ list, /** @type {string} */ format) {
 		if (!list.length) return;
-		if (!(await this.saveNow())) return this.status(m.te_clips_not_saved(), 'fehler');
-		this.status(format === 'txt' ? m.te_clip_text_building() : list.length > 1 ? m.te_clips_cutting() : m.te_clip_cutting(), 'offen');
+		if (!(await this.saveNow())) return this.status(/* @wc-include */ 'Clips not saved, the export was cancelled.', 'fehler');
+		this.status(format === 'txt' ? /* @wc-include */ 'Building the text …' : list.length > 1 ? /* @wc-include */ 'Cutting the compilation …' : /* @wc-include */ 'Cutting the clip …', 'offen');
 		const error = await this.store.exportClips(list, format, (text) => this.status(text, 'offen'));
-		if (error) this.status(m.te_export_failed({ reason: error }), 'fehler');
-		else this.status(m.te_exported());
+		if (error) this.status(/* @wc-include */ `Export failed (${error}).`, 'fehler');
+		else this.status(/* @wc-include */ 'exported');
 	}
 
 	/** lädt das Transkript herunter; vorher wird gespeichert, damit gerade Getipptes darin steht */
 	async exportTranscript(/** @type {string} */ format) {
-		if (!(await this.saveNow())) return this.status(m.te_export_not_saved(), 'fehler');
+		if (!(await this.saveNow())) return this.status(/* @wc-include */ 'Not saved: the export would lack the latest corrections.', 'fehler');
 		const error = await this.store.exportTranscript(format);
-		if (error) this.status(m.te_export_failed({ reason: error }), 'fehler');
+		if (error) this.status(/* @wc-include */ `Export failed (${error}).`, 'fehler');
 	}
 
 	// ---------------- Zeitleiste ----------------

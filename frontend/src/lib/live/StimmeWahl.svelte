@@ -15,25 +15,25 @@
 </script>
 
 <div class="sprache">
-	<Sprachenwahl bind:value={live.sprache} label="Sprachen" onchange={live.spracheWaehlen} />
+	<Sprachenwahl bind:value={live.sprache} label="Languages" onchange={live.spracheWaehlen} />
 	<span class="satz">
 		{live.sprache === 'de'
-			? 'Beim Sprechen zeigt das schnelle deutsche Modell Kroko den Text; jeden Satz schreibt danach das genauere Parakeet.'
+			? /* @wc-include */ 'While you speak, the fast German model Kroko shows the text; then the more accurate Parakeet writes each sentence.'
 			: live.sprache === 'auto'
-				? 'Der Live-Text erkennt die Sprache selbst.'
+				? /* @wc-include */ 'Live text detects the language by itself.'
 				: live.sprache.includes(',')
-					? 'Der Live-Text erkennt die Sprache selbst. Vollständig transkribiert bekommt jeder Abschnitt eine dieser Sprachen.'
-					: 'Der Live-Text erkennt die Sprache selbst; die Wahl gilt fürs vollständige Transkribieren.'}
+					? /* @wc-include */ 'Live text detects the language by itself. When fully transcribed, each section gets one of these languages.'
+					: /* @wc-include */ 'Live text detects the language by itself; the choice applies to full transcription.'}
 	</span>
 </div>
 {#if !kurz}
 	<MeineWoerter />
 	<Toggle
 		bind:checked={() => live.ansagen, (v) => live.ansagenSetzen(v)}
-		title="Satzzeichen ansagen"
+		title="Dictate punctuation"
 		description={live.ansagen
-			? 'Sag „Komma“, „Punkt“, „Fragezeichen“ oder „neuer Absatz“, und das Zeichen steht da. Sonst setzt die App sie selbst.'
-			: 'Aus: Die App setzt alle Satzzeichen selbst, „Komma“ bleibt ein Wort.'}
+			? /* @wc-include */ 'Say “comma”, “period”, “question mark” or “new paragraph”, and the mark appears. Otherwise the app sets them itself.'
+			: /* @wc-include */ 'Off: the app sets all punctuation itself, “comma” stays a word.'}
 	/>
 {/if}
 

@@ -1,8 +1,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/ui/Pager.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/ui/Pager.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <script>
 	/**
 	 * Voriger / nächster Eintrag mit Position („‹ 3 / 22 ›") — für Dialogköpfe, die durch eine
@@ -13,7 +13,6 @@
 	 * Modal), `bilder` waagerecht durch eine Bildfolge (← →).
 	 * `position` 0 = der offene Eintrag steht nicht (mehr) in der Liste („– / 22").
 	 */
-	import * as m from '$lib/moliri/texte.js';
 
 	/** @type {{
 	 *   position: number,
@@ -27,12 +26,12 @@
 	const liste = $derived(achse === 'liste');
 </script>
 
-<div class="blaetterer" role="group" aria-label={m.detail_blaettern()}>
+<div class="blaetterer" role="group" aria-label="Browse">
 	<button
 		type="button"
 		disabled={!zurueck}
-		title={liste ? `${m.detail_vorher()} (Alt+↑)` : m.detail_vorher()}
-		aria-label={m.detail_vorher()}
+		title={liste ? `${/* @wc-include */ 'Previous entry'} (Alt+↑)` : /* @wc-include */ 'Previous entry'}
+		aria-label="Previous entry"
 		aria-keyshortcuts={liste ? 'Alt+ArrowUp' : undefined}
 		onclick={() => zurueck?.()}
 	>
@@ -42,8 +41,8 @@
 	<button
 		type="button"
 		disabled={!weiter}
-		title={liste ? `${m.detail_weiter()} (Alt+↓)` : m.detail_weiter()}
-		aria-label={m.detail_weiter()}
+		title={liste ? `${/* @wc-include */ 'Next entry'} (Alt+↓)` : /* @wc-include */ 'Next entry'}
+		aria-label="Next entry"
 		aria-keyshortcuts={liste ? 'Alt+ArrowDown' : undefined}
 		onclick={() => weiter?.()}
 	>

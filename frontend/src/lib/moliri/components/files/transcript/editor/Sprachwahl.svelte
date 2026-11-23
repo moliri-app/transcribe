@@ -1,8 +1,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/files/transcript/editor/Sprachwahl.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/files/transcript/editor/Sprachwahl.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
@@ -13,12 +13,11 @@
      Was die Maschine nicht neu erkennen kann (Mundarten), sagt der Vorschlag gleich. Pfeiltasten wählen,
      Enter übernimmt, Esc schließt die Liste. value ist der Code, '' heißt nichts festgelegt. -->
 <script>
-	import * as m from '$lib/moliri/texte.js';
 	import { untrack } from 'svelte';
 	import { sprache, vorschlaege } from './sprachen.js';
 
 	/** @type {{ value: string, none: string, label?: string, disabled?: boolean }} */
-	let { value = $bindable(''), none, label = m.transcript_language(), disabled = false } = $props();
+	let { value = $bindable(''), none, label = /* @wc-include */ 'Language', disabled = false } = $props();
 
 	const id = 'sw' + Math.random().toString(36).slice(2, 8);
 	const anzeige = (/** @type {string} */ c) => (c ? `${sprache(c).name} (${c})` : '');
@@ -100,7 +99,7 @@
 			type="button"
 			class="pfeil"
 			tabindex="-1"
-			aria-label={m.te_languages_show()}
+			aria-label="Show languages"
 			{disabled}
 			onpointerdown={(e) => e.preventDefault()}
 			onclick={() => {
@@ -127,12 +126,12 @@
 					onpointermove={() => (aktiv = i)}
 					onclick={() => waehlen(s)}
 				>
-					<span class="name">{'eigen' in s && s.eigen && s.name === s.code ? m.te_language_code({ code: s.code }) : s.name}</span>
+					<span class="name">{'eigen' in s && s.eigen && s.name === s.code ? /* @wc-include */ `Code “${s.code}”` : s.name}</span>
 					{#if s.code}<span class="code">{s.code}</span>{/if}
-					{#if s.code && !s.neu}<span class="nur">{m.te_language_noted_only()}</span>{/if}
+					{#if s.code && !s.neu}<span class="nur">noted, not recognised again</span>{/if}
 				</li>
 			{:else}
-				<li class="nichts" role="presentation">{m.te_language_none_found()}</li>
+				<li class="nichts" role="presentation">No language found. A code has two or three letters, such as “pt”.</li>
 			{/each}
 		</ul>
 	{/if}

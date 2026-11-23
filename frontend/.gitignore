@@ -3,3 +3,7 @@ node_modules
 vite.config.js.timestamp-*
 # erzeugt von scripts/generate-licenses.mjs (vor dev, build und check)
 /src/lib/generated/
+# wuchale: compiled catalogues and proxies (the .po files and loaders in src/locales/ are committed)
+/src/locales/.wuchale/
+# wuchale temp files next to the catalogues while Vite runs (de.po.ad0bc2b2bee4)
+/src/locales/*.po.*

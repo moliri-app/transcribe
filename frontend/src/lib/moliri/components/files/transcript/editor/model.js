@@ -2,20 +2,19 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Gespiegelt aus Moliri (src/lib/components/files/transcript/editor/model.js) von frontend/scripts/sync-moliri.mjs.
-// Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri.
+// Mirrored from Moliri (src/lib/components/files/transcript/editor/model.js) by frontend/scripts/sync-moliri.mjs.
+// Do not change it here: change it in Moliri, then pnpm sync:moliri.
 
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-// Ported from transcribe-go (frontend/src/lib/editor/model.js); UI texts through paraglide.
+// Ported from transcribe-go (frontend/src/lib/editor/model.js); UI texts through wuchale.
 // Das Datenmodell des Editors ohne Oberfläche: aus _final.json (Maschine) und _annotations.json
 // (Menschen) entstehen die Wörter, wie sie im Text stehen. Die Regeln für Korrekturen und Zeitanker
 // sind dieselben wie im Paket annotate des Engine-Moduls (server/transcribe/vendor).
 
-import * as m from '$lib/moliri/texte.js';
-import { getLocale } from '$lib/moliri/locale.js';
+import { getLocale } from '$lib/moliri/i18n/locale.js';
 
 /** @typedef {{ w: string, start: number, end: number, p?: number, speaker?: number | null, edited?: boolean, fill?: boolean, redone?: boolean, pin?: boolean, nopin?: boolean, lang?: string, lid?: string }} Wort */
 /** @typedef {{ start: number, end: number, text?: string, mode?: string, drop?: number }} Edit */
@@ -42,7 +41,7 @@ export const fmtDur = (/** @type {number} */ s) => (s < 60 ? `${Math.round(s)} s
 /** Titel eines Clips ohne eigenen: die ersten sechs Wörter */
 export function defaultTitle(/** @type {string} */ text) {
 	const ws = text.split(/\s+/).filter(Boolean);
-	return ws.length ? ws.slice(0, 6).join(' ').replace(/[.,;:!?…]+$/, '') + (ws.length > 6 ? ' …' : '') : m.te_clip_default();
+	return ws.length ? ws.slice(0, 6).join(' ').replace(/[.,;:!?…]+$/, '') + (ws.length > 6 ? ' …' : '') : /* @wc-include */ 'Clip';
 }
 /** Dezimalzeichen der Oberfläche */
 const decimal = () => {
@@ -62,12 +61,12 @@ export { langName } from './sprachen.js';
 /** Name einer Voreinstellung der Erkennung */
 export function presetName(/** @type {string} */ p) {
 	switch (p) {
-		case 'interview': return m.transcript_preset_interview();
-		case 'gespraech': return m.transcript_preset_gespraech();
-		case 'vortrag': return m.transcript_preset_vortrag();
-		case 'musik': return m.transcript_preset_musik();
-		case 'auto': return m.transcript_preset_auto();
-		default: return p || m.transcript_preset_auto();
+		case 'interview': return /* @wc-include */ 'Interview (2 speakers)';
+		case 'gespraech': return /* @wc-include */ 'Conversation';
+		case 'vortrag': return /* @wc-include */ 'Talk (1 speaker)';
+		case 'musik': return /* @wc-include */ 'Music, stage';
+		case 'auto': return /* @wc-context: transcript_preset_auto */ /* @wc-include */ 'Automatic';
+		default: return p || /* @wc-context: transcript_preset_auto */ /* @wc-include */ 'Automatic';
 	}
 }
 
@@ -75,11 +74,11 @@ export function presetName(/** @type {string} */ p) {
 export function cueName(/** @type {string} */ label) {
 	switch (label) {
 		case 'Musik':
-		case 'Hintergrundmusik': return m.te_cue_music();
-		case 'Gesang': return m.te_cue_singing();
-		case 'Applaus': return m.te_cue_applause();
-		case 'Lachen': return m.te_cue_laughter();
-		case 'Jubel': return m.te_cue_cheering();
+		case 'Hintergrundmusik': return /* @wc-include */ 'Music';
+		case 'Gesang': return /* @wc-include */ 'Singing';
+		case 'Applaus': return /* @wc-include */ 'Applause';
+		case 'Lachen': return /* @wc-include */ 'Laughter';
+		case 'Jubel': return /* @wc-include */ 'Cheering';
 		default: return label;
 	}
 }
@@ -287,7 +286,7 @@ export function buildItems(/** @type {Wort[]} */ words, /** @type {Ereignis[]} *
 		items.push({
 			kind: 'ev',
 			label: e.label,
-			w: under ? `(${e.label === 'Musik' ? m.te_background_music() : cueName(e.label)})` : e.label,
+			w: under ? `(${e.label === 'Musik' ? /* @wc-include */ 'background music' : cueName(e.label)})` : e.label,
 			start: e.start,
 			end: e.end,
 			cue: !under
@@ -549,10 +548,10 @@ export function anchorBounds(/** @type {Wort[]} */ words, /** @type {number[]} *
 export function describeEdit(/** @type {Edit} */ e) {
 	if (e.mode === 'anchor')
 		return e.drop != null
-			? { t: e.end, what: m.te_corr_anchor_moved(), em: '', after: fmtT(e.end) }
-			: { t: e.end, what: m.te_corr_anchor({ from: fmtT(e.start) }), em: fmtT(e.end), after: '' };
-	if (!e.text) return { t: e.start, what: '', em: m.te_corr_deleted(), after: '' };
-	return { t: e.start, what: e.mode === 'insert' ? m.te_corr_inserted() : m.te_corr_replaced(), em: e.text, after: '' };
+			? { t: e.end, what: /* @wc-include */ 'Time anchor moved in the text', em: '', after: fmtT(e.end) }
+			: { t: e.end, what: /* @wc-include */ `Time anchor ${fmtT(e.start)} →`, em: fmtT(e.end), after: '' };
+	if (!e.text) return { t: e.start, what: '', em: /* @wc-include */ 'deleted', after: '' };
+	return { t: e.start, what: e.mode === 'insert' ? /* @wc-include */ 'inserted:' : /* @wc-include */ 'replaced:', em: e.text, after: '' };
 }
 
 // ---------------- Suche ----------------

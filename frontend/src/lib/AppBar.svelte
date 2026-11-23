@@ -18,10 +18,10 @@
 	// Jeder Eintrag lädt die Seite neu vom Server: welche Oberfläche eine Seite hat, alte oder
 	// neue, entscheidet internal/server/pages.go, nicht diese App.
 	const tabs = [
-		{ href: '/', label: 'Bibliothek', match: ['/', '/queue'], badge: true },
-		{ href: '/editor', label: 'Editor', match: ['/editor'] },
-		{ href: '/live', label: 'Live', match: ['/live'], more: true },
-		{ href: '/settings', label: 'Einstellungen', match: ['/settings', '/einstellungen'], end: true, more: true }
+		{ href: '/', label: /* @wc-include */ 'Library', match: ['/', '/queue'], badge: true },
+		{ href: '/editor', label: /* @wc-include */ 'Editor', match: ['/editor'] },
+		{ href: '/live', label: /* @wc-include */ 'Live', match: ['/live'], more: true },
+		{ href: '/settings', label: /* @wc-include */ 'Settings', match: ['/settings', '/einstellungen'], end: true, more: true }
 	];
 	const more = tabs.filter((t) => t.more);
 
@@ -95,26 +95,28 @@
 	const neu = $derived(['available', 'failed'].includes(update.stand?.state ?? '') ? update.stand?.latest : '');
 </script>
 
-<nav class="appbar" aria-label="Hauptnavigation">
+<nav class="appbar" aria-label="Main navigation">
 	<!-- „Transcribe“ führt zur Bibliothek, „by Moliri“ auf Moliris Website (im Browser, neues Fenster) -->
 	<div class="brand">
-		<a class="home" href="/" data-sveltekit-reload aria-label="Transcribe, Startseite">
+		<a class="home" href="/" data-sveltekit-reload aria-label="Transcribe, home page">
 			<svg viewBox="0 0 24 24" aria-hidden="true">
 				<rect x="2.5" y="8" width="3.2" height="8" rx="1.6" fill="currentColor" />
 				<rect x="7.9" y="3.5" width="3.2" height="17" rx="1.6" class="signal" />
 				<rect x="13.3" y="6.5" width="3.2" height="11" rx="1.6" fill="currentColor" />
 				<rect x="18.7" y="9.5" width="2.8" height="5" rx="1.4" fill="currentColor" />
 			</svg>
+			<!-- the brand name stays as it is; "Transcribe" as a message is the verb (Transkribieren) -->
+			<!-- @wc-ignore -->
 			<span class="word">Transcribe</span>
 		</a>
-		<a class="by" href={MOLIRI} target="_blank" rel="noopener" title="Moliri, die Museumsdatenbank: Website öffnen">
-			by <MoliriLogo class="mark" /> Moliri<span class="sr"> (öffnet die Website von Moliri)</span>
+		<a class="by" href={MOLIRI} target="_blank" rel="noopener" title="Moliri, the museum database: open website">
+			by <MoliriLogo class="mark" /> Moliri<span class="sr"> (opens Moliri’s website)</span>
 		</a>
 	</div>
 	<div class="tabs">
 		{#each tabs as t (t.href)}
 			{#if t.end && neu}
-				<a class="tab update" href="/settings#programm" data-sveltekit-reload title="Version {versionText(neu)} ist da: in den Einstellungen installieren">
+				<a class="tab update" href="/settings#programm" data-sveltekit-reload title="Version {versionText(neu)} is available: install it in Settings">
 					<IconMaterialSymbolsUpgradeRounded aria-hidden="true" />Update
 				</a>
 			{/if}
@@ -128,7 +130,7 @@
 			>
 				{t.label}
 				{#if t.badge && active > 0}
-					<span class="badge" title="{active} aktive Aufträge">{active}<span class="sr"> aktive Aufträge</span></span>
+					<span class="badge" title="{active} active jobs">{active}<span class="sr"> active jobs</span></span>
 				{/if}
 			</a>
 		{/each}
@@ -143,7 +145,7 @@
 						aria-haspopup="menu"
 						aria-expanded={menuOpen}
 					>
-						Mehr<span class="chevron" aria-hidden="true"><IconMaterialSymbolsKeyboardArrowDownRounded /></span>
+						More<span class="chevron" aria-hidden="true"><IconMaterialSymbolsKeyboardArrowDownRounded /></span>
 					</button>
 				{/snippet}
 				{#snippet children()}

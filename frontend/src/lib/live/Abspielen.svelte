@@ -57,16 +57,16 @@
 
 {#if fehlt === 'format'}
 	<p class="fehlt">
-		<IconMaterialSymbolsInfoOutlineRounded aria-hidden="true" />„{titel}“ lässt sich hier nicht anhören: Dieses Format kann
-		das Fenster nicht abspielen. Transkribieren geht trotzdem.
+		<IconMaterialSymbolsInfoOutlineRounded aria-hidden="true" />“{titel}” can't be played here: the window can't play this
+		format. You can still transcribe it.
 	</p>
 {:else if fehlt}
 	<p class="fehlt">
-		<IconMaterialSymbolsInfoOutlineRounded aria-hidden="true" />„{titel}“ lässt sich nicht abspielen. Wurde die Datei
-		verschoben oder gelöscht?
+		<IconMaterialSymbolsInfoOutlineRounded aria-hidden="true" />“{titel}” can't be played. Was the file moved or
+		deleted?
 	</p>
 {:else}
-	<div class="spieler" role="group" aria-label="Aufnahme abspielen">
+	<div class="spieler" role="group" aria-label="Play recording">
 		<audio
 			bind:this={el}
 			src="/audio/{encodeURIComponent(datei)}"
@@ -77,7 +77,7 @@
 			bind:paused={pause}
 			onerror={fehler}
 		></audio>
-		<button class="play" type="button" aria-label={pause ? 'Abspielen' : 'Anhalten'} onclick={umschalten}>
+		<button class="play" type="button" aria-label={pause ? /* @wc-include */ 'Play' : /* @wc-context: te_pause_short */ /* @wc-include */ 'Pause'} onclick={umschalten}>
 			{#if pause}<IconMaterialSymbolsPlayArrowRounded aria-hidden="true" />{:else}<IconMaterialSymbolsPauseRounded
 					aria-hidden="true"
 				/>{/if}
@@ -91,8 +91,8 @@
 			step="0.1"
 			value={zeit}
 			style:--pct="{pct}%"
-			aria-label="Stelle in der Aufnahme"
-			aria-valuetext="{dauer(zeit)} von {dauer(laenge)}"
+			aria-label="Position in the recording"
+			aria-valuetext="{dauer(zeit)} of {dauer(laenge)}"
 			oninput={(e) => el && (el.currentTime = +e.currentTarget.value)}
 		/>
 		<span class="zeit">{dauer(laenge)}</span>

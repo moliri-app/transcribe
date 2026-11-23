@@ -1,8 +1,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/files/transcript/editor/Clip.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/files/transcript/editor/Clip.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
@@ -13,7 +13,6 @@
      bei Videos Video, und Text mit Titel und Schlagworten an, für einen Clip oder einen
      Zusammenschnitt mehrerer. Schließt mit Esc, einem Klick daneben oder nach der Wahl. -->
 <script>
-	import * as m from '$lib/moliri/texte.js';
 	import { untrack } from 'svelte';
 	import { fmt, fmtDur, fmtT, parseT, rangeText, defaultTitle } from './model.js';
 
@@ -73,7 +72,7 @@
 		const a = parseT(von),
 			b = Math.min(parseT(bis), ed.duration());
 		if (!(a >= 0 && b > a)) {
-			fehler = m.te_clip_times_error();
+			fehler = /* @wc-include */ 'Enter times such as 1:02.5; the end must come after the start.';
 			return;
 		}
 		ed.saveClip(c, { start: a, end: b, title, tags: tagList });
@@ -92,7 +91,7 @@
 		<div
 			class="clipdlg"
 			role="dialog"
-			aria-label={c ? (isNew ? m.te_clip_new() : m.te_clip_named({ title: c.title ?? '' })) : many ? m.te_clips_export_many({ count: list.length }) : m.te_clip_export_named({ title: list[0]?.title ?? '' })}
+			aria-label={c ? (isNew ? /* @wc-include */ 'New clip' : /* @wc-include */ `Clip ${/* @wc-ignore */ c.title ?? ''}`) : many ? /* @wc-include */ `Export a compilation of ${list.length} clips` : /* @wc-include */ `Export ${/* @wc-ignore */ list[0]?.title ?? ''}`}
 			bind:this={box}
 			style:left="{pos.left}px"
 			style:top="{pos.top}px"
@@ -106,10 +105,10 @@
 				>
 					<div class="kopf">
 						<IconMaterialSymbolsContentCutRounded />
-						<b>{isNew ? m.te_clip_new() : m.te_clip_default()}</b>
+						<b>{isNew ? /* @wc-include */ 'New clip' : /* @wc-include */ 'Clip'}</b>
 						<span class="dauer">{fmt(c.start)} – {fmt(c.end)} · {fmtDur(c.end - c.start)}</span>
 					</div>
-					<p class="zitat" class:leer={!zitat}>{zitat || m.te_clip_no_words()}</p>
+					<p class="zitat" class:leer={!zitat}>{zitat || /* @wc-include */ 'There is no word in this passage.'}</p>
 					{#if !isNew}
 						{@const clip = /** @type {import('./model.js').Clip} */ (c)}
 						<div class="reihe">
@@ -120,24 +119,24 @@
 									const k = clip;
 									close();
 									ed.showClip(k, true);
-								}}><IconMaterialSymbolsPlayArrowRounded />{m.te_play()}</button
+								}}><IconMaterialSymbolsPlayArrowRounded />Play</button
 							>
 							<button type="button" class="pille" onclick={() => d && (ed.clipDlg = { kind: 'export', list: [clip], x: d.x, y: d.y })}
-								><IconMaterialSymbolsDownloadRounded />{m.transcript_export()}</button
+								><IconMaterialSymbolsDownloadRounded /><!-- @wc-context: transcript_export -->Export</button
 							>
 						</div>
 					{/if}
 					<div class="felder">
 						<label class="feldname">
-							{m.te_clip_title()}
+							<!-- @wc-context: te_clip_title -->Title
 							<input class="feld titel" bind:this={titleField} bind:value={title} placeholder={defaultTitle(zitat)} autocomplete="off" />
 						</label>
 						<label class="feldname">
-							{m.te_clip_tags()}
-							<input class="feld" bind:value={tags} placeholder={m.te_clip_tags_placeholder()} autocomplete="off" />
+							Tags
+							<input class="feld" bind:value={tags} placeholder={/* @wc-include */ 'separate with commas'} autocomplete="off" />
 						</label>
 						{#if ed.allTags.length}
-							<div class="marken" role="group" aria-label={m.te_clip_tag_suggestions()}>
+							<div class="marken" role="group" aria-label="Suggestions from other clips">
 								{#each ed.allTags as t (t)}
 									<button type="button" class="marke" aria-pressed={tagList.includes(t)} onclick={() => toggleTag(t)}>{t}</button>
 								{/each}
@@ -145,11 +144,11 @@
 						{/if}
 						<div class="zeiten">
 							<label class="feldname">
-								{m.te_clip_start()}
+								<!-- @wc-context: te_clip_start -->Start
 								<input class="feld zahl" bind:value={von} inputmode="decimal" aria-invalid={!!fehler && !(parseT(von) >= 0)} autocomplete="off" />
 							</label>
 							<label class="feldname">
-								{m.te_clip_end()}
+								<!-- @wc-context: te_clip_end -->End
 								<input class="feld zahl" bind:value={bis} inputmode="decimal" aria-invalid={!!fehler && !(parseT(bis) > parseT(von))} autocomplete="off" />
 							</label>
 						</div>
@@ -165,24 +164,24 @@
 									const k = id;
 									close();
 									ed.deleteClip(k);
-								}}><IconMaterialSymbolsDeleteOutlineRounded />{m.delete_btn()}</button
+								}}><IconMaterialSymbolsDeleteOutlineRounded /><!-- @wc-context: delete_btn -->Delete</button
 							>
 						{/if}
-						<button type="button" class="pille" onclick={close}>{m.te_cancel()}</button>
-						<button type="submit" class="pille tinte">{isNew ? m.te_clip_create() : m.te_apply()}</button>
+						<button type="button" class="pille" onclick={close}><!-- @wc-context: te_cancel -->Cancel</button>
+						<button type="submit" class="pille tinte">{isNew ? /* @wc-include */ 'Create clip' : /* @wc-context: te_apply */ /* @wc-include */ 'Apply'}</button>
 					</div>
 				</form>
 			{:else}
 				<div class="kopf">
 					<IconMaterialSymbolsDownloadRounded />
-					<b>{many ? m.te_clips_compilation({ count: list.length }) : list[0]?.title}</b>
+					<b>{many ? /* @wc-include */ `Compilation of ${list.length} clips` : list[0]?.title}</b>
 					<span class="dauer">{fmtDur(total)}</span>
 				</div>
 				<p class="zitat leer">
-					{many ? m.te_clips_joined() : `${fmt(list[0]?.start)} – ${fmt(list[0]?.end)}`}
+					{many ? /* @wc-include */ 'The clips are joined in time order.' : `${fmt(list[0]?.start)} – ${fmt(list[0]?.end)}`}
 				</p>
 				<div class="formate">
-					{#each [['mp3', m.te_clip_format_mp3()], ...(ed.isVideo ? [['mp4', m.te_clip_format_mp4()]] : []), ['txt', m.te_clip_format_txt()]] as [f, label] (f)}
+					{#each [['mp3', (/* @wc-include */ 'Audio (MP3)')], ...(ed.isVideo ? [['mp4', (/* @wc-include */ 'Video (MP4)')]] : []), ['txt', (/* @wc-include */ 'Text with title and tags (.txt)')]] as [f, label] (f)}
 						<button
 							class="format"
 							onclick={() => {
@@ -197,7 +196,7 @@
 					{/each}
 				</div>
 				<div class="fuss">
-					<button type="button" class="pille" onclick={close}>{m.te_cancel()}</button>
+					<button type="button" class="pille" onclick={close}><!-- @wc-context: te_cancel -->Cancel</button>
 				</div>
 			{/if}
 		</div>

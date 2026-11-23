@@ -13,7 +13,8 @@ erschließen.
 - **Hören und Mitlesen.** Der Editor spielt die Aufnahme ab und markiert die gesprochene Stelle; Sprecher
   benennen und zusammenlegen, Text ersetzen, Clips markieren und exportieren.
 
-Die Oberfläche ist deutsch.
+Die Oberfläche spricht die Sprachen von Moliri: Deutsch, Englisch, Spanisch, Französisch, Japanisch,
+Ukrainisch und Griechisch (Einstellungen › System › Sprache; ohne Wahl die Sprache von Windows).
 
 ## Download
 

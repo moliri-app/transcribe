@@ -14,6 +14,7 @@
 	import Platzhalter from './Platzhalter.svelte';
 	import { art, laenge, LINIE, live, QUELLEN, sprachname, tag, text, uhrzeit, vonHand, WARTET, wer } from './stand.svelte.js';
 	import { stellenIn, stuecke } from './suche.js';
+	import plural from '../../locales/plural.js';
 
 	/** @typedef {import('./stand.svelte.js').Notiz} Notiz */
 
@@ -42,7 +43,7 @@
 			kopiert = true;
 			setTimeout(() => (kopiert = false), 2000);
 		} catch {
-			meldung = 'Kopieren ging nicht.';
+			meldung = /* @wc-include */ "Copying didn't work.";
 		}
 	}
 
@@ -109,56 +110,58 @@
 	<header class="kopf">
 		{#if onzurueck}
 			<button class="zurueck" type="button" onclick={onzurueck}>
-				<IconMaterialSymbolsArrowBackRounded aria-hidden="true" />Alle Aufnahmen
+				<IconMaterialSymbolsArrowBackRounded aria-hidden="true" />All recordings
 			</button>
 		{/if}
 		<div class="titel">
 			<h1 id="titel-{n.id}">{tag(n.started, live.jetzt)}, {uhrzeit(n.started)}</h1>
 			{#if laeuft}
-				<span class="status live"><span class="punkt" aria-hidden="true"></span>läuft</span>
+				<span class="status live"><span class="punkt" aria-hidden="true"></span>running</span>
 			{:else if n.error}
-				<span class="status fehler">abgebrochen</span>
+				<span class="status fehler">cancelled</span>
 			{/if}
 		</div>
 		<p class="meta">
 			<span class="herkunft" class:hand>
 				{#if n.kind === 'diktat'}
-					<IconMaterialSymbolsKeyboardOutlineRounded aria-hidden="true" />Diktiert per Tastenkürzel
+					<IconMaterialSymbolsKeyboardOutlineRounded aria-hidden="true" />Dictated with a keyboard shortcut
 				{:else if hand}
-					<IconMaterialSymbolsBackHandOutlineRounded aria-hidden="true" />Von Hand, auf dieser Seite
+					<IconMaterialSymbolsBackHandOutlineRounded aria-hidden="true" />By hand, on this page
 				{:else}
 					<IconMaterialSymbolsCableRounded aria-hidden="true" /><span
-						>Per API: <b>{wer(n)}</b> {art(n)}</span
+						>Via API: <b>{wer(n)}</b> {art(n)}</span
 					>
 				{/if}
 			</span>
-			<span>Länge <b>{n.loading || n.waiting ? '–' : dauer(laenge(n, live.jetzt))}</b></span>
-			{#if n.source}<span>Quelle <b>{QUELLEN[n.source]}</b></span>{/if}
-			<span>Sprache <b>{sprachname(n.language)}</b></span>
-			{#if n.transient}<span class="fluechtig">Wird nicht gespeichert</span>{/if}
+			<span>Length <b>{n.loading || n.waiting ? '–' : dauer(laenge(n, live.jetzt))}</b></span>
+			{#if n.source}<span>Source <b>{QUELLEN[n.source]}</b></span>{/if}
+			<span>Language <b>{sprachname(n.language)}</b></span>
+			{#if n.transient}<span class="fluechtig">Won't be saved</span>{/if}
 			{#if suche && n.lines.length}
-				<span class="treffer">{treffer === 1 ? 'ein Satz' : treffer ? `${treffer} Sätze` : 'kein Satz'} mit „{suche}“</span>
+				<span class="treffer"
+					>{treffer ? plural(treffer, ['# sentence', '# sentences']) : /* @wc-include */ 'no sentences'} with “{suche}”</span
+				>
 			{/if}
 		</p>
 		<div class="tun">
 			{#if n.ended && n.audio}
 				<button class="pille dunkel" type="button" onclick={async () => (eingereiht = await live.nachtranskribieren(n))}>
-					<IconMaterialSymbolsPlaylistAddRounded aria-hidden="true" />Vollständig transkribieren
+					<IconMaterialSymbolsPlaylistAddRounded aria-hidden="true" />Transcribe in full
 				</button>
 			{/if}
 			{#if n.lines.length}
 				<button class="pille" type="button" onclick={kopieren}>
-					{#if kopiert}<IconMaterialSymbolsCheckRounded aria-hidden="true" />Kopiert{:else}<IconMaterialSymbolsContentCopyOutlineRounded
+					{#if kopiert}<IconMaterialSymbolsCheckRounded aria-hidden="true" />Copied{:else}<IconMaterialSymbolsContentCopyOutlineRounded
 							aria-hidden="true"
-						/>Text kopieren{/if}
+						/>Copy text{/if}
 				</button>
 				<span class="teilen"
-					><Teilen text={text(n)} beschreibung="Aufnahme {uhrzeit(n.started)} teilen" onmeldung={(m) => (meldung = m)} /></span
+					><Teilen text={text(n)} beschreibung={/* @wc-include */ `Share recording ${uhrzeit(n.started)}`} onmeldung={(m) => (meldung = m)} /></span
 				>
 			{/if}
 			{#if n.ended}
-				<button class="pille leise" type="button" title="Aufnahme {tag(n.started, live.jetzt)}, {uhrzeit(n.started)} löschen" onclick={() => live.loeschen(n)}>
-					<IconMaterialSymbolsDeleteOutlineRounded aria-hidden="true" />Löschen
+				<button class="pille leise" type="button" title="Delete recording {tag(n.started, live.jetzt)}, {uhrzeit(n.started)}" onclick={() => live.loeschen(n)}>
+					<IconMaterialSymbolsDeleteOutlineRounded aria-hidden="true" />Delete
 				</button>
 			{/if}
 		</div>
@@ -170,7 +173,7 @@
 
 	<!-- mit Tab erreichbar, damit es sich mit den Pfeiltasten scrollen lässt -->
 	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-	<div class="tisch" tabindex="0" role="log" aria-live={laeuft ? 'polite' : 'off'} aria-label="Text der Aufnahme" {@attach mitscrollen}>
+	<div class="tisch" tabindex="0" role="log" aria-live={laeuft ? 'polite' : 'off'} aria-label="Recording text" {@attach mitscrollen}>
 		<div class="blatt" bind:this={blatt}>
 			{#if n.error}
 				<p class="fehler" role="alert"><IconMaterialSymbolsErrorOutlineRounded aria-hidden="true" />{n.error}</p>
@@ -180,7 +183,7 @@
 					<div class="rand">
 						{#if z.wechsel && z.source}<span class="quelle {z.source}">{LINIE[z.source]}</span>{/if}
 						{#if abspielbar}
-							<button class="zeit" type="button" title="Ab hier abspielen" onclick={() => spieler?.ab(z.start)}
+							<button class="zeit" type="button" title="Play from here" onclick={() => spieler?.ab(z.start)}
 								><IconMaterialSymbolsPlayArrowRounded aria-hidden="true" />{dauer(z.start)}</button
 							>
 						{:else}
@@ -202,19 +205,22 @@
 				</div>
 			{:else if laeuft && !n.lines.length}
 				<p class="warten">
-					{n.loading ? 'Lädt die Erkennung …' : n.waiting ? WARTET[n.source ?? 'mic'] : 'Hört zu … sprich einfach los.'}
+					{n.loading
+						? /* @wc-include */ 'Loading recognition…'
+						: n.waiting
+							? WARTET[n.source ?? 'mic']
+							: /* @wc-include */ 'Listening… just start speaking.'}
 				</p>
 			{:else if !n.lines.length && !n.error}
-				<p class="warten">Es wurde nichts erkannt.</p>
+				<p class="warten">Nothing was recognised.</p>
 			{/if}
 			{#if n.audio}
 				<p class="datei">
 					<IconMaterialSymbolsSaveOutlineRounded aria-hidden="true" />
-					<span
-						>Aufnahme gespeichert als „{n.audio}“.{n.ended && !eingereiht
-							? ' Vollständig transkribiert bekommt sie Sprecher und lässt sich im Editor korrigieren.'
-							: ''}</span
-					>
+					<span>
+						<span>Recording saved as “{n.audio}”.</span>
+						{#if n.ended && !eingereiht}<span>Once fully transcribed, it gets speakers and can be corrected in the editor.</span>{/if}
+					</span>
 				</p>
 			{/if}
 		</div>

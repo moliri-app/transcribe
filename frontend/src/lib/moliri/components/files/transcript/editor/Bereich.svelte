@@ -1,8 +1,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/files/transcript/editor/Bereich.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/files/transcript/editor/Bereich.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
@@ -14,8 +14,7 @@
      Fokus nicht: wer die Auswahl einfach übertippt, ersetzt sie. Schließt mit Esc, einem Klick daneben
      oder nach dem Übernehmen. -->
 <script>
-	import * as m from '$lib/moliri/texte.js';
-	import { getLocale } from '$lib/moliri/locale.js';
+	import { getLocale } from '$lib/moliri/i18n/locale.js';
 	import { fmt, rangeText } from './model.js';
 	import Sprachwahl from './Sprachwahl.svelte';
 	import { langName, recognizable } from './sprachen.js';
@@ -69,7 +68,7 @@
 <svelte:window onpointerdown={outside} onkeydown={(e) => r && e.key === 'Escape' && close()} />
 
 {#if r}
-	<div class="bereich" role="dialog" aria-label={m.te_range_dialog({ from: fmt(r.a), to: fmt(r.b) })} bind:this={box} style:left="{pos.left}px" style:top="{pos.top}px">
+	<div class="bereich" role="dialog" aria-label="Passage {fmt(r.a)} – {fmt(r.b)}" bind:this={box} style:left="{pos.left}px" style:top="{pos.top}px">
 		<div class="kopf">
 			<b class="zeit">{fmt(r.a)} – {fmt(r.b)}</b>
 			<span class="dauer">{dauer}</span>
@@ -78,27 +77,27 @@
 			<p class="zitat">{zitat}</p>
 		{/if}
 		<div class="reihe">
-			<button class="pille" onclick={() => ed.playRange(r.a, r.b)}><IconMaterialSymbolsPlayArrowRounded />{m.te_play()}</button>
+			<button class="pille" onclick={() => ed.playRange(r.a, r.b)}><IconMaterialSymbolsPlayArrowRounded />Play</button>
 			<button
 				class="pille"
 				aria-pressed={looping}
-				title={m.te_loop_hint()}
+				title="Play the passage again and again"
 				onclick={() => {
 					if (looping) {
 						ed.loop = null;
 						ed.media?.pause();
 					} else ed.playRange(r.a, r.b, true);
-				}}><IconMaterialSymbolsRepeatRounded />{m.te_loop()}</button
+				}}><IconMaterialSymbolsRepeatRounded />Loop</button
 			>
 			{#if ed.canEdit}<button
 				class="pille"
-				title={m.te_as_clip_hint()}
+				title="Keep the passage as a clip with title and tags"
 				onclick={() => {
 					const { a, b, x, y } = r;
 					ed.range = null;
 					ed.sel = { a, b };
 					ed.clipDlg = { kind: 'clip', clip: { start: a, end: b }, x, y };
-				}}><IconMaterialSymbolsContentCutRounded />{m.te_as_clip()}</button
+				}}><IconMaterialSymbolsContentCutRounded />As clip</button
 			>{/if}
 		</div>
 
@@ -114,21 +113,21 @@
 			>
 				<div class="felder">
 					<label class="feldname">
-						{m.transcript_speakers()}
+						<span>Speakers</span>
 						<select class="feld" bind:value={speaker}>
-							<option value="">{m.te_unchanged()}</option>
+							<option value="">unchanged</option>
 							{#each ed.speakers as k (k)}<option value={String(k)}>{ed.spkName(k)}</option>{/each}
-							<option value="neu">{m.transcript_speaker_new()}</option>
+							<option value="neu">{/* @wc-include */ 'New speaker'}</option>
 						</select>
 					</label>
-					{#key r}<Sprachwahl bind:value={language} none={m.te_unchanged()} />{/key}
+					{#key r}<Sprachwahl bind:value={language} none={/* @wc-include */ 'unchanged'} />{/key}
 				</div>
 				<p class="hinweis">
-					{m.te_range_note()}{#if language && recognizable(language)}{' '}{ed.recomputes ? m.te_language_redone_recompute({ language: langName(language) }) : m.te_language_redone({ language: langName(language) })}{:else if language}{' '}{m.te_language_noted({ language: langName(language) })}{/if}
+					Applies to all words in this passage and is noted as a correction.{#if language && recognizable(language)}{' '}{ed.recomputes ? /* @wc-include */ `Recompute recognises it again in ${langName(language)}.` : /* @wc-include */ `The machine recognises it again in ${langName(language)} by itself.`}{:else if language}{' '}{langName(language)} is noted; the machine cannot recognise it again, the words stay.{/if}
 				</p>
 				<div class="fuss">
-					<button type="button" class="pille" onclick={close}>{m.close()}</button>
-					<button type="submit" class="pille rot" disabled={!speaker && !language}>{m.te_apply()}</button>
+					<button type="button" class="pille" onclick={close}>Close</button>
+					<button type="submit" class="pille rot" disabled={!speaker && !language}><!-- @wc-context: te_apply -->Apply</button>
 				</div>
 			</form>
 		{:else}
@@ -140,12 +139,12 @@
 				}}
 			>
 				<label>
-					<span>{m.te_gap_question()}</span>
-					<input bind:value={einfuegen} placeholder={m.te_gap_placeholder({ time: fmt(r.a) })} spellcheck="false" />
+					<span>There is no word in this pause. What is said here?</span>
+					<input bind:value={einfuegen} placeholder="Insert text at {fmt(r.a)}" spellcheck="false" />
 				</label>
 				<div class="fuss">
-					<button type="button" class="pille" onclick={close}>{m.close()}</button>
-					<button type="submit" class="pille rot" disabled={!einfuegen.trim()}>{m.te_insert()}</button>
+					<button type="button" class="pille" onclick={close}>Close</button>
+					<button type="submit" class="pille rot" disabled={!einfuegen.trim()}>Insert</button>
 				</div>
 			</form>
 		{/if}

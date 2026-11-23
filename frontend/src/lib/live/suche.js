@@ -14,14 +14,34 @@ import { anfrage, art, DIENSTE, laenge, sprachname, vonHand, wer, worum } from '
  * @typedef {{ score: number, zeile: number }} Treffer */
 
 /** api: Sprache, die Programme schicken oder mithören lassen; ki: ihre Anfragen an Texterkennung und Sprachmodelle */
-export const HERKUNFT = /** @type {const} */ ({ alle: 'Alle', hand: 'Von Hand', api: 'Per API', ki: 'KI & OCR' });
+// Getters, so each read takes the text in the interface language.
+export const HERKUNFT = {
+	get alle() {
+		return /* @wc-include */ 'All';
+	},
+	get hand() {
+		return /* @wc-include */ 'Manual';
+	},
+	get api() {
+		return /* @wc-include */ 'Via API';
+	},
+	get ki() {
+		return /* @wc-include */ 'AI & OCR';
+	}
+};
 /** @typedef {keyof typeof HERKUNFT} Herkunft */
 
-export const SORTIERUNG = /** @type {const} */ ({
-	neu: 'Neueste zuerst',
-	alt: 'Älteste zuerst',
-	lang: 'Längste zuerst'
-});
+export const SORTIERUNG = {
+	get neu() {
+		return /* @wc-include */ 'Newest first';
+	},
+	get alt() {
+		return /* @wc-include */ 'Oldest first';
+	},
+	get lang() {
+		return /* @wc-include */ 'Longest first';
+	}
+};
 /** @typedef {keyof typeof SORTIERUNG} Sortierung */
 
 /** Treffer darunter sind zu verstreut, um gemeint zu sein; ein fehlender oder doppelter Buchstabe liegt darüber */

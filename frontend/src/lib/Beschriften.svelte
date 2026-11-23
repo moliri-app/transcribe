@@ -9,6 +9,7 @@
 <script>
 	import Button from '$lib/moliri/components/ui/Button.svelte';
 	import { beschriften } from '$lib/api.js';
+	import { getLocale } from '$lib/moliri/i18n/locale.js';
 
 	/** @typedef {{ stem: string, title: string, file: string, tags: string[], hidden: boolean }} Beschriftbar */
 	/** @typedef {{ title: string, tags: string[], hidden: boolean }} Stand */
@@ -30,7 +31,7 @@
 
 	const tagList = $derived([...new Set(tags.split(',').map((t) => t.trim()).filter(Boolean))]);
 	/** was angetippt werden kann: die vorhandenen und die dieser Aufnahme */
-	const marken = $derived([...new Set([...(a?.tags ?? []), ...vorhanden])].sort((x, y) => x.localeCompare(y, 'de')));
+	const marken = $derived([...new Set([...(a?.tags ?? []), ...vorhanden])].sort((x, y) => x.localeCompare(y, getLocale())));
 
 	/** @param {Beschriftbar} aufnahme */
 	export function open(aufnahme) {
@@ -58,7 +59,7 @@
 			ondone(a, stand);
 			dlg.close();
 		} catch (e) {
-			fehler = `Das ließ sich nicht speichern: ${/** @type {Error} */ (e).message}`;
+			fehler = /* @wc-include */ `That could not be saved: ${/** @type {Error} */ (e).message}`;
 		} finally {
 			speichert = false;
 		}
@@ -74,18 +75,18 @@
 				speichern({ title: name, tags: tagList });
 			}}
 		>
-			<h2 id="h-beschriften">Name und Schlagworte</h2>
+			<h2 id="h-beschriften">Name and tags</h2>
 			<label class="feldname">
 				Name
 				<input class="feld" bind:this={namenfeld} bind:value={name} placeholder={a.file} autocomplete="off" maxlength="200" />
 			</label>
-			<p class="hinweis">Nur in Transcribe. Die Datei heißt weiter „{a.file}“.</p>
+			<p class="hinweis">Only in Transcribe. The file keeps its name “{a.file}”.</p>
 			<label class="feldname">
-				Schlagworte
-				<input class="feld" bind:value={tags} placeholder="mit Komma trennen, etwa Interview, Papierfabrik" autocomplete="off" />
+				Tags
+				<input class="feld" bind:value={tags} placeholder="Separate with commas, e.g. interview, paper mill" autocomplete="off" />
 			</label>
 			{#if marken.length}
-				<div class="marken" role="group" aria-label="Vergebene Schlagworte">
+				<div class="marken" role="group" aria-label="Tags in use">
 					{#each marken as t (t)}
 						<button type="button" class="marke" aria-pressed={tagList.some((k) => k.toLowerCase() === t.toLowerCase())} onclick={() => toggle(t)}
 							>{t}</button
@@ -96,13 +97,13 @@
 			{#if fehler}<p class="fehler" role="alert">{fehler}</p>{/if}
 			<div class="fuss">
 				<button type="button" class="leise" disabled={speichert} onclick={() => speichern({ hidden: !a?.hidden })}>
-					{#if a.hidden}<IconMaterialSymbolsVisibilityOutlineRounded aria-hidden="true" />Wieder einblenden{:else}<IconMaterialSymbolsVisibilityOffOutlineRounded
+					{#if a.hidden}<IconMaterialSymbolsVisibilityOutlineRounded aria-hidden="true" />{/* @wc-context: library_hide */ /* @wc-include */ 'Show again'}{:else}<IconMaterialSymbolsVisibilityOffOutlineRounded
 							aria-hidden="true"
-						/>Ausblenden{/if}
+						/>Hide{/if}
 				</button>
 				<span class="platz"></span>
-				<Button type="secondary" size="large" onclick={() => dlg.close()}>Abbrechen</Button>
-				<Button type="primary" size="large" nativeType="submit" loading={speichert}>Speichern</Button>
+				<Button type="secondary" size="large" onclick={() => dlg.close()}>Cancel</Button>
+				<Button type="primary" size="large" nativeType="submit" loading={speichert}>Save</Button>
 			</div>
 		</form>
 	{/if}

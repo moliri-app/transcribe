@@ -2,8 +2,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Gespiegelt aus Moliri (src/lib/components/files/transcript/editor/sprachen.js) von frontend/scripts/sync-moliri.mjs.
-// Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri.
+// Mirrored from Moliri (src/lib/components/files/transcript/editor/sprachen.js) by frontend/scripts/sync-moliri.mjs.
+// Do not change it here: change it in Moliri, then pnpm sync:moliri.
 
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,7 +15,7 @@
 // transcribe service (annotate/languages.go of its engine module). Everything else, dialects
 // above all, is noted and otherwise stays as the machine heard it.
 
-import { getLocale } from '$lib/moliri/locale.js';
+import { getLocale } from '$lib/moliri/i18n/locale.js';
 
 /** @typedef {{ code: string, name: string, also: string[], neu: boolean }} Sprache */
 

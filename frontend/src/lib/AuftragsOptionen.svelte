@@ -18,29 +18,30 @@
 	const waehlbar = $derived(erkennung === 'both' && optionen.engine !== undefined);
 
 	/** die Zahl als Text, wie das Auswahlfeld sie führt; '' heißt automatisch */
+	// objects, not pairs: wuchale misses a marked text after a comma on the same line in an array
 	const SPRECHER = [
-		['', 'Automatisch erkennen'],
-		['1', '1, etwa Vortrag, Lesung oder Führung'],
-		['2', '2, etwa ein Interview'],
-		...Array.from({ length: 10 }, (_, i) => [String(i + 3), String(i + 3)])
+		{ wert: '', name: /* @wc-include */ 'Detect automatically' },
+		{ wert: '1', name: /* @wc-include */ '1, e.g. a talk, reading or guided tour' },
+		{ wert: '2', name: /* @wc-include */ '2, e.g. an interview' },
+		...Array.from({ length: 10 }, (_, i) => ({ wert: String(i + 3), name: String(i + 3) }))
 	];
 </script>
 
 <!-- change steigt von den Feldern auf; die Bindungen haben den neuen Wert da schon übernommen -->
 <div class="optionen" onchange={() => onchange?.()}>
 	<label class="feldname">
-		Sprecher
+		Speakers
 		<select
 			class="feld sprecher"
 			bind:value={() => String(optionen.speakers ?? ''), (v) => (optionen.speakers = v)}
 		>
-			{#each SPRECHER as [wert, name] (wert)}<option value={wert}>{name}</option>{/each}
+			{#each SPRECHER as { wert, name } (wert)}<option value={wert}>{name}</option>{/each}
 		</select>
 	</label>
-	<Sprachenwahl bind:value={optionen.language} label="Sprachen" onchange={() => onchange?.()} />
+	<Sprachenwahl bind:value={optionen.language} label="Languages" onchange={() => onchange?.()} />
 	{#if waehlbar}
 		<label class="feldname">
-			Erkennung
+			Recognition
 			<select class="feld" bind:value={optionen.engine}>
 				{#each Object.entries(ENGINES) as [wert, name] (wert)}<option value={wert}>{name}</option>{/each}
 			</select>

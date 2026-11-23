@@ -1,8 +1,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
-<!-- Gespiegelt aus Moliri (src/lib/components/files/transcript/editor/Seitenspalte.svelte) von frontend/scripts/sync-moliri.mjs.
-     Nicht hier ändern: in Moliri ändern, dann pnpm sync:moliri. -->
+<!-- Mirrored from Moliri (src/lib/components/files/transcript/editor/Seitenspalte.svelte) by frontend/scripts/sync-moliri.mjs.
+     Do not change it here: change it in Moliri, then pnpm sync:moliri. -->
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      License, v. 2.0. If a copy of the MPL was not distributed with this
      file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
@@ -14,7 +14,6 @@
      dazu die Zeichen im Text und die Modelle, mit denen transkribiert wurde (CC BY 4.0 verlangt ihre
      Nennung). Unter 1180 px wird sie ein aufklappbarer Block unter dem Manuskript. -->
 <script>
-	import * as m from '$lib/moliri/texte.js';
 	import { onMount } from 'svelte';
 	import { describeEdit, fmt, fmtDur, langName, speakingTime } from './model.js';
 	import { spkColor } from './editor.svelte.js';
@@ -51,7 +50,7 @@
 				t: s.start,
 				what: [s.language && langName(s.language), s.speaker !== undefined && s.speaker !== '' && '→ ' + ed.spkName(s.speaker)].filter(Boolean).join(' · '),
 				em: '',
-				after: m.te_until({ time: fmt(s.end) })
+				after: /* @wc-include */ `until ${fmt(s.end)}`
 			})),
 			...ed.ann.edits.map((e, i) => ({ key: 'e' + i, kind: /** @type {const} */ ('edits'), i, ...describeEdit(e) }))
 		].sort((a, b) => a.t - b.t)
@@ -70,25 +69,25 @@
 	});
 </script>
 
-<aside class="seite" aria-label={m.te_side()}>
+<aside class="seite" aria-label="Speakers, clips, corrections and signs">
 	<div class="video" class:da={ed.isVideo}>
 		<!-- svelte-ignore a11y_media_has_caption -->
 		<video bind:this={video} preload="auto" playsinline onclick={() => ed.toggle()}></video>
 	</div>
 	<details bind:open>
-		<summary>{m.te_side()}</summary>
-		<h2 id="h-sprecher">{m.transcript_speakers()}</h2>
-		<div role="list" aria-label={m.transcript_speakers()} class="sprecher">
+		<summary>Speakers, clips, corrections and signs</summary>
+		<h2 id="h-sprecher">Speakers</h2>
+		<div role="list" aria-label="Speakers" class="sprecher">
 			{#each list as k (k)}
 				{@const vis = !ed.hidden.has(k)}
 				{@const nm = ed.spkName(k)}
 				{@const sp = ed.ann.speakers[k] || {}}
-				{@const sub = [sp.language && langName(sp.language), sp.merge_into !== undefined && m.te_merged_with({ name: ed.spkName(sp.merge_into) })].filter(Boolean).join(' · ')}
+				{@const sub = [sp.language && langName(sp.language), sp.merge_into !== undefined && /* @wc-include */ `merged with ${ed.spkName(sp.merge_into)}`].filter(Boolean).join(' · ')}
 				<div class="schild" class:aus={!vis} role="listitem" style:--c={spkColor(k)}>
 					<span class="dot" aria-hidden="true"></span>
 					<button
 						class="nm"
-						title={m.te_speaker_edit_hint()}
+						title="Edit speaker: name, language, merge, view"
 						aria-haspopup="dialog"
 						onclick={(e) => (ed.speakerMenu = { k, anchor: /** @type {HTMLElement} */ (e.currentTarget) })}>{nm}</button
 					>
@@ -98,8 +97,8 @@
 							class="sw"
 							aria-pressed={!vis}
 							disabled={ed.focused === k}
-							title={ed.focused === k ? m.te_one_stays_visible() : vis ? m.te_hide_named({ name: nm }) : m.te_show_named({ name: nm })}
-							aria-label={vis ? m.te_hide_named({ name: nm }) : m.te_show_named({ name: nm })}
+							title={ed.focused === k ? /* @wc-include */ 'One speaker always stays visible' : vis ? /* @wc-include */ `Hide ${nm}` : /* @wc-include */ `Show ${nm} again`}
+							aria-label={vis ? /* @wc-include */ `Hide ${nm}` : /* @wc-include */ `Show ${nm} again`}
 							onclick={() => ed.toggleSpeaker(k)}
 						>
 							{#if vis}<IconMaterialSymbolsVisibilityOutlineRounded />{:else}<IconMaterialSymbolsVisibilityOffOutlineRounded />{/if}
@@ -107,8 +106,8 @@
 						<button
 							class="sw fokus"
 							aria-pressed={ed.focused === k}
-							title={ed.focused === k ? m.te_show_all_speakers() : m.te_only_named_play({ name: nm })}
-							aria-label={m.te_only_named({ name: nm })}
+							title={ed.focused === k ? /* @wc-include */ 'Show all speakers again' : /* @wc-include */ `show and play only ${nm}`}
+							aria-label={/* @wc-include */ `show only ${nm}`}
 							onclick={() => ed.focusSpeaker(k)}
 						>
 							<IconMaterialSymbolsFilterCenterFocusRounded />
@@ -117,39 +116,39 @@
 					{#if sub}<span class="sub">{sub}</span>{/if}
 				</div>
 			{:else}
-				<p class="leer">{m.te_no_speakers()}</p>
+				<p class="leer">No speakers recognised.</p>
 			{/each}
 		</div>
 		{#if many}
-			<p class="hinweis">{ed.canEdit ? m.te_speakers_hint_edit() : ''} {m.te_speakers_hint()}</p>
+			<p class="hinweis">{ed.canEdit ? /* @wc-include */ 'A click on the name: rename, set the language, merge.' : ''} The eye hides a speaker, the target shows only this one. What is hidden is folded in the text and skipped when playing.</p>
 		{/if}
 
-		<h2>{m.te_clips()}</h2>
+		<h2>Clips</h2>
 		{#if ed.allTags.length && ed.ann.clips.length > 1}
-			<div class="marken" role="group" aria-label={m.te_filter_by_tag()}>
+			<div class="marken" role="group" aria-label={/* @wc-include */ 'filter by tag'}>
 				{#each ed.allTags as t (t)}
 					<button
 						class="marke"
 						aria-pressed={ed.clipTag === t}
-						title={ed.clipTag === t ? m.te_show_all_clips() : m.te_only_clips_with({ tag: t })}
+						title={ed.clipTag === t ? /* @wc-include */ 'show all clips again' : /* @wc-include */ `show only clips with “${t}”`}
 						onclick={() => (ed.clipTag = ed.clipTag === t ? null : t)}>{t}</button
 					>
 				{/each}
 			</div>
 		{/if}
-		<div role="list" aria-label={m.te_clips()} class="clips">
+		<div role="list" aria-label="Clips" class="clips">
 			{#each shownClips as c (c.id)}
 				{@const spielt = ed.playingClip === c.id}
 				<div class="clip" class:aktiv={ed.activeClip === c.id} class:spielt role="listitem">
 					<input
 						type="checkbox"
 						checked={ed.clipSel.has(c.id)}
-						aria-label={m.te_select_named({ title: c.title })}
-						title={m.te_select_clip_hint()}
+						aria-label="Select {c.title}"
+						title={/* @wc-include */ 'select: play in turn or export as a compilation'}
 						onchange={(e) => ed.toggleClipSel(c.id, e.currentTarget.checked)}
 					/>
 					<div class="inhalt">
-						<button class="ct" title={m.te_jump_to_clip()} onclick={() => ed.showClip(c)}>{c.title}</button>
+						<button class="ct" title={/* @wc-include */ 'jump to the clip'} onclick={() => ed.showClip(c)}>{c.title}</button>
 						<span class="zt">{fmt(c.start)} – {fmt(c.end)} · {fmtDur(c.end - c.start)}</span>
 					</div>
 					<div class="unten">
@@ -159,8 +158,8 @@
 						<span class="knoepfe">
 							<button
 								class="sw cplay"
-								aria-label={spielt ? m.te_pause() : m.te_play_this_clip()}
-								title={spielt ? m.te_pause() : m.te_play_this_clip()}
+								aria-label={spielt ? /* @wc-include */ 'pause' : /* @wc-include */ 'play only this clip'}
+								title={spielt ? /* @wc-include */ 'pause' : /* @wc-include */ 'play only this clip'}
 								onclick={() => (spielt ? ed.media?.pause() : ed.showClip(c, true))}
 							>
 								{#if spielt}<IconMaterialSymbolsPauseRounded />{:else}<IconMaterialSymbolsPlayArrowRounded />{/if}
@@ -168,8 +167,8 @@
 							<button
 								class="sw"
 								data-clip-oeffnet
-								aria-label={m.te_clip_export_named({ title: c.title })}
-								title={ed.isVideo ? m.te_clip_export_hint_video() : m.te_clip_export_hint()}
+								aria-label="Export {c.title}"
+								title={ed.isVideo ? /* @wc-include */ 'export: audio, video or text' : /* @wc-include */ 'export: audio or text'}
 								onclick={(e) => (ed.clipDlg = { kind: 'export', list: [c], x: e.clientX - 340, y: e.clientY })}
 							>
 								<IconMaterialSymbolsDownloadRounded />
@@ -177,8 +176,8 @@
 							{#if ed.canEdit}<button
 								class="sw"
 								data-clip-oeffnet
-								aria-label={m.te_edit_named({ title: c.title })}
-								title={m.te_clip_edit_hint()}
+								aria-label={/* @wc-context: te_edit_named */ /* @wc-include */ `Edit ${c.title}`}
+								title="Change title, tags, times"
 								onclick={(e) => {
 									ed.showClip(c);
 									ed.clipDlg = { kind: 'clip', clip: c, x: e.clientX - 340, y: e.clientY };
@@ -191,7 +190,7 @@
 				</div>
 			{:else}
 				<p class="leer">
-					{ed.ann.clips.length ? m.te_no_clip_with_tag() : ed.canEdit ? m.te_no_clips_hint() : m.te_none_yet()}
+					{ed.ann.clips.length ? /* @wc-include */ 'No clip with this tag.' : ed.canEdit ? /* @wc-include */ 'None yet. Mark a passage in the text or the timeline and choose “As clip”.' : /* @wc-include */ 'None yet.'}
 				</p>
 			{/each}
 		</div>
@@ -200,7 +199,7 @@
 				<label class="alle">
 					<input
 						type="checkbox"
-						aria-label={m.te_select_all()}
+						aria-label={/* @wc-include */ 'select all'}
 						checked={shownClips.length > 0 && visSel === shownClips.length}
 						indeterminate={visSel > 0 && visSel < shownClips.length}
 						onchange={(e) => {
@@ -210,12 +209,12 @@
 							ed.clipSel = s;
 						}}
 					/>
-					<span>{chosen.length ? m.te_selected({ count: chosen.length, time: fmtDur(chosen.reduce((t, c) => t + c.end - c.start, 0)) }) : m.te_select_all()}</span>
+					<span>{chosen.length ? /* @wc-include */ `${chosen.length} selected · ${fmtDur(chosen.reduce((t, c) => t + c.end - c.start, 0))}` : /* @wc-include */ 'select all'}</span>
 				</label>
 				<div class="reihe">
 					<!-- spielt von vorn; anhalten über den Player (der Name bleibt, damit „Anhalten“ eindeutig der Player ist) -->
 					<button class="pille" class:spielt={playingChosen} disabled={!chosen.length} onclick={() => ed.playClips(chosen)}>
-						<IconMaterialSymbolsPlaylistPlayRounded />{m.te_play_in_turn()}
+						<IconMaterialSymbolsPlaylistPlayRounded />Play in turn
 					</button>
 					<button
 						class="pille tinte"
@@ -223,38 +222,38 @@
 						disabled={!chosen.length}
 						onclick={(e) => (ed.clipDlg = { kind: 'export', list: chosen, x: e.clientX - 340, y: e.clientY - 160 })}
 					>
-						<IconMaterialSymbolsDownloadRounded />{chosen.length > 1 ? m.te_export_compilation() : m.transcript_export()}
+						<IconMaterialSymbolsDownloadRounded />{chosen.length > 1 ? /* @wc-include */ 'Export compilation' : /* @wc-context: transcript_export */ /* @wc-include */ 'Export'}
 					</button>
 				</div>
 			</div>
 		{/if}
 
-		<h2>{m.te_corrections()}</h2>
-		<div role="list" aria-label={m.te_corrections()} class="korrekturen">
+		<h2><!-- @wc-context: te_corrections -->Corrections</h2>
+		<div role="list" aria-label={/* @wc-context: te_corrections */ /* @wc-include */ 'Corrections'} class="korrekturen">
 			{#each corr as c (c.key)}
 				<div class="korr" role="listitem">
-					<button class="hin" title={m.te_play_from({ time: fmt(c.t) })} onclick={() => ed.seek(c.t)}>
+					<button class="hin" title={/* @wc-include */ `play from ${fmt(c.t)}`} onclick={() => ed.seek(c.t)}>
 						<span class="t">{fmt(c.t)}</span>
 						<span class="was">{#if c.what}{c.what + ' '}{/if}{#if c.em}<em>{c.em}</em>{/if}{#if c.after}{' '}<span class="nach">{c.after}</span>{/if}</span>
 					</button>
-					{#if ed.canEdit}<button class="x" title={m.te_remove_correction()} aria-label={m.te_remove_correction()} onclick={() => ed.removeCorrection(c.kind, c.i)}>
+					{#if ed.canEdit}<button class="x" title="Remove correction" aria-label="Remove correction" onclick={() => ed.removeCorrection(c.kind, c.i)}>
 						<IconMaterialSymbolsCloseRounded />
 					</button>{/if}
 				</div>
 			{:else}
-				<p class="leer">{ed.canEdit ? m.te_no_corrections_hint() : m.te_none_yet()}</p>
+				<p class="leer">{ed.canEdit ? /* @wc-include */ 'None yet. Just click into the text and type.' : /* @wc-include */ 'None yet.'}</p>
 			{/each}
 		</div>
 
-		<h2>{m.te_signs()}</h2>
+		<h2>Signs in the text</h2>
 		<ul class="zeichen">
-			<li><i class="linie" style:border-color="var(--red)"></i>{m.te_sign_edited()}</li>
-			<li><i class="linie" style:border-color="var(--doubt)" style:border-bottom-style="dotted"></i>{m.te_sign_doubt()}</li>
-			<li><i class="linie" style:border-color="var(--blue)"></i>{m.te_sign_redone()}</li>
-			<li><i class="linie" style:border-color="var(--fill)"></i>{m.te_sign_fill()}</li>
-			<li><i class="anker"></i>{m.te_sign_anchor()}</li>
-			<li><i class="marker"></i>{m.te_sign_now()}</li>
-			<li><i class="klammer"></i>{m.te_sign_clip()}</li>
+			<li><i class="linie" style:border-color="var(--red)"></i>corrected by hand</li>
+			<li><i class="linie" style:border-color="var(--doubt)" style:border-bottom-style="dotted"></i>machine unsure</li>
+			<li><i class="linie" style:border-color="var(--blue)"></i>recognised again (language set)</li>
+			<li><i class="linie" style:border-color="var(--fill)"></i>filled in, italic in brackets</li>
+			<li><i class="anker"></i>time anchor, red = set by hand</li>
+			<li><i class="marker"></i>being spoken now</li>
+			<li><i class="klammer"></i>part of a clip</li>
 		</ul>
 		{#if ed.attribution}<p class="modelle">{ed.attribution}</p>{/if}
 	</details>
